@@ -1,11 +1,13 @@
-from rest_framework import status, filters
+from rest_framework import filters, status
+from rest_framework.generics import (CreateAPIView, DestroyAPIView,
+                                    ListAPIView, ListCreateAPIView,
+                                    RetrieveUpdateDestroyAPIView)
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView, ListCreateAPIView, CreateAPIView, DestroyAPIView
 
-from .models import Wishlist, Property
-from .serializers import PropertySerializer, WishlistPropertySerializer
+from .models import Property, Wishlist
 from .permissions import IsAdminOrEstateManager, IsBuyer
+from .serializers import PropertySerializer, WishlistPropertySerializer
 
 
 class PropertyListCreateView(ListCreateAPIView):

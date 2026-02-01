@@ -1,5 +1,7 @@
 from django.urls import path
-from .views import PropertyListCreateView, PropertyDetailView, WishlistCreateView, WishlistDeleteView, WishlistListView
+
+from .views import (PropertyDetailView, PropertyListCreateView,
+                    WishlistCreateView, WishlistDeleteView, WishlistListView)
 
 urlpatterns = [
     path('', PropertyListCreateView.as_view()),

@@ -1,17 +1,15 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
 from django.contrib.auth import get_user_model
-
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework.exceptions import AuthenticationFailed
-
-from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .serializers import RegisterSerializer, VerifiedTokenSerializer
 from .models import OTP
+from .serializers import RegisterSerializer, VerifiedTokenSerializer
 from .utils import send_otp_email
 
 User = get_user_model()
@@ -111,3 +109,24 @@ class VerifyOTPView(APIView):
 
 class LoginView(TokenObtainPairView):
     serializer_class = VerifiedTokenSerializer
+
+
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            return Response(
+                {"success": True, "message": "Logged out successfully."},
+                status=status.HTTP_205_RESET_CONTENT
+            )
+        except Exception as e:
+            return Response(
+                {"error": "Invalid or missing refresh token."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
