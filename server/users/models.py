@@ -57,3 +57,34 @@ class OTP(models.Model):
 
     def __str__(self):
         return f"OTP for {self.user.username}"
+
+
+class Subscription(models.Model):
+    BASIC = 'basic'
+    PRO = 'pro'
+    ENTERPRISE = 'enterprise'
+
+    PLAN_CHOICES = [
+        (BASIC, 'Basic'),
+        (PRO, 'Pro'),
+        (ENTERPRISE, 'Enterprise'),
+    ]
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='subscription'
+    )
+
+    plan = models.CharField(
+        max_length=20,
+        choices=PLAN_CHOICES,
+        default=BASIC
+    )
+
+    def max_properties(self):
+        return {
+            self.BASIC: 2,
+            self.PRO: 5,
+            self.ENTERPRISE: 10,
+        }[self.plan]
