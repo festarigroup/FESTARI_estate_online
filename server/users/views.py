@@ -4,6 +4,11 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.exceptions import AuthenticationFailed
+
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from .serializers import RegisterSerializer, VerifiedTokenSerializer
 from .models import OTP
@@ -13,6 +18,20 @@ User = get_user_model()
 
 
 class RegisterView(APIView):
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['username', 'password'],
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Username', example='john_doe'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description='Password', example='strongpassword123'),
+                'email': openapi.Schema(type=openapi.TYPE_STRING, description='Email', example='john@example.com'),
+                'phone_number': openapi.Schema(type=openapi.TYPE_STRING, description='Phone number', example='233244123456'),
+            },
+        ),
+        responses={201: "User registered. OTP sent."}
+    )
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
 
@@ -35,6 +54,18 @@ class RegisterView(APIView):
 
 
 class VerifyOTPView(APIView):
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['username', 'code'],
+            properties={
+                'username': openapi.Schema(type=openapi.TYPE_STRING, description='Username'),
+                'code': openapi.Schema(type=openapi.TYPE_STRING, description='OTP code (4 digits)'),
+            },
+        ),
+        responses={200: "Account verified successfully."}
+    )
     def post(self, request):
         username = request.data.get('username')
         code = request.data.get('code')
