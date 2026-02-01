@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView, ListCreateAPIView, CreateAPIView, DestroyAPIView
 
 from .models import Wishlist, Property
-from .serializers import PropertySerializer, WishlistPropertySerializer, WishlistSerializer
+from .serializers import PropertySerializer, WishlistPropertySerializer
 from .permissions import IsAdminOrEstateManager, IsBuyer
 
 

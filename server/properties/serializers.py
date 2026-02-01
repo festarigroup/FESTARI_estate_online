@@ -17,14 +17,6 @@ class PropertySerializer(serializers.ModelSerializer):
         read_only_fields = ('owner',)
 
 
-class WishlistSerializer(serializers.ModelSerializer):
-    property = PropertySerializer(read_only=True)
-    property_id = serializers.IntegerField(write_only=True)
-
-    class Meta:
-        model = Wishlist
-        fields = ('id', 'property', 'property_id', 'created_at')
-
 class WishlistPropertySerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
 
