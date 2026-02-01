@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 from datetime import timedelta
 
@@ -91,6 +92,16 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.environ.get('POSTGRES_DB', 'festari_db'),
+#         'USER': os.environ.get('POSTGRES_USER', 'festari'),
+#         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'festari123'),
+#         'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
+#         'PORT': os.environ.get('POSTGRES_PORT', 5432),
+#     }
+# }
 
 
 # Password validation
