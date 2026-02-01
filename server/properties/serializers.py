@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Property, PropertyImage, Wishlist
+from .models import Property, PropertyImage
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
