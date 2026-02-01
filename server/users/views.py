@@ -115,6 +115,21 @@ class LoginView(TokenObtainPairView):
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['refresh'],
+            properties={
+                'refresh': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Refresh token',
+                    example='ja9843u52.aks34j7oi7qrk.ajo2is7dru9jlksdf'
+                ),
+            },
+        ),
+        responses={205: "Logged out successfully."}
+    )
+
     def post(self, request):
         try:
             refresh_token = request.data["refresh"]

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Property, PropertyImage
+from .models import Property, PropertyImage, Wishlist
 
 
 class PropertyImageSerializer(serializers.ModelSerializer):
@@ -38,3 +38,11 @@ class WishlistPropertySerializer(serializers.ModelSerializer):
 
     def get_images(self, obj):
         return [img.image for img in obj.images.all()]
+
+
+class WishlistAddSerializer(serializers.ModelSerializer):
+    property_id = serializers.IntegerField(write_only=True)
+
+    class Meta:
+        model = Wishlist
+        fields = ['property_id']

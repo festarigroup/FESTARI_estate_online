@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from .models import Property, Wishlist
 from .permissions import IsAdminOrEstateManager, IsBuyer
-from .serializers import PropertySerializer, WishlistPropertySerializer
+from .serializers import PropertySerializer, WishlistAddSerializer, WishlistPropertySerializer
 
 
 class PropertyListCreateView(ListCreateAPIView):
@@ -62,25 +62,30 @@ class WishlistListView(ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Property.objects.none()
         return Property.objects.filter(wishlisted_by__user=self.request.user)
 
 
 class WishlistCreateView(CreateAPIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = WishlistAddSerializer
 
-    def post(self, request, *args, **kwargs):
-        property_id = request.data.get('property_id')
-        user = request.user
-        prop = Property.objects.get(id=property_id)
+    def perform_create(self, serializer):
+        prop_id = serializer.validated_data['property_id']
+        prop = Property.objects.get(id=prop_id)  # You can add try/except here if you want
+        serializer.save(user=self.request.user, property=prop)
 
-        wishlist_item, created = Wishlist.objects.get_or_create(
-            user=user,
-            property=prop
-        )
-
+    def create(self, request, *args, **kwargs):
+        """
+        Override create to customize response message.
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
         return Response(
             {"success": True, "message": "Property added to wishlist."},
-            status=201 if created else 200
+            status=status.HTTP_201_CREATED
         )
 
 
@@ -88,4 +93,6 @@ class WishlistDeleteView(DestroyAPIView):
     permission_classes = [IsBuyer]
 
     def get_queryset(self):
+        if getattr(self, 'swagger_fake_view', False):
+            return Wishlist.objects.none()
         return Wishlist.objects.filter(user=self.request.user)
