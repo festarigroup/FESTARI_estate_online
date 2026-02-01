@@ -131,6 +131,9 @@ STATIC_URL = 'static/'
 CORS_ALLOW_ALL_ORIGINS = True  # for development only
 AUTH_USER_MODEL = 'users.User'
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'andyansong82@gmail.com'
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',

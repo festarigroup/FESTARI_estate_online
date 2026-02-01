@@ -39,6 +39,9 @@ class User(AbstractUser):
 
 
 class OTP(models.Model):
+    class Meta:
+        ordering = ['-created_at']
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
