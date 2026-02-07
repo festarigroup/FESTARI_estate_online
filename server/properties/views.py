@@ -4,7 +4,7 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from utils import api_response
+from utils.api_response import api_response
 
 from .models import Property, Wishlist
 from .permissions import IsAdminOrEstateManager, IsBuyer

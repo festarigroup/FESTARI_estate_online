@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from utils import api_response
+from utils.api_response import api_response
 
 from .models import OTP
 from .serializers import RegisterSerializer, VerifiedTokenSerializer
