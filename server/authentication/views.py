@@ -8,6 +8,8 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from utils import api_response
+
 from .models import OTP
 from .serializers import RegisterSerializer, VerifiedTokenSerializer
 from .utils import send_otp_email
@@ -16,7 +18,6 @@ User = get_user_model()
 
 
 class RegisterView(APIView):
-
     @swagger_auto_schema(
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -32,7 +33,6 @@ class RegisterView(APIView):
     )
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
-
         if serializer.is_valid():
             user = serializer.save()
             otp = user.otps.latest('created_at')
@@ -40,19 +40,18 @@ class RegisterView(APIView):
             if user.email:
                 send_otp_email(user.email, otp.code)
 
-            return Response(
-                {
-                    "success": True,
-                    "message": "User registered. OTP sent.",
-                },
-                status=status.HTTP_201_CREATED
-            )
+            data = {
+                "user_id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "otp_sent": True
+            }
+            return api_response(True, "User registered. OTP sent.", status.HTTP_201_CREATED, data=data)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return api_response(False, "Validation failed.", status.HTTP_400_BAD_REQUEST, errors=serializer.errors)
 
 
 class VerifyOTPView(APIView):
-
     @swagger_auto_schema(
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -70,46 +69,33 @@ class VerifyOTPView(APIView):
 
         try:
             user = User.objects.get(username=username)
-            otp = OTP.objects.filter(
-                user=user,
-                code=code,
-                is_used=False
-            ).latest('created_at')
+            otp = OTP.objects.filter(user=user, code=code, is_used=False).latest('created_at')
 
             if otp.is_expired():
-                return Response(
-                    {"error": "OTP expired"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                return api_response(False, "OTP expired.", status.HTTP_400_BAD_REQUEST)
 
             otp.is_used = True
             otp.save()
-
             user.is_verified = True
             user.save()
 
-            return Response(
-                {
-                    "success": True,
-                    "message": "Account verified successfully."
-                }
-            )
+            return api_response(True, "Account verified successfully.", status.HTTP_200_OK)
 
         except User.DoesNotExist:
-            return Response(
-                {"error": "User not found"},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            return api_response(False, "User not found.", status.HTTP_404_NOT_FOUND)
         except OTP.DoesNotExist:
-            return Response(
-                {"error": "Invalid OTP"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return api_response(False, "Invalid OTP.", status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(TokenObtainPairView):
     serializer_class = VerifiedTokenSerializer
 
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 200:
+            data = response.data
+            return api_response(True, "Login successful.", status.HTTP_200_OK, data=data)
+        return api_response(False, "Invalid credentials.", status.HTTP_401_UNAUTHORIZED, errors=response.data)
 
 
 class LogoutView(APIView):
@@ -129,19 +115,17 @@ class LogoutView(APIView):
         ),
         responses={205: "Logged out successfully."}
     )
-
     def post(self, request):
         try:
-            refresh_token = request.data["refresh"]
+            refresh_token = request.data.get("refresh")
+            if not refresh_token:
+                return api_response(False, "Refresh token is required.", status.HTTP_400_BAD_REQUEST)
+
             token = RefreshToken(refresh_token)
             token.blacklist()
 
-            return Response(
-                {"success": True, "message": "Logged out successfully."},
-                status=status.HTTP_205_RESET_CONTENT
-            )
-        except Exception as e:
-            return Response(
-                {"error": "Invalid or missing refresh token."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return api_response(True, "Logged out successfully.", status.HTTP_205_RESET_CONTENT)
+
+        except Exception:
+            return api_response(False, "Invalid or expired refresh token.", status.HTTP_400_BAD_REQUEST)
+        
