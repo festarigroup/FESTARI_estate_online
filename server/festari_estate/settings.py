@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 ]
 
 INSTALLED_APPS += [
+    'authentication',
     'users',
     'properties',
     'artisans',
