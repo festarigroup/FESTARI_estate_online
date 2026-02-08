@@ -102,6 +102,7 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        security=[{'Bearer': []}],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             required=['refresh'],
