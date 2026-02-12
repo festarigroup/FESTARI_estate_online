@@ -22,6 +22,17 @@ class PropertyListCreateView(ListCreateAPIView):
         if self.request.method == 'POST':
             return [IsAuthenticated(), IsAdminOrEstateManager()]
         return [AllowAny()]
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return api_response(True, "Properties retrieved successfully.", status.HTTP_200_OK, data=serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return api_response(True, "Properties retrieved successfully.", status.HTTP_200_OK, data=serializer.data)
+    
 
     def create(self, request, *args, **kwargs):
         user = request.user
