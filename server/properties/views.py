@@ -4,6 +4,7 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from utils.pagination import PageLimitPagination
 from utils.api_response import api_response
 
 from .models import Property, Wishlist
@@ -14,6 +15,7 @@ from .serializers import PropertySerializer, WishlistAddSerializer, WishlistProp
 class PropertyListCreateView(ListCreateAPIView):
     queryset = Property.objects.all()
     serializer_class = PropertySerializer
+    pagination_class = PageLimitPagination
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'location', 'description']
     ordering_fields = ['price', 'created_at']
@@ -29,10 +31,17 @@ class PropertyListCreateView(ListCreateAPIView):
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
-            return api_response(True, "Properties retrieved successfully.", status.HTTP_200_OK, data=serializer.data)
+            paginated_data = self.get_paginated_response(serializer.data).data
+
+            return api_response(
+                True,
+                "Properties retrieved successfully.",
+                status.HTTP_200_OK,
+                data=paginated_data,
+            )
+
         serializer = self.get_serializer(queryset, many=True)
         return api_response(True, "Properties retrieved successfully.", status.HTTP_200_OK, data=serializer.data)
-    
 
     def create(self, request, *args, **kwargs):
         user = request.user
