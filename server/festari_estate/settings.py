@@ -53,6 +53,8 @@ INSTALLED_APPS += [
     'properties',
     'artisans',
     'hotels',
+    'art_services',
+    'art_service_request'
 ]
 
 MIDDLEWARE = [
