@@ -5,10 +5,16 @@ from utils import api_response
 from .models import Subscriber
 from .serializers import SubscriberSerializer
 from .permissions import IsAdminRole
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 class SubscribeView(APIView):
     permission_classes = [AllowAny]
+    @swagger_auto_schema(
+        request_body=SubscriberSerializer,
+        responses={201: SubscriberSerializer, 400: "Validation failed"}
+    )
 
     def post(self, request):
         serializer = SubscriberSerializer(data=request.data)
@@ -40,8 +46,18 @@ class SubscribeView(APIView):
         )
 
 
+
 class UnsubscribeView(APIView):
     permission_classes = [AllowAny]
+    email_param = openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={"email": openapi.Schema(type=openapi.TYPE_STRING)},
+        required=["email"]
+    )
+    @swagger_auto_schema(
+        request_body=email_param,
+        responses={200: "Unsubscribed successfully", 404: "Email not found"}
+    )
 
     def delete(self, request):
         email = request.data.get("email")
