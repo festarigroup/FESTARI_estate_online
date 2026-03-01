@@ -1,21 +1,31 @@
-from rest_framework.views import APIView
+from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from utils.api_response import api_response
-from artisans.models import ArtisanProfile
 from .models import ArtisanService
 from .serializers import ArtisanServiceSerializer
 
-class CreateArtisanServiceView(APIView):
+
+class ArtisanServiceCreateView(generics.CreateAPIView):
+    serializer_class = ArtisanServiceSerializer
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def create(self, request, *args, **kwargs):
         profile = getattr(request.user, "artisan_profile", None)
+
         if not profile:
-            return api_response(False, "Create profile first.", 400)
+            return api_response(
+                False,
+                "Create profile first.",
+                status.HTTP_400_BAD_REQUEST
+            )
 
-        serializer = ArtisanServiceSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(artisan=profile)
-            return api_response(True, "Service created successfully.", 201, data=serializer.data)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(artisan=profile)
 
-        return api_response(False, "Validation failed.", 400, errors=serializer.errors)
+        return api_response(
+            True,
+            "Service created successfully.",
+            status.HTTP_201_CREATED,
+            data=serializer.data
+        )

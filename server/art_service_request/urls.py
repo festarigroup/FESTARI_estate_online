@@ -1,7 +1,10 @@
-from django.urls import path
-from .views import CreateServiceRequestView, MarkServiceCompleteView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import ServiceRequestViewSet
+
+router = DefaultRouter()
+router.register("", ServiceRequestViewSet, basename="service-requests")
 
 urlpatterns = [
-    path("services/<int:service_id>/request/", CreateServiceRequestView.as_view()),
-    path("requests/<int:request_id>/complete/", MarkServiceCompleteView.as_view()),
+    path("", include(router.urls)),
 ]

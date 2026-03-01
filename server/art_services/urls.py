@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import CreateArtisanServiceView
+from .views import ArtisanServiceCreateView
 
 urlpatterns = [
-    path("", CreateArtisanServiceView.as_view()),
+    path("", ArtisanServiceCreateView.as_view()),
 ]
