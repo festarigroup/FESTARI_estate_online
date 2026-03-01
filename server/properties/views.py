@@ -3,10 +3,8 @@ from rest_framework.generics import (
     CreateAPIView, DestroyAPIView, ListAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 )
 from rest_framework.permissions import AllowAny, IsAuthenticated
-
 from utils.pagination import PageLimitPagination
 from utils.api_response import api_response
-
 from .models import Property, Wishlist
 from .permissions import IsAdminOrEstateManager, IsBuyer
 from .serializers import PropertySerializer, WishlistAddSerializer, WishlistPropertySerializer
@@ -17,7 +15,7 @@ class PropertyListCreateView(ListCreateAPIView):
     serializer_class = PropertySerializer
     pagination_class = PageLimitPagination
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['title', 'location', 'description']
+    search_fields = ['title', 'location', 'description', 'beds', 'capacity', 'bathrooms']
     ordering_fields = ['price', 'created_at']
 
     def get_permissions(self):

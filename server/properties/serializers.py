@@ -1,5 +1,4 @@
 from rest_framework import serializers
-
 from .models import Property, PropertyImage, Wishlist
 
 
@@ -30,6 +29,10 @@ class WishlistPropertySerializer(serializers.ModelSerializer):
             'property_type',
             'listing_type',
             'price',
+            'rental_period',
+            'beds',
+            'capacity',
+            'bathrooms',
             'location',
             'is_available',
             'created_at',
