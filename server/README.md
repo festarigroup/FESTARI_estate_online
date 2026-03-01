@@ -19,6 +19,7 @@ Create your **.env** file, paste and fill in these values with the appropriate d
 - SECRET_KEY=string
 - EMAIL_HOST_USER=someone@example.com
 - EMAIL_HOST_PASSWORD=your_app_password
+- FRONTEND_URL=http://localhost:3000
 
 Then run these commands in your terminal
 ```bash
