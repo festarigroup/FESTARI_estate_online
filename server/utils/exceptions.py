@@ -2,8 +2,8 @@ from rest_framework.views import exception_handler
 from rest_framework import status
 from .api_response import api_response
 
-def custom_exception_handler(execption, context):
-    response = exception_handler(execption, context)
+def custom_exception_handler(exception, context):
+    response = exception_handler(exception, context)
 
     if response is not None:
         return api_response(

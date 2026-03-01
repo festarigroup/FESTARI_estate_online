@@ -1,7 +1,5 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.db.models import Q
 
 from .models import ArtisanProfile
 from .serializers import ArtisanProfileSerializer

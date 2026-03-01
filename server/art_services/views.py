@@ -1,7 +1,6 @@
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from utils.api_response import api_response
-from .models import ArtisanService
 from .serializers import ArtisanServiceSerializer
 
 

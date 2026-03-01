@@ -54,7 +54,8 @@ INSTALLED_APPS += [
     'artisans',
     'hotels',
     'art_services',
-    'art_service_request'
+    'art_service_request',
+    'notifications'
 ]
 
 MIDDLEWARE = [
