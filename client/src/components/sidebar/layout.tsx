@@ -37,7 +37,7 @@ export default function SidebarLayout() {
             </Link>
           </li>
           <li>
-            <Link href="/properties" className="text-black">
+            <Link href="/property" className="text-black">
               Properties
             </Link>
           </li>
