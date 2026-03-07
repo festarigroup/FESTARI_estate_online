@@ -110,7 +110,7 @@ export default function Navbar() {
             </div>
           )}
         </div>
-        <h1 className="text-xl font-bold text-gray-900">Festari Estate</h1>
+        {/* <h1 className="text-xl font-bold text-gray-900">Festari Estate</h1> */}
       </div>
     </nav>
   );
