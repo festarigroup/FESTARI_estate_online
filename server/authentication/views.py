@@ -1,3 +1,7 @@
+from datetime import timedelta
+from django.utils import timezone
+import random
+
 from django.contrib.auth import get_user_model
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -13,7 +17,7 @@ from .utils import send_otp_email, send_password_reset_email
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.core.mail import send_mail
+from django.db import transaction
 from django.conf import settings
 
 User = get_user_model()
@@ -35,22 +39,45 @@ class RegisterView(APIView):
     )
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            otp = user.otps.latest('created_at')
+        if not serializer.is_valid():
+            return api_response(
+                False,
+                "Validation failed.",
+                status.HTTP_400_BAD_REQUEST,
+                errors=serializer.errors
+            )
 
-            if user.email:
-                send_otp_email(user.email, otp.code)
+        try:
+            with transaction.atomic():
+                user = serializer.save()
 
-            data = {
-                "user_id": user.id,
-                "username": user.username,
-                "email": user.email,
-                "otp_sent": True
-            }
-            return api_response(True, "User registered. OTP sent.", status.HTTP_201_CREATED, data=data)
+                code = str(random.randint(1000, 9999))
+                otp = OTP.objects.create(
+                    user=user,
+                    code=code,
+                    expires_at=timezone.now() + timedelta(minutes=10)
+                )
 
-        return api_response(False, "Validation failed.", status.HTTP_400_BAD_REQUEST, errors=serializer.errors)
+                if user.email:
+                    print("sending email")
+                    send_otp_email(user.email, code)
+                    print("email sent")
+
+        except Exception as e:
+            return api_response(
+                False,
+                f"Failed to register user: {str(e)}",
+                status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        data = {
+            "user_id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "otp_sent": True
+        }
+
+        return api_response(True, "User registered. OTP sent.", status.HTTP_201_CREATED, data=data)
 
 
 class VerifyOTPView(APIView):
