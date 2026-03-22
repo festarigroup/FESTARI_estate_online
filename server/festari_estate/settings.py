@@ -55,7 +55,8 @@ INSTALLED_APPS += [
     'hotels',
     'art_services',
     'art_service_request',
-    'notifications'
+    'notifications',
+    'payments'
 ]
 
 MIDDLEWARE = [
@@ -158,6 +159,7 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('EMAIL_HOST_USER')
 
 FRONTEND_URL = config('FRONTEND_URL')
+PAYSTACK_SECRET_KEY = config('PAYSTACK_SECRET_KEY')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
