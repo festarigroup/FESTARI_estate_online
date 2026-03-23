@@ -6,3 +6,4 @@ class PaymentInitializeSerializer(serializers.Serializer):
 class SubscriptionSerializer(serializers.Serializer):
     PLAN_CHOICES = ['basic', 'pro', 'enterprise']
     plan = serializers.ChoiceField(choices=PLAN_CHOICES)
+    recurring = serializers.BooleanField(default=True)

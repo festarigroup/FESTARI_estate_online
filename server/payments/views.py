@@ -37,57 +37,103 @@ class SubscribeView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        print(1)
         plan = serializer.validated_data["plan"]
+        recurring = serializer.validated_data["recurring"]
         user = request.user
+        print(2)
 
         PLAN_MAP = {
-            'basic': {"amount": 5000, "plan_code": "PLN_basic123"},
-            'pro': {"amount": 15000, "plan_code": "PLN_pro123"},
-            'enterprise': {"amount": 50000, "plan_code": "PLN_enterprise123"},
+            'basic': {"amount": 5000, "plan_code": "PLN_j15oejicxwctp14"},
+            'pro': {"amount": 7000, "plan_code": "PLN_697asolzl4o05tx"},
+            'enterprise': {"amount": 10000, "plan_code": "PLN_yo5yprsfwhuxex9"},
         }
 
-        # 1️⃣ Ensure the customer exists in Paystack
-        customer = PaystackService.get_customer_by_email(user.email)
-        if not customer:
-            customer = PaystackService.create_customer(
-                email=user.email,
-                first_name=user.first_name,
-                last_name=user.last_name
-            )
+        amount = PLAN_MAP[plan]["amount"]
+        plan_code = PLAN_MAP[plan]["plan_code"]
+        print(3)
 
-        # 2️⃣ Create subscription in Paystack
-        response = PaystackSubscriptionService.create_subscription(
-            customer_code=customer['customer_code'],  # Use Paystack's unique customer code
-            plan_code=PLAN_MAP[plan]["plan_code"]
-        )
+        # 🔍 Check active subscription
+        active_sub = SubscriptionPayment.objects.filter(
+            user=user,
+            is_active=True
+        ).first()
+        print(4)
 
-        # 3️⃣ Store subscription payment locally
-        reference = str(uuid.uuid4())
-        payment = SubscriptionPayment.objects.create(
+        # ❌ Same plan
+        if active_sub and active_sub.subscription_plan == plan:
+            return api_response(False, "You are already on this plan", 400)
+
+        try:
+            # 🔁 CHANGE PLAN (cancel old)
+            if active_sub:
+                print(5)
+                PaystackSubscriptionService.disable_subscription(
+                    active_sub.subscription_code,
+                    active_sub.email_token
+                )
+                active_sub.is_active = False
+                active_sub.save()
+
+            # 🆕 Create new subscription or one-time
+            reference = str(uuid.uuid4())
+
+            if recurring:
+                print(6)
+                response = PaystackService.initialize_payment(
+                    email=user.email,
+                    amount=amount,
+                    reference=reference,
+                    plan_code=plan_code
+                )
+            else:
+                response = PaystackService.initialize_payment(
+                    email=user.email,
+                    amount=amount,
+                    reference=reference
+                )
+
+        except Exception as e:
+            return api_response(False, str(e), 500)
+
+        # 💾 Save new record
+        print(7)
+        SubscriptionPayment.objects.create(
             user=user,
             subscription_plan=plan,
-            amount=PLAN_MAP[plan]["amount"],
-            reference=reference
+            amount=amount,
+            reference=reference,
+            status="pending"
         )
 
-        return api_response(True, "Subscription initiated", 200, data=response)
+        return api_response(True, "Plan change initiated", 200, data=response)
 
 
-class VerifyPaymentView(APIView):
+class CancelSubscriptionView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, reference):
-        response = PaystackService.verify_payment(reference)
-        data = response.get("data")
+    def post(self, request):
+        user = request.user
 
-        if data and data.get("status") == "success":
-            try:
-                payment = Payment.objects.get(reference=reference)
-                if payment.status != "success":
-                    payment.status = "success"
-                    payment.save()
-            except Payment.DoesNotExist:
-                return api_response(False, "Payment not found", 404)
+        sub = SubscriptionPayment.objects.filter(
+            user=user,
+            is_active=True
+        ).first()
 
-        return api_response(True, "Payment verification result", 200, data=response)
+        if not sub:
+            return api_response(False, "No active subscription", 400)
 
+        try:
+            PaystackSubscriptionService.disable_subscription(
+                sub.subscription_code,
+                sub.email_token
+            )
+
+            sub.is_active = False
+            sub.save()
+
+        except Exception as e:
+            return api_response(False, str(e), 500)
+
+        return api_response(True, "Subscription cancelled", 200)
