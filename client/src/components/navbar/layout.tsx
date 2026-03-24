@@ -27,15 +27,6 @@ export default function Navbar() {
               {item.label}
             </Link>
           ))}
-        </div>
-
-        <div className="hidden items-center gap-4 lg:flex">
-          <Link
-            href="/become-host"
-            className="inline-flex items-center border border-gray-300 bg-gray-100 px-5 py-2 text-base font-medium text-gray-800 transition-colors hover:bg-gray-200"
-          >
-            Become a host
-          </Link>
           <Link
             href="/login"
             className="text-base font-medium leading-none text-gray-900 transition-colors hover:text-[#BE4D00]"
@@ -47,6 +38,15 @@ export default function Navbar() {
             className="bg-[#BE4D00] px-4 py-2 text-base font-medium leading-none text-white transition-colors hover:bg-[#a64300]"
           >
             Signup
+          </Link>
+        </div>
+
+        <div className="hidden items-center gap-4 lg:flex">
+          <Link
+            href="/become-host"
+            className="inline-flex items-center border border-gray-300 bg-gray-100 px-5 py-2 text-base font-medium text-gray-800 transition-colors hover:bg-gray-200"
+          >
+            Become a host
           </Link>
         </div>
 
@@ -93,15 +93,6 @@ export default function Navbar() {
                 ))}
                 <li>
                   <Link
-                    href="/become-host"
-                    className="block px-4 py-2 text-base text-gray-800 hover:bg-gray-100"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Become a host
-                  </Link>
-                </li>
-                <li>
-                  <Link
                     href="/login"
                     className="block px-4 py-2 text-base text-gray-800 hover:bg-gray-100"
                     onClick={() => setIsMenuOpen(false)}
@@ -116,6 +107,15 @@ export default function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Signup
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/become-host"
+                    className="block px-4 py-2 text-base text-gray-800 hover:bg-gray-100"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Become a host
                   </Link>
                 </li>
               </ul>
