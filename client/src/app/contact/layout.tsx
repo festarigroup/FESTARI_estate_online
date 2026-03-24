@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Navbar from "@/components/navbar/layout";
 
 export const metadata: Metadata = {
   title: "Contact | Festari Estate",
@@ -18,7 +17,6 @@ export default function ContactLayout({
       {/* HERO SECTION */}
       
             <div className="w-full h-screen shadow-sm rounded-lg bg-cover bg-center relative" style={{ backgroundImage: "url('/services.jpg')" }}>
-              <Navbar />
               <div className="p-8 px-32">{children}</div>
               <div className="absolute bottom-8 left-8">
                 <h2 className="text-4xl font-bold text-white uppercase">Contact</h2>
