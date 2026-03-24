@@ -17,33 +17,34 @@ export default function Navbar() {
   return (
     <nav className="mt-4 w-full border-b border-gray-200 bg-transparent">
       <div className="mx-auto flex h-16 w-full max-w-[1180px] items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link
-          href="/become-host"
-          className="inline-flex items-center border border-gray-300 bg-gray-100 px-5 py-2 text-base font-medium text-gray-800 transition-colors hover:bg-gray-200"
-        >
-          Become a host
-        </Link>
-
         <div className="hidden items-center gap-8 lg:flex">
           {navLinks.map((item) => (
             <Link
               key={item.label}
               href={item.href}
-              className="text-[30px] font-medium leading-none text-gray-900 transition-colors hover:text-[#BE4D00]"
+              className="text-base font-medium leading-none text-gray-900 transition-colors hover:text-[#BE4D00]"
             >
               {item.label}
             </Link>
           ))}
+        </div>
 
+        <div className="hidden items-center gap-4 lg:flex">
+          <Link
+            href="/become-host"
+            className="inline-flex items-center border border-gray-300 bg-gray-100 px-5 py-2 text-base font-medium text-gray-800 transition-colors hover:bg-gray-200"
+          >
+            Become a host
+          </Link>
           <Link
             href="/login"
-            className="text-[30px] font-medium leading-none text-gray-900 transition-colors hover:text-[#BE4D00]"
+            className="text-base font-medium leading-none text-gray-900 transition-colors hover:text-[#BE4D00]"
           >
             Log in
           </Link>
           <Link
             href="/signup"
-            className="bg-[#BE4D00] px-4 py-2 text-[30px] font-medium leading-none text-white transition-colors hover:bg-[#a64300]"
+            className="bg-[#BE4D00] px-4 py-2 text-base font-medium leading-none text-white transition-colors hover:bg-[#a64300]"
           >
             Signup
           </Link>
@@ -90,6 +91,15 @@ export default function Navbar() {
                     </Link>
                   </li>
                 ))}
+                <li>
+                  <Link
+                    href="/become-host"
+                    className="block px-4 py-2 text-base text-gray-800 hover:bg-gray-100"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Become a host
+                  </Link>
+                </li>
                 <li>
                   <Link
                     href="/login"
