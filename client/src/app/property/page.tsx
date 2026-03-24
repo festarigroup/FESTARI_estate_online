@@ -255,7 +255,7 @@ export default function PropertyPage() {
 
       {/* Pagination */}
       <div className="flex justify-center items-center gap-2 mt-12">
-        <button className="w-9 h-9 flex items-center justify-center rounded-md border border-gray-300 text-gray-500 hover:bg-gray-100 transition-colors rounded-l-md">
+        <button className="w-9 h-9 flex items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 transition-colors rounded-l-md">
           <svg
             className="w-4 h-4"
             fill="none"
@@ -273,7 +273,7 @@ export default function PropertyPage() {
         {[1, 2, 3, 4, 5].map((page) => (
           <button
             key={page}
-            className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors  ${
+            className={`w-9 h-9 flex items-center justify-center rounded-full text-sm font-medium transition-colors  ${
               page === 1
                 ? "bg-[#BE4D00] text-white"
                 : "border border-gray-300 text-gray-700 hover:bg-gray-100"
@@ -282,7 +282,7 @@ export default function PropertyPage() {
             {page}
           </button>
         ))}
-        <button className="w-9 h-9 flex items-center justify-center rounded-md border border-gray-300 text-gray-500 hover:bg-gray-100 transition-colors rounded-l-md">
+        <button className="w-9 h-9 flex items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 transition-colors rounded-l-md">
           <svg
             className="w-4 h-4"
             fill="none"
