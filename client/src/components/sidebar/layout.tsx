@@ -53,43 +53,6 @@ export default function SidebarLayout() {
           </li>
         </ul>
       </nav>
-
-      {/* Social Media Icons */}
-      <div className="pb-8 flex gap-6">
-        <Link href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-          <div className="w-6 h-6">
-            <Image
-              src="/instagram.png"
-              alt="Instagram"
-              width={24}
-              height={24}
-              className="w-full h-full hover:opacity-70 transition-opacity"
-            />
-          </div>
-        </Link>
-        <Link href="https://x.com" target="_blank" rel="noopener noreferrer">
-          <div className="w-6 h-6">
-            <Image
-              src="/x.png"
-              alt="X"
-              width={24}
-              height={24}
-              className="w-full h-full hover:opacity-70 transition-opacity"
-            />
-          </div>
-        </Link>
-        <Link href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-          <div className="w-6 h-6">
-            <Image
-              src="/facebook.png"
-              alt="Facebook"
-              width={24}
-              height={24}
-              className="w-full h-full hover:opacity-70 transition-opacity"
-            />
-          </div>
-        </Link>
-      </div>
     </aside>
   );
 }

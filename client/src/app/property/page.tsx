@@ -116,10 +116,8 @@ export default function PropertyPage() {
 
   return (
     <div>
-  
-
       {/* Property Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
         {filtered.map((property) => (
           <div
             key={property.id}
@@ -145,17 +143,19 @@ export default function PropertyPage() {
                 <span className="text-xs">No image</span>
               </div>
 
-              {/* Type badge */}
-              <div className="absolute top-3 left-3">
-                <span
-                  className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
-                    property.type === "Sale"
-                      ? "bg-emerald-500 text-white"
-                      : "bg-sky-500 text-white"
-                  }`}
-                >
-                  For {property.type}
-                </span>
+              {/* Rating badge */}
+              <div className="absolute top-3 left-3 flex items-center gap-1  px-2 py-1 rounded-sm">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <svg
+                    key={index}
+                    className="w-3 h-3"
+                    viewBox="0 0 20 20"
+                    fill={index < 3 ? "#163958" : "#F8F8F8"}
+                    aria-hidden="true"
+                  >
+                    <path d="M10 1.5l2.5 5.1 5.6.8-4 3.9.9 5.6L10 14.2 5 16.9l.9-5.6-4-3.9 5.6-.8L10 1.5z" />
+                  </svg>
+                ))}
               </div>
 
               {/* Favorite button */}
@@ -257,7 +257,7 @@ export default function PropertyPage() {
 
       {/* Pagination */}
       <div className="flex justify-center items-center gap-2 mt-12">
-        <button className="w-9 h-9 flex items-center justify-center rounded-md border border-gray-300 text-gray-500 hover:bg-gray-100 transition-colors">
+        <button className="w-9 h-9 flex items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 transition-colors rounded-l-md">
           <svg
             className="w-4 h-4"
             fill="none"
@@ -275,7 +275,7 @@ export default function PropertyPage() {
         {[1, 2, 3, 4, 5].map((page) => (
           <button
             key={page}
-            className={`w-9 h-9 flex items-center justify-center rounded-md text-sm font-medium transition-colors ${
+            className={`w-9 h-9 flex items-center justify-center rounded-full text-sm font-medium transition-colors  ${
               page === 1
                 ? "bg-[#BE4D00] text-white"
                 : "border border-gray-300 text-gray-700 hover:bg-gray-100"
@@ -284,7 +284,7 @@ export default function PropertyPage() {
             {page}
           </button>
         ))}
-        <button className="w-9 h-9 flex items-center justify-center rounded-md border border-gray-300 text-gray-500 hover:bg-gray-100 transition-colors">
+        <button className="w-9 h-9 flex items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 transition-colors rounded-l-md">
           <svg
             className="w-4 h-4"
             fill="none"

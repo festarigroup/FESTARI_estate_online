@@ -6,69 +6,53 @@ import { useState } from "react";
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const menuItems = [
-    { label: "Logout", href: "/logout" },
-    { label: "Register", href: "/signup" },
-    { label: "Properties", href: "/properties" },
-    { label: "Artisans", href: "/artisans" },
+  const navLinks = [
     { label: "Hotels", href: "/hotels" },
+    { label: "Artisan", href: "/artisans" },
+    { label: "Agents", href: "/agents" },
+    { label: "About us", href: "/about" },
     { label: "Pricings", href: "/pricing" },
-    { label: "Make Inquiry", href: "/inquiry" },
-    { label: "About Us", href: "/about" },
   ];
 
   return (
-    <nav className="mt-4 w-full">
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center px-8 h-12.5 mx-auto">
-        <div aria-hidden="true" />
-        <div className="bg-white border border-gray-200 rounded-md px-6 py-2.5 flex items-center gap-4">
-          <Link
-            href="/list-property"
-            className="text-gray-700 hover:text-gray-900 text-sm font-medium"
-          >
-            List a property
-          </Link>
-          <Link
-            href="/list-venue"
-            className="text-gray-700 hover:text-gray-900 text-sm font-medium"
-          >
-            List a venue
-          </Link>
-          <Link
-            href="/offer-service"
-            className="text-gray-700 hover:text-gray-900 text-sm font-medium"
-          >
-            Offer your service
-          </Link>
-          <button
-            className="w-8 h-8 rounded-full bg-[#BE4D00] flex items-center justify-center hover:bg-[#a64300] transition-colors ml-2"
-            aria-label="Filter"
-          >
-            <svg
-              className="w-4 h-4 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+    <nav className="mt-4 w-full border-b border-gray-200 bg-transparent">
+      <div className="mx-auto flex h-16 w-full max-w-[1180px] items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="hidden items-center gap-8 lg:flex">
+          {navLinks.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="text-base font-medium leading-none text-gray-900 transition-colors hover:text-[#BE4D00]"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-              />
-            </svg>
-          </button>
+              {item.label}
+            </Link>
+          ))}
+          <Link
+            href="/login"
+            className="text-base font-medium leading-none text-gray-900 transition-colors hover:text-[#BE4D00]"
+          >
+            Log in
+          </Link>
+          <Link
+            href="/signup"
+            className="bg-[#BE4D00] px-4 py-2 text-base font-medium leading-none text-white transition-colors hover:bg-[#a64300]"
+          >
+            Signup
+          </Link>
         </div>
 
-        <div className="relative flex items-center gap-3 justify-self-end">
+        <div className="hidden items-center gap-4 lg:flex">
           <Link
             href="/become-host"
-            className="border border-[#BE4D00] text-[#BE4D00] px-4 py-2 rounded-md text-sm font-medium hover:bg-[#BE4D00] hover:text-white transition-colors"
+            className="inline-flex items-center border border-gray-300 bg-gray-100 px-5 py-2 text-base font-medium text-gray-800 transition-colors hover:bg-gray-200"
           >
-            Become host
+            Become a host
           </Link>
+        </div>
+
+        <div className="relative flex items-center lg:hidden">
           <button
-            className="w-10 h-10 flex items-center justify-center text-[#BE4D00] hover:text-[#a64300] transition-colors"
+            className="inline-flex h-10 w-10 items-center justify-center text-gray-800 transition-colors hover:text-[#BE4D00]"
             aria-label="Open menu"
             aria-expanded={isMenuOpen}
             aria-controls="navbar-menu"
@@ -93,24 +77,51 @@ export default function Navbar() {
             <div
               id="navbar-menu"
               role="menu"
-              className="absolute right-0 top-12 w-48 bg-white border border-gray-200 shadow-lg"
+              className="absolute right-0 top-12 z-20 w-60 border border-gray-200 bg-white shadow-lg"
             >
               <ul className="divide-y divide-gray-200">
-                {menuItems.map((item) => (
+                {navLinks.map((item) => (
                   <li key={item.label}>
                     <Link
                       href={item.href}
-                      className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
+                      className="block px-4 py-2 text-base text-gray-800 hover:bg-gray-100"
+                      onClick={() => setIsMenuOpen(false)}
                     >
                       {item.label}
                     </Link>
                   </li>
                 ))}
+                <li>
+                  <Link
+                    href="/login"
+                    className="block px-4 py-2 text-base text-gray-800 hover:bg-gray-100"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Log in
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/signup"
+                    className="block bg-[#BE4D00] px-4 py-2 text-base text-white hover:bg-[#a64300]"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Signup
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/become-host"
+                    className="block px-4 py-2 text-base text-gray-800 hover:bg-gray-100"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Become a host
+                  </Link>
+                </li>
               </ul>
             </div>
           )}
         </div>
-        {/* <h1 className="text-xl font-bold text-gray-900">Festari Estate</h1> */}
       </div>
     </nav>
   );

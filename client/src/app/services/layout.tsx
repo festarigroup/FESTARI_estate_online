@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Navbar from "@/components/navbar/layout";
 
 export const metadata: Metadata = {
   title: "Services | Festari Estate",
@@ -213,7 +212,6 @@ export default function ServicesLayout({
   return (
     <div className="flex flex-col p-8">
       <div className="w-full h-screen shadow-sm rounded-lg bg-cover bg-center relative" style={{ backgroundImage: "url('/services.jpg')" }}>
-        <Navbar />
         <div className="p-8 px-32">{children}</div>
         <div className="absolute bottom-8 left-8">
           <h2 className="text-4xl font-bold text-white uppercase">Services</h2>
@@ -289,7 +287,7 @@ export default function ServicesLayout({
           </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-4 gap-6">
           {propertyListings.map((property) => (
             <div key={property.id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition">
               <div className="h-64 bg-gray-200 flex items-center justify-center">
