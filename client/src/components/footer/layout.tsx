@@ -3,34 +3,7 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <footer className="bg-gray-50 text-gray-800 border-t border-gray-200">
-      <div className="max-w-6xl mx-auto px-6 py-12 space-y-12">
-        <div className="text-center space-y-4">
-          <h2 className="text-2xl font-semibold">
-            Stay updated on what matters
-          </h2>
-          <p className="text-sm text-gray-600">
-            Get alerts for new listings, artisan recommendations, and venue
-            availability
-          </p>
-          <form className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <input
-              type="email"
-              name="newsletter-email"
-              placeholder="Enter your email"
-              className="w-full sm:w-72 px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-1 focus:ring-[#BE4D00] focus:border-[#BE4D00] text-sm"
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 bg-[#BE4D00] text-white text-sm font-medium hover:bg-[#a64300] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#BE4D00] h-13.25 w-47"
-            >
-              Subscribe
-            </button>
-          </form>
-          <p className="text-xs text-gray-500">
-            By clicking Sign Up you&apos;re confirming that you agree with our
-            Terms and Conditions.
-          </p>
-        </div>
+      <div className="max-w-7xl mx-auto px-6 py-12 space-y-12">
 
         <div className="grid gap-8 md:grid-cols-4 text-sm">
           <div className="space-y-4">

@@ -117,7 +117,7 @@ export default function PropertyPage() {
   return (
     <div>
       {/* Property Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
         {filtered.map((property) => (
           <div
             key={property.id}
@@ -143,17 +143,19 @@ export default function PropertyPage() {
                 <span className="text-xs">No image</span>
               </div>
 
-              {/* Type badge */}
-              <div className="absolute top-3 left-3">
-                <span
-                  className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
-                    property.type === "Sale"
-                      ? "bg-emerald-500 text-white"
-                      : "bg-sky-500 text-white"
-                  }`}
-                >
-                  For {property.type}
-                </span>
+              {/* Rating badge */}
+              <div className="absolute top-3 left-3 flex items-center gap-1  px-2 py-1 rounded-sm">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <svg
+                    key={index}
+                    className="w-3 h-3"
+                    viewBox="0 0 20 20"
+                    fill={index < 3 ? "#163958" : "#F8F8F8"}
+                    aria-hidden="true"
+                  >
+                    <path d="M10 1.5l2.5 5.1 5.6.8-4 3.9.9 5.6L10 14.2 5 16.9l.9-5.6-4-3.9 5.6-.8L10 1.5z" />
+                  </svg>
+                ))}
               </div>
 
               {/* Favorite button */}

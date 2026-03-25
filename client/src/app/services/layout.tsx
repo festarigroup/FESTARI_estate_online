@@ -287,7 +287,7 @@ export default function ServicesLayout({
           </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-4 gap-6">
           {propertyListings.map((property) => (
             <div key={property.id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition">
               <div className="h-64 bg-gray-200 flex items-center justify-center">
