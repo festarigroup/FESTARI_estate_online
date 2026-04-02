@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const hotels = [
   {
@@ -138,6 +139,7 @@ const hotels = [
 ];
 
 export default function HotelPage() {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const cardsPerPage = 8;
   const totalPages = Math.ceil(hotels.length / cardsPerPage);
@@ -231,7 +233,16 @@ export default function HotelPage() {
         {paginatedHotels.map((hotel) => (
           <article
             key={hotel.id}
-            className="group overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl"
+            role="button"
+            tabIndex={0}
+            onClick={() => router.push(`/hotel/${hotel.id}`)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                router.push(`/hotel/${hotel.id}`);
+              }
+            }}
+            className="group cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl"
           >
             <div className="relative h-48 overflow-hidden">
               <img

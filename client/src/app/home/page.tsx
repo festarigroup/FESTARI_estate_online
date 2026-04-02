@@ -1,5 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
+import StatsMarquee, { type MarqueeStat } from "./components/StatsMarquee";
+import WhoWeAreSection from "./components/WhoWeAreSection";
+import OurServicesSection from "./components/OurServicesSection";
+import GettingStartedSection from "./components/GettingStartedSection";
+import FeaturedPropertiesSection from "./components/FeaturedPropertiesSection";
+import DashboardWorksSection from "./components/DashboardWorksSection";
+import MarketplaceValueSection from "./components/MarketplaceValueSection";
+import FeaturedInSection from "./components/FeaturedInSection";
+import TestimonialsSection from "./components/TestimonialsSection";
+import PricingSection from "./components/PricingSection";
+import SuccessStoriesSection from "./components/SuccessStoriesSection";
+import FAQSection from "./components/FAQSection";
+import ReadyJourneySection from "./components/ReadyJourneySection";
 
 function StarRating() {
   return (
@@ -19,7 +32,16 @@ function StarRating() {
 }
 
 export default function HomePage() {
+  const stats: MarqueeStat[] = [
+    { value: "340+", label: "Clients helped in their search" },
+    { value: "500+", label: "Homes available to you" },
+    { value: "500+", label: "Homes available to you" },
+    { value: "340+", label: "Clients helped in their search" },
+    { value: "500+", label: "Homes available to you" },
+  ];
+
   return (
+    <>
     <section
       id="hero-section"
       className="relative w-full min-h-[600px] bg-[#BE4D0008] overflow-hidden"
@@ -92,14 +114,14 @@ export default function HomePage() {
 
         {/* ─── Right Image ─── */}
         <div className="flex-1 relative w-full max-w-2xl">
-          <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
+          <div className="relative w-full aspect-[4/3] overflow-hidden">
             {/* Placeholder — swap src when the real image is ready */}
             <Image
               src="/HomePageHeroSection.png"
               alt="Modern luxury property"
               fill
               priority
-              className="object-cover"
+              className="object-cover scale-110"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
 
@@ -136,5 +158,37 @@ export default function HomePage() {
         </div>
       </div>
     </section>
+
+      {/* ─── Stats Marquee Section ─── */}
+      <StatsMarquee stats={stats} durationSeconds={25} repeat={2} />
+
+      {/* ─── Who We Are Section ─── */}
+      <WhoWeAreSection />
+
+      {/* ─── Our Services Section ─── */}
+      <OurServicesSection />
+
+      {/* ─── Getting Started Section ─── */}
+      <GettingStartedSection />
+
+      {/* ─── Featured Properties Section ─── */}
+      <FeaturedPropertiesSection />
+
+      {/* ─── Dashboard Works Section ─── */}
+      <DashboardWorksSection />
+
+      {/* ─── Marketplace Value Section ─── */}
+      <MarketplaceValueSection />
+
+      {/* ─── Featured In + Testimonials + Pricing ─── */}
+      <FeaturedInSection />
+      <TestimonialsSection />
+      <PricingSection />
+
+      {/* ─── Success Stories + FAQ + Ready Journey ─── */}
+      <SuccessStoriesSection />
+      <FAQSection />
+      <ReadyJourneySection />
+    </>
   );
 }
