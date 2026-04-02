@@ -7,7 +7,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navLinks = [
-    { label: "Hotels", href: "/hotels" },
+    { label: "Hotels", href: "/hotel" },
     { label: "Artisan", href: "/artisans" },
     { label: "Agents", href: "/agents" },
     { label: "About us", href: "/about" },
@@ -27,18 +27,6 @@ export default function Navbar() {
               {item.label}
             </Link>
           ))}
-          <Link
-            href="/login"
-            className="text-base font-medium leading-none text-gray-900 transition-colors hover:text-[#BE4D00]"
-          >
-            Log in
-          </Link>
-          <Link
-            href="/signup"
-            className="bg-[#BE4D00] px-4 py-2 text-base font-medium leading-none text-white transition-colors hover:bg-[#a64300]"
-          >
-            Signup
-          </Link>
         </div>
 
         <div className="hidden items-center gap-4 lg:flex">
@@ -47,6 +35,18 @@ export default function Navbar() {
             className="inline-flex items-center border border-gray-300 bg-gray-100 px-5 py-2 text-base font-medium text-gray-800 transition-colors hover:bg-gray-200"
           >
             Become a host
+          </Link>
+          <Link
+            href="/signup"
+            className="bg-[#BE4D00] px-4 py-2 text-base font-medium leading-none text-white transition-colors hover:bg-[#a64300]"
+          >
+            Signup
+          </Link>
+          <Link
+            href="/login"
+            className="text-base font-medium leading-none text-gray-900 transition-colors hover:text-[#BE4D00]"
+          >
+            Log in
           </Link>
         </div>
 
