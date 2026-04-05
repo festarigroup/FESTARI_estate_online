@@ -73,3 +73,41 @@ def send_email_task(self, subject, recipient_list, template_name=None, context=N
     except Exception as exc:
         logger.exception("Email send failed: %s - Error: %s", message_id, str(exc))
         raise self.retry(exc=exc)
+
+
+@shared_task(bind=True, base=BaseTaskWithRetry, queue="default")
+def check_expired_subscriptions(self):
+    """Check and deactivate expired subscriptions."""
+    from django.utils import timezone
+    from apps.subscriptions.models import UserSubscription
+    
+    logger.info("Checking for expired subscriptions")
+    
+    expired_subscriptions = UserSubscription.objects.filter(
+        end_date__lt=timezone.now(),
+        is_active=True
+    )
+    
+    count = 0
+    for subscription in expired_subscriptions:
+        subscription.is_active = False
+        subscription.save(update_fields=['is_active'])
+        count += 1
+        
+        # Send notification email
+        context = {
+            "recipient_name": subscription.user.first_name or subscription.user.username,
+            "plan_name": subscription.plan.name,
+            "end_date": subscription.end_date.strftime("%B %d, %Y"),
+            "logo_url": settings.EMAIL_LOGO_URL,
+        }
+        send_email_task.delay(
+            subject="Your Festari Subscription Has Expired",
+            recipient_list=subscription.user.email,
+            template_name="subscriptions/subscription_expired.html",
+            context=context,
+            message_id=f"subscription_expired:{subscription.id}"
+        )
+    
+    logger.info(f"Deactivated {count} expired subscriptions")
+    return {"deactivated_count": count}

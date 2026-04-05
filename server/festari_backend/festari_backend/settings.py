@@ -159,6 +159,15 @@ CELERY_TASK_QUEUES = {
     "heavy": {"exchange": "heavy", "routing_key": "heavy"},
 }
 
+# Celery Beat Schedule
+from celery.schedules import crontab
+CELERY_BEAT_SCHEDULE = {
+    'check-expired-subscriptions': {
+        'task': 'apps.common.tasks.check_expired_subscriptions',
+        'schedule': crontab(hour=0, minute=0),  # Run daily at midnight
+    },
+}
+
 SWAGGER_SETTINGS = {
     "USE_SESSION_AUTH": False,
     "DEFAULT_AUTO_SCHEMA_CLASS": "apps.common.swagger.AuthAwareSwaggerAutoSchema",
