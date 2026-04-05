@@ -17,5 +17,21 @@ class PaystackService:
         return requests.post(f"{cls.base_url}/transaction/initialize", json=payload, headers=cls._headers(), timeout=20)
 
     @classmethod
-    def verify(cls, reference):
-        return requests.get(f"{cls.base_url}/transaction/verify/{reference}", headers=cls._headers(), timeout=20)
+    def create_plan(cls, name, amount, interval="monthly"):
+        payload = {"name": name, "amount": int(float(amount) * 100), "interval": interval}
+        return requests.post(f"{cls.base_url}/plan", json=payload, headers=cls._headers(), timeout=20)
+
+    @classmethod
+    def list_plans(cls):
+        return requests.get(f"{cls.base_url}/plan", headers=cls._headers(), timeout=20)
+
+    @classmethod
+    def update_plan(cls, plan_code, name=None, amount=None, interval=None):
+        payload = {}
+        if name:
+            payload["name"] = name
+        if amount:
+            payload["amount"] = int(float(amount) * 100)
+        if interval:
+            payload["interval"] = interval
+        return requests.put(f"{cls.base_url}/plan/{plan_code}", json=payload, headers=cls._headers(), timeout=20)

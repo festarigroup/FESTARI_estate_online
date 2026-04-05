@@ -8,12 +8,15 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.views import APIView
+from django.utils import timezone
+from datetime import timedelta
 
 from apps.common.email_utils import send_email
 from apps.common.responses import api_response
 from apps.payments.models import Payment
 from apps.payments.serializers import PaymentSerializer
 from apps.payments.services import PaystackService
+from apps.subscriptions.models import SubscriptionPlan, UserSubscription
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +96,42 @@ class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
         payment = Payment.objects.filter(reference=reference).first()
         if payment and paystack_resp.get("data", {}).get("status") == "success":
             payment.status = "success"
-            payment.save(update_fields=["status"])
+            payment.metadata = paystack_resp
+            payment.save(update_fields=["status", "metadata"])
+
+            # Handle subscription creation for successful subscription payments
+            if payment.payment_type == Payment.PaymentType.SUBSCRIPTION:
+                plan_id = payment.metadata.get("plan_id")
+                if plan_id:
+                    try:
+                        plan = SubscriptionPlan.objects.get(id=plan_id)
+                        # Calculate end date based on interval
+                        if plan.interval == "yearly":
+                            end_date = timezone.now() + timedelta(days=365)
+                        else:  # monthly
+                            end_date = timezone.now() + timedelta(days=30)
+                        
+                        # Create or update subscription
+                        subscription, created = UserSubscription.objects.get_or_create(
+                            user=payment.user,
+                            defaults={
+                                'plan': plan,
+                                'end_date': end_date,
+                                'is_active': True
+                            }
+                        )
+                        
+                        if not created:
+                            # Update existing subscription
+                            subscription.plan = plan
+                            subscription.end_date = end_date
+                            subscription.is_active = True
+                            subscription.save()
+                        
+                        logger.info(f"Subscription {'created' if created else 'updated'} for user {payment.user.username} with plan {plan.name}")
+                        
+                    except SubscriptionPlan.DoesNotExist:
+                        logger.error(f"Plan {plan_id} not found for subscription payment {reference}")
 
             _send_payment_notification(
                 payment=payment,
@@ -129,6 +167,40 @@ class PaymentWebhookView(APIView):
             payment.save(update_fields=["status", "metadata"])
 
             if new_status == "success":
+                # Handle subscription creation for successful subscription payments
+                if payment.payment_type == Payment.PaymentType.SUBSCRIPTION:
+                    plan_id = payment.metadata.get("plan_id")
+                    if plan_id:
+                        try:
+                            plan = SubscriptionPlan.objects.get(id=plan_id)
+                            # Calculate end date based on interval
+                            if plan.interval == "yearly":
+                                end_date = timezone.now() + timedelta(days=365)
+                            else:  # monthly
+                                end_date = timezone.now() + timedelta(days=30)
+                            
+                            # Create or update subscription
+                            subscription, created = UserSubscription.objects.get_or_create(
+                                user=payment.user,
+                                defaults={
+                                    'plan': plan,
+                                    'end_date': end_date,
+                                    'is_active': True
+                                }
+                            )
+                            
+                            if not created:
+                                # Update existing subscription
+                                subscription.plan = plan
+                                subscription.end_date = end_date
+                                subscription.is_active = True
+                                subscription.save()
+                            
+                            logger.info(f"Subscription {'created' if created else 'updated'} for user {payment.user.username} with plan {plan.name}")
+                            
+                        except SubscriptionPlan.DoesNotExist:
+                            logger.error(f"Plan {plan_id} not found for subscription payment {reference}")
+
                 _send_payment_notification(
                     payment=payment,
                     recipient_email=payment.user.email,

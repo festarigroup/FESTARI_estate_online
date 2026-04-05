@@ -10,6 +10,7 @@ class ArtisanProfile(models.Model):
     service_categories = models.JSONField(default=list, blank=True)
     hourly_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     status = models.CharField(max_length=16, default="pending")
+    media_urls = models.JSONField(default=list, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
