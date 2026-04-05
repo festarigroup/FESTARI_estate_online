@@ -155,6 +155,20 @@ class ArtisanProfileViewSet(viewsets.ModelViewSet):
         obj.save(update_fields=["media_urls"])
         return api_response(True, "Artisan media deleted.", status.HTTP_200_OK, data={"url": media_url})
 
+    @action(detail=True, methods=["post"], url_path="approve")
+    def approve(self, request, pk=None):
+        obj = self.get_object()
+        obj.status = "approved"
+        obj.save(update_fields=["status"])
+        return api_response(True, "Artisan profile approved", status.HTTP_200_OK, data=ArtisanProfileSerializer(obj).data)
+
+    @action(detail=True, methods=["post"], url_path="reject")
+    def reject(self, request, pk=None):
+        obj = self.get_object()
+        obj.status = "rejected"
+        obj.save(update_fields=["status"])
+        return api_response(True, "Artisan profile rejected", status.HTTP_200_OK, data=ArtisanProfileSerializer(obj).data)
+
 
 class ArtisanHireRequestViewSet(viewsets.ModelViewSet):
     serializer_class = ArtisanHireRequestSerializer

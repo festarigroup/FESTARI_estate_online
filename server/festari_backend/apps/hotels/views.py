@@ -16,7 +16,7 @@ from apps.common.supabase import (
     get_media_path_from_url,
     upload_media_file,
 )
-from apps.common.tasks import delete_supabase_media_file_task
+from apps.common.email_utils import send_email
 from apps.hotels.models import Hotel, HotelBooking
 from apps.hotels.serializers import HotelBookingSerializer, HotelSerializer
 
@@ -164,6 +164,20 @@ class HotelViewSet(viewsets.ModelViewSet):
         obj.save(update_fields=["media_urls"])
         return api_response(True, "Hotel media deleted.", status.HTTP_200_OK, data={"url": media_url})
 
+    @action(detail=True, methods=["post"], url_path="approve")
+    def approve(self, request, pk=None):
+        obj = self.get_object()
+        obj.status = "approved"
+        obj.save(update_fields=["status"])
+        return api_response(True, "Hotel approved", status.HTTP_200_OK, data=HotelSerializer(obj).data)
+
+    @action(detail=True, methods=["post"], url_path="reject")
+    def reject(self, request, pk=None):
+        obj = self.get_object()
+        obj.status = "rejected"
+        obj.save(update_fields=["status"])
+        return api_response(True, "Hotel rejected", status.HTTP_200_OK, data=HotelSerializer(obj).data)
+
 
 class HotelBookingViewSet(viewsets.ModelViewSet):
     serializer_class = HotelBookingSerializer
@@ -177,4 +191,25 @@ class HotelBookingViewSet(viewsets.ModelViewSet):
         return HotelBooking.objects.filter(user=self.request.user).select_related("hotel")
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        booking = serializer.save(user=self.request.user)
+        
+        # Send booking confirmation email
+        context = {
+            "guest_name": booking.user.first_name or booking.user.username,
+            "guest_email": booking.user.email,
+            "hotel_name": booking.hotel.name,
+            "check_in_date": booking.check_in.strftime("%B %d, %Y"),
+            "check_out_date": booking.check_out.strftime("%B %d, %Y"),
+            "total_amount": str(booking.total_amount),
+            "booking_reference": str(booking.id)[:8].upper(),
+            "hotel_contact_url": f"mailto:{booking.hotel.manager.email}",
+        }
+        
+        send_email(
+            subject=f"Hotel Booking Confirmation - {booking.hotel.name}",
+            recipient_list=booking.user.email,
+            template_name="hotels/booking_confirmation.html",
+            context=context,
+            background=True,
+            message_id=f"hotel_booking:{booking.id}"
+        )

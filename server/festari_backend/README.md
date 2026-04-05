@@ -19,11 +19,13 @@ Production-focused Django REST Framework backend for properties, hotels, artisan
 
 Festari Estates is a comprehensive real estate platform backend that provides APIs for:
 
-- **Property Management**: List, search, and manage real estate properties
-- **Hotel Management**: Hotel listings and booking management
-- **Artisan Services**: Connect customers with local artisans
-- **Subscription System**: Tiered plans for different user types
-- **Payment Processing**: Secure payments via Paystack
+- **Property Management**: List, search, and manage real estate properties with media upload and approval workflow
+- **Hotel Management**: Hotel listings and booking management with admin approval
+- **Artisan Services**: Connect customers with local artisans with profile approval
+- **Subscription System**: Tiered plans for different user types with Paystack integration
+- **Payment Processing**: Secure payments via Paystack with webhook handling
+- **Contact/Inquiry System**: Property and artisan contact messaging without real-time chat
+- **Email Notifications**: Comprehensive email system for bookings, inquiries, and subscriptions
 - **Media Management**: File uploads to Supabase storage
 - **Admin Analytics**: Dashboard insights and reporting
 
@@ -479,6 +481,56 @@ Content-Type: application/json
 {
   "reference": "payment-reference"
 }
+```
+
+#### Contact/Inquiry API
+
+**Create Property Inquiry**
+```http
+POST /api/v1/property-inquiries/
+Authorization: Bearer <access-token>
+Content-Type: application/json
+
+{
+  "property": "property-uuid",
+  "subject": "Interested in your property",
+  "message": "Hi, I'm interested in this property. Can we schedule a viewing?",
+  "contact_email": "buyer@example.com",
+  "contact_phone": "+2348012345678"
+}
+```
+
+**List Property Inquiries** (Property owners see inquiries for their properties)
+```http
+GET /api/v1/property-inquiries/
+Authorization: Bearer <access-token>
+```
+
+**Create Artisan Inquiry**
+```http
+POST /api/v1/artisan-inquiries/
+Authorization: Bearer <access-token>
+Content-Type: application/json
+
+{
+  "artisan": "artisan-profile-uuid",
+  "subject": "Need plumbing services",
+  "message": "Hi, I need help with plumbing repairs in my home.",
+  "contact_email": "customer@example.com",
+  "contact_phone": "+2348012345678"
+}
+```
+
+**List Artisan Inquiries** (Artisans see inquiries for their profiles)
+```http
+GET /api/v1/artisan-inquiries/
+Authorization: Bearer <access-token>
+```
+
+**Mark Inquiry as Read**
+```http
+POST /api/v1/property-inquiries/{id}/mark-read/
+Authorization: Bearer <access-token>
 ```
 
 ## Core Services & Features
