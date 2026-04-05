@@ -231,15 +231,126 @@ Content-Type: application/json
 }
 ```
 
-#### Refresh Token
+#### OAuth Authentication (Google/Apple)
+
+The API supports OAuth authentication via Supabase Auth for Google and Apple sign-in.
+
+**OAuth Login**
 ```http
-POST /api/v1/auth/refresh/
+POST /api/v1/auth/oauth-login/
 Content-Type: application/json
 
 {
-  "refresh": "refresh-token-here"
+  "provider": "google",
+  "token": "supabase-oauth-access-token",
+  "id_token": "optional-id-token"
 }
 ```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Successfully authenticated with google",
+  "data": {
+    "user": {
+      "id": 1,
+      "username": "john_doe_abc123",
+      "email": "john.doe@gmail.com",
+      "first_name": "John",
+      "last_name": "Doe",
+      "role": "customer",
+      "is_verified": true
+    },
+    "tokens": {
+      "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+      "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+    },
+    "provider": "google",
+    "created": true
+  }
+}
+```
+
+### Supabase OAuth Configuration
+
+For OAuth authentication to work properly, you need to configure the following in your Supabase project:
+
+#### 1. Enable OAuth Providers
+- Go to Authentication → Providers in your Supabase dashboard
+- Enable Google and/or Apple providers
+- Configure OAuth credentials:
+  - **Google**: Get Client ID and Secret from Google Cloud Console
+  - **Apple**: Configure App ID and Services ID from Apple Developer Console
+
+#### 2. Configure Redirect URLs
+Add your frontend URLs to the redirect allowlist:
+```
+https://yourdomain.com/auth/callback
+http://localhost:3000/auth/callback (for development)
+```
+
+#### 3. Set OAuth Scopes
+Ensure the following scopes are enabled:
+- `email` (required)
+- `profile` (recommended for name information)
+
+#### 4. JWT Secret Configuration
+The `SUPABASE_JWT_SECRET` in your `.env` file should match your Supabase project's JWT secret (found in Project Settings → API).
+
+#### 5. Frontend Integration
+Your frontend should:
+1. Use Supabase Auth client to initiate OAuth flow
+2. Handle the OAuth callback
+3. Extract the access token
+4. Send it to the backend `/api/v1/auth/oauth-login/` endpoint
+
+### Testing OAuth Authentication
+
+To test OAuth authentication:
+
+1. **Setup Supabase Auth**:
+   - Configure Google/Apple providers in Supabase dashboard
+   - Add `http://localhost:3000` to redirect URLs for development
+
+2. **Frontend Testing**:
+   ```javascript
+   // Example using Supabase JS client
+   import { createClient } from '@supabase/supabase-js'
+   
+   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+   
+   // Sign in with Google
+   const { data, error } = await supabase.auth.signInWithOAuth({
+     provider: 'google',
+     options: {
+       redirectTo: 'http://localhost:3000/auth/callback'
+     }
+   })
+   
+   // In callback, get session
+   const { data: { session } } = await supabase.auth.getSession()
+   
+   // Send to backend
+   const response = await fetch('/api/v1/auth/oauth-login/', {
+     method: 'POST',
+     headers: { 'Content-Type': 'application/json' },
+     body: JSON.stringify({
+       provider: 'google',
+       token: session.access_token
+     })
+   })
+   ```
+
+3. **Backend Testing** (using curl):
+   ```bash
+   curl -X POST http://localhost:8000/api/v1/auth/oauth-login/ \
+     -H "Content-Type: application/json" \
+     -d '{
+       "provider": "google",
+       "token": "your-supabase-access-token"
+     }'
+   ```
 
 ### Core API Endpoints
 
@@ -439,7 +550,21 @@ Content-Type: application/json
 11. Property goes live after admin approval
 ```
 
-### 2. Hotel Manager Onboarding
+### 2. OAuth Authentication (Google/Apple)
+
+```
+1. User clicks "Sign in with Google/Apple" on frontend
+2. Frontend redirects to Supabase Auth
+3. User authenticates with OAuth provider
+4. Supabase returns OAuth tokens to frontend
+5. Frontend sends tokens to backend /api/v1/auth/oauth-login/
+6. Backend verifies tokens with Supabase
+7. User account created/linked automatically
+8. JWT tokens returned for API authentication
+9. User can now access protected endpoints
+```
+
+### 3. Hotel Manager Onboarding
 
 ```
 1. User registers account
@@ -570,6 +695,7 @@ REDIS_URL=redis://redis:6379/0
 # Supabase
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=service-role-key
+SUPABASE_JWT_SECRET=your-supabase-jwt-secret
 SUPABASE_BUCKET=festari-media
 
 # Paystack
@@ -597,21 +723,28 @@ CSRF_TRUSTED_ORIGINS=http://localhost:3000
    - Use strong `SECRET_KEY`
    - Configure HTTPS
    - Set up proper CORS policies
+   - Validate Supabase JWT tokens properly
 
-2. **Database**
+2. **OAuth Configuration**
+   - Ensure OAuth redirect URLs are properly configured in Supabase
+   - Use production OAuth credentials (not development ones)
+   - Configure proper JWT secrets
+   - Test OAuth flow end-to-end in production environment
+
+3. **Database**
    - Use managed PostgreSQL
    - Configure backups
    - Set up read replicas for scaling
 
-3. **File Storage**
+4. **File Storage**
    - Configure Supabase for production
    - Set up CDN for media files
 
-4. **Email**
+5. **Email**
    - Use transactional email service (SendGrid, Mailgun)
    - Configure SPF/DKIM
 
-5. **Monitoring**
+6. **Monitoring**
    - Set up logging
    - Configure error tracking (Sentry)
    - Monitor Celery tasks

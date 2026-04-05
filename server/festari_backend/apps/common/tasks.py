@@ -45,6 +45,26 @@ class BaseTaskWithRetry(Task):
     soft_time_limit = 45
     acks_late = True
 
+@shared_task(bind=True, base=BaseTaskWithRetry, queue="default")
+def delete_supabase_media_file_task(self, path: str):
+    """Delete media file from Supabase storage asynchronously."""
+    from apps.common.supabase import delete_media_file
+    
+    logger.info("Deleting Supabase media file: %s", path)
+    
+    try:
+        result = delete_media_file(path)
+        if result.get("success"):
+            logger.info("Successfully deleted Supabase media file: %s", path)
+            return {"success": True, "path": path}
+        else:
+            error_msg = result.get("error", "Unknown error")
+            logger.error("Failed to delete Supabase media file %s: %s", path, error_msg)
+            return {"success": False, "path": path, "error": error_msg}
+    except Exception as exc:
+        logger.exception("Exception deleting Supabase media file %s: %s", path, str(exc))
+        raise self.retry(exc=exc)
+
 @shared_task(bind=True, base=BaseTaskWithRetry, queue="email")
 def send_email_task(self, subject, recipient_list, template_name=None, context=None, plain_message=None, from_email=None, message_id=None):
     """

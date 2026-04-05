@@ -52,4 +52,5 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 class OAuthLoginSerializer(serializers.Serializer):
     provider = serializers.ChoiceField(choices=["google", "apple"])
-    token = serializers.CharField()
+    token = serializers.CharField(help_text="OAuth access token from Supabase Auth")
+    id_token = serializers.CharField(required=False, help_text="ID token for additional user info")

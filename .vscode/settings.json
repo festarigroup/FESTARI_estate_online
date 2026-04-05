@@ -1,0 +1,12 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^python -m py_compile apps/users/views\\.py apps/properties/views\\.py apps/hotels/views\\.py apps/artisans/views\\.py apps/subscriptions/views\\.py apps/payments/views\\.py apps/common/tasks\\.py apps/common/supabase\\.py apps/common/email_utils\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^python -c \"import apps\\.users\\.views; import apps\\.properties\\.views; import apps\\.hotels\\.views; import apps\\.artisans\\.views; import apps\\.subscriptions\\.views; import apps\\.payments\\.views; import apps\\.common\\.tasks; import apps\\.common\\.supabase; import apps\\.common\\.email_utils; print\\('All imports successful'\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

@@ -1,6 +1,7 @@
 from datetime import timedelta
 import random
 import logging
+import uuid
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -15,10 +16,11 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from apps.common.email_utils import send_email
-from apps.common.responses import api_response
+from apps.common.supabase import verify_supabase_jwt
 from apps.users.models import OTPVerification
 from apps.users.serializers import EmailSerializer, EmptySerializer, OAuthLoginSerializer, RegisterSerializer, ResetPasswordSerializer, UserSerializer, VerifyOTPSerializer
+from apps.common.email_utils import send_email
+from apps.common.responses import api_response
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -233,11 +235,81 @@ class AuthViewSet(viewsets.GenericViewSet):
 
     @action(detail=False, methods=["post"])
     def oauth_login(self, request):
-        provider = request.data.get("provider")
-        token = request.data.get("token")
-        if provider not in {"google", "apple"} or not token:
-            return api_response(False, "Invalid OAuth payload", status.HTTP_400_BAD_REQUEST, errors={"provider": "google/apple required"})
-        return api_response(True, "OAuth token accepted. Validate against Supabase in production.", status.HTTP_200_OK, data={"provider": provider})
+        """Authenticate user with OAuth providers (Google/Apple) via Supabase."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        provider = serializer.validated_data["provider"]
+        token = serializer.validated_data["token"]
+
+        logger.info(f"OAuth login attempt - Provider: {provider}, Email: checking token")
+
+        # Verify the OAuth token with Supabase
+        user_data = verify_supabase_jwt(token)
+        if not user_data:
+            logger.warning(f"OAuth login failed - Invalid token for provider: {provider}")
+            return api_response(
+                False, 
+                "Invalid or expired OAuth token", 
+                status.HTTP_401_UNAUTHORIZED
+            )
+
+        # Extract user information from Supabase response
+        email = user_data.get("email")
+        if not email:
+            logger.warning(f"OAuth login failed - No email in response for provider: {provider}")
+            return api_response(
+                False, 
+                "Email not found in OAuth response", 
+                status.HTTP_400_BAD_REQUEST
+            )
+
+        logger.info(f"OAuth login - Processing user: {email} via {provider}")
+
+        # Check if user exists, create if not
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                "username": email.split("@")[0] + "_" + str(uuid.uuid4().hex[:8]),
+                "first_name": user_data.get("user_metadata", {}).get("full_name", "").split()[0] if user_data.get("user_metadata", {}).get("full_name") else "",
+                "last_name": " ".join(user_data.get("user_metadata", {}).get("full_name", "").split()[1:]) if user_data.get("user_metadata", {}).get("full_name") and len(user_data.get("user_metadata", {}).get("full_name").split()) > 1 else "",
+                "is_verified": True,  # OAuth users are pre-verified
+            }
+        )
+
+        if created:
+            logger.info(f"New OAuth user created: {user.email} via {provider}")
+        else:
+            logger.info(f"Existing OAuth user logged in: {user.email} via {provider}")
+
+        # Generate JWT tokens for the user
+        from rest_framework_simplejwt.tokens import RefreshToken
+
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+
+        response_data = {
+            "user": UserSerializer(user).data,
+            "tokens": {
+                "access": access_token,
+                "refresh": refresh_token,
+            },
+            "provider": provider,
+            "created": created,
+        }
+
+        response = api_response(
+            True, 
+            f"Successfully authenticated with {provider}", 
+            status.HTTP_200_OK, 
+            data=response_data
+        )
+        
+        # Set auth cookies
+        _set_auth_cookies(response, access_token, refresh_token)
+        
+        return response
 
     @action(detail=False, methods=["get"])
     def csrf(self, request):

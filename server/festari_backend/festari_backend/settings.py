@@ -1,6 +1,8 @@
 import os
 from datetime import timedelta
 from pathlib import Path
+import platform
+from celery.schedules import crontab
 
 from decouple import Csv, config
 
@@ -144,8 +146,7 @@ CELERY_TASK_ACKS_LATE = True
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_TASK_REJECT_ON_WORKER_LOST = True
 
-# Windows compatibility settings
-import platform
+
 if platform.system() == 'Windows':
     CELERY_WORKER_POOL = 'solo'
     CELERY_WORKER_CONCURRENCY = 1
@@ -159,12 +160,10 @@ CELERY_TASK_QUEUES = {
     "heavy": {"exchange": "heavy", "routing_key": "heavy"},
 }
 
-# Celery Beat Schedule
-from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'check-expired-subscriptions': {
         'task': 'apps.common.tasks.check_expired_subscriptions',
-        'schedule': crontab(hour=0, minute=0),  # Run daily at midnight
+        'schedule': crontab(hour=0, minute=0),
     },
 }
 
@@ -225,9 +224,12 @@ LOGGING = {
             "formatter": "verbose",
         },
         "file": {
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.TimedRotatingFileHandler",
             "filename": "logs/django.log",
             "formatter": "verbose",
+            "when": "midnight",
+            "interval": 1,
+            "backupCount": 30,
         },
     },
     "root": {
