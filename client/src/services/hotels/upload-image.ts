@@ -10,7 +10,7 @@ export const uploadHotelImage = async (data: UploadHotelImageType) => {
   formData.append("file", data.file);
 
   const response = await privateApi.post(
-    `/properties/${data.hotelId}/upload-media/`,
+    `/hotels/${data.hotelId}/upload-media/`,
     formData,
     {
       headers: {

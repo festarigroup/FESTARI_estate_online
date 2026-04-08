@@ -31,7 +31,6 @@ Content-Type: application/json
 - `GET /api/properties/{id}/` - Get property details
 - `PUT /api/properties/{id}/` - Update property (Manager/Admin only)
 - `DELETE /api/properties/{id}/` - Delete property (Admin only)
-- `GET /api/properties/{id}/images/` - Get property images
 - `POST /api/properties/{id}/images/` - Upload property images
 
 ### Property Inquiries
