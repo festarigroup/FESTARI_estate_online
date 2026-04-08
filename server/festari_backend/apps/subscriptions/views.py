@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
+import uuid
 
 from apps.common.permissions import IsAdminRole
 from apps.common.responses import api_response
@@ -113,8 +114,6 @@ class UserSubscriptionViewSet(viewsets.ModelViewSet):
                 status.HTTP_400_BAD_REQUEST
             )
 
-        # Create payment record
-        import uuid
         reference = f"FESTARI-SUB-{uuid.uuid4().hex[:16].upper()}"
         payment = Payment.objects.create(
             user=request.user,

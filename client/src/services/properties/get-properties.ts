@@ -1,3 +1,4 @@
+import { Property } from "@/types/Property";
 import { publicApi } from "../axios-wrapper";
 
 export interface GetPropertiesOptions {
@@ -12,7 +13,7 @@ export interface GetPropertiesOptions {
 
 export const getProperties = async (options: GetPropertiesOptions = {}) => {
   try {
-    const response = await publicApi.get("/properties/", {
+    const response = await publicApi.get<Array<Property>>("/properties/", {
       params: {
         status: options.status,
         is_featured: options.is_featured,
