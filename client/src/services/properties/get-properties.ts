@@ -1,18 +1,22 @@
 import { publicApi } from "../axios-wrapper";
 
-export interface GetArtisansOptions {
+export interface GetPropertiesOptions {
   status?: string;
+  is_featured?: string;
+  location?: string;
   search?: string;
   ordering?: string;
   page?: number;
   page_size?: number;
 }
 
-export const getArtisans = async (options: GetArtisansOptions = {}) => {
+export const getProperties = async (options: GetPropertiesOptions = {}) => {
   try {
-    const response = await publicApi.get("/artisans/", {
+    const response = await publicApi.get("/properties/", {
       params: {
         status: options.status,
+        is_featured: options.is_featured,
+        location: options.location,
         search: options.search,
         ordering: options.ordering,
         page: options.page ?? 1,
