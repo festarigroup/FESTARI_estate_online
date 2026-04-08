@@ -16,8 +16,8 @@ export const register = async (data: RegisterType) => {
         const response = await publicApi.post<User>("/auth/register", {
             ...data
         })
-        console.log(response)
+        return response
     }catch(err){
-        console.log(err)
+        return err
     }
 }

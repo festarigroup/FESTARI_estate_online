@@ -10,8 +10,8 @@ export const VerifyOtp = async (data: VerifyOtp) => {
         const response = await publicApi.post("/auth/verify_otp", {
             ...data
         })
-        console.log(response)
+        return response
     }catch(err){
-        console.log(err)
+        return err
     }
 }

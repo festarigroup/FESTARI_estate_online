@@ -191,7 +191,7 @@ Content-Type: application/json
 - **Postman Collection**: Available in `/docs/postman_collection.json`
 
 ## Testing
-- **Base URL for testing**: `http://localhost:8000/api/`
+- **Base URL for testing**: `http://localhost:8000/api`
 - **Test credentials**: Available in development environment
 - **API documentation**: Interactive Swagger UI at `/api/docs/`
 

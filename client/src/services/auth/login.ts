@@ -11,9 +11,9 @@ export const login = async (data: LoginType) => {
         const response = await publicApi.post<User>("/auth/login", {
             ...data
         })
-        console.log(response)
+        return response
     }catch(err){
-        console.log(err)
+        return err
     }
 }
 

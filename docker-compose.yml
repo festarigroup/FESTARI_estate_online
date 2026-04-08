@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   server:
     build:
@@ -60,7 +58,7 @@ services:
       - server
 
   db:
-    image: postgres:15-alpine
+    image: postgresql
     container_name: postgres_db
     volumes:
       - postgres_data:/var/lib/postgresql/data

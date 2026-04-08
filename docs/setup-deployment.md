@@ -158,7 +158,6 @@ REDIS_URL=redis://redis-host:6379/0
 ### 3. Docker Production Setup
 ```yaml
 # docker-compose.prod.yml
-version: '3.8'
 services:
   backend:
     build: ./server

@@ -9,8 +9,8 @@ export const RequestPasswordReset = async (data: RequestPasswordResetType) => {
         const response = await publicApi.post("/auth/request_password_reset", {
             ...data
         })
-        console.log(response)
+        return response
     }catch(err){
-        console.log(err)
+        return err
     }
 }
