@@ -58,7 +58,7 @@ services:
       - server
 
   db:
-    image: postgresql
+    image: postgres
     container_name: postgres_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -71,7 +71,7 @@ services:
       - "5432:5432"
 
   redis:
-    image: redis:7-alpine
+    image: redis
     container_name: redis_cache
     volumes:
       - redis_data:/data
