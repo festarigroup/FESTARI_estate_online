@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import Footer from "@/components/footer/layout";
 import Navbar from "@/components/navbar/layout";
 import SidebarLayout from "@/components/sidebar/layout";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -26,6 +27,7 @@ export default function RootLayout({
         <SidebarLayout />
         <div className="min-h-screen ml-64 flex flex-col">
           <Navbar />
+          <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
           <main className="flex-1">{children}</main>
           <Footer />
         </div>

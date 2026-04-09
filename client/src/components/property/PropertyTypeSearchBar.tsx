@@ -12,14 +12,22 @@ const houseOptions = [
 
 const apartmentOptions = ["Studio", "1 bedroom", "2 bedroom", "3+ bedroom"];
 const roomOptions = ["Single", "Chamber &", "2 bedroom", "3+ bedroom"];
+const landOptions = ["Residential Land", "Commercial Land", "Agricultural Land"];
+const commercialOptions = ["Office", "Shop/Retail", "Warehouse", "Industrial"];
 
 export default function PropertyTypeSearchBar() {
   const [isHouseOpen, setIsHouseOpen] = useState(false);
   const [isApartmentOpen, setIsApartmentOpen] = useState(false);
   const [isRoomOpen, setIsRoomOpen] = useState(false);
+  const [isLandOpen, setIsLandOpen] = useState(false);
+  const [isCommercialOpen, setIsCommercialOpen] = useState(false);
+
   const [selectedHouseType, setSelectedHouseType] = useState("Detached");
   const [selectedApartmentType, setSelectedApartmentType] = useState("Studio");
   const [selectedRoomType, setSelectedRoomType] = useState("Single");
+  const [selectedLandType, setSelectedLandType] = useState("Residential Land");
+  const [selectedCommercialType, setSelectedCommercialType] = useState("Office");
+
   const controlsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,6 +40,8 @@ export default function PropertyTypeSearchBar() {
         setIsHouseOpen(false);
         setIsApartmentOpen(false);
         setIsRoomOpen(false);
+        setIsLandOpen(false);
+        setIsCommercialOpen(false);
       }
     }
 
@@ -53,7 +63,9 @@ export default function PropertyTypeSearchBar() {
               onClick={() => {
                 setIsHouseOpen((prev) => !prev);
                 setIsApartmentOpen(false);
-                    setIsRoomOpen(false);
+                setIsRoomOpen(false);
+                setIsLandOpen(false);
+                setIsCommercialOpen(false);
               }}
               className={`flex items-center gap-2 border px-2 py-3 text-sm whitespace-nowrap transition-colors ${
                 isHouseOpen
@@ -108,6 +120,8 @@ export default function PropertyTypeSearchBar() {
                   setIsApartmentOpen((prev) => !prev);
                   setIsHouseOpen(false);
                   setIsRoomOpen(false);
+                  setIsLandOpen(false);
+                  setIsCommercialOpen(false);
                 }}
                 className={`flex items-center gap-2 border px-2 py-3 text-sm whitespace-nowrap transition-colors ${
                   isApartmentOpen
@@ -162,6 +176,8 @@ export default function PropertyTypeSearchBar() {
                   setIsRoomOpen((prev) => !prev);
                   setIsHouseOpen(false);
                   setIsApartmentOpen(false);
+                  setIsLandOpen(false);
+                  setIsCommercialOpen(false);
                 }}
                 className={`flex items-center gap-2 border px-2 py-3 text-sm whitespace-nowrap transition-colors ${
                   isRoomOpen
@@ -210,24 +226,101 @@ export default function PropertyTypeSearchBar() {
             </div>
           </div>
 
-          {["Land/plot", "Commercial"].map((item) => (
-            <button
-              key={item}
-              type="button"
-              className="flex items-center gap-2 px-5 py-3 text-sm text-gray-500 whitespace-nowrap transition-colors hover:text-gray-700"
-            >
-              <span>{item}</span>
-              <svg
-                className="h-3 w-3"
-                viewBox="0 0 20 20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLandOpen((prev) => !prev);
+                  setIsHouseOpen(false);
+                  setIsApartmentOpen(false);
+                  setIsRoomOpen(false);
+                  setIsCommercialOpen(false);
+                }}
+                className={`flex items-center gap-2 border px-2 py-3 text-sm whitespace-nowrap transition-colors ${
+                  isLandOpen
+                    ? "border-[#BE4D00] text-[#BE4D00]"
+                    : "border-transparent text-gray-500"
+                }`}
+                aria-expanded={isLandOpen}
+                aria-haspopup="menu"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 8l4 4 4-4" />
-              </svg>
-            </button>
-          ))}
+                <span>Land/plot</span>
+                <svg className={`h-3 w-3 transition-transform ${isLandOpen ? "rotate-180" : ""}`} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 8l4 4 4-4" />
+                </svg>
+              </button>
+
+              {isLandOpen && (
+                <div className="absolute left-0 top-full z-20 mt-1 w-36 border border-[#BE4D00] bg-white shadow-sm" role="menu">
+                  {landOptions.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => {
+                        setSelectedLandType(option);
+                        setIsLandOpen(false);
+                      }}
+                      className={`block w-full px-2 py-2 text-left text-sm ${
+                        selectedLandType === option
+                          ? "bg-[#C05000] text-white"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                      role="menuitem"
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCommercialOpen((prev) => !prev);
+                  setIsHouseOpen(false);
+                  setIsApartmentOpen(false);
+                  setIsRoomOpen(false);
+                  setIsLandOpen(false);
+                }}
+                className={`flex items-center gap-2 border px-2 py-3 text-sm whitespace-nowrap transition-colors ${
+                  isCommercialOpen
+                    ? "border-[#BE4D00] text-[#BE4D00]"
+                    : "border-transparent text-gray-500"
+                }`}
+                aria-expanded={isCommercialOpen}
+                aria-haspopup="menu"
+              >
+                <span>Commercial</span>
+                <svg className={`h-3 w-3 transition-transform ${isCommercialOpen ? "rotate-180" : ""}`} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 8l4 4 4-4" />
+                </svg>
+              </button>
+
+              {isCommercialOpen && (
+                <div className="absolute left-0 top-full z-20 mt-1 w-32 border border-[#BE4D00] bg-white shadow-sm" role="menu">
+                  {commercialOptions.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => {
+                        setSelectedCommercialType(option);
+                        setIsCommercialOpen(false);
+                      }}
+                      className={`block w-full px-2 py-2 text-left text-sm ${
+                        selectedCommercialType === option
+                          ? "bg-[#C05000] text-white"
+                          : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                      role="menuitem"
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
           <button
             type="button"
