@@ -1,2 +1,2 @@
 # FESTARI_estate_online
-### 📂[docs](docs)
+### 📂[docs](docs/README.md)

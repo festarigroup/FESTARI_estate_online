@@ -9,7 +9,8 @@ COPY ../requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY . /app
+RUN mkdir -p /app/fesstari_backend/logs
 
 EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "festari_backend/manage.py", "runserver", "0.0.0.0:8000"]
