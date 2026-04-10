@@ -4,8 +4,8 @@ services:
       context: ./server
       dockerfile: festari_backend/Dockerfile
     container_name: django_api
-    volumes:
-      - ./server:/app
+    # volumes:
+    #   - ./server:/app
     ports:
       - "8000:8000"
     env_file:
@@ -19,8 +19,8 @@ services:
       context: ./server
       dockerfile: festari_backend/Dockerfile
     container_name: django_worker
-    volumes:
-      - ./server:/app
+    # volumes:
+    #   - ./server:/app
     env_file:
       - ./server/festari_backend/.env
     depends_on:
@@ -33,23 +33,23 @@ services:
       context: ./server
       dockerfile: festari_backend/Dockerfile
     container_name: django_beat
-    volumes:
-      - ./server:/app
+    # volumes:
+    #   - ./server:/app
     env_file:
       - ./server/festari_backend/.env
     depends_on:
       - db
       - redis
-    command: ["celery", "-A", "festari_backend/festari_backend.celery", "beat", "--loglevel=info"]
+    command: ["celery", "-A", "festari_backend.celery", "beat", "--loglevel=info"]
 
   client:
     build:
       context: ./client
       dockerfile: Dockerfile
     container_name: nextjs_app
-    volumes:
-      - ./client:/app
-      - /app/node_modules
+    # volumes:
+    #   - ./client:/app
+    #   - /app/node_modules
     ports:
       - "3000:3000"
     env_file:
@@ -60,8 +60,8 @@ services:
   db:
     image: postgres
     container_name: postgres_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    # volumes:
+    #   - postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -73,11 +73,11 @@ services:
   redis:
     image: redis
     container_name: redis_cache
-    volumes:
-      - redis_data:/data
+    # volumes:
+    #   - redis_data:/data
     ports:
       - "6379:6379"
 
-volumes:
-  postgres_data:
-  redis_data:
+# volumes:
+#   postgres_data:
+#   redis_data:
