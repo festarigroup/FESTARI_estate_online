@@ -9,7 +9,8 @@ COPY ../requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY . /app
-RUN mkdir -p /app/fesstari_backend/logs
+RUN mkdir -p /app/festari_backend/logs
+RUN mkdir -p /app/logs
 
 EXPOSE 8000
 

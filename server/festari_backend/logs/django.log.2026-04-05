@@ -1,0 +1,72 @@
+INFO 2026-04-05 21:13:37,551 autoreload 17456 21092 Watching for file changes with StatReloader
+INFO 2026-04-05 21:14:37,251 autoreload 17456 21092 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\properties\views.py changed, reloading.
+INFO 2026-04-05 21:14:40,696 autoreload 14976 14824 Watching for file changes with StatReloader
+INFO 2026-04-05 21:15:36,774 autoreload 23856 23108 Watching for file changes with StatReloader
+INFO 2026-04-05 21:25:38,984 autoreload 23856 23108 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\common\tasks.py changed, reloading.
+INFO 2026-04-05 21:25:43,302 autoreload 588 24916 Watching for file changes with StatReloader
+INFO 2026-04-05 21:26:44,631 autoreload 588 24916 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\common\tasks.py changed, reloading.
+INFO 2026-04-05 21:26:49,818 autoreload 22032 21388 Watching for file changes with StatReloader
+INFO 2026-04-05 21:27:23,764 autoreload 22032 21388 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\common\tasks.py changed, reloading.
+INFO 2026-04-05 21:27:26,448 autoreload 14136 15968 Watching for file changes with StatReloader
+WARNING 2026-04-05 21:27:31,852 log 14136 27088 Not Found: /
+WARNING 2026-04-05 21:27:31,854 log 14136 27088 "GET / HTTP/1.1" 404 3563
+INFO 2026-04-05 21:27:37,537 log 14136 27088 "GET /swagger/ HTTP/1.1" 200 1643
+INFO 2026-04-05 21:27:39,545 log 14136 27088 "GET /swagger/?format=openapi HTTP/1.1" 200 54889
+INFO 2026-04-05 21:48:46,493 autoreload 14136 15968 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\festari_backend\urls.py changed, reloading.
+INFO 2026-04-05 21:48:50,636 autoreload 6320 23332 Watching for file changes with StatReloader
+INFO 2026-04-05 21:48:58,116 autoreload 6320 23332 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\artisans\views.py changed, reloading.
+INFO 2026-04-05 21:49:00,898 autoreload 24724 25316 Watching for file changes with StatReloader
+INFO 2026-04-05 21:51:40,031 autoreload 24724 25316 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\common\views.py changed, reloading.
+INFO 2026-04-05 21:51:43,121 autoreload 21792 21516 Watching for file changes with StatReloader
+INFO 2026-04-05 21:51:48,490 autoreload 21792 21516 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\common\views.py changed, reloading.
+INFO 2026-04-05 21:51:51,667 autoreload 27164 23732 Watching for file changes with StatReloader
+INFO 2026-04-05 21:51:56,438 autoreload 27164 23732 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\hotels\views.py changed, reloading.
+INFO 2026-04-05 21:51:58,521 autoreload 2912 26420 Watching for file changes with StatReloader
+INFO 2026-04-05 21:52:09,440 autoreload 2912 26420 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\hotels\views.py changed, reloading.
+INFO 2026-04-05 21:52:11,950 autoreload 23544 22316 Watching for file changes with StatReloader
+INFO 2026-04-05 21:54:35,996 autoreload 23544 22316 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\hotels\views.py changed, reloading.
+INFO 2026-04-05 21:54:38,462 autoreload 15764 26400 Watching for file changes with StatReloader
+INFO 2026-04-05 23:25:02,504 autoreload 27352 23680 Watching for file changes with StatReloader
+INFO 2026-04-05 23:25:10,979 log 27352 13044 "GET /api/v1/properties/?page=1&page_size=12&ordering=-created_at HTTP/1.1" 200 52
+INFO 2026-04-05 23:25:16,297 log 27352 13044 "GET /api/v1/properties/?page=1&page_size=3&ordering=-created_at&is_featured=true HTTP/1.1" 200 52
+INFO 2026-04-05 23:25:16,297 log 27352 26308 "GET /api/v1/hotels/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:25:16,501 log 27352 13044 "GET /api/v1/artisans/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:25:16,581 log 27352 26308 "GET /api/v1/properties/?page=1&page_size=3&ordering=-created_at&is_featured=true HTTP/1.1" 200 52
+INFO 2026-04-05 23:25:16,651 log 27352 13044 "GET /api/v1/artisans/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:25:16,680 log 27352 24196 "GET /api/v1/hotels/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:26:05,981 log 27352 13044 "GET /api/v1/hotels/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:26:06,004 log 27352 26308 "GET /api/v1/artisans/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:26:06,087 log 27352 24196 "GET /api/v1/properties/?page=1&page_size=3&ordering=-created_at&is_featured=true HTTP/1.1" 200 52
+INFO 2026-04-05 23:26:18,229 log 27352 24196 "GET /api/v1/properties/?page=1&page_size=3&ordering=-created_at&is_featured=true HTTP/1.1" 200 52
+INFO 2026-04-05 23:26:18,279 log 27352 26308 "GET /api/v1/hotels/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:26:18,327 log 27352 13044 "GET /api/v1/artisans/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:26:23,942 log 27352 13044 "GET /api/v1/properties/?page=1&page_size=12&ordering=-created_at HTTP/1.1" 200 52
+INFO 2026-04-05 23:26:24,063 log 27352 26308 "GET /api/v1/properties/?page=1&page_size=12&ordering=-created_at HTTP/1.1" 200 52
+INFO 2026-04-05 23:26:29,251 log 27352 13044 "GET /api/v1/hotels/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:26:29,302 log 27352 26308 "GET /api/v1/properties/?page=1&page_size=3&ordering=-created_at&is_featured=true HTTP/1.1" 200 52
+INFO 2026-04-05 23:26:29,343 log 27352 24196 "GET /api/v1/artisans/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:26:29,456 log 27352 13044 "GET /api/v1/hotels/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:26:29,501 log 27352 26308 "GET /api/v1/properties/?page=1&page_size=3&ordering=-created_at&is_featured=true HTTP/1.1" 200 52
+INFO 2026-04-05 23:26:29,543 log 27352 24196 "GET /api/v1/artisans/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:27:32,850 autoreload 27352 23680 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\dashboard\views.py changed, reloading.
+INFO 2026-04-05 23:27:46,442 autoreload 16956 23884 Watching for file changes with StatReloader
+INFO 2026-04-05 23:28:08,787 autoreload 16956 23884 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\dashboard\views.py changed, reloading.
+INFO 2026-04-05 23:28:15,458 autoreload 9512 19360 Watching for file changes with StatReloader
+INFO 2026-04-05 23:28:22,935 autoreload 9512 19360 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\payments\models.py changed, reloading.
+INFO 2026-04-05 23:28:28,962 autoreload 18460 17136 Watching for file changes with StatReloader
+INFO 2026-04-05 23:28:42,672 autoreload 18460 17136 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\dashboard\views.py changed, reloading.
+INFO 2026-04-05 23:28:49,579 autoreload 25960 15096 Watching for file changes with StatReloader
+INFO 2026-04-05 23:29:14,939 autoreload 25960 15096 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\dashboard\urls.py changed, reloading.
+INFO 2026-04-05 23:29:26,077 autoreload 18088 22316 Watching for file changes with StatReloader
+INFO 2026-04-05 23:30:02,599 autoreload 18088 22316 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\dashboard\views.py changed, reloading.
+INFO 2026-04-05 23:30:16,454 autoreload 13040 21172 Watching for file changes with StatReloader
+INFO 2026-04-05 23:30:22,602 log 13040 26764 "GET /api/v1/properties/?page=1&page_size=3&ordering=-created_at&is_featured=true HTTP/1.1" 200 52
+INFO 2026-04-05 23:30:22,850 log 13040 17912 "GET /api/v1/hotels/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:30:23,034 log 13040 23140 "GET /api/v1/artisans/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:30:26,854 log 13040 23140 "GET /api/v1/properties/?page=1&page_size=3&ordering=-created_at&is_featured=true HTTP/1.1" 200 52
+INFO 2026-04-05 23:30:26,888 log 13040 26764 "GET /api/v1/artisans/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:30:26,969 log 13040 17912 "GET /api/v1/hotels/?page=1&page_size=3&ordering=-created_at&status=approved HTTP/1.1" 200 52
+INFO 2026-04-05 23:31:33,650 autoreload 13040 21172 C:\Users\Gaa\Documents\GitHub\FESTARI_estate_online\server\festari_backend\apps\payments\models.py changed, reloading.
+INFO 2026-04-05 23:31:54,402 autoreload 13048 20408 Watching for file changes with StatReloader
+INFO 2026-04-05 23:47:19,105 log 13048 17324 "GET /api/v1/properties/?page=1&page_size=12&ordering=-created_at HTTP/1.1" 200 52
+INFO 2026-04-05 23:47:19,202 log 13048 17324 "GET /api/v1/properties/?page=1&page_size=12&ordering=-created_at HTTP/1.1" 200 52

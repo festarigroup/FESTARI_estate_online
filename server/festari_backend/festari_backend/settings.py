@@ -225,7 +225,7 @@ LOGGING = {
         },
         "file": {
             "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": "logs/django.log",
+            "filename": os.path.join(BASE_DIR, 'logs/django.log'),
             "formatter": "verbose",
             "when": "midnight",
             "interval": 1,
