@@ -2,12 +2,6 @@
 
 ## Prerequisites
 
-### System Requirements
-- **OS**: Windows 10/11, macOS, or Linux
-- **RAM**: Minimum 4GB, Recommended 8GB+
-- **Storage**: 5GB free space
-- **Network**: Stable internet connection
-
 ### Software Dependencies
 - **Docker**: Version 20.10 or later
 - **Docker Compose**: Version 2.0 or later
@@ -19,7 +13,7 @@
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/FESTARI_estate_online.git
+git clone https://github.com/festarigroup/FESTARI_estate_online.git
 cd FESTARI_estate_online
 ```
 
@@ -94,7 +88,7 @@ docker-compose exec backend python manage.py loaddata initial_data.json
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 - **Admin Panel**: http://localhost:8000/admin/
-- **API Documentation**: http://localhost:8000/api/docs/
+- **API Documentation**: http://localhost:8000/swagger
 
 ## Local Development Setup
 
@@ -158,7 +152,6 @@ REDIS_URL=redis://redis-host:6379/0
 ### 3. Docker Production Setup
 ```yaml
 # docker-compose.prod.yml
-version: '3.8'
 services:
   backend:
     build: ./server

@@ -46,7 +46,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "festari_backend.urls"
+ROOT_URLCONF = "urls"
 
 TEMPLATES = [
     {
@@ -63,7 +63,7 @@ TEMPLATES = [
     }
 ]
 
-WSGI_APPLICATION = "festari_backend.wsgi.application"
+WSGI_APPLICATION = "wsgi.application"
 
 DATABASES = {
     "default": {
@@ -225,7 +225,7 @@ LOGGING = {
         },
         "file": {
             "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": "logs/django.log",
+            "filename": os.path.join(BASE_DIR, 'logs/django.log'),
             "formatter": "verbose",
             "when": "midnight",
             "interval": 1,
