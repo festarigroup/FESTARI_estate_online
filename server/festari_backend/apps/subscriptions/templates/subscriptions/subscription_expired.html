@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Your Festari Subscription Has Expired</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #f8f9fa; padding: 20px; text-align: center; }
+        .content { padding: 20px; }
+        .button { display: inline-block; background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Festari Estates</h1>
+            <p>Subscription Expired</p>
+        </div>
+        <div class="content">
+            <p>Dear {{ recipient_name }},</p>
+
+            <p>Your Festari subscription for the <strong>{{ plan_name }}</strong> plan has expired.</p>
+
+            <p><strong>Expiration Date:</strong> {{ end_date }}</p>
+
+            <p>To continue enjoying premium features on Festari Estates, please renew your subscription.</p>
+
+            <p><a href="{{ site_url }}/subscriptions" class="button">Renew Subscription</a></p>
+
+            <p>If you have any questions, please contact our support team.</p>
+
+            <p>Best regards,<br>The Festari Estates Team</p>
+        </div>
+        <div class="footer">
+            <p>This email was sent to {{ recipient_email }}</p>
+            <p>&copy; 2026 Festari Estates. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
