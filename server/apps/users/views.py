@@ -98,7 +98,7 @@ class AuthViewSet(viewsets.GenericViewSet):
         return super().get_serializer_class()
 
     @action(detail=False, methods=["post"])
-    async def register(self, request):
+    def register(self, request):
         logger.info("User registration attempt - Email: %s", request.data.get("email"))
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
