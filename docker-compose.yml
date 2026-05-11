@@ -40,7 +40,7 @@ services:
     depends_on:
       - db
       - redis
-    command: ["celery", "-A", "festari_backend/festari_backend.celery", "beat", "--loglevel=info"]
+    command: ["celery", "-A", "festari_backend.celery", "beat", "--loglevel=info"]
 
   client:
     build:
