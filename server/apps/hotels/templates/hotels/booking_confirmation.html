@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Hotel Booking Confirmation</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #f8f9fa; padding: 20px; text-align: center; }
+        .content { padding: 20px; }
+        .booking-details { background-color: #f8f9fa; padding: 15px; margin: 20px 0; border-radius: 5px; }
+        .button { display: inline-block; background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Festari Estates</h1>
+            <p>Hotel Booking Confirmation</p>
+        </div>
+        <div class="content">
+            <p>Dear {{ guest_name }},</p>
+
+            <p>Your hotel booking has been confirmed! Here are the details:</p>
+
+            <div class="booking-details">
+                <h3>{{ hotel_name }}</h3>
+                <p><strong>Check-in:</strong> {{ check_in_date }}</p>
+                <p><strong>Check-out:</strong> {{ check_out_date }}</p>
+                <p><strong>Total Amount:</strong> ₦{{ total_amount }}</p>
+                <p><strong>Booking Reference:</strong> {{ booking_reference }}</p>
+            </div>
+
+            <p>Please arrive at the hotel by check-in time. If you need to make any changes to your booking, please contact the hotel directly or our support team.</p>
+
+            <p><a href="{{ hotel_contact_url }}" class="button">Contact Hotel</a></p>
+
+            <p>We hope you have a pleasant stay!</p>
+
+            <p>Best regards,<br>The Festari Estates Team</p>
+        </div>
+        <div class="footer">
+            <p>This email was sent to {{ guest_email }}</p>
+            <p>&copy; 2026 Festari Estates. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

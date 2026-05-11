@@ -1,0 +1,40 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F3F4F6"/>
+      <stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FDBA74"/>
+      <stop offset="1" stop-color="#BE4D00"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#111827" flood-opacity="0.14"/>
+    </filter>
+    <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="3" r="2" fill="#9CA3AF" opacity="0.18"/>
+    </pattern>
+  </defs>
+
+  <rect width="1600" height="900" rx="28" fill="url(#bg)"/>
+  <rect x="40" y="40" width="1520" height="820" rx="22" fill="url(#dots)" opacity="0.55"/>
+
+  <g filter="url(#shadow)">
+    <rect x="120" y="120" width="1360" height="660" rx="26" fill="#FFFFFF"/>
+    <rect x="120" y="120" width="1360" height="14" rx="7" fill="#BE4D00" opacity="0.9"/>
+
+    <!-- abstract photo-like scene -->
+    <rect x="180" y="180" width="1240" height="540" rx="22" fill="#F9FAFB"/>
+    <circle cx="320" cy="300" r="120" fill="url(#sun)" opacity="0.35"/>
+    <path d="M180 600C360 520 520 660 700 600C880 540 1040 620 1220 570C1320 540 1400 520 1420 510V720H180V600Z" fill="#E5E7EB"/>
+    <path d="M180 630C360 560 520 720 700 650C880 580 1040 700 1220 620C1320 580 1400 560 1420 552V720H180V630Z" fill="#D1D5DB" opacity="0.85"/>
+
+    <!-- foreground silhouettes -->
+    <path d="M620 520C650 480 690 470 720 500C745 525 745 560 720 585C690 615 650 610 620 575C600 552 600 540 620 520Z" fill="#9CA3AF" opacity="0.55"/>
+    <path d="M760 520C790 480 830 470 860 500C885 525 885 560 860 585C830 615 790 610 760 575C740 552 740 540 760 520Z" fill="#6B7280" opacity="0.45"/>
+
+    <rect x="220" y="220" width="420" height="16" rx="8" fill="#111827" opacity="0.06"/>
+    <rect x="220" y="246" width="520" height="14" rx="7" fill="#111827" opacity="0.05"/>
+  </g>
+</svg>
+
