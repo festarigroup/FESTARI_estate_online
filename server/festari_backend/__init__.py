@@ -1,4 +1,4 @@
-from .celery_config import app as celery_app
+from .celery_app import app as celery_app
 
 celery_config = celery_app
 

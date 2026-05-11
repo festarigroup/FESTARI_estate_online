@@ -4,12 +4,14 @@ services:
       context: ./server
       dockerfile: festari_backend/Dockerfile
     container_name: django_api
-    # volumes:
-    #   - ./server:/app
+    volumes:
+      - ./server:/app
     ports:
       - "8000:8000"
     env_file:
       - ./server/festari_backend/.env
+    environment:
+      - PYTHONPATH=/app
     depends_on:
       - db
       - redis
@@ -19,28 +21,32 @@ services:
       context: ./server
       dockerfile: festari_backend/Dockerfile
     container_name: django_worker
-    # volumes:
-    #   - ./server:/app
+    volumes:
+      - ./server:/app
     env_file:
       - ./server/festari_backend/.env
+    environment:
+      - PYTHONPATH=/app
     depends_on:
       - db
       - redis
-    command: ["celery", "-A", "festari_backend", "worker", "--loglevel=info", "--concurrency=1"]
+    command: ["celery", "-A", "festari_backend.celery_app", "worker", "--loglevel=info", "--concurrency=1"]
 
   beat:
     build:
       context: ./server
       dockerfile: festari_backend/Dockerfile
     container_name: django_beat
-    # volumes:
-    #   - ./server:/app
+    volumes:
+      - ./server:/app
     env_file:
       - ./server/festari_backend/.env
+    environment:
+      - PYTHONPATH=/app
     depends_on:
       - db
       - redis
-    command: ["celery", "-A", "festari_backend", "beat", "--loglevel=info"]
+    command: ["celery", "-A", "festari_backend.celery_app", "beat", "--loglevel=info"]
 
   client:
     build:
