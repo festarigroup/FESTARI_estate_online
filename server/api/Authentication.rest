@@ -1,0 +1,32 @@
+@baseUrl = http://127.0.0.1:8000/api/v1
+@testEmail = "Festari26@gmail.com"
+@testPassword = "admin123"
+
+### Register a new user
+POST {{baseUrl}}/auth/register/
+Content-Type: application/json
+
+{
+  "username": "Festari",
+  "email": "Festari26@gmail.com",
+  "password": "admin123",
+  "first_name": "Festari",
+  "last_name": "O.",
+  "role": "buyer"
+}
+
+### Verify otp of a new user
+POST {{baseUrl}}/auth/verify_otp
+Content-Type: application/json
+
+{
+  "email": {{testEmail}},
+  "otp": "string"
+}
+
+### Resend otp if first time failed
+POST {{baseUrl}}/auth/resend_otp
+Content-Type: application/json
+{
+  "email": {{testEmail}}
+}

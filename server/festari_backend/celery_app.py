@@ -1,6 +1,8 @@
 import os
+import sys
 from celery import Celery
 
+sys.path.insert(0, '/app/festari_backend')
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "festari_backend.settings")
 
 app = Celery("festari_backend")

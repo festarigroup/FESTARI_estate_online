@@ -68,13 +68,23 @@ WSGI_APPLICATION = "wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME", default="festari_db"),
+        "NAME": config("DB_NAME", default="postgres"),
         "USER": config("DB_USER", default="postgres"),
         "PASSWORD": config("DB_PASSWORD", default="postgres"),
         "HOST": config("DB_HOST", default="localhost"),
         "PORT": config("DB_PORT", default="5432"),
+        "OPTIONS": {
+            "sslmode": "require",
+        },
     }
 }
+
+# Alternative: Use DATABASE_URL if provided
+DATABASE_URL = config("DATABASE_URL", default="")
+if DATABASE_URL:
+    # Supabase requires SSL. Ensure it is enabled when using DATABASE_URL.
+    DATABASES["default"].setdefault("OPTIONS", {})
+    DATABASES["default"]["OPTIONS"]["sslmode"] = "require"
 
 AUTH_USER_MODEL = "users.User"
 
@@ -145,6 +155,7 @@ CELERY_TASK_SOFT_TIME_LIMIT = 45
 CELERY_TASK_ACKS_LATE = True
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1
 CELERY_TASK_REJECT_ON_WORKER_LOST = True
+CELERY_BEAT_SCHEDULE_FILENAME = 'celerybeat-schedule'
 
 
 if platform.system() == 'Windows':
@@ -225,7 +236,7 @@ LOGGING = {
         },
         "file": {
             "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": os.path.join(BASE_DIR, 'logs/django.log'),
+            "filename": os.path.join(BASE_DIR, "logs/django.log"),
             "formatter": "verbose",
             "when": "midnight",
             "interval": 1,
@@ -240,11 +251,6 @@ LOGGING = {
         "django": {
             "handlers": ["console", "file"],
             "level": "INFO",
-            "propagate": False,
-        },
-        "apps.common.email_utils": {
-            "handlers": ["console", "file"],
-            "level": "DEBUG",
             "propagate": False,
         },
         "apps.common.tasks": {
