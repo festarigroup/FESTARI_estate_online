@@ -79,11 +79,12 @@ services:
   redis:
     image: redis
     container_name: redis_cache
-    # volumes:
-    #   - redis_data:/data
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
 
-# volumes:
-#   postgres_data:
-#   redis_data:
+volumes:
+  redis_data:
+  # postgres_data:

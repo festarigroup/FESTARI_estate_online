@@ -68,13 +68,23 @@ WSGI_APPLICATION = "wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DB_NAME", default="festari_db"),
+        "NAME": config("DB_NAME", default="postgres"),
         "USER": config("DB_USER", default="postgres"),
         "PASSWORD": config("DB_PASSWORD", default="postgres"),
         "HOST": config("DB_HOST", default="localhost"),
         "PORT": config("DB_PORT", default="5432"),
+        "OPTIONS": {
+            "sslmode": "require",
+        },
     }
 }
+
+# Alternative: Use DATABASE_URL if provided
+DATABASE_URL = config("DATABASE_URL", default="")
+if DATABASE_URL:
+    # Supabase requires SSL. Ensure it is enabled when using DATABASE_URL.
+    DATABASES["default"].setdefault("OPTIONS", {})
+    DATABASES["default"]["OPTIONS"]["sslmode"] = "require"
 
 AUTH_USER_MODEL = "users.User"
 

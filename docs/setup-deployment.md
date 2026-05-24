@@ -18,6 +18,8 @@ cd FESTARI_estate_online
 ```
 
 ### 2. Environment Configuration
+Create server/logs folder
+
 Create environment files:
 
 **Backend (.env)**
@@ -94,7 +96,10 @@ docker-compose exec backend python manage.py loaddata initial_data.json
 
 ### Backend Setup
 ```bash
-cd server/festari_backend
+cd server
+
+# Create logs folder
+mkdir logs
 
 # Create virtual environment
 python -m venv venv
@@ -104,6 +109,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # Run migrations
+cd festari_backend
 python manage.py migrate
 
 # Start development server
@@ -297,6 +303,6 @@ LOG_LEVEL=DEBUG
 - **Wiki**: Extended documentation and tutorials
 
 ### Professional Support
-- **Email**: support@festariestate.com
+- **Email**: festari26@gmail.com
 - **Priority Support**: Available for enterprise customers
 - **Consulting**: Custom development and integration services

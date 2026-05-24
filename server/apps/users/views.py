@@ -98,9 +98,12 @@ class AuthViewSet(viewsets.GenericViewSet):
         return super().get_serializer_class()
 
     @action(detail=False, methods=["post"])
-    async def register(self, request):
+    def register(self, request):
         logger.info("User registration attempt - Email: %s", request.data.get("email"))
-        serializer = self.get_serializer(data=request.data)
+        data = request.data.copy()
+        if "email" in data:
+            data["email"] = data["email"].lower()
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
@@ -122,7 +125,7 @@ class AuthViewSet(viewsets.GenericViewSet):
             return api_response(False, "Email and OTP are required.", status.HTTP_400_BAD_REQUEST)
 
         try:
-            user = User.objects.get(email=email)
+            user = User.objects.get(email=email.lower())
         except User.DoesNotExist:
             return api_response(False, "Invalid email or OTP.", status.HTTP_400_BAD_REQUEST)
 
