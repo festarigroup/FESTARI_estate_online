@@ -19,6 +19,7 @@ Content-Type: application/json
 ### Authentication
 - `POST /api/auth/register/` - User registration
 - `POST /api/auth/login/` - User login
+- `POST /api/auth/oauth-login/` - OAuth login/register (Google, Apple)
 - `POST /api/auth/refresh/` - Refresh JWT token
 - `POST /api/auth/forgot-password/` - Password reset request
 - `POST /api/auth/reset-password/` - Password reset confirmation
@@ -168,6 +169,143 @@ Content-Type: application/json
 - **Headers**:
   - `X-Paystack-Signature`: Webhook signature
 - **Events**: `charge.success`, `charge.failed`, `transfer.success`
+
+## OAuth Authentication (Google & Apple)
+
+### Overview
+Users can authenticate using Google or Apple OAuth via Supabase Auth. The backend handles token verification and user creation/login.
+
+### Endpoint: OAuth Login/Register
+**POST** `/api/auth/oauth-login/`
+
+**Request**:
+```json
+{
+  "provider": "google",
+  "token": "supabase-oauth-access-token"
+}
+```
+
+**Parameters**:
+- `provider` (string, required): OAuth provider - `google` or `apple`
+- `token` (string, required): Access token returned by Supabase Auth after OAuth callback
+
+**Response** (201 Created):
+```json
+{
+  "success": true,
+  "message": "Successfully authenticated with google",
+  "data": {
+    "user": {
+      "id": "uuid-user-id",
+      "email": "user@example.com",
+      "first_name": "John",
+      "last_name": "Doe",
+      "username": "john_doe_abc123",
+      "role": "buyer",
+      "is_verified": true
+    },
+    "tokens": {
+      "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    },
+    "provider": "google",
+    "created": true
+  }
+}
+```
+
+**Error Response** (401 Unauthorized):
+```json
+{
+  "success": false,
+  "message": "Invalid or expired OAuth token"
+}
+```
+
+### Frontend Implementation
+
+1. **Initialize Supabase Auth**: Use Supabase JS client with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+2. **Trigger OAuth Flow**:
+```javascript
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider: 'google', // or 'apple'
+  options: { redirectTo: 'http://localhost:3000/auth/callback' }
+});
+```
+
+3. **Handle Callback**: After user authenticates with Google/Apple, Supabase redirects to the redirect URL with a session token
+
+4. **Send Token to Backend**:
+```javascript
+const { data } = await supabase.auth.getSession();
+const token = data?.session?.access_token;
+
+const response = await fetch('/api/auth/oauth-login/', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    provider: 'google',
+    token: token
+  }),
+  credentials: 'include' // Include cookies for JWT
+});
+
+const result = await response.json();
+// Use result.data.tokens.access for subsequent API calls
+```
+
+### Backend Configuration
+
+Required environment variables (`.env`):
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SUPABASE_JWT_SECRET=your-supabase-jwt-secret
+```
+
+**Note**: You do NOT need to configure OAuth provider client IDs on the backend. Supabase handles all OAuth provider configuration (Google, Apple) on their dashboard. The backend only verifies the JWT token returned by Supabase.
+
+### Setup Steps
+
+1. **Supabase Configuration** (one-time setup):
+   - Go to your Supabase project dashboard
+   - Navigate to Authentication → Providers
+   - Enable Google provider and enter your Google OAuth credentials
+   - Enable Apple provider and enter your Apple OAuth credentials
+   - Add your frontend redirect URL to the allowlist (e.g., `http://localhost:3000/auth/callback`)
+
+2. **Backend Requirements**:
+   - Set the three environment variables above
+   - Restart the backend server
+
+3. **Frontend Requirements**:
+   - Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`
+   - Import Supabase client: `import { createClient } from '@supabase/supabase-js'`
+   - Call the OAuth login endpoint after obtaining the token
+
+### User Data Storage
+
+When a user authenticates via OAuth:
+- **First-time users**: A new user account is created in the database
+  - Email: From OAuth provider
+  - Username: Auto-generated (email prefix + random suffix)
+  - First/Last Name: Extracted from OAuth profile if available
+  - is_verified: Set to `true` (OAuth users are pre-verified)
+  - oauth_provider: Stores the provider name (`google` or `apple`)
+
+- **Existing users**: Account is updated and user is logged in
+  - oauth_provider: Updated if different from previous login
+  - is_verified: Ensured to be `true`
+
+### JWT Tokens
+
+After successful OAuth authentication, the backend returns both access and refresh tokens:
+- **Access Token**: Valid for ~24 hours, use for API requests
+- **Refresh Token**: Use to obtain new access tokens when expired
+
+Both tokens are also set as secure, HTTP-only cookies for cookie-based auth.
 
 ## Rate Limiting
 - **Authenticated requests**: 1000/hour

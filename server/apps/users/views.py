@@ -262,28 +262,40 @@ class AuthViewSet(viewsets.GenericViewSet):
         if not email:
             logger.warning(f"OAuth login failed - No email in response for provider: {provider}")
             return api_response(
-                False, 
-                "Email not found in OAuth response", 
+                False,
+                "Email not found in OAuth response",
                 status.HTTP_400_BAD_REQUEST
             )
 
+        email = email.lower()
         logger.info(f"OAuth login - Processing user: {email} via {provider}")
 
         # Check if user exists, create if not
-        user, created = User.objects.get_or_create(
-            email=email,
-            defaults={
-                "username": email.split("@")[0] + "_" + str(uuid.uuid4().hex[:8]),
-                "first_name": user_data.get("user_metadata", {}).get("full_name", "").split()[0] if user_data.get("user_metadata", {}).get("full_name") else "",
-                "last_name": " ".join(user_data.get("user_metadata", {}).get("full_name", "").split()[1:]) if user_data.get("user_metadata", {}).get("full_name") and len(user_data.get("user_metadata", {}).get("full_name").split()) > 1 else "",
-                "is_verified": True,  # OAuth users are pre-verified
-            }
-        )
-
-        if created:
-            logger.info(f"New OAuth user created: {user.email} via {provider}")
-        else:
+        created = False
+        try:
+            user = User.objects.get(email=email)
+            if not user.is_verified:
+                user.is_verified = True
+            if user.oauth_provider != provider:
+                user.oauth_provider = provider
+            user.save(update_fields=["is_verified", "oauth_provider"])
             logger.info(f"Existing OAuth user logged in: {user.email} via {provider}")
+        except User.DoesNotExist:
+            full_name = user_data.get("user_metadata", {}).get("full_name", "") or ""
+            first_name = full_name.split()[0] if full_name else ""
+            last_name = " ".join(full_name.split()[1:]) if full_name and len(full_name.split()) > 1 else ""
+            username = email.split("@")[0] + "_" + uuid.uuid4().hex[:8]
+            user = User.objects.create_user(
+                email=email,
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                is_verified=True,
+            )
+            user.oauth_provider = provider
+            user.save(update_fields=["oauth_provider"])
+            created = True
+            logger.info(f"New OAuth user created: {user.email} via {provider}")
 
         # Generate JWT tokens for the user
         from rest_framework_simplejwt.tokens import RefreshToken
