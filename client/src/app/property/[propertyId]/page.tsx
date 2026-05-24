@@ -1,19 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const hotelNames: Record<number, string> = {
-  1: "Labadi Seaside Suites",
-  2: "East Legon Grand Hotel",
-  3: "Kumasi City Comfort Inn",
-  4: "Takoradi Palm Residences",
-  5: "Cantonments Skyline Hotel",
-  6: "Osu Boutique Stay",
-  7: "Ridge Executive Suites",
-  8: "Airport City Inn",
-  9: "Koforidua Hillview Lodge",
-  10: "Tamale Heritage Hotel",
-  11: "Cape Coast Ocean Breeze",
-  12: "Ho Garden Retreat",
+const propertyNames: Record<number, string> = {
+  1: "Large 4-room apartment with a beautiful terrace",
+  2: "Modern 3-bedroom detached house with garden",
+  3: "Cozy studio apartment near the city center",
+  4: "Spacious penthouse with panoramic city views",
+  5: "Newly built 2-bedroom semi-detached house",
+  6: "Executive 5-bedroom villa with swimming pool",
+  7: "Commercial property ideal for office space",
+  8: "Furnished 2-bed apartment with 24hr security",
 };
 
 const CARD_GRADIENT = {
@@ -22,15 +18,15 @@ const CARD_GRADIENT = {
 };
 
 const INFO_CARDS = [
-  { label: "Average Price", value: "GHS 2,400/month" },
+  { label: "Price", value: "GHS 2,400/month" },
   { label: "Area", value: "760 m²" },
 ] as const;
 
 const GALLERY_ITEMS = [
-  { src: "/HotelHeroSection.jpg", alt: "Hotel gallery image 1", className: "relative h-36 md:h-44 overflow-hidden" },
-  { src: "/detailedhotelherosection.jpg", alt: "Hotel gallery image 2", className: "relative h-36 md:h-44 md:col-span-2 overflow-hidden" },
-  { src: "/HotelHeroSection.jpg", alt: "Hotel gallery image 3", className: "relative h-36 md:h-44 md:col-span-2 overflow-hidden" },
-  { src: "/detailedhotelherosection.jpg", alt: "Hotel gallery image 4", className: "relative h-36 md:h-44 overflow-hidden" },
+  { src: "/PropertyHeroSection.png", alt: "Property gallery image 1", className: "relative h-36 md:h-44 overflow-hidden" },
+  { src: "/PropertyHeroSection.png", alt: "Property gallery image 2", className: "relative h-36 md:h-44 md:col-span-2 overflow-hidden" },
+  { src: "/PropertyHeroSection.png", alt: "Property gallery image 3", className: "relative h-36 md:h-44 md:col-span-2 overflow-hidden" },
+  { src: "/PropertyHeroSection.png", alt: "Property gallery image 4", className: "relative h-36 md:h-44 overflow-hidden" },
 ] as const;
 
 const HIGHLIGHTS = [
@@ -47,7 +43,7 @@ const HIGHLIGHTS = [
   {
     icon: "◷",
     title: "Exceptional host communication",
-    description: "Recent guests gave Dominic Dk a 5-star rating for communication.",
+    description: "Recent guests gave the host a 5-star rating for communication.",
   },
 ] as const;
 
@@ -57,9 +53,9 @@ const AMENITIES = [
   "▭ Free parking on premises",
   "◫ Microwave",
   "▣ Television",
-  "▯ Akai refrigerator",
+  "▯ Refrigerator",
   "❉ Air conditioning",
-  "⚡ Air conditioning",
+  "⚡ Backup power",
 ] as const;
 
 const HOST_STATS = [
@@ -67,24 +63,6 @@ const HOST_STATS = [
   { value: "5.0★", label: "Rating" },
   { value: "3", label: "Months hosting" },
 ] as const;
-
-function StarRow() {
-  return (
-    <div className="mt-1 flex justify-center gap-0.5">
-      {Array.from({ length: 5 }).map((_, index) => (
-        <svg
-          key={index}
-          className="h-2 w-2"
-          viewBox="0 0 20 20"
-          fill="#BE4D00"
-          aria-hidden="true"
-        >
-          <path d="M10 1.5l2.5 5.1 5.6.8-4 3.9.9 5.6L10 14.2 5 16.9l.9-5.6-4-3.9 5.6-.8L10 1.5z" />
-        </svg>
-      ))}
-    </div>
-  );
-}
 
 function InfoCard({ label, value }: { label: string; value: string }) {
   return (
@@ -95,21 +73,21 @@ function InfoCard({ label, value }: { label: string; value: string }) {
   );
 }
 
-export default async function HotelDetailPage({
+export default async function PropertyDetailPage({
   params,
 }: {
-  params: Promise<{ hotelId: string }>;
+  params: Promise<{ propertyId: string }>;
 }) {
-  const { hotelId } = await params;
-  const numericId = Number(hotelId);
-  const title = hotelNames[numericId] ?? "FirstClass Hotel";
+  const { propertyId } = await params;
+  const numericId = Number(propertyId);
+  const title = propertyNames[numericId] ?? "Featured Property";
 
   return (
     <section className="w-full px-6 py-8 md:px-10 md:py-10">
       <div className="relative w-full overflow-hidden">
         <div className="relative h-[clamp(370px,47vw,760px)] w-full">
           <Image
-            src="/detailedhotelherosection.jpg"
+            src="/PropertyHeroSection.png"
             alt={title}
             fill
             priority
@@ -120,14 +98,14 @@ export default async function HotelDetailPage({
           <div className="absolute inset-0 bg-black/10" />
 
           <h1 className="absolute bottom-5 left-4 z-10 text-3xl font-light tracking-tight text-white md:left-6 md:bottom-6 md:text-5xl">
-            FirstClass Hotel
+            {title}
           </h1>
 
           <div className="absolute bottom-3 right-3 z-20 w-[clamp(220px,30vw,360px)] bg-white/95">
             <div className="grid grid-cols-3 border-b border-gray-200">
               <div className="px-2.5 py-2 text-center">
                 <p className="text-[11px] font-medium text-gray-700 leading-tight">
-                  Guest
+                  Buyer
                   <br />
                   favorite
                 </p>
@@ -154,25 +132,25 @@ export default async function HotelDetailPage({
               </div>
             </div>
 
-            <Link
-              href={`/hotel/${numericId}/reserve`}
-              className="block text-center w-full bg-[#BE4D00] px-6 py-2 text-base leading-none font-medium text-white hover:bg-[#a54300] transition-colors"
+            <button
+              type="button"
+              className="w-full bg-[#BE4D00] px-6 py-2 text-base leading-none font-medium text-white hover:bg-[#a54300] transition-colors"
             >
-              Reserve now
-            </Link>
+              Contact agent
+            </button>
           </div>
         </div>
 
         <div className="mt-8 flex items-center justify-between">
           <Link
-            href="/hotel"
+            href="/property"
             className="inline-flex items-center gap-2 border border-gray-200 bg-white px-4 py-2 text-sm leading-none text-gray-500 hover:bg-gray-50 transition-colors"
           >
-            <span aria-hidden="true">←</span> Previous
+            <span aria-hidden="true">←</span> Back to properties
           </Link>
 
           <Link
-            href={numericId < 12 ? `/hotel/${numericId + 1}` : "/hotel/1"}
+            href={numericId < 8 ? `/property/${numericId + 1}` : "/property/1"}
             className="inline-flex items-center gap-2 bg-[#BE4D00] px-5 py-2 text-sm leading-none text-white hover:bg-[#a54300] transition-colors"
           >
             Next <span aria-hidden="true">→</span>
@@ -189,12 +167,11 @@ export default async function HotelDetailPage({
           <InfoCard label="Address" value="Airport Residential, Accra" />
 
           <p className="pt-2 text-lg leading-relaxed text-gray-500">
-            Available for both short- and long-term stays, FirstClass Hotel
+            Available for both short- and long-term stays, this property
             offers a cozy and serene environment with full access to the
-            entire space for guests. The hotel is located near Airport
-            Residential, making it ideal for guests seeking a peaceful stay
-            with privacy and security. Assistance is provided remotely through
-            the app, as there is no staff permanently on-site.
+            entire space. Located in a prime area, it is ideal for those
+            seeking a peaceful stay with privacy and security. Assistance
+            is provided remotely through the app.
           </p>
         </div>
 
@@ -244,7 +221,7 @@ export default async function HotelDetailPage({
             <p className="mt-3 text-lg leading-relaxed text-gray-500 max-w-[1200px]">
               Enjoy a range of amenities designed to make your stay comfortable and
               convenient. From essential services to thoughtful extras, everything
-              is prepared for a relaxing experience. Option 2 (modern hospitality tone)
+              is prepared for a relaxing experience.
             </p>
 
             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-x-14 gap-y-4 text-sm text-gray-900">
@@ -261,7 +238,7 @@ export default async function HotelDetailPage({
             <p className="mt-2 text-base text-gray-500 max-w-5xl">
               Find us easily with the map below. Explore our exact location and
               nearby landmarks. Use Google Maps to get quick directions to the
-              hotel.
+              property.
             </p>
 
             <div className="mt-5 relative w-full aspect-[16/7] overflow-hidden border border-gray-200">
@@ -313,12 +290,12 @@ export default async function HotelDetailPage({
 
                 <div className="mt-5 space-y-2 text-sm text-gray-500">
                   <p>♡ Born in the 80s</p>
-                  <p>⌂ Works at Tarkwa,Within 10km</p>
+                  <p>⌂ Works at Accra, Within 10km</p>
                 </div>
 
                 <p className="mt-4 text-sm leading-relaxed text-gray-500 max-w-md">
-                  I focus on delivering safe, neat, and reliable electrical
-                  works. I believe in simple, quality solutions you can trust.
+                  I focus on delivering safe, neat, and reliable property
+                  listings. I believe in simple, quality solutions you can trust.
                 </p>
               </div>
 
@@ -341,4 +318,3 @@ export default async function HotelDetailPage({
     </section>
   );
 }
-
