@@ -27,3 +27,24 @@ export async function mockForgotPassword(emailOrPhone: string): Promise<ApiRespo
   if (!isEmail && !isPhone) return { success: false, message: "Please enter a valid email or phone number." };
   return { success: true, data: null };
 }
+
+export async function mockVerifyOtp(code: string, expectedLength = 6): Promise<ApiResponse<null>> {
+  await delay(1200);
+  if (shouldFail()) return { success: false, message: "Network error. Please try again." };
+  if (code.length < expectedLength) return { success: false, message: `Enter the full ${expectedLength}-digit code.` };
+  if (/^0+$/.test(code)) return { success: false, message: "Invalid or expired code. Please try again." };
+  return { success: true, data: null };
+}
+
+export async function mockResendOtp(): Promise<ApiResponse<null>> {
+  await delay(900);
+  if (shouldFail()) return { success: false, message: "Could not resend code. Please try again." };
+  return { success: true, data: null };
+}
+
+export async function mockUpdatePassword(password: string): Promise<ApiResponse<null>> {
+  await delay(1500);
+  if (shouldFail()) return { success: false, message: "Network error. Please try again." };
+  if (password.length < 8) return { success: false, message: "Password must be at least 8 characters." };
+  return { success: true, data: null };
+}
