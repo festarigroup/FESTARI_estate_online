@@ -233,7 +233,7 @@ export default function ServicesLayout({
         ))}
       </div>
 
-      <h2 className="text-5xl font-bold mt-16">Who it's for</h2>
+      <h2 className="text-5xl font-bold mt-16">Who it&apos;s for</h2>
       <div className="mt-6 space-y-4">
         {whoItsFFor.map((item) => (
           <p key={item} className="text-lg text-gray-800">{item}</p>
@@ -436,7 +436,7 @@ export default function ServicesLayout({
                 ))}
               </div>
 
-              <p className="text-gray-800 italic mb-4">"{testimonial.text}"</p>
+              <p className="text-gray-800 italic mb-4">&quot;{testimonial.text}&quot;</p>
 
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-500">
@@ -497,7 +497,7 @@ export default function ServicesLayout({
 
       <div className="mt-20">
         <h2 className="text-5xl font-bold mb-4">Get in touch</h2>
-        <p className="text-gray-700 mb-6">Have questions or want to partner with us? We're here to help</p>
+        <p className="text-gray-700 mb-6">Have questions or want to partner with us? We&apos;re here to help</p>
 
         <div className="flex gap-12 items-start mt-8">
           <div className="flex-1 space-y-8">

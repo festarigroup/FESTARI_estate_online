@@ -1,14 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+
+const noopSubscribe = () => () => {};
 
 export default function DesktopScreenGuard({ children }: { children: React.ReactNode }) {
   const [isMobile, setIsMobile] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  // Hydration-safe "mounted" flag: server always renders `false`, client flips
+  // to `true` on the first render after hydration, without setState-in-effect.
+  const mounted = useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false
+  );
 
   useEffect(() => {
-    setMounted(true);
-    
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1024);
     };

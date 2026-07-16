@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { type AxiosResponse } from "axios";
 import { getAxiosError } from "./getAxiosError";
 import { ApiResponse } from "@/types/axios-types";
 
@@ -24,10 +24,11 @@ const privateClient = axios.create({
 });
 
 // Shared response handler
-const handleResponse = <T>(response: any): ApiResponse<T> => ({
+const handleResponse = <T>(response: AxiosResponse<T>): ApiResponse<T> => ({
   success: true,
   data: response.data,
   status: response.status,
+  message: response.statusText || "Success",
 });
 
 // Attach interceptors
@@ -40,34 +41,34 @@ const handleResponse = <T>(response: any): ApiResponse<T> => ({
 
 export const publicApi = {
   get: <T = unknown>(url: string, config = {}) =>
-    publicClient.get<any, ApiResponse<T>>(url, config).then((res) => handleResponse<T>(res)),
+    publicClient.get<T>(url, config).then((res) => handleResponse<T>(res)),
 
   post: <T = unknown>(url: string, data?: unknown, config = {}) =>
-    publicClient.post<any, ApiResponse<T>>(url, data, config).then((res) => handleResponse<T>(res)),
+    publicClient.post<T>(url, data, config).then((res) => handleResponse<T>(res)),
 
   put: <T = unknown>(url: string, data?: unknown, config = {}) =>
-    publicClient.put<any, ApiResponse<T>>(url, data, config).then((res) => handleResponse<T>(res)),
+    publicClient.put<T>(url, data, config).then((res) => handleResponse<T>(res)),
 
   patch: <T = unknown>(url: string, data?: unknown, config = {}) =>
-    publicClient.patch<any, ApiResponse<T>>(url, data, config).then((res) => handleResponse<T>(res)),
+    publicClient.patch<T>(url, data, config).then((res) => handleResponse<T>(res)),
 
   delete: <T = unknown>(url: string, config = {}) =>
-    publicClient.delete<any, ApiResponse<T>>(url, config).then((res) => handleResponse<T>(res)),
+    publicClient.delete<T>(url, config).then((res) => handleResponse<T>(res)),
 };
 
 export const privateApi = {
   get: <T = unknown>(url: string, config = {}) =>
-    privateClient.get<any, ApiResponse<T>>(url, config).then((res) => handleResponse<T>(res)),
+    privateClient.get<T>(url, config).then((res) => handleResponse<T>(res)),
 
   post: <T = unknown>(url: string, data?: unknown, config = {}) =>
-    privateClient.post<any, ApiResponse<T>>(url, data, config).then((res) => handleResponse<T>(res)),
+    privateClient.post<T>(url, data, config).then((res) => handleResponse<T>(res)),
 
   put: <T = unknown>(url: string, data?: unknown, config = {}) =>
-    privateClient.put<any, ApiResponse<T>>(url, data, config).then((res) => handleResponse<T>(res)),
+    privateClient.put<T>(url, data, config).then((res) => handleResponse<T>(res)),
 
   patch: <T = unknown>(url: string, data?: unknown, config = {}) =>
-    privateClient.patch<any, ApiResponse<T>>(url, data, config).then((res) => handleResponse<T>(res)),
+    privateClient.patch<T>(url, data, config).then((res) => handleResponse<T>(res)),
 
   delete: <T = unknown>(url: string, config = {}) =>
-    privateClient.delete<any, ApiResponse<T>>(url, config).then((res) => handleResponse<T>(res)),
+    privateClient.delete<T>(url, config).then((res) => handleResponse<T>(res)),
 };

@@ -22,8 +22,8 @@ export default function ContactLayout({
                 <h2 className="text-4xl font-bold text-white uppercase">Contact</h2>
               </div>
             </div>
-            <p className="mt-12">We're here to assist you with all your real estate needs.
-            Reach out to us via phone, email, or our contact form, and we'll
+            <p className="mt-12">We&apos;re here to assist you with all your real estate needs.
+            Reach out to us via phone, email, or our contact form, and we&apos;ll
             be happy to help!</p>
             <h2 className="text-5xl font-bold mt-12">Contact Us</h2>
           <div className="mt-12 flex gap-12 items-center">
@@ -83,7 +83,7 @@ export default function ContactLayout({
       <div className="mt-20">
         <h2 className="text-5xl font-bold">Get in touch</h2>
         <p className="text-gray-600 mt-3 text-lg">
-          Have questions or want to partner with us? We're here to help
+          Have questions or want to partner with us? We&apos;re here to help
         </p>
 
         <div className="flex gap-12 items-start mt-12">
