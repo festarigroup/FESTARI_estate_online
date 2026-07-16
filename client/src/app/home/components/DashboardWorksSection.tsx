@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import Reveal from "@/components/motion/Reveal";
+import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
 
 type DashboardCard = {
   title: string;
@@ -40,13 +42,13 @@ function ArrowRight() {
 
 function DashboardInfoCard({ card }: { card: DashboardCard }) {
   return (
-    <div className="bg-white border border-gray-200 shadow-sm rounded-sm overflow-hidden">
-      <div className="relative w-full aspect-[16/9] bg-gray-100">
+    <div className="group bg-white border border-gray-200 shadow-sm rounded-sm overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 hover:border-[#BE4D00]/30">
+      <div className="relative w-full aspect-[16/9] bg-gray-100 overflow-hidden">
         <Image
           src={card.imageSrc ?? "/dashboard-placeholder.svg"}
           alt={card.imageAlt ?? card.title}
           fill
-          className="object-cover"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
           sizes="(max-width: 1024px) 100vw, 42vw"
         />
       </div>
@@ -95,7 +97,7 @@ export default function DashboardWorksSection({
     <section id={sectionId} className="w-full bg-white">
       <div className="w-full max-w-[1400px] mx-auto px-4 md:px-6 py-10 md:py-14">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-          <div className="pt-2 lg:sticky lg:top-[40%] lg:-translate-y-1/2 self-start">
+          <Reveal className="pt-2 lg:sticky lg:top-[40%] lg:-translate-y-1/2 self-start">
             <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 whitespace-pre-line">
               {title}
             </h2>
@@ -107,27 +109,29 @@ export default function DashboardWorksSection({
               <Link
                 href={primaryCta.href}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#BE4D00] text-white text-sm font-semibold rounded
-                           hover:bg-[#a54300] transition-colors"
+                           transition-all duration-200 hover:bg-[#a54300] hover:-translate-y-0.5"
               >
                 {primaryCta.label} <ArrowRight />
               </Link>
               <Link
                 href={secondaryCta.href}
                 className="inline-flex items-center justify-center px-5 py-2.5 border border-gray-300 text-gray-900 text-sm font-semibold rounded
-                           hover:bg-gray-50 transition-colors"
+                           transition-all duration-200 hover:bg-gray-50 hover:-translate-y-0.5"
               >
                 {secondaryCta.label}
               </Link>
             </div>
-          </div>
+          </Reveal>
 
           <div className="relative">
             {/* Mobile: simple list. Desktop: stacked sticky cards that layer while scrolling. */}
-            <div className="flex flex-col gap-8 lg:hidden">
+            <StaggerContainer className="flex flex-col gap-8 lg:hidden">
               {cards.map((card) => (
-                <DashboardInfoCard key={card.title} card={card} />
+                <StaggerItem key={card.title}>
+                  <DashboardInfoCard card={card} />
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerContainer>
 
             <div
               className="hidden lg:block relative"

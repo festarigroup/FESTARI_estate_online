@@ -17,11 +17,11 @@ export default function Footer() {
                 type="email"
                 name="footer-email"
                 placeholder="Email address"
-                className="flex-1 px-3 py-2 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#BE4D00] focus:border-[#BE4D00] text-sm"
+                className="flex-1 px-3 py-2 border border-gray-300 transition-colors focus:outline-none focus:ring-1 focus:ring-[#BE4D00] focus:border-[#BE4D00] text-sm"
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-[#BE4D00] text-white text-sm font-medium hover:bg-[#a64300] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#BE4D00] whitespace-nowrap"
+                className="px-4 py-2 bg-[#BE4D00] text-white text-sm font-medium transition-all duration-200 hover:bg-[#a64300] hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#BE4D00] whitespace-nowrap"
               >
                 Subscribe
               </button>
@@ -35,19 +35,19 @@ export default function Footer() {
             <div className="font-semibold">Explore</div>
             <ul className="space-y-2 text-gray-700">
               <li>
-                <Link href="/properties">Properties</Link>
+                <Link href="/properties" className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1">Properties</Link>
               </li>
               <li>
-                <Link href="/howitworks">How it works</Link>
+                <Link href="/howitworks" className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1">How it works</Link>
               </li>
               <li>
-                <Link href="/pricing">Pricing</Link>
+                <Link href="/pricing" className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1">Pricing</Link>
               </li>
               <li>
-                <Link href="/about">About Us</Link>
+                <Link href="/about" className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1">About Us</Link>
               </li>
               <li>
-                <Link href="/contact">Contact Us</Link>
+                <Link href="/contact" className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1">Contact Us</Link>
               </li>
             </ul>
           </div>
@@ -56,19 +56,19 @@ export default function Footer() {
             <div className="font-semibold">Accounts</div>
             <ul className="space-y-2 text-gray-700">
               <li>
-                <Link href="/signin">Seller Dashboard</Link>
+                <Link href="/signin" className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1">Seller Dashboard</Link>
               </li>
               <li>
-                <Link href="/signup">Buyer Dashboard</Link>
+                <Link href="/signup" className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1">Buyer Dashboard</Link>
               </li>
               <li>
-                <Link href="/bookings">Artisan Dashboard</Link>
+                <Link href="/bookings" className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1">Artisan Dashboard</Link>
               </li>
               <li>
-                <Link href="/contact">Venue Dashboard</Link>
+                <Link href="/contact" className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1">Venue Dashboard</Link>
               </li>
               <li>
-                <Link href="/contact">Admin Dashboard</Link>
+                <Link href="/contact" className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1">Admin Dashboard</Link>
               </li>
             </ul>
           </div>
@@ -81,6 +81,7 @@ export default function Footer() {
                   href="https://facebook.com"
                   target="_blank"
                   rel="noreferrer"
+                  className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1"
                 >
                   Facebook
                 </Link>
@@ -90,12 +91,13 @@ export default function Footer() {
                   href="https://instagram.com"
                   target="_blank"
                   rel="noreferrer"
+                  className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1"
                 >
                   Instagram
                 </Link>
               </li>
               <li>
-                <Link href="https://x.com" target="_blank" rel="noreferrer">
+                <Link href="https://x.com" target="_blank" rel="noreferrer" className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1">
                   X
                 </Link>
               </li>
@@ -104,6 +106,7 @@ export default function Footer() {
                   href="https://linkedin.com"
                   target="_blank"
                   rel="noreferrer"
+                  className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1"
                 >
                   LinkedIn
                 </Link>
@@ -114,6 +117,7 @@ export default function Footer() {
                   href="https://youtube.com"
                   target="_blank"
                   rel="noreferrer"
+                  className="inline-block transition-all duration-200 hover:text-[#BE4D00] hover:translate-x-1"
                 >
                   YouTube
                 </Link>

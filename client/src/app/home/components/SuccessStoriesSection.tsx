@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
 
 type Story = {
   quote: string;
@@ -42,10 +44,12 @@ function ArrowButton({
   onClick: () => void;
 }) {
   return (
-    <button
+    <motion.button
+      whileHover={{ scale: 1.08 }}
+      whileTap={{ scale: 0.94 }}
       type="button"
       onClick={onClick}
-      className="w-9 h-9 border border-gray-200 bg-white hover:bg-gray-50 transition-colors inline-flex items-center justify-center"
+      className="w-9 h-9 border border-gray-200 bg-white hover:bg-gray-50 hover:border-[#BE4D00]/40 transition-colors inline-flex items-center justify-center"
       aria-label={direction === "left" ? "Previous testimonial" : "Next testimonial"}
     >
       <svg
@@ -74,7 +78,7 @@ function ArrowButton({
           />
         )}
       </svg>
-    </button>
+    </motion.button>
   );
 }
 
@@ -148,12 +152,14 @@ export default function SuccessStoriesSection({
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+        <StaggerContainer className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
           {visibleStories.map((s, idx) => (
-            <div
+            <StaggerItem
               key={s.name}
-              className={`bg-gray-100 border border-gray-200 p-6 ${
-                idx === 2 ? "md:opacity-75" : ""
+              className={`border p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+                idx === active
+                  ? "bg-white border-[#BE4D00]/40 shadow-md"
+                  : `bg-gray-100 border-gray-200 ${idx === 2 ? "md:opacity-75" : ""}`
               }`}
             >
               <Stars rating={s.rating ?? 5} />
@@ -168,20 +174,22 @@ export default function SuccessStoriesSection({
                   <p className="text-[11px] text-gray-500">{s.role}</p>
                 </div>
               </div>
-            </div>
+            </StaggerItem>
           ))}
 
           <div className="flex md:hidden items-center justify-between gap-2">
             <ArrowButton direction="left" onClick={goPrev} />
             <ArrowButton direction="right" onClick={goNext} />
           </div>
-        </div>
+        </StaggerContainer>
 
         <div className="mt-6 flex justify-center gap-2">
           {Array.from({ length: Math.min(4, total) }).map((_, i) => (
-            <span
+            <motion.span
               key={i}
-              className={`h-1.5 w-1.5 rounded-full ${
+              animate={{ scale: i === active ? 1.4 : 1 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className={`h-1.5 w-1.5 rounded-full transition-colors duration-300 ${
                 i === active ? "bg-[#BE4D00]" : "bg-gray-300"
               }`}
             />

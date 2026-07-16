@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Reveal from "@/components/motion/Reveal";
 
 const propertyNames: Record<number, string> = {
   1: "Large 4-room apartment with a beautiful terrace",
@@ -66,7 +67,10 @@ const HOST_STATS = [
 
 function InfoCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border border-gray-200 px-5 py-4" style={CARD_GRADIENT}>
+    <div
+      className="border border-gray-200 px-5 py-4 transition-all duration-300 hover:border-[#BE4D00]/40 hover:shadow-md"
+      style={CARD_GRADIENT}
+    >
       <p className="text-base leading-none text-gray-500">{label}</p>
       <p className="mt-2 text-xl leading-none font-light text-gray-900">{value}</p>
     </div>
@@ -85,7 +89,7 @@ export default async function PropertyDetailPage({
   return (
     <section className="w-full px-6 py-8 md:px-10 md:py-10">
       <div className="relative w-full overflow-hidden">
-        <div className="relative h-[clamp(370px,47vw,760px)] w-full">
+        <Reveal y={0} className="relative h-[clamp(370px,47vw,760px)] w-full">
           <Image
             src="/PropertyHeroSection.png"
             alt={title}
@@ -139,9 +143,9 @@ export default async function PropertyDetailPage({
               Contact agent
             </button>
           </div>
-        </div>
+        </Reveal>
 
-        <div className="mt-8 flex items-center justify-between">
+        <Reveal className="mt-8 flex items-center justify-between">
           <Link
             href="/property"
             className="inline-flex items-center gap-2 border border-gray-200 bg-white px-4 py-2 text-sm leading-none text-gray-500 hover:bg-gray-50 transition-colors"
@@ -155,9 +159,9 @@ export default async function PropertyDetailPage({
           >
             Next <span aria-hidden="true">→</span>
           </Link>
-        </div>
+        </Reveal>
 
-        <div className="mt-10 space-y-4">
+        <Reveal className="mt-10 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {INFO_CARDS.map((card) => (
               <InfoCard key={card.label} label={card.label} value={card.value} />
@@ -173,17 +177,17 @@ export default async function PropertyDetailPage({
             seeking a peaceful stay with privacy and security. Assistance
             is provided remotely through the app.
           </p>
-        </div>
+        </Reveal>
 
         <div className="mt-14 border-t border-gray-200 pt-10">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <Reveal className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {GALLERY_ITEMS.map((item, index) => (
-              <div key={item.alt} className={item.className}>
+              <div key={item.alt} className={`group ${item.className}`}>
                 <Image
                   src={item.src}
                   alt={item.alt}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                   sizes={
                     index === 1 || index === 2
                       ? "(max-width: 768px) 100vw, 66vw"
@@ -200,9 +204,9 @@ export default async function PropertyDetailPage({
                 ) : null}
               </div>
             ))}
-          </div>
+          </Reveal>
 
-          <div className="mt-12 border-t border-gray-200 pt-8 space-y-6">
+          <Reveal className="mt-12 border-t border-gray-200 pt-8 space-y-6">
             {HIGHLIGHTS.map((highlight) => (
               <div key={highlight.title} className="flex items-start gap-3">
                 <span className="mt-1 text-gray-700">{highlight.icon}</span>
@@ -212,9 +216,9 @@ export default async function PropertyDetailPage({
                 </div>
               </div>
             ))}
-          </div>
+          </Reveal>
 
-          <div className="mt-14">
+          <Reveal className="mt-14">
             <h2 className="text-2xl font-bold tracking-tight text-gray-900">
               What this place offers
             </h2>
@@ -229,9 +233,9 @@ export default async function PropertyDetailPage({
                 <p key={amenity}>{amenity}</p>
               ))}
             </div>
-          </div>
+          </Reveal>
 
-          <div className="mt-14 border-t border-gray-200 pt-10">
+          <Reveal className="mt-14 border-t border-gray-200 pt-10">
             <h2 className="text-2xl font-bold tracking-tight text-gray-900">
               Location
             </h2>
@@ -250,9 +254,9 @@ export default async function PropertyDetailPage({
                 sizes="100vw"
               />
             </div>
-          </div>
+          </Reveal>
 
-          <div className="mt-14 border-t border-gray-200 pt-10">
+          <Reveal className="mt-14 border-t border-gray-200 pt-10">
             <h2 className="text-2xl font-light tracking-tight text-gray-900">
               Meet your host
             </h2>
@@ -312,7 +316,7 @@ export default async function PropertyDetailPage({
                 </button>
               </div>
             </div>
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>

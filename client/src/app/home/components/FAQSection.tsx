@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
 
 type FAQ = {
   question: string;
@@ -64,18 +65,18 @@ export default function FAQSection({
         </h2>
         <p className="mt-3 text-sm text-gray-500">{subtitle}</p>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-10">
+        <StaggerContainer className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-10">
           {faqs.map((f) => (
-            <div key={f.question}>
-              <h3 className="text-sm font-semibold text-gray-900">
+            <StaggerItem key={f.question} className="group">
+              <h3 className="text-sm font-semibold text-gray-900 transition-colors duration-300 group-hover:text-[#BE4D00]">
                 {f.question}
               </h3>
               <p className="mt-2 text-sm text-gray-500 leading-relaxed">
                 {f.answer}
               </p>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
 
         <div className="mt-10">
           <h3 className="text-xl font-extrabold tracking-tight text-gray-900">

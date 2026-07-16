@@ -137,13 +137,13 @@ function MiniIconBath() {
 
 function FeaturedPropertyCard({ p }: { p: FeaturedProperty }) {
   return (
-    <div className="bg-white rounded-sm overflow-hidden border border-gray-100">
+    <div className="group bg-white rounded-sm overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <div className="relative h-40 md:h-44 bg-gray-100 overflow-hidden">
         <Image
           src={p.imageSrc ?? "/property-card-placeholder.svg"}
           alt={p.title}
           fill
-          className="object-cover"
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
           sizes="(max-width: 1024px) 100vw, 33vw"
         />
 
@@ -259,10 +259,13 @@ export default function FeaturedPropertiesSection({
         <div className="mt-8 flex justify-end">
           <Link
             href={viewMoreHref}
-            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded text-xs text-gray-700
-                       hover:bg-gray-50 transition-colors"
+            className="group inline-flex items-center gap-2 px-4 py-2 border border-gray-200 rounded text-xs text-gray-700
+                       hover:bg-gray-50 hover:border-[#BE4D00]/40 transition-all"
           >
-            View more <ViewMoreArrow />
+            View more{" "}
+            <span className="transition-transform duration-200 group-hover:translate-x-1">
+              <ViewMoreArrow />
+            </span>
           </Link>
         </div>
       </div>

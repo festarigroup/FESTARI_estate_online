@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface ReserveFormProps {
   numericId: number;
@@ -64,7 +65,12 @@ export default function ReserveForm({ numericId, title }: ReserveFormProps) {
       </div>
 
       {/* Form Container */}
-      <div className="relative z-10 w-full max-w-4xl bg-white p-8 md:p-12 shadow-2xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="relative z-10 w-full max-w-4xl bg-white p-8 md:p-12 shadow-2xl"
+      >
         <h1 className="text-3xl md:text-4xl text-center mb-10 font-normal text-gray-900">
           {getTitle()}
         </h1>
@@ -76,8 +82,8 @@ export default function ReserveForm({ numericId, title }: ReserveFormProps) {
               {/* Step 1 */}
               <div className="flex items-start gap-4 mb-8 relative">
                 <div className="flex flex-col items-center z-10 mt-1">
-                  <div className="w-3 h-3 rounded-full bg-[#BE4D00]"></div>
-                  <div className={`w-0.5 h-16 absolute top-3 ${step >= 2 ? "bg-[#BE4D00]" : "bg-[#BE4D00]"}`}></div>
+                  <div className="w-3 h-3 rounded-full bg-[#BE4D00] transition-colors duration-300"></div>
+                  <div className={`w-0.5 h-16 absolute top-3 transition-colors duration-300 ${step >= 2 ? "bg-[#BE4D00]" : "bg-[#BE4D00]"}`}></div>
                 </div>
                 <div>
                   <p className="text-gray-800 text-[15px]">Dates and Guests</p>
@@ -88,8 +94,8 @@ export default function ReserveForm({ numericId, title }: ReserveFormProps) {
               {/* Step 2 */}
               <div className="flex items-start gap-4 mb-8 relative">
                 <div className="flex flex-col items-center z-10 mt-1">
-                  <div className={`w-3 h-3 rounded-full ${step >= 2 ? "bg-[#BE4D00]" : "border-[1.5px] border-gray-200 bg-[#FAFAFA]"}`}></div>
-                  <div className={`w-0.5 h-16 absolute top-3 ${step >= 3 ? "bg-[#BE4D00]" : "bg-gray-100"}`}></div>
+                  <div className={`w-3 h-3 rounded-full transition-colors duration-300 ${step >= 2 ? "bg-[#BE4D00]" : "border-[1.5px] border-gray-200 bg-[#FAFAFA]"}`}></div>
+                  <div className={`w-0.5 h-16 absolute top-3 transition-colors duration-300 ${step >= 3 ? "bg-[#BE4D00]" : "bg-gray-100"}`}></div>
                 </div>
                 <div>
                   <p className="text-gray-800 text-[15px]">Guest Details</p>
@@ -100,8 +106,8 @@ export default function ReserveForm({ numericId, title }: ReserveFormProps) {
               {/* Step 3 */}
               <div className="flex items-start gap-4 mb-8 relative">
                 <div className="flex flex-col items-center z-10 mt-1">
-                  <div className={`w-3 h-3 rounded-full ${step >= 3 ? "bg-[#BE4D00]" : "border-[1.5px] border-gray-200 bg-[#FAFAFA]"}`}></div>
-                  <div className={`w-0.5 h-16 absolute top-3 ${step >= 4 ? "bg-[#BE4D00]" : "bg-gray-100"}`}></div>
+                  <div className={`w-3 h-3 rounded-full transition-colors duration-300 ${step >= 3 ? "bg-[#BE4D00]" : "border-[1.5px] border-gray-200 bg-[#FAFAFA]"}`}></div>
+                  <div className={`w-0.5 h-16 absolute top-3 transition-colors duration-300 ${step >= 4 ? "bg-[#BE4D00]" : "bg-gray-100"}`}></div>
                 </div>
                 <div>
                   <p className="text-gray-800 text-[15px]">Review</p>
@@ -112,7 +118,7 @@ export default function ReserveForm({ numericId, title }: ReserveFormProps) {
               {/* Step 4 */}
               <div className="flex items-start gap-4 relative">
                 <div className="flex flex-col items-center z-10 mt-1">
-                  <div className={`w-3 h-3 rounded-full ${step >= 4 ? "border-[2.5px] border-[#BE4D00] bg-[#FAFAFA]" : "border-[1.5px] border-gray-200 bg-[#FAFAFA]"}`}></div>
+                  <div className={`w-3 h-3 rounded-full transition-colors duration-300 ${step >= 4 ? "border-[2.5px] border-[#BE4D00] bg-[#FAFAFA]" : "border-[1.5px] border-gray-200 bg-[#FAFAFA]"}`}></div>
                 </div>
                 <div>
                   <p className="text-gray-800 text-[15px]">Payment</p>
@@ -124,9 +130,15 @@ export default function ReserveForm({ numericId, title }: ReserveFormProps) {
 
           {/* Right Content - Form Fields */}
           <div className="flex-1 pt-2">
-            
+            <AnimatePresence mode="wait">
             {step === 1 && (
-              <>
+              <motion.div
+                key="step1"
+                initial={{ opacity: 0, x: 24 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -24 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
                   <div className="relative">
                     <label className="absolute -top-[9px] left-3 bg-white px-1.5 text-[11px] text-[#BE4D00] z-10">Check-in Date</label>
@@ -169,19 +181,27 @@ export default function ReserveForm({ numericId, title }: ReserveFormProps) {
                   </div>
                 </div>
 
-                <button
+                <motion.button
+                  whileHover={isStep1Valid ? { y: -1 } : undefined}
+                  whileTap={isStep1Valid ? { scale: 0.98 } : undefined}
                   type="button"
                   onClick={() => { if (isStep1Valid) setStep(2); }}
                   disabled={!isStep1Valid}
                   className={`w-full mt-10 py-4 text-[15px] transition-colors text-white ${isStep1Valid ? "bg-[#BE4D00] hover:bg-[#a54300] cursor-pointer" : "bg-[#F2DDD1] cursor-not-allowed"}`}
                 >
                   Continue to guest details
-                </button>
-              </>
+                </motion.button>
+              </motion.div>
             )}
 
             {step === 2 && (
-              <>
+              <motion.div
+                key="step2"
+                initial={{ opacity: 0, x: 24 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -24 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
                   <div className="relative">
                     <label className="absolute -top-[9px] left-3 bg-white px-1.5 text-[11px] text-[#BE4D00] z-10">First Name</label>
@@ -207,20 +227,28 @@ export default function ReserveForm({ numericId, title }: ReserveFormProps) {
 
                 <div className="flex items-center gap-4 mt-10">
                   <button type="button" onClick={() => setStep(1)} className="py-4 px-6 text-[15px] border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">Back</button>
-                  <button
+                  <motion.button
+                    whileHover={isStep2Valid ? { y: -1 } : undefined}
+                    whileTap={isStep2Valid ? { scale: 0.98 } : undefined}
                     type="button"
                     onClick={() => { if (isStep2Valid) setStep(3); }}
                     disabled={!isStep2Valid}
                     className={`flex-1 py-4 text-[15px] transition-colors text-white ${isStep2Valid ? "bg-[#BE4D00] hover:bg-[#a54300] cursor-pointer" : "bg-[#F2DDD1] cursor-not-allowed"}`}
                   >
                     Continue to review details
-                  </button>
+                  </motion.button>
                 </div>
-              </>
+              </motion.div>
             )}
 
             {step === 3 && (
-              <>
+              <motion.div
+                key="step3"
+                initial={{ opacity: 0, x: 24 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -24 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              >
                 {/* Information Card */}
                 <div className="border border-gray-100 rounded-sm p-4 mb-8">
                   <div className="flex gap-4 items-center">
@@ -307,20 +335,28 @@ export default function ReserveForm({ numericId, title }: ReserveFormProps) {
 
                 <div className="flex items-center gap-4 mt-8">
                   <button type="button" onClick={() => setStep(2)} className="py-4 px-6 text-[15px] border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">Back</button>
-                  <button
+                  <motion.button
+                    whileHover={termsAccepted ? { y: -1 } : undefined}
+                    whileTap={termsAccepted ? { scale: 0.98 } : undefined}
                     type="button"
                     onClick={() => { if (termsAccepted) setStep(4); }}
                     disabled={!termsAccepted}
                     className={`flex-1 py-4 text-[15px] transition-colors text-white ${termsAccepted ? "bg-[#BE4D00] hover:bg-[#a54300] cursor-pointer" : "bg-[#F2DDD1] cursor-not-allowed"}`}
                   >
                     Continue
-                  </button>
+                  </motion.button>
                 </div>
-              </>
+              </motion.div>
             )}
 
             {step === 4 && (
-              <>
+              <motion.div
+                key="step4"
+                initial={{ opacity: 0, x: 24 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -24 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              >
                 <div className="space-y-4 mb-10 w-full md:w-3/4">
                   {/* Payment Methods */}
                   <div className="flex items-center gap-4 p-3 bg-gray-100 rounded-sm">
@@ -420,25 +456,27 @@ export default function ReserveForm({ numericId, title }: ReserveFormProps) {
                 <div className="mt-10">
                   <div className="flex gap-4">
                     <button type="button" onClick={() => setStep(3)} className="py-4 px-6 text-[15px] border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">Back</button>
-                    <button
+                    <motion.button
+                      whileHover={isStep4Valid ? { y: -1 } : undefined}
+                      whileTap={isStep4Valid ? { scale: 0.98 } : undefined}
                       type="button"
                       onClick={() => { if (isStep4Valid) alert("Payment Successful!"); }}
                       disabled={!isStep4Valid}
                       className={`flex-1 py-4 text-[15px] transition-colors rounded-sm text-white ${isStep4Valid ? "bg-[#BE4D00] hover:bg-[#a54300] cursor-pointer" : "bg-[#F2DDD1] cursor-not-allowed"}`}
                     >
                       Confirm
-                    </button>
+                    </motion.button>
                   </div>
                   <p className="text-center text-xs text-gray-400 mt-4 leading-relaxed max-w-sm mx-auto">
                     An additional E-levy fee of 1% may apply<br/>to this payment. <a href="#" className="text-[#3b82f6] hover:underline">Learn more.</a>
                   </p>
                 </div>
-              </>
+              </motion.div>
             )}
-
+            </AnimatePresence>
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }

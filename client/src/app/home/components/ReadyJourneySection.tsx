@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Reveal from "@/components/motion/Reveal";
 
 type ReadyJourneySectionProps = {
   title?: string;
@@ -25,7 +26,7 @@ export default function ReadyJourneySection({
     <section id={sectionId} className="w-full bg-white">
       <div className="w-full max-w-[1400px] mx-auto px-4 md:px-6 py-10 md:py-14">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          <div>
+          <Reveal x={-28} y={0}>
             <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 whitespace-pre-line">
               {title}
             </h2>
@@ -37,29 +38,29 @@ export default function ReadyJourneySection({
               <Link
                 href={primaryCta.href}
                 className="inline-flex items-center justify-center px-4 py-2 bg-[#BE4D00] text-white text-xs font-semibold rounded
-                           hover:bg-[#a54300] transition-colors"
+                           transition-all duration-200 hover:bg-[#a54300] hover:-translate-y-0.5"
               >
                 {primaryCta.label}
               </Link>
               <Link
                 href={secondaryCta.href}
                 className="inline-flex items-center justify-center px-4 py-2 border border-gray-200 text-gray-900 text-xs font-semibold rounded
-                           hover:bg-gray-50 transition-colors"
+                           transition-all duration-200 hover:bg-gray-50 hover:-translate-y-0.5"
               >
                 {secondaryCta.label}
               </Link>
             </div>
-          </div>
+          </Reveal>
 
-          <div className="relative w-full aspect-[16/9] bg-gray-100 overflow-hidden">
+          <Reveal x={28} y={0} delay={0.1} className="relative w-full aspect-[16/9] bg-gray-100 overflow-hidden">
             <Image
               src={imageSrc}
               alt={imageAlt}
               fill
-              className="object-cover"
+              className="object-cover transition-transform duration-700 hover:scale-105"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>

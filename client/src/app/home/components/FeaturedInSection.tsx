@@ -1,3 +1,5 @@
+import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
+
 type FeaturedLogo = {
   name: string;
 };
@@ -41,16 +43,16 @@ export default function FeaturedInSection({
           {title}
         </h2>
 
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-x-12 gap-y-4">
+        <StaggerContainer className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-x-12 gap-y-4">
           {logos.map((logo, idx) => (
-            <div
+            <StaggerItem
               key={`${logo.name}-${idx}`}
-              className="h-12 bg-gray-100 border border-gray-200 flex items-center justify-center"
+              className="h-12 bg-gray-100 border border-gray-200 flex items-center justify-center grayscale opacity-70 transition-all duration-300 hover:grayscale-0 hover:opacity-100 hover:scale-105 hover:border-[#BE4D00]/40"
             >
               <LogoMark name={logo.name} />
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );

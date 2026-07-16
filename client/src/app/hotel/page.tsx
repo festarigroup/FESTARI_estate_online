@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
+import Reveal from "@/components/motion/Reveal";
 
 const hotels = [
   {
@@ -157,7 +159,12 @@ export default function HotelPage() {
 
         <div className="absolute inset-0 bg-black/35" />
 
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 text-center text-white">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 text-center text-white"
+        >
           <h1 className="text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
             Discover the perfect place
             <br />
@@ -168,21 +175,33 @@ export default function HotelPage() {
             <br />
             Find the perfect stay for any trip with ease.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="absolute bottom-4 left-4 z-20 sm:bottom-6 sm:left-6 md:bottom-8 md:left-8">
+        <motion.div
+          initial={{ opacity: 0, x: -16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute bottom-4 left-4 z-20 sm:bottom-6 sm:left-6 md:bottom-8 md:left-8"
+        >
           <p className="max-w-[125px] text-[9px] leading-tight text-white/90 sm:max-w-[150px] sm:text-[10px] md:max-w-[170px] md:text-xs">
             Start your journey towards home ownership today!
           </p>
-          <button
+          <motion.button
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.96 }}
             type="button"
             className="mt-2 bg-[#BE4D00] px-3 py-1.5 text-[10px] font-semibold text-white sm:text-[11px]"
           >
             List property
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
 
-        <div className="absolute bottom-4 right-4 z-20 flex flex-col gap-1 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8">
+        <motion.div
+          initial={{ opacity: 0, x: 16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute bottom-4 right-4 z-20 flex flex-col gap-1 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8"
+        >
           <span className="inline-flex items-center border border-[#E2AE8A] bg-black/25 px-2 py-1 text-[9px] text-white sm:text-[10px] md:text-[11px]">
             Modern home
           </span>
@@ -194,10 +213,10 @@ export default function HotelPage() {
               Eco-friendly
             </span>
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      <div className="mt-6 flex flex-col items-center text-center">
+      <Reveal className="mt-6 flex flex-col items-center text-center">
         <h2 className="text-3xl font-bold">Guest Favorites</h2>
 
         <div className="mt-3 inline-flex items-center gap-6 border border-[#BE4D00] px-4 py-2">
@@ -227,23 +246,34 @@ export default function HotelPage() {
         </div>
 
         <p className="mt-2 font-bold text-lg text-gray-600">Homes selected just for you</p>
-      </div>
+      </Reveal>
 
       <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-        {paginatedHotels.map((hotel) => (
-          <article
-            key={hotel.id}
-            role="button"
-            tabIndex={0}
-            onClick={() => router.push(`/hotel/${hotel.id}`)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                router.push(`/hotel/${hotel.id}`);
-              }
-            }}
-            className="group cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl"
-          >
+        <AnimatePresence mode="popLayout">
+          {paginatedHotels.map((hotel, index) => (
+            <motion.article
+              key={hotel.id}
+              layout
+              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.94 }}
+              transition={{
+                duration: 0.4,
+                ease: [0.22, 1, 0.36, 1],
+                delay: index * 0.05,
+              }}
+              whileHover={{ y: -6 }}
+              role="button"
+              tabIndex={0}
+              onClick={() => router.push(`/hotel/${hotel.id}`)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  router.push(`/hotel/${hotel.id}`);
+                }
+              }}
+              className="group cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl"
+            >
             <div className="relative h-48 overflow-hidden">
               <img
                 src="/HotelHeroSection.jpg"
@@ -334,8 +364,9 @@ export default function HotelPage() {
                 </div>
               </div>
             </div>
-          </article>
-        ))}
+            </motion.article>
+          ))}
+        </AnimatePresence>
       </div>
 
       <div className="mt-10 flex items-center justify-center gap-2">

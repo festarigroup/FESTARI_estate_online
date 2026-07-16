@@ -1,3 +1,5 @@
+import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
+
 type GettingStartedStep = {
   title: string;
   description: string;
@@ -72,13 +74,13 @@ export default function GettingStartedSection({
         </h2>
         <p className="mt-3 text-sm text-gray-500">{subtitle}</p>
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0">
+        <StaggerContainer className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0">
           {steps.map((step, idx) => (
-            <div
+            <StaggerItem
               key={`${step.title}-${idx}`}
-              className="bg-gray-100 px-7 py-9 border-y border-white/50 lg:border-y-0 lg:border-x border-white/70"
+              className="group bg-gray-100 px-7 py-9 border-y border-white/50 lg:border-y-0 lg:border-x border-white/70 transition-all duration-300 hover:bg-white hover:shadow-lg hover:-translate-y-1"
             >
-              <div className="w-10 h-10 rounded bg-white/70 inline-flex items-center justify-center">
+              <div className="w-10 h-10 rounded bg-white/70 inline-flex items-center justify-center transition-colors duration-300 group-hover:bg-[#BE4D00] group-hover:text-white [&_svg]:transition-colors [&_svg]:duration-300 group-hover:[&_svg]:text-white">
                 {step.icon ?? <CubeIcon />}
               </div>
 
@@ -88,9 +90,9 @@ export default function GettingStartedSection({
               <p className="mt-3 text-sm text-gray-400 whitespace-pre-line">
                 {step.description}
               </p>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );

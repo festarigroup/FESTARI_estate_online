@@ -23,7 +23,7 @@ export default function StatsMarquee({
   return (
     <section id={sectionId} className={className}>
       <div
-        className="flex animate-marquee whitespace-nowrap"
+        className="flex animate-marquee whitespace-nowrap hover:[animation-play-state:paused]"
         style={{ animationDuration: `${durationSeconds}s` }}
       >
         {Array.from({ length: repeat }).map((_, setIdx) => (

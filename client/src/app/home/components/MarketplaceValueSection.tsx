@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import Reveal from "@/components/motion/Reveal";
+import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
 
 type ValueFeature = {
   title: string;
@@ -141,10 +143,10 @@ export default function MarketplaceValueSection({
           {eyebrowDescription}
         </p>
 
-        <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
+        <StaggerContainer className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
           {features.map((f) => (
-            <div key={f.title} className="flex flex-col items-center text-center">
-              <div className="w-10 h-10 rounded bg-gray-100 inline-flex items-center justify-center">
+            <StaggerItem key={f.title} className="group flex flex-col items-center text-center">
+              <div className="w-10 h-10 rounded bg-gray-100 inline-flex items-center justify-center transition-all duration-300 group-hover:bg-[#BE4D00] group-hover:scale-110 [&_svg]:transition-colors [&_svg]:duration-300 group-hover:[&_svg]:text-white">
                 {f.icon}
               </div>
               <h3 className="mt-4 text-lg font-bold text-gray-900">
@@ -153,44 +155,46 @@ export default function MarketplaceValueSection({
               <p className="mt-2 text-sm text-gray-500 max-w-xs leading-relaxed">
                 {f.description}
               </p>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
 
         <div className="mt-14">
-          <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
-            {mainTitle}
-          </h3>
-          <p className="mt-4 text-sm md:text-base text-gray-500 leading-relaxed max-w-6xl">
-            {mainDescription}
-          </p>
+          <Reveal>
+            <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
+              {mainTitle}
+            </h3>
+            <p className="mt-4 text-sm md:text-base text-gray-500 leading-relaxed max-w-6xl">
+              {mainDescription}
+            </p>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <Link
-              href={primaryCta.href}
-              className="inline-flex items-center justify-center px-4 py-2 bg-[#BE4D00] text-white text-xs font-semibold rounded
-                         hover:bg-[#a54300] transition-colors"
-            >
-              {primaryCta.label}
-            </Link>
-            <Link
-              href={secondaryCta.href}
-              className="inline-flex items-center justify-center px-4 py-2 border border-gray-200 text-gray-900 text-xs font-semibold rounded
-                         hover:bg-gray-50 transition-colors"
-            >
-              {secondaryCta.label}
-            </Link>
-          </div>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <Link
+                href={primaryCta.href}
+                className="inline-flex items-center justify-center px-4 py-2 bg-[#BE4D00] text-white text-xs font-semibold rounded
+                           transition-all duration-200 hover:bg-[#a54300] hover:-translate-y-0.5"
+              >
+                {primaryCta.label}
+              </Link>
+              <Link
+                href={secondaryCta.href}
+                className="inline-flex items-center justify-center px-4 py-2 border border-gray-200 text-gray-900 text-xs font-semibold rounded
+                           transition-all duration-200 hover:bg-gray-50 hover:-translate-y-0.5"
+              >
+                {secondaryCta.label}
+              </Link>
+            </div>
+          </Reveal>
 
-          <div className="mt-8 relative w-full aspect-[16/9] bg-gray-100 overflow-hidden">
+          <Reveal delay={0.1} className="mt-8 relative w-full aspect-[16/9] bg-gray-100 overflow-hidden">
             <Image
               src={imageSrc}
               alt={imageAlt}
               fill
-              className="object-cover"
+              className="object-cover transition-transform duration-700 hover:scale-105"
               sizes="100vw"
             />
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>

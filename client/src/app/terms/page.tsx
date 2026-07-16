@@ -2,13 +2,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function TermsPage() {
   const [accepted, setAccepted] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   return (
-    <div className="relative bg-white rounded-lg shadow-sm border border-gray-200">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="relative bg-white rounded-lg shadow-sm border border-gray-200"
+    >
       <div className="p-6">
         <h1 className="text-2xl font-bold text-[#BE4D00]">Terms and Conditions</h1>
         <h2 className="mt-2 text-sm font-semibold text-gray-800">Your Agreement</h2>
@@ -193,11 +199,13 @@ export default function TermsPage() {
         <div className="flex gap-3">
           <Link
             href="/signup"
-            className="py-2 px-4 bg-[#ffffff] text-[#BE4D00] font-medium hover:bg-orange-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#BE4D00] text-sm border-[#BE4D00] border"
+            className="py-2 px-4 bg-[#ffffff] text-[#BE4D00] font-medium transition-colors hover:bg-orange-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#BE4D00] text-sm border-[#BE4D00] border"
           >
             Back
           </Link>
-          <button
+          <motion.button
+            whileHover={{ y: -1 }}
+            whileTap={{ scale: 0.97 }}
             type="button"
             disabled={!accepted}
             onClick={() => accepted && setShowModal(true)}
@@ -209,48 +217,62 @@ export default function TermsPage() {
             }
           >
             Accept
-          </button>
+          </motion.button>
         </div>
       </div>
 
-      {showModal && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white w-full max-w-md rounded-md shadow-lg p-6 space-y-4">
-            <button
-              type="button"
-              onClick={() => setShowModal(false)}
-              className="flex items-center text-sm text-gray-700 hover:text-gray-900"
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 12 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="bg-white w-full max-w-md rounded-md shadow-lg p-6 space-y-4"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="flex items-center text-sm text-gray-700 hover:text-gray-900"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-              </svg>
-              Back
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                </svg>
+                Back
+              </button>
 
-            <div className="text-center space-y-2">
-              <h3 className="text-xl font-semibold text-gray-900">Terms and Conditions</h3>
-              <p className="text-sm text-gray-700">
-                By accepting, you agree to the company&apos;s Terms and Conditions
-              </p>
-            </div>
+              <div className="text-center space-y-2">
+                <h3 className="text-xl font-semibold text-gray-900">Terms and Conditions</h3>
+                <p className="text-sm text-gray-700">
+                  By accepting, you agree to the company&apos;s Terms and Conditions
+                </p>
+              </div>
 
-            <button
-              type="button"
-              className="w-full py-3 bg-[#BE4D00] text-white font-semibold text-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#BE4D00]"
-              onClick={() => setShowModal(false)}
-            >
-              Agree and register
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+              <button
+                type="button"
+                className="w-full py-3 bg-[#BE4D00] text-white font-semibold text-sm hover:bg-orange-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#BE4D00]"
+                onClick={() => setShowModal(false)}
+              >
+                Agree and register
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

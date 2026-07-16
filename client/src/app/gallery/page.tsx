@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 const galleryImages = [
   { id: 1, src: "/gallery.png", alt: "Modern luxury villa exterior", cols: 2, rows: 2 },
@@ -27,31 +28,46 @@ const galleryImages = [
 
 export default function GalleryPage() {
   return (
-    <div
+    <motion.div
       className="grid gap-2"
       style={{
         gridTemplateColumns: "repeat(4, 1fr)",
         gridAutoRows: "200px",
       }}
+      initial="hidden"
+      animate="visible"
+      variants={{
+        hidden: {},
+        visible: { transition: { staggerChildren: 0.045 } },
+      }}
     >
       {galleryImages.map((img) => (
-        <div
+        <motion.div
           key={img.id}
-          className="relative overflow-hidden rounded-sm"
+          className="group relative overflow-hidden rounded-sm"
           style={{
             gridColumn: `span ${img.cols}`,
             gridRow: `span ${img.rows}`,
+          }}
+          variants={{
+            hidden: { opacity: 0, scale: 0.9 },
+            visible: {
+              opacity: 1,
+              scale: 1,
+              transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+            },
           }}
         >
           <Image
             src={img.src}
             alt={img.alt}
             fill
-            className="object-cover"
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
             sizes="(max-width: 768px) 100vw, 25vw"
           />
-        </div>
+          <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10" />
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 }

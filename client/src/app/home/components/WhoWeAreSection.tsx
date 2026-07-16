@@ -135,12 +135,12 @@ export default function WhoWeAreSection({
               {title}
             </h2>
 
-            <div className="mt-8 relative w-full max-w-[560px] aspect-[4/3]">
+            <div className="mt-8 relative w-full max-w-[560px] aspect-[4/3] overflow-hidden">
               <Image
                 src={imageSrc}
                 alt={imageAlt}
                 fill
-                className="object-contain"
+                className="object-contain transition-transform duration-500 hover:scale-105"
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 priority={false}
               />
@@ -163,7 +163,7 @@ export default function WhoWeAreSection({
               {items.map((item) => {
                 const content = (
                   <div className="flex items-center gap-3">
-                    <span className="inline-flex items-center justify-center">
+                    <span className="inline-flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
                       {item.icon}
                     </span>
                     <span className="text-sm font-medium text-[#BE4D00]">
@@ -190,14 +190,14 @@ export default function WhoWeAreSection({
               <Link
                 href={primaryCta.href}
                 className="inline-flex items-center justify-center px-6 py-2.5 rounded bg-[#BE4D00] text-white text-sm font-semibold
-                           hover:bg-[#a54300] transition-colors"
+                           hover:bg-[#a54300] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#BE4D00]/25 active:translate-y-0"
               >
                 {primaryCta.label}
               </Link>
               <Link
                 href={secondaryCta.href}
                 className="inline-flex items-center justify-center px-6 py-2.5 rounded border border-gray-300 text-gray-900 text-sm font-semibold
-                           hover:bg-gray-50 transition-colors"
+                           hover:bg-gray-50 transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
               >
                 {secondaryCta.label}
               </Link>

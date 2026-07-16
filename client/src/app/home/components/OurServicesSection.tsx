@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
 
 type ServiceCard = {
   title: string;
@@ -161,13 +162,13 @@ export default function OurServicesSection({
           {title}
         </h2>
 
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-7">
+        <StaggerContainer className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-7">
           {services.map((s) => (
-            <div
+            <StaggerItem
               key={s.ctaLabel}
-              className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow rounded-sm p-7"
+              className="group bg-white border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1.5 hover:border-[#BE4D00]/30 transition-all duration-300 rounded-sm p-7"
             >
-              <div className="w-10 h-10 rounded bg-gray-100 inline-flex items-center justify-center">
+              <div className="w-10 h-10 rounded bg-gray-100 inline-flex items-center justify-center transition-colors duration-300 group-hover:bg-[#BE4D00] group-hover:text-white [&_svg]:transition-colors [&_svg]:duration-300 group-hover:[&_svg]:text-white">
                 {s.icon}
               </div>
 
@@ -181,13 +182,13 @@ export default function OurServicesSection({
               <Link
                 href={s.href}
                 className="mt-5 inline-flex items-center gap-2 px-4 py-2 bg-[#BE4D00] text-white text-xs font-semibold rounded
-                           hover:bg-[#a54300] transition-colors"
+                           hover:bg-[#a54300] transition-all duration-200 hover:gap-3"
               >
                 {s.ctaLabel} <ArrowRight />
               </Link>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );

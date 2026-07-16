@@ -1,3 +1,5 @@
+import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
+
 type Testimonial = {
   quote: string;
   name: string;
@@ -81,11 +83,11 @@ export default function TestimonialsSection({
         </h2>
         <p className="mt-3 text-sm text-gray-500">{subtitle}</p>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <StaggerContainer className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
           {testimonials.map((t) => (
-            <div
+            <StaggerItem
               key={t.name}
-              className="bg-gray-100 border border-gray-200 p-6"
+              className="bg-gray-100 border border-gray-200 p-6 transition-all duration-300 hover:bg-white hover:shadow-xl hover:-translate-y-1 hover:border-[#BE4D00]/30"
             >
               <Stars rating={t.rating ?? 5} />
               <p className="mt-4 text-sm text-gray-800 leading-relaxed">
@@ -99,9 +101,9 @@ export default function TestimonialsSection({
                   <p className="text-[11px] text-gray-500">{t.role}</p>
                 </div>
               </div>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );

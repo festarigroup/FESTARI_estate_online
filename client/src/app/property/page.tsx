@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import PropertyTypeSearchBar from "@/components/property/PropertyTypeSearchBar";
 import LocationSearchBar from "@/components/property/LocationSearchBar";
 import PricingSearchBar from "@/components/property/PricingSearchBar";
+import Reveal from "@/components/motion/Reveal";
 const properties = [
   {
     id: 1,
@@ -123,31 +125,58 @@ export default function PropertyPage() {
       {/* Hero Banner */}
       <div className="relative -mt-2 pt-3 md:-mt-3">
         <div className="relative h-[clamp(320px,46vw,700px)]">
-          <p className="absolute left-1/2 top-[clamp(1.2rem,3.2vw,2.8rem)] z-20 -translate-x-1/2 text-[11px] leading-none sm:text-xs md:text-sm">
+          <motion.p
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute left-1/2 top-[clamp(1.2rem,3.2vw,2.8rem)] z-20 -translate-x-1/2 text-[11px] leading-none sm:text-xs md:text-sm"
+          >
             Transforming the future of home living
-          </p>
-          <h2 className="absolute inset-x-0 top-[clamp(1.75rem,4.1vw,3.75rem)] z-0 w-full text-center text-[clamp(4.2rem,14vw,11.3rem)] font-black uppercase text-[#BE4D00]">
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-x-0 top-[clamp(1.75rem,4.1vw,3.75rem)] z-0 w-full text-center text-[clamp(4.2rem,14vw,11.3rem)] font-black uppercase text-[#BE4D00]"
+          >
             Property
-          </h2>
-          <div className="absolute inset-x-0 bottom-[-2.5rem] z-10 flex justify-center">
+          </motion.h2>
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-x-0 bottom-[-2.5rem] z-10 flex justify-center"
+          >
             <img
               src="/PropertyHeroSection.png"
               alt="Modern property building"
               className="pointer-events-none h-[clamp(240px,46vw,735px)] w-auto"
             />
-          </div>
-          <div className="absolute left-4 top-[225px] z-20 sm:left-8 sm:top-[245px] md:left-20 md:top-[305px] lg:left-24 lg:top-[370px] xl:left-32 xl:top-[445px] 2xl:left-44 2xl:top-[520px]">
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute left-4 top-[225px] z-20 sm:left-8 sm:top-[245px] md:left-20 md:top-[305px] lg:left-24 lg:top-[370px] xl:left-32 xl:top-[445px] 2xl:left-44 2xl:top-[520px]"
+          >
             <p className="max-w-[120px] text-[10px] leading-tight text-gray-500 sm:max-w-[135px] sm:text-[11px] md:max-w-[148px] md:text-[12px]">
               Start your journey towards home ownership today!
             </p>
-            <button
+            <motion.button
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.96 }}
               type="button"
               className="mt-2 bg-[#BE4D00] px-3 py-1.5 text-[10px] font-semibold text-white sm:px-3.5 sm:py-1.5 sm:text-[11px] md:text-[12px]"
             >
               List property
-            </button>
-          </div>
-          <div className="absolute right-3 top-[225px] z-20 flex flex-col gap-1 sm:right-8 sm:top-[245px] md:right-20 md:top-[305px] lg:right-24 lg:top-[370px] xl:right-32 xl:top-[445px] 2xl:right-44 2xl:top-[520px]">
+            </motion.button>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute right-3 top-[225px] z-20 flex flex-col gap-1 sm:right-8 sm:top-[245px] md:right-20 md:top-[305px] lg:right-24 lg:top-[370px] xl:right-32 xl:top-[445px] 2xl:right-44 2xl:top-[520px]"
+          >
             <span className="inline-flex items-center border border-[#E2AE8A] bg-white/90 px-3 py-1.5 text-[10px] text-gray-500 sm:text-[11px] md:text-[12px]">
               Modern home
             </span>
@@ -155,12 +184,14 @@ export default function PropertyPage() {
               <span className="border border-[#E2AE8A] bg-white/90 px-3 py-1.5 text-[10px] text-gray-500 sm:text-[11px] md:text-[12px]">Luxury</span>
               <span className="border border-[#E2AE8A] bg-white/90 px-3 py-1.5 text-[10px] text-gray-500 sm:text-[11px] md:text-[12px]">Eco-friendly</span>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* Intro Text */}
-      <h1 className="text-center text-5xl font-bold text-gray-800">Featured Properties</h1>
+      <Reveal>
+        <h1 className="text-center text-5xl font-bold text-gray-800">Featured Properties</h1>
+      </Reveal>
 
       {/* Filter Strip */}
       <div className="mt-6 flex justify-center">
@@ -196,21 +227,47 @@ export default function PropertyPage() {
       </div>
 
       {/* Search Bars */}
-      {activeFilterTab === "Property" && <PropertyTypeSearchBar />}
-      {activeFilterTab === "Location" && <LocationSearchBar />}
-      {activeFilterTab === "Pricing" && <PricingSearchBar />}
+      <AnimatePresence mode="wait">
+        {activeFilterTab && (
+          <motion.div
+            key={activeFilterTab}
+            initial={{ opacity: 0, y: -10, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            exit={{ opacity: 0, y: -10, height: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            {activeFilterTab === "Property" && <PropertyTypeSearchBar />}
+            {activeFilterTab === "Location" && <LocationSearchBar />}
+            {activeFilterTab === "Pricing" && <PricingSearchBar />}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <h3 className="text-3xl text-center mt-10">Homes selected just for you</h3>
 
       {/* Property Cards Grid */}
       <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-        {filtered.map((property) => (
-          <Link
-            key={property.id}
-            href={`/property/${property.id}`}
-            id={`property-card-${property.id}`}
-            className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 bg-white group block"
-          >
+        <AnimatePresence mode="popLayout">
+          {filtered.map((property, index) => (
+            <motion.div
+              key={property.id}
+              layout
+              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.94 }}
+              transition={{
+                duration: 0.4,
+                ease: [0.22, 1, 0.36, 1],
+                delay: index * 0.05,
+              }}
+              whileHover={{ y: -6 }}
+            >
+              <Link
+                href={`/property/${property.id}`}
+                id={`property-card-${property.id}`}
+                className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 bg-white group block"
+              >
             {/* Image Placeholder */}
             <div className="h-48 bg-gray-200 flex items-center justify-center relative overflow-hidden">
               <div className="text-gray-400 flex flex-col items-center gap-1">
@@ -320,8 +377,10 @@ export default function PropertyPage() {
                 </div>
               </div>
             </div>
-          </Link>
-        ))}
+              </Link>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
 
       {/* No Results */}
