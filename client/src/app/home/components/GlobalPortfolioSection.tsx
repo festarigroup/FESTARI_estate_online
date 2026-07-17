@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { montserrat } from "../landing-fonts";
 
@@ -10,10 +11,11 @@ type Region = {
   properties: number;
 };
 
+// Positioned against real place labels on the map (Accra, Sekondi, Bawku/Bolgatanga).
 const REGIONS: Region[] = [
-  { name: "Greater Accra", top: "68%", left: "58%", properties: 248 },
-  { name: "Western", top: "80%", left: "32%", properties: 96 },
-  { name: "Upper East", top: "18%", left: "48%", properties: 41 },
+  { name: "Greater Accra", top: "80%", left: "64%", properties: 248 },
+  { name: "Western", top: "87%", left: "36%", properties: 96 },
+  { name: "Upper East", top: "10%", left: "58%", properties: 41 },
 ];
 
 function PinIcon({ active }: { active: boolean }) {
@@ -73,12 +75,11 @@ export default function GlobalPortfolioSection() {
           </div>
 
           <div className="relative min-h-[420px] flex-1 bg-[#e5e2e1] lg:min-h-[700px]">
-            <div
-              className="absolute inset-0 opacity-70"
-              style={{
-                backgroundImage: "radial-gradient(circle, rgba(0,38,27,0.18) 1.5px, transparent 1.5px)",
-                backgroundSize: "22px 22px",
-              }}
+            <Image
+              src="/landing/ghana-map.jpg"
+              alt="Map of Ghana"
+              fill
+              className="object-cover mix-blend-multiply opacity-80"
             />
             {REGIONS.map((region) => (
               <button
