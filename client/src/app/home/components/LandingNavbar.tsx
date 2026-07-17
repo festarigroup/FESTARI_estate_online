@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
@@ -16,6 +17,7 @@ const NAV_LINKS = [
 export default function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 48);
@@ -50,19 +52,24 @@ export default function LandingNavbar() {
               />
             </Link>
             <div className="hidden items-center gap-8 lg:flex">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  className={`text-[16px] font-medium tracking-[0.7px] transition-colors ${
-                    link.label === "Features"
-                      ? "border-b-2 border-[#fb7933] pb-1.5 font-semibold text-[#fb7933]"
-                      : "text-white hover:text-[#fb7933]"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {NAV_LINKS.map((link) => {
+                const isActive = link.href.startsWith("/")
+                  ? pathname === link.href
+                  : pathname === "/home" && link.label === "Features";
+                return (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className={`text-[16px] font-medium tracking-[0.7px] transition-colors ${
+                      isActive
+                        ? "border-b-2 border-[#fb7933] pb-1.5 font-semibold text-[#fb7933]"
+                        : "text-white hover:text-[#fb7933]"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
