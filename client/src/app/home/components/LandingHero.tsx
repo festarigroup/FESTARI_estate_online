@@ -13,16 +13,72 @@ const SEARCH_TABS = [
   { key: "artisans", label: "Artisans", href: "/services" },
 ] as const;
 
-const PROPERTY_TYPES = ["Any type", "Villa", "Penthouse", "Estate", "Townhouse"];
-const PRICE_RANGES = ["Any price", "Under $1M", "$1M – $3M", "$3M – $10M", "$10M+"];
+type SearchTabKey = (typeof SEARCH_TABS)[number]["key"];
+
+type SearchField = {
+  key: string;
+  label: string;
+  placeholder: string;
+} & ({ type: "text" | "date" } | { type: "select"; options: string[] });
+
+const SEARCH_FIELDS: Record<SearchTabKey, SearchField[]> = {
+  properties: [
+    { key: "location", label: "Location", type: "text", placeholder: "Where to?" },
+    {
+      key: "propertyType",
+      label: "Property type",
+      type: "select",
+      placeholder: "Choose type",
+      options: ["Any type", "Villa", "Penthouse", "Estate", "Townhouse"],
+    },
+    {
+      key: "priceRange",
+      label: "Price range",
+      type: "select",
+      placeholder: "Select price",
+      options: ["Any price", "Under $1M", "$1M – $3M", "$3M – $10M", "$10M+"],
+    },
+  ],
+  hotels: [
+    { key: "location", label: "Location", type: "text", placeholder: "Where to?" },
+    { key: "checkIn", label: "Check-in date", type: "date", placeholder: "Add date" },
+    {
+      key: "guests",
+      label: "Guests",
+      type: "select",
+      placeholder: "Add guests",
+      options: ["1 Guest", "2 Guests", "3 Guests", "4 Guests", "5+ Guests"],
+    },
+  ],
+  artisans: [
+    { key: "location", label: "Location", type: "text", placeholder: "Where to?" },
+    {
+      key: "serviceType",
+      label: "Service type",
+      type: "select",
+      placeholder: "Choose service",
+      options: ["Interior Designer", "Landscape Architect", "Craftsman", "Event Planner"],
+    },
+    {
+      key: "budget",
+      label: "Budget",
+      type: "select",
+      placeholder: "Select budget",
+      options: ["Any budget", "Under $5K", "$5K – $20K", "$20K – $50K", "$50K+"],
+    },
+  ],
+};
 
 export default function LandingHero() {
   const router = useRouter();
   const shouldReduceMotion = useReducedMotion();
-  const [activeTab, setActiveTab] = useState<(typeof SEARCH_TABS)[number]["key"]>("properties");
-  const [location, setLocation] = useState("");
-  const [propertyType, setPropertyType] = useState("");
-  const [priceRange, setPriceRange] = useState("");
+  const [activeTab, setActiveTab] = useState<SearchTabKey>("properties");
+  const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
+
+  const handleTabChange = (tab: SearchTabKey) => {
+    setActiveTab(tab);
+    setFieldValues({});
+  };
 
   const handleExplore = () => {
     const tab = SEARCH_TABS.find((t) => t.key === activeTab)!;
@@ -72,7 +128,7 @@ export default function LandingHero() {
                 <button
                   key={tab.key}
                   type="button"
-                  onClick={() => setActiveTab(tab.key)}
+                  onClick={() => handleTabChange(tab.key)}
                   className={`rounded-xl px-4 py-3.5 text-lg font-semibold transition-colors ${
                     activeTab === tab.key
                       ? "border border-white text-white"
@@ -85,51 +141,40 @@ export default function LandingHero() {
             </div>
 
             <div className="flex flex-col items-stretch gap-4 p-4 md:flex-row md:items-center">
-              <label className="flex flex-1 flex-col gap-1 border-white/20 px-4 py-1 text-left md:border-r">
-                <span className="text-xs font-medium uppercase tracking-[1.4px] text-white">Location</span>
-                <input
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Where to?"
-                  className="bg-transparent text-base text-white placeholder:text-[#8f8f8f] focus:outline-none"
-                />
-              </label>
-
-              <label className="flex flex-1 flex-col gap-1 border-white/20 px-4 py-1 text-left md:border-r">
-                <span className="text-xs font-medium uppercase tracking-[1.4px] text-white">Property type</span>
-                <select
-                  value={propertyType}
-                  onChange={(e) => setPropertyType(e.target.value)}
-                  className="appearance-none bg-transparent text-base text-white focus:outline-none [&>option]:text-[#0f1621]"
+              {SEARCH_FIELDS[activeTab].map((field, i) => (
+                <label
+                  key={field.key}
+                  className={`flex flex-1 flex-col gap-1 border-white/20 px-4 py-1 text-left ${
+                    i < SEARCH_FIELDS[activeTab].length - 1 ? "md:border-r" : ""
+                  }`}
                 >
-                  <option value="" disabled className="hidden">
-                    Choose type
-                  </option>
-                  {PROPERTY_TYPES.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="flex flex-1 flex-col gap-1 px-4 py-1 text-left">
-                <span className="text-xs font-medium uppercase tracking-[1.4px] text-white">Price range</span>
-                <select
-                  value={priceRange}
-                  onChange={(e) => setPriceRange(e.target.value)}
-                  className="appearance-none bg-transparent text-base text-white focus:outline-none [&>option]:text-[#0f1621]"
-                >
-                  <option value="" disabled className="hidden">
-                    Select price
-                  </option>
-                  {PRICE_RANGES.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                  <span className="text-xs font-medium uppercase tracking-[1.4px] text-white">{field.label}</span>
+                  {field.type === "select" ? (
+                    <select
+                      value={fieldValues[field.key] ?? ""}
+                      onChange={(e) => setFieldValues((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                      className="appearance-none bg-transparent text-base text-white focus:outline-none [&>option]:text-[#0f1621]"
+                    >
+                      <option value="" disabled className="hidden">
+                        {field.placeholder}
+                      </option>
+                      {field.options.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type={field.type}
+                      value={fieldValues[field.key] ?? ""}
+                      onChange={(e) => setFieldValues((prev) => ({ ...prev, [field.key]: e.target.value }))}
+                      placeholder={field.placeholder}
+                      className="bg-transparent text-base text-white placeholder:text-[#8f8f8f] focus:outline-none [color-scheme:dark]"
+                    />
+                  )}
+                </label>
+              ))}
 
               <motion.button
                 type="button"
