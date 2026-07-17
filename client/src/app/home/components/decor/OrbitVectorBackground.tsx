@@ -11,7 +11,15 @@ const PETAL_PATHS = [
   "M329.173 0.628492C180.986 0.628508 99.0365 25.7269 54.0691 66.1144C9.0588 106.54 0.902986 162.442 0.902972 224.413C0.902972 286.384 9.05896 342.287 54.0691 382.712C99.0365 423.099 180.986 448.198 329.173 448.198C477.223 448.198 652.999 392.175 791.867 336.076C861.276 308.036 921.425 279.996 964.219 258.965C985.616 248.449 1002.67 239.688 1014.38 233.555C1020.23 230.488 1024.75 228.078 1027.8 226.437C1029.33 225.615 1030.49 224.986 1031.27 224.561C1031.36 224.509 1031.45 224.46 1031.54 224.413C1031.45 224.366 1031.36 224.317 1031.27 224.265C1030.49 223.841 1029.33 223.211 1027.8 222.391C1024.75 220.748 1020.23 218.339 1014.38 215.273C1002.67 209.141 985.616 200.377 964.219 189.862C921.425 168.832 861.276 140.791 791.867 112.75C652.999 56.6519 477.223 0.628492 329.173 0.628492Z",
 ];
 
-const BALL_PATH = PETAL_PATHS[5];
+// Four distinct petals, each with its own speed and start offset — different
+// paths and non-matching durations mean the balls never reach the shared
+// center point at the same moment, so they never meet.
+const BALLS = [
+  { path: PETAL_PATHS[5], dur: "11s", begin: "0s" },
+  { path: PETAL_PATHS[2], dur: "13s", begin: "2s" },
+  { path: PETAL_PATHS[1], dur: "17s", begin: "4s" },
+  { path: PETAL_PATHS[4], dur: "19s", begin: "6s" },
+];
 
 export default function OrbitVectorBackground() {
   const shouldReduceMotion = useReducedMotion();
@@ -27,11 +35,12 @@ export default function OrbitVectorBackground() {
             <path key={i} d={d} />
           ))}
         </g>
-        <circle r="6" fill="#be4d00">
-          {!shouldReduceMotion && (
-            <animateMotion dur="12s" repeatCount="indefinite" path={BALL_PATH} rotate="auto" />
-          )}
-        </circle>
+        {!shouldReduceMotion &&
+          BALLS.map((ball, i) => (
+            <circle key={i} r="6" fill="#be4d00">
+              <animateMotion dur={ball.dur} begin={ball.begin} repeatCount="indefinite" path={ball.path} rotate="auto" />
+            </circle>
+          ))}
       </svg>
     </div>
   );
