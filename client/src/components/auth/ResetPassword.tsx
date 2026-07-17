@@ -184,7 +184,7 @@ export default function ResetPassword() {
 
   return (
     <div className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-white p-6">
-      <Image src="/reset-password-bg.png" alt="" fill priority className="object-cover" sizes="100vw" />
+      <Image src="/reset-password-bg.png" alt="" fill priority className="object-contain" sizes="100vw" />
 
       <motion.div
         initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
