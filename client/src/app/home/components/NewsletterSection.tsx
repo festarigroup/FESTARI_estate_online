@@ -4,6 +4,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { montserrat } from "../landing-fonts";
 import { mockSubscribeNewsletter } from "@/lib/mockApi";
+import OrbitVectorBackground from "./decor/OrbitVectorBackground";
 
 export default function NewsletterSection() {
   const [email, setEmail] = useState("");
@@ -26,8 +27,9 @@ export default function NewsletterSection() {
   };
 
   return (
-    <section className="w-full bg-[#fcf9f8]">
-      <div className="mx-auto flex max-w-[672px] flex-col items-center gap-6 px-8 py-16 text-center md:py-24">
+    <section className="relative w-full overflow-hidden bg-[#fcf9f8]">
+      <OrbitVectorBackground />
+      <div className="relative mx-auto flex max-w-[672px] flex-col items-center gap-6 px-8 py-16 text-center md:py-24">
         <h2 className={`${montserrat.className} text-[32px] font-semibold text-[#00261b] md:text-[40px]`}>
           Stay Informed on Rare Opportunities
         </h2>

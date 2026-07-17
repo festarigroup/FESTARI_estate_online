@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { montserrat } from "../landing-fonts";
+import BgStringsBackground from "./decor/BgStringsBackground";
 
 type SideEstate = {
   image: string;
@@ -37,8 +38,9 @@ function LocationPinIcon() {
 
 export default function FeaturedEstatesSection() {
   return (
-    <section id="featured-estates" className="w-full bg-[#fcf9f8]">
-      <div className="mx-auto max-w-[1280px] px-8 py-16 md:py-24">
+    <section id="featured-estates" className="relative w-full overflow-hidden bg-[#fcf9f8]">
+      <BgStringsBackground />
+      <div className="relative mx-auto max-w-[1280px] px-8 py-16 md:py-24">
         <div className="mb-12 flex items-end justify-between gap-6">
           <div className="flex flex-col gap-3">
             <p className="text-sm font-semibold uppercase tracking-[1.4px] text-[#be4d00]">Curated Selection</p>
