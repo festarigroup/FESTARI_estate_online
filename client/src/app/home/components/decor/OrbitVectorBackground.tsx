@@ -21,10 +21,7 @@ export default function OrbitVectorBackground() {
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden"
     >
-      <svg
-        viewBox="0 0 2066 450"
-        className={`h-[130%] w-auto min-w-[160%] opacity-50 ${shouldReduceMotion ? "" : "animate-flower-spin"}`}
-      >
+      <svg viewBox="0 0 2066 450" className="h-[130%] w-auto min-w-[160%] opacity-50">
         <g fill="none" stroke="#be4d00" strokeOpacity="0.3" strokeWidth="1.0329">
           {PETAL_PATHS.map((d, i) => (
             <path key={i} d={d} />

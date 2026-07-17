@@ -48,21 +48,8 @@
   animation: bg-strings-drift 50s linear infinite;
 }
 
-/* Decorative orbit vector (Newsletter section) — slow constant spin. */
-@keyframes flower-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-flower-spin {
-  animation: flower-spin 90s linear infinite;
-  transform-origin: center;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .animate-bg-strings,
-  .animate-flower-spin {
+  .animate-bg-strings {
     animation: none;
   }
 }
