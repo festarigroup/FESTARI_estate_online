@@ -48,3 +48,12 @@ export async function mockUpdatePassword(password: string): Promise<ApiResponse<
   if (password.length < 8) return { success: false, message: "Password must be at least 8 characters." };
   return { success: true, data: null };
 }
+
+export async function mockSubscribeNewsletter(email: string): Promise<ApiResponse<null>> {
+  await delay(1200);
+  if (shouldFail()) return { success: false, message: "Could not subscribe right now. Please try again." };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    return { success: false, message: "Enter a valid email address." };
+  }
+  return { success: true, data: null };
+}

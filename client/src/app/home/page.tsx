@@ -1,86 +1,48 @@
-import StatsMarquee, { type MarqueeStat } from "./components/StatsMarquee";
-import HeroSection from "./components/HeroSection";
+import LandingHero from "./components/LandingHero";
+import TrustStatsSection from "./components/TrustStatsSection";
+import FeaturedEstatesSection from "./components/FeaturedEstatesSection";
 import WhoWeAreSection from "./components/WhoWeAreSection";
-import OurServicesSection from "./components/OurServicesSection";
-import GettingStartedSection from "./components/GettingStartedSection";
-import FeaturedPropertiesSection from "./components/FeaturedPropertiesSection";
-import DashboardWorksSection from "./components/DashboardWorksSection";
-import MarketplaceValueSection from "./components/MarketplaceValueSection";
-import FeaturedInSection from "./components/FeaturedInSection";
+import HolisticServicesSection from "./components/HolisticServicesSection";
 import TestimonialsSection from "./components/TestimonialsSection";
-import PricingSection from "./components/PricingSection";
-import SuccessStoriesSection from "./components/SuccessStoriesSection";
-import FAQSection from "./components/FAQSection";
-import ReadyJourneySection from "./components/ReadyJourneySection";
+import GlobalPortfolioSection from "./components/GlobalPortfolioSection";
+import NewsletterSection from "./components/NewsletterSection";
+import LandingFooter from "./components/LandingFooter";
 import Reveal from "@/components/motion/Reveal";
 
 export default function HomePage() {
-  const stats: MarqueeStat[] = [
-    { value: "340+", label: "Clients helped in their search" },
-    { value: "500+", label: "Homes available to you" },
-    { value: "500+", label: "Homes available to you" },
-    { value: "340+", label: "Clients helped in their search" },
-    { value: "500+", label: "Homes available to you" },
-  ];
-
   return (
     <>
-      <HeroSection />
+      <LandingHero />
 
-      {/* ─── Stats Marquee Section ─── */}
-      <StatsMarquee stats={stats} durationSeconds={25} repeat={2} />
+      <Reveal>
+        <TrustStatsSection />
+      </Reveal>
 
-      {/* ─── Who We Are Section ─── */}
+      <Reveal>
+        <FeaturedEstatesSection />
+      </Reveal>
+
       <Reveal>
         <WhoWeAreSection />
       </Reveal>
 
-      {/* ─── Our Services Section ─── */}
       <Reveal>
-        <OurServicesSection />
+        <HolisticServicesSection />
       </Reveal>
 
-      {/* ─── Getting Started Section ─── */}
-      <Reveal>
-        <GettingStartedSection />
-      </Reveal>
-
-      {/* ─── Featured Properties Section ─── */}
-      <Reveal>
-        <FeaturedPropertiesSection />
-      </Reveal>
-
-      {/* ─── Dashboard Works Section ─── */}
-      <Reveal>
-        <DashboardWorksSection />
-      </Reveal>
-
-      {/* ─── Marketplace Value Section ─── */}
-      <Reveal>
-        <MarketplaceValueSection />
-      </Reveal>
-
-      {/* ─── Featured In + Testimonials + Pricing ─── */}
-      <Reveal>
-        <FeaturedInSection />
-      </Reveal>
       <Reveal>
         <TestimonialsSection />
       </Reveal>
+
       <Reveal>
-        <PricingSection />
+        <GlobalPortfolioSection />
       </Reveal>
 
-      {/* ─── Success Stories + FAQ + Ready Journey ─── */}
       <Reveal>
-        <SuccessStoriesSection />
+        <NewsletterSection />
       </Reveal>
-      <Reveal>
-        <FAQSection />
-      </Reveal>
-      <Reveal>
-        <ReadyJourneySection />
-      </Reveal>
+
+      <LandingFooter />
     </>
   );
 }

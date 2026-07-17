@@ -9,7 +9,7 @@ import PageTransition from "@/components/motion/PageTransition";
 import Reveal from "@/components/motion/Reveal";
 
 // Routes that render full-bleed, without the site sidebar/navbar/footer chrome.
-const BARE_ROUTES = ["/login", "/signup", "/verify-otp", "/verify-otp/change-contact", "/forgot-password"];
+const BARE_ROUTES = ["/home", "/login", "/signup", "/verify-otp", "/verify-otp/change-contact", "/forgot-password"];
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
