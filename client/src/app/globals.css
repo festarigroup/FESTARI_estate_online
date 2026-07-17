@@ -33,6 +33,14 @@
   animation: marquee 25s linear infinite;
 }
 
+.animate-marquee-slow {
+  animation: marquee 45s linear infinite;
+}
+
+.animate-marquee-slow:hover {
+  animation-play-state: paused;
+}
+
 /* Decorative lattice background (Featured Estates section) — drifts by exactly
    one tile width (6337px) so the loop is seamless. */
 @keyframes bg-strings-drift {
@@ -49,7 +57,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-bg-strings {
+  .animate-bg-strings,
+  .animate-marquee,
+  .animate-marquee-slow {
     animation: none;
   }
 }

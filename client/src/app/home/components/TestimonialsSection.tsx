@@ -1,34 +1,47 @@
-import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
+import { montserrat } from "../landing-fonts";
 
 type Testimonial = {
   quote: string;
   name: string;
   role: string;
-  rating?: number; // 0-5
+  location: string;
 };
 
-type TestimonialsSectionProps = {
-  title?: string;
-  subtitle?: string;
-  testimonials?: Testimonial[];
-  sectionId?: string;
-};
+const TESTIMONIALS: Testimonial[] = [
+  {
+    quote: "They tailored their marketing to our estate's specific buyers and closed within three weeks.",
+    name: "Sarah Mitchell",
+    role: "Property Seller",
+    location: "Accra, Ghana",
+  },
+  {
+    quote: "Finding a vetted interior designer was effortless — three quotes within days, no back and forth.",
+    name: "James Chen",
+    role: "Homeowner",
+    location: "London, UK",
+  },
+  {
+    quote: "Our venue bookings doubled since joining. The platform brings serious, qualified clients.",
+    name: "Emma Roberts",
+    role: "Venue Host",
+    location: "Cape Coast, Ghana",
+  },
+  {
+    quote: "Working with the artisan network was a genuinely great experience from first call to handover.",
+    name: "Kwame Boateng",
+    role: "Artisan Partner",
+    location: "Kumasi, Ghana",
+  },
+];
 
-function Stars({ rating = 5 }: { rating?: number }) {
+function QuoteMarkIcon() {
   return (
-    <div className="flex items-center gap-1 text-gray-900">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <svg
-          key={i}
-          className="w-3 h-3"
-          viewBox="0 0 20 20"
-          fill={i < rating ? "#111827" : "#E5E7EB"}
-          aria-hidden="true"
-        >
-          <path d="M10 1.5l2.5 5.1 5.6.8-4 3.9.9 5.6L10 14.2 5 16.9l.9-5.6-4-3.9 5.6-.8L10 1.5z" />
-        </svg>
-      ))}
-    </div>
+    <svg width="28" height="22" viewBox="0 0 28 22" fill="none" className="text-[#c0c8c3]">
+      <path
+        d="M0 22V13.75C0 9.4375 1.1875 6.1875 3.5625 4C5.9375 1.8125 8.75 0.5 12 0V4.5C10 5.125 8.5 6.0625 7.5 7.3125C6.5 8.5625 6 10.0625 6 11.8125H12V22H0ZM16 22V13.75C16 9.4375 17.1875 6.1875 19.5625 4C21.9375 1.8125 24.75 0.5 28 0V4.5C26 5.125 24.5 6.0625 23.5 7.3125C22.5 8.5625 22 10.0625 22 11.8125H28V22H16Z"
+        fill="currentColor"
+      />
+    </svg>
   );
 }
 
@@ -41,71 +54,66 @@ function AvatarFallback({ name }: { name: string }) {
     .join("");
 
   return (
-    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-700">
+    <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#f6f3f2] text-sm font-bold text-[#be4d00]">
       {initials}
     </div>
   );
 }
 
-export default function TestimonialsSection({
-  title = "Real voices",
-  subtitle = "Hear from sellers, buyers, artisans, and venue hosters",
-  testimonials = [
-    {
-      quote:
-        '"I sold my property in three weeks. The platform made it simple and straightforward."',
-      name: "Sarah Mitchell",
-      role: "Property seller",
-      rating: 5,
-    },
-    {
-      quote:
-        '"Finding the right artisan was effortless. I got three quotes within days."',
-      name: "James Chen",
-      role: "Homeowner",
-      rating: 5,
-    },
-    {
-      quote:
-        '"My venue bookings doubled since I joined. The platform brings serious clients."',
-      name: "Emma Roberts",
-      role: "Venue host",
-      rating: 5,
-    },
-  ],
-  sectionId = "testimonials",
-}: TestimonialsSectionProps) {
+function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
   return (
-    <section id={sectionId} className="w-full bg-white">
-      <div className="w-full max-w-[1400px] mx-auto px-4 md:px-6 py-10 md:py-12">
-        <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900">
-          {title}
-        </h2>
-        <p className="mt-3 text-sm text-gray-500">{subtitle}</p>
+    <div className="flex w-[360px] shrink-0 flex-col gap-6 rounded-2xl bg-white p-8 shadow-[0px_20px_40px_0px_rgba(26,26,26,0.06)]">
+      <div className="flex items-center justify-between">
+        <AvatarFallback name={testimonial.name} />
+        <span className="rounded-full bg-[#f6f3f2] px-3 py-1.5 text-xs font-semibold tracking-[0.7px] text-[#414944]">
+          {testimonial.role}
+        </span>
+      </div>
+      <QuoteMarkIcon />
+      <p className="min-h-[80px] text-lg font-medium leading-relaxed text-[#00261b]">{testimonial.quote}</p>
+      <div>
+        <p className="text-sm font-semibold tracking-[0.7px] text-[#00261b]">{testimonial.name}</p>
+        <p className="text-sm text-[#717974]">{testimonial.location}</p>
+      </div>
+    </div>
+  );
+}
 
-        <StaggerContainer className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((t) => (
-            <StaggerItem
-              key={t.name}
-              className="bg-gray-100 border border-gray-200 p-6 transition-all duration-300 hover:bg-white hover:shadow-xl hover:-translate-y-1 hover:border-[#BE4D00]/30"
-            >
-              <Stars rating={t.rating ?? 5} />
-              <p className="mt-4 text-sm text-gray-800 leading-relaxed">
-                {t.quote}
-              </p>
+export default function TestimonialsSection() {
+  const cards = [...TESTIMONIALS, ...TESTIMONIALS];
 
-              <div className="mt-5 flex items-center gap-3">
-                <AvatarFallback name={t.name} />
-                <div className="leading-tight">
-                  <p className="text-sm font-semibold text-gray-900">{t.name}</p>
-                  <p className="text-[11px] text-gray-500">{t.role}</p>
-                </div>
-              </div>
-            </StaggerItem>
+  return (
+    <section id="testimonials" className="w-full overflow-hidden bg-[#fcf9f8]">
+      <div className="mx-auto max-w-[1280px] px-8 py-16 md:py-24">
+        <div className="mb-12 flex items-end justify-between gap-6">
+          <div className="flex flex-col gap-3">
+            <p className="text-sm font-semibold uppercase tracking-[1.4px] text-[#be4d00]">Our Reviews</p>
+            <h2 className={`${montserrat.className} text-[32px] font-semibold text-[#00261b] md:text-[40px]`}>
+              What Our Clients Say
+            </h2>
+          </div>
+          <div className="hidden items-center gap-4 sm:flex" aria-hidden="true">
+            <span className="flex size-12 items-center justify-center rounded-full border-2 border-[#c0c8c3] text-[#c0c8c3]">
+              <svg width="8" height="12" viewBox="0 0 8 12" fill="none">
+                <path d="M7 1 1 6l6 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+            <span className="flex size-12 items-center justify-center rounded-full bg-[#be4d00] text-white">
+              <svg width="8" height="12" viewBox="0 0 8 12" fill="none">
+                <path d="M1 1l6 5-6 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full">
+        <div className="animate-marquee-slow flex w-max gap-6 px-8">
+          {cards.map((testimonial, i) => (
+            <TestimonialCard key={`${testimonial.name}-${i}`} testimonial={testimonial} />
           ))}
-        </StaggerContainer>
+        </div>
       </div>
     </section>
   );
 }
-
