@@ -32,3 +32,37 @@
 .animate-marquee {
   animation: marquee 25s linear infinite;
 }
+
+/* Decorative lattice background (Featured Estates section) — drifts by exactly
+   one tile width (6337px) so the loop is seamless. */
+@keyframes bg-strings-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -6337px 0;
+  }
+}
+
+.animate-bg-strings {
+  animation: bg-strings-drift 50s linear infinite;
+}
+
+/* Decorative orbit vector (Newsletter section) — slow constant spin. */
+@keyframes flower-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-flower-spin {
+  animation: flower-spin 90s linear infinite;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bg-strings,
+  .animate-flower-spin {
+    animation: none;
+  }
+}
