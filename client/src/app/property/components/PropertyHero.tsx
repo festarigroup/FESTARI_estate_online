@@ -37,7 +37,7 @@ export default function PropertyHero() {
   return (
     <section className="relative flex min-h-[820px] w-full flex-col overflow-hidden pb-24">
       <div className="absolute inset-0">
-        <Image src="/landing/hero-estate.jpg" alt="Modern estate at dusk" fill priority className="object-cover" />
+        <Image src="/property/property-hero.jpg" alt="Grand estate at sunset" fill priority className="object-cover" />
         <div className="absolute inset-0 bg-black/60" />
       </div>
 
