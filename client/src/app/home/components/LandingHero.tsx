@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import LandingNavbar from "./LandingNavbar";
+import HeroSelect from "./HeroSelect";
 import { montserrat } from "../landing-fonts";
 
 const SEARCH_TABS = [
@@ -150,20 +151,12 @@ export default function LandingHero() {
                 >
                   <span className="text-xs font-medium uppercase tracking-[1.4px] text-white">{field.label}</span>
                   {field.type === "select" ? (
-                    <select
+                    <HeroSelect
                       value={fieldValues[field.key] ?? ""}
-                      onChange={(e) => setFieldValues((prev) => ({ ...prev, [field.key]: e.target.value }))}
-                      className="appearance-none bg-transparent text-base text-white focus:outline-none [&>option]:text-[#0f1621]"
-                    >
-                      <option value="" disabled className="hidden">
-                        {field.placeholder}
-                      </option>
-                      {field.options.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder={field.placeholder}
+                      options={field.options}
+                      onChange={(v) => setFieldValues((prev) => ({ ...prev, [field.key]: v }))}
+                    />
                   ) : (
                     <input
                       type={field.type}
