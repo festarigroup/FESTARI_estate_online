@@ -232,6 +232,8 @@ export default function AuthGateway({ initialMode }: AuthGatewayProps) {
   const isSignIn = mode === "signin";
   const hero = HERO_CONTENT[mode];
 
+  const [signupStep, setSignupStep] = useState<1 | 2 | 3>(1);
+
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -260,6 +262,12 @@ export default function AuthGateway({ initialMode }: AuthGatewayProps) {
     setErrors({});
     setShowPassword(false);
     setShowConfirmPassword(false);
+    setSignupStep(1);
+  };
+
+  const handleBack = () => {
+    setErrors({});
+    setSignupStep((s) => (s > 1 ? ((s - 1) as 1 | 2 | 3) : s));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -291,22 +299,35 @@ export default function AuthGateway({ initialMode }: AuthGatewayProps) {
       return;
     }
 
-    if (!firstName.trim()) {
-      setErrors({ firstName: "First name is required." });
+    if (signupStep === 1) {
+      if (!firstName.trim()) {
+        setErrors({ firstName: "First name is required." });
+        return;
+      }
+      if (!lastName.trim()) {
+        setErrors({ lastName: "Last name is required." });
+        return;
+      }
+      setErrors({});
+      setSignupStep(2);
       return;
     }
-    if (!lastName.trim()) {
-      setErrors({ lastName: "Last name is required." });
+
+    if (signupStep === 2) {
+      if (!phone.trim()) {
+        setErrors({ phone: "Phone number is required." });
+        return;
+      }
+      if (!EMAIL_PATTERN.test(email.trim())) {
+        setErrors({ email: "Enter a valid email address." });
+        return;
+      }
+      setErrors({});
+      setSignupStep(3);
       return;
     }
-    if (!phone.trim()) {
-      setErrors({ phone: "Phone number is required." });
-      return;
-    }
-    if (!EMAIL_PATTERN.test(email.trim())) {
-      setErrors({ email: "Enter a valid email address." });
-      return;
-    }
+
+    // signupStep === 3: final registration
     if (password.length < 8) {
       setErrors({ password: "Password must be at least 8 characters." });
       return;
@@ -580,107 +601,21 @@ export default function AuthGateway({ initialMode }: AuthGatewayProps) {
             className={`flex w-full flex-col ${isSignIn ? "gap-[clamp(0.75rem,2vh,1rem)]" : "gap-[clamp(0.5rem,1.6vh,0.75rem)]"}`}
           >
           {isSignIn ? (
-            <FormField
-              id="email"
-              label="Email Address"
-              type="email"
-              value={email}
-              onChange={(v) => {
-                setEmail(v);
-                setErrors({});
-              }}
-              placeholder="name@firm.com"
-              disabled={loading}
-              autoComplete="email"
-              error={errors.email}
-            />
-          ) : (
             <>
-              <div className="flex w-full items-start gap-[clamp(0.875rem,2vw,1rem)]">
-                <FormField
-                  id="firstName"
-                  label="First Name"
-                  value={firstName}
-                  onChange={(v) => {
-                    setFirstName(v);
-                    setErrors({});
-                  }}
-                  placeholder="Alexander"
-                  disabled={loading}
-                  autoComplete="given-name"
-                  error={errors.firstName}
-                />
-                <FormField
-                  id="lastName"
-                  label="Last Name"
-                  value={lastName}
-                  onChange={(v) => {
-                    setLastName(v);
-                    setErrors({});
-                  }}
-                  placeholder="Festari"
-                  disabled={loading}
-                  autoComplete="family-name"
-                  error={errors.lastName}
-                />
-              </div>
-              <div className="flex w-full items-start gap-[clamp(0.875rem,2vw,1rem)]">
-                <FormField
-                  id="phone"
-                  label="Phone Number"
-                  type="tel"
-                  value={phone}
-                  onChange={(v) => {
-                    setPhone(v);
-                    setErrors({});
-                  }}
-                  placeholder="0246 508595"
-                  disabled={loading}
-                  autoComplete="tel"
-                  error={errors.phone}
-                />
-                <FormField
-                  id="email"
-                  label="Email"
-                  type="email"
-                  value={email}
-                  onChange={(v) => {
-                    setEmail(v);
-                    setErrors({});
-                  }}
-                  placeholder="name@firm.com"
-                  disabled={loading}
-                  autoComplete="email"
-                  error={errors.email}
-                />
-              </div>
-            </>
-          )}
-
-          {isSignIn ? (
-            <PasswordField
-              id="password"
-              label="Password"
-              value={password}
-              onChange={(v) => {
-                setPassword(v);
-                setErrors({});
-              }}
-              disabled={loading}
-              show={showPassword}
-              onToggleShow={() => setShowPassword((v) => !v)}
-              error={errors.password}
-              extra={
-                <Link
-                  href="/forgot-password"
-                  className="text-[clamp(0.6875rem,0.8vh,0.75rem)] font-bold italic text-[#be4d00] hover:text-[#a54300]"
-                >
-                  Forgot password?
-                </Link>
-              }
-            />
-          ) : (
-            <div className="flex w-full items-start gap-[clamp(0.875rem,2vw,1.25rem)]">
+              <FormField
+                id="email"
+                label="Email Address"
+                type="email"
+                value={email}
+                onChange={(v) => {
+                  setEmail(v);
+                  setErrors({});
+                }}
+                placeholder="name@firm.com"
+                disabled={loading}
+                autoComplete="email"
+                error={errors.email}
+              />
               <PasswordField
                 id="password"
                 label="Password"
@@ -693,80 +628,242 @@ export default function AuthGateway({ initialMode }: AuthGatewayProps) {
                 show={showPassword}
                 onToggleShow={() => setShowPassword((v) => !v)}
                 error={errors.password}
+                extra={
+                  <Link
+                    href="/forgot-password"
+                    className="text-[clamp(0.6875rem,0.8vh,0.75rem)] font-bold italic text-[#be4d00] hover:text-[#a54300]"
+                  >
+                    Forgot password?
+                  </Link>
+                }
               />
-              <PasswordField
-                id="confirmPassword"
-                label="Confirm Password"
-                value={confirmPassword}
-                onChange={(v) => {
-                  setConfirmPassword(v);
-                  setErrors({});
-                }}
-                disabled={loading}
-                show={showConfirmPassword}
-                onToggleShow={() => setShowConfirmPassword((v) => !v)}
-                error={errors.confirmPassword}
-              />
-            </div>
-          )}
-
-          {isSignIn ? (
-            <label className="flex items-center gap-2 py-[clamp(0.25rem,1vh,0.5rem)]">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                disabled={loading}
-                className="h-4 w-4 rounded border-[#c0c8c3] accent-[#be4d00]"
-              />
-              <span className={`${FLUID.label} text-[#414944]`}>Remember me</span>
-            </label>
-          ) : (
-            <div className="flex flex-col gap-1">
-              <label className="flex items-start gap-3 py-[clamp(0.25rem,1vh,0.5rem)]">
+              <label className="flex items-center gap-2 py-[clamp(0.25rem,1vh,0.5rem)]">
                 <input
                   type="checkbox"
-                  checked={termsAccepted}
-                  onChange={(e) => {
-                    setTermsAccepted(e.target.checked);
-                    setErrors({});
-                  }}
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   disabled={loading}
-                  className="mt-1 h-5 w-5 shrink-0 rounded border-[#c0c8c3] accent-[#be4d00]"
+                  className="h-4 w-4 rounded border-[#c0c8c3] accent-[#be4d00]"
                 />
-                <span className={`${FLUID.label} font-medium text-[#414944]`}>
-                  I agree to the{" "}
-                  <Link href="/terms" className="text-[#0f1621] underline">
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link href="/privacy" className="text-[#0f1621] underline">
-                    Privacy Policy
-                  </Link>
-                  .
-                </span>
+                <span className={`${FLUID.label} text-[#414944]`}>Remember me</span>
               </label>
-              {errors.terms && <p className="text-xs text-red-500">{errors.terms}</p>}
-            </div>
+              <motion.button
+                whileHover={shouldReduceMotion || loading ? undefined : { y: -1 }}
+                whileTap={shouldReduceMotion || loading ? undefined : { scale: 0.98 }}
+                type="submit"
+                disabled={loading}
+                className={`flex w-full items-center justify-center gap-2 rounded-xl bg-[#be4d00] text-white transition-colors hover:bg-[#a54300] disabled:opacity-70 ${FLUID.buttonPad} ${FLUID.buttonText}`}
+              >
+                {loading ? (
+                  <>
+                    <Spinner /> Signing in…
+                  </>
+                ) : (
+                  "Sign in"
+                )}
+              </motion.button>
+            </>
+          ) : (
+            <AnimatePresence mode="wait" initial={false}>
+              {signupStep === 1 ? (
+                <motion.div
+                  key="step1"
+                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: -16 }}
+                  transition={{ duration: 0.25, ease: EASE }}
+                  className="flex w-full flex-col gap-[clamp(0.5rem,1.6vh,0.75rem)]"
+                >
+                  <div className="flex w-full flex-col items-start gap-[clamp(0.5rem,1.6vh,0.75rem)]">
+                    <FormField
+                      id="firstName"
+                      label="First Name"
+                      value={firstName}
+                      onChange={(v) => {
+                        setFirstName(v);
+                        setErrors({});
+                      }}
+                      placeholder="Alexander"
+                      disabled={loading}
+                      autoComplete="given-name"
+                      error={errors.firstName}
+                    />
+                    <FormField
+                      id="lastName"
+                      label="Last Name"
+                      value={lastName}
+                      onChange={(v) => {
+                        setLastName(v);
+                        setErrors({});
+                      }}
+                      placeholder="Festari"
+                      disabled={loading}
+                      autoComplete="family-name"
+                      error={errors.lastName}
+                    />
+                  </div>
+                  <motion.button
+                    whileHover={shouldReduceMotion ? undefined : { y: -1 }}
+                    whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+                    type="submit"
+                    className={`flex w-full items-center justify-center gap-2 rounded-xl bg-[#be4d00] text-white transition-colors hover:bg-[#a54300] ${FLUID.buttonPad} ${FLUID.buttonText}`}
+                  >
+                    Next
+                  </motion.button>
+                </motion.div>
+              ) : signupStep === 2 ? (
+                <motion.div
+                  key="step2"
+                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: -16 }}
+                  transition={{ duration: 0.25, ease: EASE }}
+                  className="flex w-full flex-col gap-[clamp(0.5rem,1.6vh,0.75rem)]"
+                >
+                  <div className="flex w-full flex-col items-start gap-[clamp(0.5rem,1.6vh,0.75rem)]">
+                    <FormField
+                      id="phone"
+                      label="Phone Number"
+                      type="tel"
+                      value={phone}
+                      onChange={(v) => {
+                        setPhone(v);
+                        setErrors({});
+                      }}
+                      placeholder="0246 508595"
+                      disabled={loading}
+                      autoComplete="tel"
+                      error={errors.phone}
+                    />
+                    <FormField
+                      id="email"
+                      label="Email"
+                      type="email"
+                      value={email}
+                      onChange={(v) => {
+                        setEmail(v);
+                        setErrors({});
+                      }}
+                      placeholder="name@firm.com"
+                      disabled={loading}
+                      autoComplete="email"
+                      error={errors.email}
+                    />
+                  </div>
+                  <div className="flex w-full items-center gap-[clamp(0.75rem,2vw,1rem)]">
+                    <motion.button
+                      whileHover={shouldReduceMotion ? undefined : { y: -1 }}
+                      whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+                      type="button"
+                      onClick={handleBack}
+                      className={`flex w-full items-center justify-center gap-2 rounded-xl border border-[#c0c8c3] text-[#414944] transition-colors hover:bg-[#f3f0ee] ${FLUID.buttonPad} ${FLUID.buttonText}`}
+                    >
+                      Back
+                    </motion.button>
+                    <motion.button
+                      whileHover={shouldReduceMotion ? undefined : { y: -1 }}
+                      whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+                      type="submit"
+                      className={`flex w-full items-center justify-center gap-2 rounded-xl bg-[#be4d00] text-white transition-colors hover:bg-[#a54300] ${FLUID.buttonPad} ${FLUID.buttonText}`}
+                    >
+                      Next
+                    </motion.button>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="step3"
+                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: -16 }}
+                  transition={{ duration: 0.25, ease: EASE }}
+                  className="flex w-full flex-col gap-[clamp(0.5rem,1.6vh,0.75rem)]"
+                >
+                  <div className="flex w-full flex-col items-start gap-[clamp(0.5rem,1.6vh,0.75rem)]">
+                    <PasswordField
+                      id="password"
+                      label="Password"
+                      value={password}
+                      onChange={(v) => {
+                        setPassword(v);
+                        setErrors({});
+                      }}
+                      disabled={loading}
+                      show={showPassword}
+                      onToggleShow={() => setShowPassword((v) => !v)}
+                      error={errors.password}
+                    />
+                    <PasswordField
+                      id="confirmPassword"
+                      label="Confirm Password"
+                      value={confirmPassword}
+                      onChange={(v) => {
+                        setConfirmPassword(v);
+                        setErrors({});
+                      }}
+                      disabled={loading}
+                      show={showConfirmPassword}
+                      onToggleShow={() => setShowConfirmPassword((v) => !v)}
+                      error={errors.confirmPassword}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="flex items-start gap-3 py-[clamp(0.25rem,1vh,0.5rem)]">
+                      <input
+                        type="checkbox"
+                        checked={termsAccepted}
+                        onChange={(e) => {
+                          setTermsAccepted(e.target.checked);
+                          setErrors({});
+                        }}
+                        disabled={loading}
+                        className="mt-1 h-5 w-5 shrink-0 rounded border-[#c0c8c3] accent-[#be4d00]"
+                      />
+                      <span className={`${FLUID.label} font-medium text-[#414944]`}>
+                        I agree to the{" "}
+                        <Link href="/terms" className="text-[#0f1621] underline">
+                          Terms of Service
+                        </Link>{" "}
+                        and{" "}
+                        <Link href="/privacy" className="text-[#0f1621] underline">
+                          Privacy Policy
+                        </Link>
+                        .
+                      </span>
+                    </label>
+                    {errors.terms && <p className="text-xs text-red-500">{errors.terms}</p>}
+                  </div>
+                  <div className="flex w-full items-center gap-[clamp(0.75rem,2vw,1rem)]">
+                    <motion.button
+                      whileHover={shouldReduceMotion || loading ? undefined : { y: -1 }}
+                      whileTap={shouldReduceMotion || loading ? undefined : { scale: 0.98 }}
+                      type="button"
+                      onClick={handleBack}
+                      disabled={loading}
+                      className={`flex w-full items-center justify-center gap-2 rounded-xl border border-[#c0c8c3] text-[#414944] transition-colors hover:bg-[#f3f0ee] disabled:opacity-70 ${FLUID.buttonPad} ${FLUID.buttonText}`}
+                    >
+                      Back
+                    </motion.button>
+                    <motion.button
+                      whileHover={shouldReduceMotion || loading ? undefined : { y: -1 }}
+                      whileTap={shouldReduceMotion || loading ? undefined : { scale: 0.98 }}
+                      type="submit"
+                      disabled={loading}
+                      className={`flex w-full items-center justify-center gap-2 rounded-xl bg-[#be4d00] text-white transition-colors hover:bg-[#a54300] disabled:opacity-70 ${FLUID.buttonPad} ${FLUID.buttonText}`}
+                    >
+                      {loading ? (
+                        <>
+                          <Spinner /> Creating account…
+                        </>
+                      ) : (
+                        "Create an account"
+                      )}
+                    </motion.button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           )}
-
-          <motion.button
-            whileHover={shouldReduceMotion || loading ? undefined : { y: -1 }}
-            whileTap={shouldReduceMotion || loading ? undefined : { scale: 0.98 }}
-            type="submit"
-            disabled={loading}
-            className={`flex w-full items-center justify-center gap-2 rounded-xl bg-[#be4d00] text-white transition-colors hover:bg-[#a54300] disabled:opacity-70 ${FLUID.buttonPad} ${FLUID.buttonText}`}
-          >
-            {loading ? (
-              <>
-                <Spinner /> {isSignIn ? "Signing in…" : "Creating account…"}
-              </>
-            ) : isSignIn ? (
-              "Sign in"
-            ) : (
-              "Create an account"
-            )}
-          </motion.button>
           </motion.div>
         </AnimatePresence>
         </motion.form>
