@@ -90,6 +90,16 @@ export default function HolisticServicesSection() {
         <div className="relative">
           <div className="relative h-[420px] w-full overflow-hidden rounded-3xl shadow-[0px_20px_40px_0px_rgba(26,26,26,0.08)] md:h-[560px]">
             <Image src="/landing/services-interior.jpg" alt="Holistic estate services" fill className="object-cover" />
+            <div className="absolute inset-0 bg-black/50" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Image
+                src="/auth-logo-mark.png"
+                alt=""
+                width={140}
+                height={186}
+                className="h-[38%] w-auto opacity-90 [filter:brightness(0)_invert(1)] drop-shadow-[0_0_48px_rgba(0,0,0,0.55)]"
+              />
+            </div>
           </div>
           <div className="relative -mt-16 ml-4 max-w-[320px] rounded-2xl border border-white/20 bg-[rgba(252,249,248,0.85)] p-8 shadow-xl backdrop-blur-md md:absolute md:bottom-[-40px] md:left-[-40px] md:mt-0">
             <div className="flex items-center gap-4">
