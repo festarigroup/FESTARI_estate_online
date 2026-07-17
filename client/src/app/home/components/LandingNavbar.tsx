@@ -7,11 +7,11 @@ import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
 const NAV_LINKS = [
-  { label: "Features", href: "#holistic-services" },
+  { label: "Features", href: "/home#holistic-services" },
   { label: "Real Estates", href: "/property" },
   { label: "Venues", href: "/services" },
   { label: "Artisans", href: "/services" },
-  { label: "Pricings", href: "#featured-estates" },
+  { label: "Pricings", href: "/home#featured-estates" },
 ];
 
 export default function LandingNavbar() {
@@ -53,9 +53,9 @@ export default function LandingNavbar() {
             </Link>
             <div className="hidden items-center gap-8 lg:flex">
               {NAV_LINKS.map((link) => {
-                const isActive = link.href.startsWith("/")
-                  ? pathname === link.href
-                  : pathname === "/home" && link.label === "Features";
+                const isActive = link.href.includes("#")
+                  ? pathname === "/home" && link.label === "Features"
+                  : pathname === link.href;
                 return (
                   <Link
                     key={link.label}
