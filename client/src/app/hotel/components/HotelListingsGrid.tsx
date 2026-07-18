@@ -6,13 +6,6 @@ import { useMemo, useState } from "react";
 import { montserrat } from "@/app/home/landing-fonts";
 import { HOTELS, formatNightlyRate, type Hotel } from "@/lib/hotels";
 
-const STATS = [
-  { label: "Hotels", value: "12+" },
-  { label: "Regions", value: "10+" },
-  { label: "Guests Hosted", value: "8,400+" },
-  { label: "Avg. Rating", value: "4.2★" },
-];
-
 const SORTS = ["Featured", "Price: Low to High", "Price: High to Low"] as const;
 const HOTELS_PER_PAGE = 8;
 
@@ -144,7 +137,7 @@ export default function HotelListingsGrid() {
   };
 
   return (
-    <section id="listings" className="w-full bg-white px-8 py-16 md:py-24">
+    <section id="listings" className="w-full bg-white px-8 pt-16 md:pt-24">
       <div className="mx-auto flex max-w-[1280px] flex-col gap-16">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div className="flex max-w-[672px] flex-col gap-4">
@@ -228,15 +221,6 @@ export default function HotelListingsGrid() {
               <path d="M1 1l6 5-6 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-8 border-t border-[#c0c8c3]/30 pt-8 sm:grid-cols-4">
-          {STATS.map((stat) => (
-            <div key={stat.label} className="flex flex-col items-center gap-2 text-center">
-              <p className="text-sm font-medium text-[#414944]">{stat.label}</p>
-              <p className={`${montserrat.className} text-[28px] font-bold text-[#00261b] md:text-[36px]`}>{stat.value}</p>
-            </div>
-          ))}
         </div>
       </div>
     </section>
