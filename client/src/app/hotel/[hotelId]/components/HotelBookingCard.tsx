@@ -23,8 +23,19 @@ function ChevronDownIcon() {
   );
 }
 
+function CalendarIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-[#be4d00]">
+      <rect x="3" y="5" width="18" height="16" rx="3" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M3 9.5h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 const FIELD_CLASSNAME =
   "w-full rounded-xl border border-[#c0c8c3] bg-[#f8fafc] px-3 py-3 text-sm text-[#0f1621] transition-colors [color-scheme:light] hover:border-[#be4d00]/50 focus:border-[#be4d00] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#be4d00]/15";
+
+const DATE_FIELD_CLASSNAME = `${FIELD_CLASSNAME} pr-9 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-9 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0`;
 
 export default function HotelBookingCard({ hotel }: { hotel: Hotel }) {
   const shouldReduceMotion = useReducedMotion();
@@ -56,21 +67,31 @@ export default function HotelBookingCard({ hotel }: { hotel: Hotel }) {
       <div className="grid grid-cols-2 gap-3">
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-semibold uppercase tracking-[0.7px] text-[#717974]">Check-in</span>
-          <input
-            type="date"
-            value={checkIn}
-            onChange={(e) => setCheckIn(e.target.value)}
-            className={FIELD_CLASSNAME}
-          />
+          <div className="relative">
+            <input
+              type="date"
+              value={checkIn}
+              onChange={(e) => setCheckIn(e.target.value)}
+              className={DATE_FIELD_CLASSNAME}
+            />
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+              <CalendarIcon />
+            </span>
+          </div>
         </label>
         <label className="flex flex-col gap-1.5">
           <span className="text-xs font-semibold uppercase tracking-[0.7px] text-[#717974]">Check-out</span>
-          <input
-            type="date"
-            value={checkOut}
-            onChange={(e) => setCheckOut(e.target.value)}
-            className={FIELD_CLASSNAME}
-          />
+          <div className="relative">
+            <input
+              type="date"
+              value={checkOut}
+              onChange={(e) => setCheckOut(e.target.value)}
+              className={DATE_FIELD_CLASSNAME}
+            />
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+              <CalendarIcon />
+            </span>
+          </div>
         </label>
       </div>
 
