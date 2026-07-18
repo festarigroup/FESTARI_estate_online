@@ -1,21 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import toast from "react-hot-toast";
 import { montserrat } from "@/app/home/landing-fonts";
+import OrbitVectorBackground from "@/app/home/components/decor/OrbitVectorBackground";
 
 export default function ArtisanCTASection() {
   return (
     <section className="relative flex h-[556px] w-full items-center justify-center overflow-hidden bg-gradient-to-b from-[#616161] to-[#00261b] px-6 py-[120px]">
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <Image
-          src="/artisans/newsletter-bg.svg"
-          alt=""
-          width={2066}
-          height={450}
-          className="w-[160%] max-w-none md:w-full"
-        />
-      </div>
+      <OrbitVectorBackground />
 
       <div className="relative z-10 mx-auto flex max-w-[768px] flex-col items-center gap-10">
         <div className="flex flex-col items-center gap-4">
