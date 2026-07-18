@@ -108,9 +108,11 @@ export default function ChangeContactMethod() {
     }
   };
 
+  const selectedMasked = selected === "email" ? maskedEmail ?? "No email on file" : maskedPhone ?? "No mobile number on file";
+
   return (
-    <div className="h-screen w-full bg-white p-8">
-      <div className="relative h-full w-full overflow-hidden rounded-[35px]">
+    <div className="h-screen w-full bg-white p-3">
+      <div className="relative h-full w-full overflow-hidden rounded-[24px]">
         <Image
           src="/change-contact-hero.png"
           alt="Modern luxury residence at dusk"
@@ -145,75 +147,68 @@ export default function ChangeContactMethod() {
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: EASE }}
-            className="w-full max-w-[898px] rounded-[34px] border border-white/10 bg-white/10 p-[clamp(1.5rem,3vw,3rem)] backdrop-blur-xl"
+            className="w-full max-w-[512px] rounded-[33px] border border-white/20 bg-white/10 p-[clamp(1.5rem,4vw,3.0625rem)] backdrop-blur-[10px]"
           >
-            <div className="flex flex-col gap-[clamp(1.25rem,3vh,1.5rem)]">
-              <div className="flex flex-col gap-4 pb-[clamp(1rem,3vh,2rem)]">
-                <Link
-                  href={backHref}
-                  className="flex items-center gap-2 text-[clamp(0.8125rem,0.9vh+0.2vw,1.125rem)] font-semibold tracking-[0.5px] text-white transition-opacity hover:opacity-80"
-                >
-                  <ArrowLeftIcon />
-                  Back to Verification
-                </Link>
+            <div className="flex flex-col gap-[clamp(1rem,2.6vh,1.5rem)]">
+              <Link
+                href={backHref}
+                className="flex items-center gap-2 text-[clamp(0.8125rem,0.9vh+0.2vw,1rem)] font-semibold tracking-[0.7px] text-white transition-opacity hover:opacity-80"
+              >
+                <ArrowLeftIcon />
+                Back to Verification
+              </Link>
 
-                <h1 className="pt-[clamp(0.75rem,2vh,2rem)] text-[clamp(1.5rem,2vh+1.4vw,2.25rem)] font-semibold leading-tight text-white">
+              <div className="flex flex-col gap-[clamp(1rem,2.6vh,1.5rem)]">
+                <h1 className="text-[clamp(1.5rem,1.6vw+1.4vh,2rem)] font-semibold leading-tight text-white">
                   Change Contact Method
                 </h1>
 
-                <p className="text-[clamp(0.875rem,1vh+0.2vw,1.125rem)] leading-relaxed text-white/90">
+                <p className="text-[clamp(0.875rem,1vh+0.2vw,1.125rem)] leading-relaxed text-white">
                   To maintain the highest security standards for your Festari Estates account, please choose which
-                  verified contact method you wish to update. This ensures your luxury portfolio remains accessible
-                  only to you.
+                  verified contact method you wish to receive your OTP on.
                 </p>
-              </div>
 
-              <div className="flex flex-col gap-4 pb-[clamp(1rem,3vh,2rem)] sm:flex-row">
-                <button
-                  type="button"
-                  onClick={() => setSelected("email")}
-                  className={`flex flex-1 items-center gap-[clamp(1rem,2vw,1.5rem)] rounded-[24px] px-[clamp(1rem,2vw,1.5rem)] py-[clamp(0.9rem,2vh,1.125rem)] text-left transition-all ${
-                    selected === "email"
-                      ? "border-[3px] border-white bg-white/25"
-                      : "border border-white/25 bg-white/10 hover:bg-white/15"
-                  }`}
-                >
-                  <span className="flex size-[clamp(2.25rem,5vh,3.06rem)] shrink-0 items-center justify-center rounded-full bg-[rgba(240,237,237,0.3)] text-white">
-                    <MailIcon />
-                  </span>
-                  <span className="flex min-w-0 flex-1 flex-col gap-1">
-                    <span className="text-[clamp(0.9375rem,1vh+0.2vw,1.125rem)] font-semibold leading-tight text-[#0f1621]">
-                      Update Email Address
+                <div className="flex items-center gap-[clamp(0.75rem,1.6vw,1.4375rem)]">
+                  <button
+                    type="button"
+                    onClick={() => setSelected("email")}
+                    className={`flex flex-1 items-center gap-2 rounded-[24px] px-3 py-2 transition-all ${
+                      selected === "email"
+                        ? "border-[3px] border-white bg-white/25"
+                        : "border border-white/25 bg-white/10 hover:bg-white/15"
+                    }`}
+                  >
+                    <span className="flex size-[clamp(2.25rem,5vh,3.0625rem)] shrink-0 items-center justify-center rounded-full bg-[rgba(240,237,237,0.3)] text-white">
+                      <MailIcon />
                     </span>
-                    <span className="truncate text-[clamp(0.8125rem,0.9vh,1rem)] text-[#0f1621]">
-                      {maskedEmail ?? "No email on file"}
+                    <span className="flex-1 text-[clamp(0.9375rem,1vh+0.2vw,1.125rem)] font-semibold leading-tight text-[#0f1621]">
+                      Email
                     </span>
-                  </span>
-                  <ChevronRightIcon />
-                </button>
+                    <ChevronRightIcon />
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => setSelected("phone")}
-                  className={`flex flex-1 items-center gap-[clamp(1rem,2vw,1.5rem)] rounded-[24px] px-[clamp(1rem,2vw,1.5rem)] py-[clamp(0.9rem,2vh,1.125rem)] text-left transition-all ${
-                    selected === "phone"
-                      ? "border-[3px] border-white bg-white/25"
-                      : "border border-white/25 bg-white/10 hover:bg-white/15"
-                  }`}
-                >
-                  <span className="flex size-[clamp(2.25rem,5vh,3.06rem)] shrink-0 items-center justify-center rounded-full bg-[rgba(240,237,237,0.3)] text-white">
-                    <PhoneIcon />
-                  </span>
-                  <span className="flex min-w-0 flex-1 flex-col gap-1">
-                    <span className="text-[clamp(0.9375rem,1vh+0.2vw,1.125rem)] font-semibold leading-tight text-[#0f1621]">
-                      Update Mobile Number
+                  <button
+                    type="button"
+                    onClick={() => setSelected("phone")}
+                    className={`flex flex-1 items-center gap-2 rounded-[24px] px-3 py-2 transition-all ${
+                      selected === "phone"
+                        ? "border-[3px] border-white bg-white/25"
+                        : "border border-white/25 bg-white/10 hover:bg-white/15"
+                    }`}
+                  >
+                    <span className="flex size-[clamp(2.25rem,5vh,3.0625rem)] shrink-0 items-center justify-center rounded-full bg-[rgba(240,237,237,0.3)] text-white">
+                      <PhoneIcon />
                     </span>
-                    <span className="truncate text-[clamp(0.8125rem,0.9vh,1rem)] text-[#0f1621]">
-                      {maskedPhone ?? "No mobile number on file"}
+                    <span className="flex-1 text-[clamp(0.9375rem,1vh+0.2vw,1.125rem)] font-semibold leading-tight text-[#0f1621]">
+                      Number
                     </span>
-                  </span>
-                  <ChevronRightIcon />
-                </button>
+                    <ChevronRightIcon />
+                  </button>
+                </div>
+
+                <p className="truncate text-[clamp(0.75rem,0.8vh+0.1vw,0.875rem)] text-white/70">
+                  We&apos;ll send the code to <span className="text-white">{selectedMasked}</span>
+                </p>
               </div>
 
               <motion.button
