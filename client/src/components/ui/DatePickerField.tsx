@@ -71,12 +71,25 @@ export default function DatePickerField({
   minDate,
 }: DatePickerFieldProps) {
   const [open, setOpen] = useState(false);
+  const [align, setAlign] = useState<"left" | "right">("left");
   const containerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
   const reference = value ? new Date(`${value}T00:00:00`) : new Date();
   const [viewYear, setViewYear] = useState(reference.getFullYear());
   const [viewMonth, setViewMonth] = useState(reference.getMonth());
+
+  const POPOVER_WIDTH = 280;
+
+  const toggleOpen = () => {
+    if (!open && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const overflowsRight = rect.left + POPOVER_WIDTH > window.innerWidth - 16;
+      const fitsLeft = rect.right - POPOVER_WIDTH >= 16;
+      setAlign(overflowsRight && fitsLeft ? "right" : "left");
+    }
+    setOpen((v) => !v);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -130,7 +143,7 @@ export default function DatePickerField({
       <span className="text-xs font-semibold uppercase tracking-[0.7px] text-[#717974]">{label}</span>
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggleOpen}
         className={`flex items-center justify-between gap-2 rounded-xl border bg-[#f8fafc] px-3 py-3 text-left text-sm transition-colors ${
           open ? "border-[#be4d00] bg-white ring-2 ring-[#be4d00]/15" : "border-[#c0c8c3] hover:border-[#be4d00]/50"
         }`}
@@ -146,7 +159,9 @@ export default function DatePickerField({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.98 }}
             transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute left-0 top-[calc(100%+8px)] z-50 w-[280px] rounded-2xl border border-[#e5e2e1] bg-white p-4 shadow-2xl"
+            className={`absolute top-[calc(100%+8px)] z-50 w-[280px] rounded-2xl border border-[#e5e2e1] bg-white p-4 shadow-2xl ${
+              align === "right" ? "right-0" : "left-0"
+            }`}
           >
             <div className="flex items-center justify-between pb-3">
               <button
