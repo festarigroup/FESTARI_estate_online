@@ -11,7 +11,7 @@ const NAV_LINKS = [
   { label: "Real Estates", href: "/property" },
   { label: "Hotels", href: "/hotel" },
   { label: "Artisans", href: "/services" },
-  { label: "Pricings", href: "/home#featured-estates" },
+  { label: "Pricings", href: "/pricing" },
 ];
 
 export default function LandingNavbar({ overlay = false }: { overlay?: boolean }) {
