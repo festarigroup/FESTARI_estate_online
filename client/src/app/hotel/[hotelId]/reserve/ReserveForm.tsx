@@ -9,6 +9,37 @@ interface ReserveFormProps {
   title: string;
 }
 
+const FIELD_CLASSNAME =
+  "relative z-0 w-full border border-gray-200 bg-[#f8fafc] px-4 py-3.5 text-sm text-gray-900 transition-colors hover:border-[#be4d00]/50 focus:border-[#be4d00] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#be4d00]/15";
+
+const DATE_FIELD_CLASSNAME = `${FIELD_CLASSNAME} pr-10 [color-scheme:light] [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0`;
+
+const SELECT_CLASSNAME = `${FIELD_CLASSNAME} appearance-none pr-10`;
+
+function CalendarIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="pointer-events-none absolute right-4 top-1/2 z-10 -translate-y-1/2 text-[#be4d00]">
+      <rect x="3" y="5" width="18" height="16" rx="3" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M3 9.5h18M8 3v4M16 3v4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ChevronDownIcon() {
+  return (
+    <svg
+      className="pointer-events-none absolute right-4 top-1/2 z-10 -translate-y-1/2 text-[#be4d00]"
+      width="16"
+      height="16"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    </svg>
+  );
+}
+
 export default function ReserveForm({ numericId, title }: ReserveFormProps) {
   const [step, setStep] = useState(1);
 
@@ -141,43 +172,41 @@ export default function ReserveForm({ numericId, title }: ReserveFormProps) {
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
                   <div className="relative">
-                    <label className="absolute -top-[9px] left-3 bg-white px-1.5 text-[11px] text-[#BE4D00] z-10">Check-in Date</label>
-                    <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} className="w-full px-4 py-3.5 border border-[#BE4D00] text-gray-900 text-sm focus:outline-none bg-transparent relative z-0" />
+                    <label className="absolute -top-[9px] left-3 z-10 bg-white px-1.5 text-[11px] text-[#BE4D00]">Check-in Date</label>
+                    <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} className={DATE_FIELD_CLASSNAME} />
+                    <CalendarIcon />
                   </div>
                   <div className="relative">
-                    <label className="absolute -top-[9px] left-3 bg-white px-1.5 text-[11px] text-gray-400 z-10">Check-out Date</label>
-                    <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} className="w-full px-4 py-3.5 border border-gray-200 text-gray-900 text-sm focus:outline-none bg-transparent relative z-0" />
+                    <label className="absolute -top-[9px] left-3 z-10 bg-white px-1.5 text-[11px] text-gray-400">Check-out Date</label>
+                    <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} className={DATE_FIELD_CLASSNAME} />
+                    <CalendarIcon />
                   </div>
                   <div className="relative">
-                    <label className="absolute -top-[9px] left-3 bg-white px-1.5 text-[11px] text-gray-400 z-10">Number of Guests</label>
-                    <div className="relative">
-                      <select className="w-full px-4 py-3.5 border border-gray-200 text-gray-900 text-sm focus:outline-none bg-transparent appearance-none relative z-0">
-                        <option>2 Guests</option>
-                        <option>1 Guest</option>
-                        <option>3 Guests</option>
-                        <option>4 Guests</option>
-                      </select>
-                      <svg className="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                    </div>
+                    <label className="absolute -top-[9px] left-3 z-10 bg-white px-1.5 text-[11px] text-gray-400">Number of Guests</label>
+                    <select className={SELECT_CLASSNAME}>
+                      <option>2 Guests</option>
+                      <option>1 Guest</option>
+                      <option>3 Guests</option>
+                      <option>4 Guests</option>
+                    </select>
+                    <ChevronDownIcon />
                   </div>
                   <div className="relative">
-                    <label className="absolute -top-[9px] left-3 bg-white px-1.5 text-[11px] text-gray-400 z-10">Number of Rooms</label>
-                    <div className="relative">
-                      <select className="w-full px-4 py-3.5 border border-gray-200 text-gray-900 text-sm focus:outline-none bg-transparent appearance-none relative z-0">
-                        <option>1 Room</option>
-                        <option>2 Rooms</option>
-                        <option>3 Rooms</option>
-                      </select>
-                      <svg className="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                    </div>
+                    <label className="absolute -top-[9px] left-3 z-10 bg-white px-1.5 text-[11px] text-gray-400">Number of Rooms</label>
+                    <select className={SELECT_CLASSNAME}>
+                      <option>1 Room</option>
+                      <option>2 Rooms</option>
+                      <option>3 Rooms</option>
+                    </select>
+                    <ChevronDownIcon />
                   </div>
                   <div className="relative">
-                    <label className="absolute -top-[9px] left-3 bg-white px-1.5 text-[11px] text-gray-400 z-10">Preferred Currency</label>
-                    <input type="text" defaultValue="Gh cedis (GHS )" className="w-full px-4 py-3.5 border border-gray-200 text-gray-900 text-sm focus:outline-none bg-transparent relative z-0" />
+                    <label className="absolute -top-[9px] left-3 z-10 bg-white px-1.5 text-[11px] text-gray-400">Preferred Currency</label>
+                    <input type="text" defaultValue="Gh cedis (GHS )" className={FIELD_CLASSNAME} />
                   </div>
                   <div className="relative">
-                    <label className="absolute -top-[9px] left-3 bg-white px-1.5 text-[11px] text-gray-400 z-10">Promotional code</label>
-                    <input type="text" placeholder="Enter promo code" className="w-full px-4 py-3.5 border border-gray-200 text-gray-900 text-sm focus:outline-none bg-transparent relative z-0" />
+                    <label className="absolute -top-[9px] left-3 z-10 bg-white px-1.5 text-[11px] text-gray-400">Promotional code</label>
+                    <input type="text" placeholder="Enter promo code" className={FIELD_CLASSNAME} />
                   </div>
                 </div>
 
