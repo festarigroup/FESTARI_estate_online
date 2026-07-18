@@ -45,7 +45,7 @@ export default function LandingHero() {
         };
 
   return (
-    <section className="relative flex min-h-[870px] w-full flex-col">
+    <section className="relative flex min-h-[700px] w-full flex-col">
       <div className="absolute inset-0 overflow-hidden">
         <Image
           src="/landing/hero-estate.jpg"
