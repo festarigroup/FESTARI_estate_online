@@ -158,7 +158,7 @@ export default function VerifyIdentity() {
           >
             <Image
               src="/verify-hero.jpg"
-              alt="Modern townhouse exterior"
+              alt="Modern luxury villa with an infinity pool"
               fill
               priority
               className="object-cover"
