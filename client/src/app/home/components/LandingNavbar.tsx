@@ -57,7 +57,9 @@ export default function LandingNavbar({ overlay = false }: { overlay?: boolean }
             </Link>
             <div className="hidden items-center gap-8 lg:flex">
               {NAV_LINKS.map((link) => {
-                const isActive = !link.href.includes("#") && pathname === link.href;
+                const isActive =
+                  !link.href.includes("#") &&
+                  (pathname === link.href || pathname.startsWith(`${link.href}/`));
                 return (
                   <Link
                     key={link.label}
