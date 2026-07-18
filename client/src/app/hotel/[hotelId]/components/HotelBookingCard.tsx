@@ -15,6 +15,17 @@ function StarIcon({ filled }: { filled: boolean }) {
   );
 }
 
+function ChevronDownIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-[#717974]">
+      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+const FIELD_CLASSNAME =
+  "w-full rounded-xl border border-[#c0c8c3] bg-[#f8fafc] px-3 py-3 text-sm text-[#0f1621] transition-colors [color-scheme:light] hover:border-[#be4d00]/50 focus:border-[#be4d00] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#be4d00]/15";
+
 export default function HotelBookingCard({ hotel }: { hotel: Hotel }) {
   const shouldReduceMotion = useReducedMotion();
   const [checkIn, setCheckIn] = useState("");
@@ -49,7 +60,7 @@ export default function HotelBookingCard({ hotel }: { hotel: Hotel }) {
             type="date"
             value={checkIn}
             onChange={(e) => setCheckIn(e.target.value)}
-            className="rounded-xl border border-[#c0c8c3] px-3 py-2.5 text-sm text-[#0f1621] focus:outline-none focus:ring-1 focus:ring-[#be4d00]"
+            className={FIELD_CLASSNAME}
           />
         </label>
         <label className="flex flex-col gap-1.5">
@@ -58,24 +69,29 @@ export default function HotelBookingCard({ hotel }: { hotel: Hotel }) {
             type="date"
             value={checkOut}
             onChange={(e) => setCheckOut(e.target.value)}
-            className="rounded-xl border border-[#c0c8c3] px-3 py-2.5 text-sm text-[#0f1621] focus:outline-none focus:ring-1 focus:ring-[#be4d00]"
+            className={FIELD_CLASSNAME}
           />
         </label>
       </div>
 
       <label className="flex flex-col gap-1.5">
         <span className="text-xs font-semibold uppercase tracking-[0.7px] text-[#717974]">Guests</span>
-        <select
-          value={guests}
-          onChange={(e) => setGuests(e.target.value)}
-          className="rounded-xl border border-[#c0c8c3] px-3 py-2.5 text-sm text-[#0f1621] focus:outline-none focus:ring-1 focus:ring-[#be4d00]"
-        >
-          {GUEST_COUNTS.map((count) => (
-            <option key={count} value={count}>
-              {count}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            value={guests}
+            onChange={(e) => setGuests(e.target.value)}
+            className={`${FIELD_CLASSNAME} appearance-none pr-9`}
+          >
+            {GUEST_COUNTS.map((count) => (
+              <option key={count} value={count}>
+                {count}
+              </option>
+            ))}
+          </select>
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+            <ChevronDownIcon />
+          </span>
+        </div>
       </label>
 
       <Link
