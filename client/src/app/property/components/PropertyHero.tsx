@@ -35,13 +35,13 @@ export default function PropertyHero() {
         };
 
   return (
-    <section className="relative flex min-h-[820px] w-full flex-col overflow-hidden pb-24">
-      <div className="absolute inset-0">
+    <section className="relative flex min-h-[820px] w-full flex-col pb-24">
+      <div className="absolute inset-0 overflow-hidden">
         <Image src="/property/property-hero.jpg" alt="Grand estate at sunset" fill priority className="object-cover" />
         <div className="absolute inset-0 bg-black/60" />
       </div>
 
-      <LandingNavbar />
+      <LandingNavbar overlay />
 
       <div className="relative z-10 flex flex-1 flex-col justify-center gap-6 px-5 py-16 md:px-16">
         <motion.div {...fadeUp(0)} className="flex gap-2">

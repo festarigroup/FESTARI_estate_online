@@ -96,8 +96,8 @@ export default function LandingHero() {
         };
 
   return (
-    <section className="relative flex min-h-[870px] w-full flex-col overflow-hidden">
-      <div className="absolute inset-0">
+    <section className="relative flex min-h-[870px] w-full flex-col">
+      <div className="absolute inset-0 overflow-hidden">
         <Image
           src="/landing/hero-estate.jpg"
           alt="Luxury legacy estate at dusk"
@@ -108,7 +108,7 @@ export default function LandingHero() {
         <div className="absolute inset-0 bg-black/60" />
       </div>
 
-      <LandingNavbar />
+      <LandingNavbar overlay />
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center gap-8 px-5 py-16 text-center">
         <motion.h1

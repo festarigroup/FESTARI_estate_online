@@ -14,7 +14,7 @@ const NAV_LINKS = [
   { label: "Pricings", href: "/home#featured-estates" },
 ];
 
-export default function LandingNavbar() {
+export default function LandingNavbar({ overlay = false }: { overlay?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const pathname = usePathname();
@@ -27,7 +27,11 @@ export default function LandingNavbar() {
   }, []);
 
   return (
-    <div className="sticky top-0 z-50 flex justify-center px-5 pt-5 md:px-8">
+    <div
+      className={`${
+        overlay ? "fixed inset-x-0" : "sticky"
+      } top-0 z-50 flex justify-center px-5 pt-5 md:px-8`}
+    >
       <motion.nav
         initial={false}
         animate={{
