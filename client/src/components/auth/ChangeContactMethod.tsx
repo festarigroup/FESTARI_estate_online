@@ -114,7 +114,7 @@ export default function ChangeContactMethod() {
     <div className="h-screen w-full bg-white p-3">
       <div className="relative h-full w-full overflow-hidden rounded-[24px]">
         <Image
-          src="/change-contact-hero.png"
+          src="/change-contact-hero.jpg"
           alt="Modern luxury residence at dusk"
           fill
           priority
