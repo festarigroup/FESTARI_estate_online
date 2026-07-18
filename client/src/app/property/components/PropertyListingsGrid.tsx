@@ -183,7 +183,7 @@ export default function PropertyListingsGrid() {
 
         <div className="grid grid-cols-2 gap-8 border-t border-[#c0c8c3]/30 pt-8 sm:grid-cols-4">
           {STATS.map((stat) => (
-            <div key={stat.label} className="flex flex-col gap-2">
+            <div key={stat.label} className="flex flex-col items-center gap-2 text-center">
               <p className="text-sm font-medium text-[#414944]">{stat.label}</p>
               <p className={`${montserrat.className} text-[28px] font-bold text-[#00261b] md:text-[36px]`}>{stat.value}</p>
             </div>
