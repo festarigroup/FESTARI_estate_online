@@ -10,11 +10,12 @@ import Reveal from "@/components/motion/Reveal";
 
 // Routes that render full-bleed, without the site sidebar/navbar/footer chrome.
 const BARE_ROUTES = ["/home", "/property", "/login", "/signup", "/verify-otp", "/verify-otp/change-contact", "/forgot-password"];
+const BARE_ROUTE_PREFIXES = ["/property/"];
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
-  if (BARE_ROUTES.includes(pathname)) {
+  if (BARE_ROUTES.includes(pathname) || BARE_ROUTE_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
     return <>{children}</>;
   }
 

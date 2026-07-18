@@ -57,3 +57,13 @@ export async function mockSubscribeNewsletter(email: string): Promise<ApiRespons
   }
   return { success: true, data: null };
 }
+
+export async function mockSendInquiry(name: string, email: string, message: string): Promise<ApiResponse<null>> {
+  await delay(1400);
+  if (shouldFail()) return { success: false, message: "Could not send your inquiry. Please try again." };
+  if (!name.trim() || !message.trim()) return { success: false, message: "Please fill in all fields." };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    return { success: false, message: "Enter a valid email address." };
+  }
+  return { success: true, data: null };
+}

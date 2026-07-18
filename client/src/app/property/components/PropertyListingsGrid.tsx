@@ -4,25 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { montserrat } from "@/app/home/landing-fonts";
-
-type Property = {
-  id: number;
-  image: string;
-  price: number;
-  name: string;
-  beds: number;
-  baths: number;
-  area: string;
-};
-
-const PROPERTIES: Property[] = [
-  { id: 1, image: "/property/azure-cliffside-villa.jpg", price: 42_000_000, name: "Azure Cliffside Villa", beds: 5, baths: 2, area: "285m²" },
-  { id: 4, image: "/property/skyloft-penthouse.jpg", price: 51_000_000, name: "Skyloft Penthouse", beds: 4, baths: 3, area: "220m²" },
-  { id: 6, image: "/property/alpine-lake-retreat.jpg", price: 39_000_000, name: "Alpine Lake Retreat", beds: 5, baths: 4, area: "310m²" },
-  { id: 2, image: "/landing/sandstone-valleys.jpg", price: 65_000_000, name: "The Sandstone Valleys", beds: 8, baths: 12, area: "1,150m²" },
-  { id: 5, image: "/landing/chelsea-heights.jpg", price: 48_000_000, name: "Chelsea Heights Penthouse", beds: 3, baths: 2, area: "195m²" },
-  { id: 7, image: "/landing/uluwatu-villa.jpg", price: 33_000_000, name: "Uluwatu Cliffside Villa", beds: 4, baths: 5, area: "420m²" },
-];
+import { PROPERTIES, formatGHS, type Property } from "@/lib/properties";
 
 const STATS = [
   { label: "Rent Home", value: "6,675+" },
@@ -75,10 +57,6 @@ function AreaIcon() {
   );
 }
 
-function formatGHS(value: number) {
-  return `GHS ${value.toLocaleString("en-US")}`;
-}
-
 function PropertyCard({ property }: { property: Property }) {
   return (
     <Link
@@ -87,7 +65,7 @@ function PropertyCard({ property }: { property: Property }) {
     >
       <div className="relative h-[300px] w-full overflow-hidden rounded-2xl md:h-[380px]">
         <Image
-          src={property.image}
+          src={property.heroImage}
           alt={property.name}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -109,7 +87,7 @@ function PropertyCard({ property }: { property: Property }) {
           </span>
           <span className="flex items-center gap-1.5">
             <AreaIcon />
-            {property.area}
+            {property.sqft.toLocaleString()} sqft
           </span>
         </div>
       </div>
