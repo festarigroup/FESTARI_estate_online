@@ -9,6 +9,7 @@ import HotelQuickStats from "./components/HotelQuickStats";
 import HotelDescription from "./components/HotelDescription";
 import HotelAmenities from "./components/HotelAmenities";
 import HotelBookingCard from "./components/HotelBookingCard";
+import HotelGuestFavorite from "./components/HotelGuestFavorite";
 
 export default async function HotelDetailPage({
   params,
@@ -53,6 +54,10 @@ export default async function HotelDetailPage({
               </div>
             </div>
           </div>
+
+          <Reveal>
+            <HotelGuestFavorite hotel={hotel} />
+          </Reveal>
         </div>
       </section>
 
