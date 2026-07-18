@@ -11,6 +11,9 @@ import HotelAmenities from "./components/HotelAmenities";
 import HotelBookingCard from "./components/HotelBookingCard";
 import HotelGuestFavorite from "./components/HotelGuestFavorite";
 import HotelReviews from "./components/HotelReviews";
+import HotelLocationMap from "./components/HotelLocationMap";
+import HotelHostCard from "./components/HotelHostCard";
+import HotelThingsToKnow from "./components/HotelThingsToKnow";
 
 export default async function HotelDetailPage({
   params,
@@ -62,6 +65,18 @@ export default async function HotelDetailPage({
 
           <Reveal>
             <HotelReviews hotel={hotel} />
+          </Reveal>
+
+          <Reveal>
+            <HotelLocationMap hotel={hotel} />
+          </Reveal>
+
+          <Reveal>
+            <HotelHostCard hotel={hotel} />
+          </Reveal>
+
+          <Reveal>
+            <HotelThingsToKnow />
           </Reveal>
         </div>
       </section>

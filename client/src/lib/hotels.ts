@@ -8,6 +8,13 @@ export const HOTEL_AMENITIES = [
   "Climate-controlled Cellar",
 ];
 
+export const HOTEL_HOST = {
+  name: "Ama & Kwabena",
+  role: "Superhost",
+  yearsHosting: 6,
+  bio: "We personally inspect every stay in our portfolio and are on call throughout your visit — usually reachable within the hour.",
+};
+
 export type Hotel = {
   id: number;
   name: string;
