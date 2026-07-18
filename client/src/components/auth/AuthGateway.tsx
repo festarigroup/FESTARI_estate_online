@@ -507,7 +507,7 @@ export default function AuthGateway({ initialMode }: AuthGatewayProps) {
 
         {/* Tab Switcher */}
         <div
-          className={`relative flex w-full justify-center border-b border-[#c0c8c3] ${
+          className={`relative flex w-full justify-center ${
             isSignIn ? "pb-[clamp(1rem,3vh,2rem)]" : "pb-[clamp(0.5rem,1.6vh,1rem)]"
           }`}
         >
