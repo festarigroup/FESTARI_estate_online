@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
+import toast from "react-hot-toast";
 import { montserrat } from "@/app/home/landing-fonts";
 import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
 import { HOTEL_HOST, type Hotel } from "@/lib/hotels";
@@ -77,6 +78,7 @@ export default function HotelHostCard({ hotel }: { hotel: Hotel }) {
             </div>
             <button
               type="button"
+              onClick={() => toast.success(`Your message request has been sent to ${HOTEL_HOST.name}.`)}
               className="mt-4 self-center rounded-xl bg-[#be4d00] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#a54300] sm:mt-0 sm:self-auto"
             >
               Message Host

@@ -186,13 +186,6 @@ export default function HotelReviews({ hotel }: { hotel: Hotel }) {
           </StaggerItem>
         ))}
       </StaggerContainer>
-
-      <button
-        type="button"
-        className="self-start rounded-full border border-[#c0c8c3] px-6 py-3 text-sm font-semibold text-[#00261b] transition-colors hover:bg-[#f6f3f2]"
-      >
-        Show all {reviewCount} reviews
-      </button>
     </div>
   );
 }

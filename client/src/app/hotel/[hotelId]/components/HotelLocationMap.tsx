@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { montserrat } from "@/app/home/landing-fonts";
 import type { Hotel } from "@/lib/hotels";
@@ -17,6 +18,7 @@ function PinIcon() {
 
 export default function HotelLocationMap({ hotel }: { hotel: Hotel }) {
   const shouldReduceMotion = useReducedMotion();
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <div className="flex flex-col gap-6">
@@ -82,9 +84,20 @@ export default function HotelLocationMap({ hotel }: { hotel: Hotel }) {
 
       <p className="max-w-[680px] text-base leading-relaxed text-[#414944]">
         Set within easy reach of {hotel.location}&apos;s best restaurants and everyday conveniences, with quiet
-        residential streets just beyond the property line.{" "}
-        <button type="button" className="font-semibold text-[#00261b] underline">
-          Show more
+        residential streets just beyond the property line.
+        {expanded && (
+          <>
+            {" "}
+            Guests typically reach the nearest beach or landmark within a 10-minute drive, with airport transfers
+            and private drivers available on request through your host.
+          </>
+        )}{" "}
+        <button
+          type="button"
+          onClick={() => setExpanded((prev) => !prev)}
+          className="font-semibold text-[#00261b] underline"
+        >
+          {expanded ? "Show less" : "Show more"}
         </button>
       </p>
     </div>
