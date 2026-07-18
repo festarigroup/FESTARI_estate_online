@@ -9,7 +9,7 @@ import { motion, useReducedMotion } from "framer-motion";
 const NAV_LINKS = [
   { label: "Features", href: "/home" },
   { label: "Real Estates", href: "/property" },
-  { label: "Venues", href: "/services" },
+  { label: "Hotels", href: "/hotel" },
   { label: "Artisans", href: "/services" },
   { label: "Pricings", href: "/home#featured-estates" },
 ];
