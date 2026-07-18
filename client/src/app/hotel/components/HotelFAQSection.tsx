@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { montserrat } from "@/app/home/landing-fonts";
+import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
 
 const FAQS = [
   {
@@ -70,14 +71,14 @@ export default function HotelFAQSection() {
           </h2>
         </div>
 
-        <div className="mt-16 grid gap-12 lg:grid-cols-2 lg:gap-16">
-          <div className="flex flex-col gap-4">
-            <div className="relative h-[320px] w-full overflow-hidden rounded-[24px] lg:h-full lg:min-h-[420px]">
+        <StaggerContainer className="mt-16 grid gap-12 lg:grid-cols-2 lg:gap-16">
+          <StaggerItem className="flex flex-col gap-4">
+            <div className="group relative h-[320px] w-full overflow-hidden rounded-[24px] lg:h-full lg:min-h-[420px]">
               <Image
                 src="/hotel/hotel-dusk-pool.jpg"
                 alt="Labadi Seaside Suites"
                 fill
-                className="object-cover"
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
@@ -85,13 +86,13 @@ export default function HotelFAQSection() {
               <p className="text-sm text-white/50">Featured Stay</p>
               <p className="text-lg font-semibold text-white">Labadi Seaside Suites</p>
             </div>
-          </div>
+          </StaggerItem>
 
           <div className="flex flex-col justify-center">
             {FAQS.map((faq, index) => {
               const open = index === openIndex;
               return (
-                <div key={faq.question} className="border-b border-white/10 py-5">
+                <StaggerItem key={faq.question} className="border-b border-white/10 py-5">
                   <button
                     type="button"
                     onClick={() => setOpenIndex(open ? -1 : index)}
@@ -111,11 +112,11 @@ export default function HotelFAQSection() {
                   >
                     <p className="pt-3 text-sm leading-relaxed text-white/60 md:text-base">{faq.answer}</p>
                   </motion.div>
-                </div>
+                </StaggerItem>
               );
             })}
           </div>
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );
