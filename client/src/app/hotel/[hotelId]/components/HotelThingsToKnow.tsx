@@ -1,4 +1,7 @@
+"use client";
+
 import { montserrat } from "@/app/home/landing-fonts";
+import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
 
 const COLUMNS = [
   {
@@ -20,9 +23,9 @@ export default function HotelThingsToKnow() {
     <div className="flex flex-col gap-8">
       <h2 className={`${montserrat.className} text-2xl font-semibold text-[#00261b]`}>Things to Know</h2>
 
-      <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+      <StaggerContainer className="grid grid-cols-1 gap-8 sm:grid-cols-3">
         {COLUMNS.map((column) => (
-          <div key={column.title} className="flex flex-col gap-4">
+          <StaggerItem key={column.title} className="flex flex-col gap-4">
             <h3 className="text-base font-bold text-[#00261b]">{column.title}</h3>
             <ul className="flex flex-col gap-2">
               {column.items.map((item) => (
@@ -34,9 +37,9 @@ export default function HotelThingsToKnow() {
             <button type="button" className="self-start text-sm font-semibold text-[#00261b] underline">
               Show more
             </button>
-          </div>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
     </div>
   );
 }

@@ -1,52 +1,106 @@
+"use client";
+
 import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
 import { montserrat } from "@/app/home/landing-fonts";
+import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
 import { HOTEL_HOST, type Hotel } from "@/lib/hotels";
+
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 function StarIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 20 20" fill="#fed65b">
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="#fed65b">
       <path d="M10 1.5l2.5 5.1 5.6.8-4 3.9.9 5.6L10 14.2l-5 2.7.9-5.6-4-3.9 5.6-.8L10 1.5z" />
     </svg>
   );
 }
 
+function LaurelBadgeIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M12 2 2 7l10 5 10-5-10-5ZM2 12l10 5 10-5M2 17l10 5 10-5"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export default function HotelHostCard({ hotel }: { hotel: Hotel }) {
+  const shouldReduceMotion = useReducedMotion();
   const baseScore = 4.68 + hotel.rating * 0.05;
   const reviewCount = Math.round(hotel.rating * 45 + 70);
+
+  const stats = [
+    { value: reviewCount, label: "Reviews" },
+    { value: baseScore.toFixed(2), label: "Rating", icon: <StarIcon /> },
+    { value: HOTEL_HOST.yearsHosting, label: "Years Hosting" },
+  ];
 
   return (
     <div className="flex flex-col gap-6">
       <h2 className={`${montserrat.className} text-2xl font-semibold text-[#00261b]`}>Meet Your Host</h2>
 
-      <div className="flex flex-col gap-8 rounded-[24px] border border-[rgba(89,112,97,0.2)] bg-[#f6f3f2] p-8 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-6">
-          <div className="relative size-20 shrink-0 overflow-hidden rounded-2xl">
-            <Image src="/landing/consultant-avatar.jpg" alt={HOTEL_HOST.name} fill className="object-cover" />
-            <span className="absolute bottom-0 right-0 flex size-6 items-center justify-center rounded-full border-4 border-white bg-[#22c55e]" />
-          </div>
-          <div className="flex flex-col gap-1">
-            <p className="text-lg font-bold text-[#00261b]">{HOTEL_HOST.name}</p>
-            <p className="text-sm text-[#717974]">{HOTEL_HOST.role}</p>
-            <div className="mt-1 flex items-center gap-1.5">
-              <StarIcon />
-              <span className="text-sm font-semibold text-[#00261b]">{baseScore.toFixed(2)}</span>
-              <span className="text-xs text-[#717974]">
-                · {reviewCount} reviews · {HOTEL_HOST.yearsHosting} years hosting
-              </span>
+      <motion.div
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.6, ease: EASE }}
+        whileHover={shouldReduceMotion ? undefined : { y: -2 }}
+        className="flex flex-col gap-8 rounded-[24px] border border-[rgba(89,112,97,0.2)] bg-white p-8"
+      >
+        <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:items-center sm:text-left">
+          <motion.div
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.7 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.5, delay: 0.1, ease: EASE }}
+            className="relative shrink-0"
+          >
+            <div className="size-24 overflow-hidden rounded-full border-4 border-white shadow-md">
+              <Image src="/landing/consultant-avatar.jpg" alt={HOTEL_HOST.name} width={96} height={96} className="size-full object-cover" />
             </div>
+            <span className="absolute -bottom-1.5 left-1/2 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-full bg-[#be4d00] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.5px] text-white shadow-md">
+              <LaurelBadgeIcon />
+              Superhost
+            </span>
+          </motion.div>
+
+          <div className="flex flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xl font-bold text-[#00261b]">{HOTEL_HOST.name}</p>
+              <p className="text-sm text-[#717974]">Hosting on Festari Estates</p>
+            </div>
+            <button
+              type="button"
+              className="mt-4 self-center rounded-xl bg-[#be4d00] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#a54300] sm:mt-0 sm:self-auto"
+            >
+              Message Host
+            </button>
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 md:w-[320px] md:shrink-0">
+        <StaggerContainer className="grid grid-cols-3 divide-x divide-[rgba(89,112,97,0.2)] rounded-2xl border border-[rgba(89,112,97,0.2)] bg-[#f6f3f2] py-5">
+          {stats.map((stat) => (
+            <StaggerItem key={stat.label} className="flex flex-col items-center gap-1 px-2 text-center">
+              <span className="flex items-center gap-1 text-lg font-bold text-[#00261b]">
+                {stat.icon}
+                {stat.value}
+              </span>
+              <span className="text-xs font-semibold text-[#717974]">{stat.label}</span>
+            </StaggerItem>
+          ))}
+        </StaggerContainer>
+
+        <div className="flex flex-col gap-2">
           <p className="text-sm leading-relaxed text-[#414944]">{HOTEL_HOST.bio}</p>
-          <button
-            type="button"
-            className="self-start rounded-xl bg-[#00261b] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#00382a]"
-          >
-            Message Host
-          </button>
+          <p className="text-xs font-semibold text-[#717974]">Response rate: 100% · Responds within an hour</p>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

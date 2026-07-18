@@ -1,5 +1,10 @@
+"use client";
+
+import { motion, useReducedMotion } from "framer-motion";
 import { montserrat } from "@/app/home/landing-fonts";
 import type { Hotel } from "@/lib/hotels";
+
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 const LEAVES = [
   { x: 27, y: 51, angle: -35 },
@@ -33,21 +38,59 @@ function LaurelIcon({ flip = false }: { flip?: boolean }) {
 }
 
 export default function HotelGuestFavorite({ hotel }: { hotel: Hotel }) {
+  const shouldReduceMotion = useReducedMotion();
   const guestScore = (4.68 + hotel.rating * 0.05).toFixed(2);
 
   return (
     <div className="flex flex-col items-center gap-3 py-8 text-center">
       <div className="flex items-center gap-4">
-        <LaurelIcon />
-        <span className={`${montserrat.className} text-[56px] font-bold text-[#00261b] md:text-[64px]`}>
+        <motion.div
+          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: -24, rotate: -8 }}
+          whileInView={{ opacity: 1, x: 0, rotate: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6, ease: EASE }}
+        >
+          <LaurelIcon />
+        </motion.div>
+
+        <motion.span
+          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.6 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5, delay: 0.15, ease: EASE }}
+          className={`${montserrat.className} text-[56px] font-bold text-[#00261b] md:text-[64px]`}
+        >
           {guestScore}
-        </span>
-        <LaurelIcon flip />
+        </motion.span>
+
+        <motion.div
+          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 24, rotate: 8 }}
+          whileInView={{ opacity: 1, x: 0, rotate: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6, ease: EASE }}
+        >
+          <LaurelIcon flip />
+        </motion.div>
       </div>
-      <h3 className={`${montserrat.className} text-2xl font-semibold text-[#00261b]`}>Guest Favorite</h3>
-      <p className="max-w-md text-base text-[#717974]">
+
+      <motion.h3
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.5, delay: 0.3, ease: EASE }}
+        className={`${montserrat.className} text-2xl font-semibold text-[#00261b]`}
+      >
+        Guest Favorite
+      </motion.h3>
+      <motion.p
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.5, delay: 0.38, ease: EASE }}
+        className="max-w-md text-base text-[#717974]"
+      >
         One of the most loved stays on Festari Estates, based on ratings, reviews, and reliability.
-      </p>
+      </motion.p>
     </div>
   );
 }

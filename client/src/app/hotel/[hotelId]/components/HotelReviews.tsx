@@ -1,4 +1,7 @@
+"use client";
+
 import { montserrat } from "@/app/home/landing-fonts";
+import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
 import type { Hotel } from "@/lib/hotels";
 
 const REVIEWS = [
@@ -145,24 +148,24 @@ export default function HotelReviews({ hotel }: { hotel: Hotel }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
+      <StaggerContainer className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
         {categories.map((category) => (
-          <div
+          <StaggerItem
             key={category.label}
             className="flex flex-col items-center gap-2 rounded-2xl border border-[rgba(89,112,97,0.2)] bg-white p-4 text-center"
           >
             {category.icon}
             <p className="text-lg font-bold text-[#00261b]">{Math.min(5, baseScore + category.offset).toFixed(1)}</p>
             <p className="text-xs font-semibold text-[#717974]">{category.label}</p>
-          </div>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <StaggerContainer className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {REVIEWS.map((review) => (
-          <div
+          <StaggerItem
             key={review.name}
-            className="flex flex-col gap-4 rounded-[24px] border border-[rgba(89,112,97,0.2)] bg-white p-6"
+            className="flex flex-col gap-4 rounded-[24px] border border-[rgba(89,112,97,0.2)] bg-white p-6 transition-shadow duration-300 hover:shadow-[0px_20px_40px_0px_rgba(26,26,26,0.08)]"
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -180,9 +183,9 @@ export default function HotelReviews({ hotel }: { hotel: Hotel }) {
             </div>
             <p className="text-base italic leading-relaxed text-[#717974]">{review.quote}</p>
             <p className="text-xs font-semibold uppercase tracking-[0.7px] text-[#717974]">{review.stay}</p>
-          </div>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerContainer>
 
       <button
         type="button"

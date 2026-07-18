@@ -1,5 +1,10 @@
+"use client";
+
+import { motion, useReducedMotion } from "framer-motion";
 import { montserrat } from "@/app/home/landing-fonts";
 import type { Hotel } from "@/lib/hotels";
+
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 function PinIcon() {
   return (
@@ -11,6 +16,8 @@ function PinIcon() {
 }
 
 export default function HotelLocationMap({ hotel }: { hotel: Hotel }) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -21,7 +28,13 @@ export default function HotelLocationMap({ hotel }: { hotel: Hotel }) {
         </div>
       </div>
 
-      <div className="relative h-[384px] w-full overflow-hidden rounded-[24px] bg-[#f0eded]">
+      <motion.div
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.97 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.6, ease: EASE }}
+        className="relative h-[384px] w-full overflow-hidden rounded-[24px] bg-[#f0eded]"
+      >
         <svg className="absolute inset-0 h-full w-full opacity-40" viewBox="0 0 800 400" preserveAspectRatio="none">
           <defs>
             <pattern id="hotel-location-grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -34,7 +47,17 @@ export default function HotelLocationMap({ hotel }: { hotel: Hotel }) {
           <path d="M700 0 Q640 160 720 400" stroke="#c0c8c3" strokeWidth="6" fill="none" />
         </svg>
 
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full">
+        <motion.div
+          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={
+            shouldReduceMotion
+              ? { duration: 0 }
+              : { type: "spring", stiffness: 300, damping: 16, delay: 0.35 }
+          }
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full"
+        >
           <div className="flex size-16 items-center justify-center rounded-full bg-[#be4d00]/15">
             <div className="flex size-12 items-center justify-center rounded-full bg-[#be4d00] shadow-lg">
               <svg width="20" height="24" viewBox="0 0 24 30" fill="none">
@@ -43,13 +66,19 @@ export default function HotelLocationMap({ hotel }: { hotel: Hotel }) {
               </svg>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="absolute bottom-6 left-6 max-w-[280px] rounded-xl border border-white/40 bg-white/90 p-4 backdrop-blur-md">
+        <motion.div
+          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5, delay: 0.5, ease: EASE }}
+          className="absolute bottom-6 left-6 max-w-[280px] rounded-xl border border-white/40 bg-white/90 p-4 backdrop-blur-md"
+        >
           <p className="text-sm font-semibold tracking-[0.5px] text-[#00261b]">{hotel.tag}</p>
           <p className="text-xs text-[#717974]">{hotel.location}</p>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       <p className="max-w-[680px] text-base leading-relaxed text-[#414944]">
         Set within easy reach of {hotel.location}&apos;s best restaurants and everyday conveniences, with quiet
