@@ -78,7 +78,13 @@ export default function LandingFooter() {
                   aria-label={social.label}
                   className="flex size-10 items-center justify-center rounded-full border border-white/20 transition-colors hover:bg-white/10"
                 >
-                  <Image src={social.icon} alt="" width={14} height={14} className="opacity-80" />
+                  <Image
+                    src={social.icon}
+                    alt=""
+                    width={14}
+                    height={14}
+                    className="opacity-80 [filter:brightness(0)_invert(1)]"
+                  />
                 </a>
               ))}
             </div>
