@@ -107,8 +107,8 @@ export default function TestimonialsSection() {
         </div>
       </div>
 
-      <div className="w-full">
-        <div className="animate-marquee-slow flex w-max gap-6 px-8">
+      <div className="w-full pb-16 md:pb-24">
+        <div className="animate-marquee-slow flex w-max gap-6 px-8 py-4">
           {cards.map((testimonial, i) => (
             <TestimonialCard key={`${testimonial.name}-${i}`} testimonial={testimonial} />
           ))}
