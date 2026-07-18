@@ -7,32 +7,32 @@ import { montserrat } from "@/app/home/landing-fonts";
 
 const FAQS = [
   {
-    question: "What makes Festari Estates different?",
+    question: "What makes Festari Hotels different?",
     answer:
-      "Every listing is personally vetted by our estate specialists. We pair rigorous due diligence with a concierge-level buying experience, so every property you see here is one we'd stand behind ourselves.",
+      "Every stay in our portfolio is personally inspected by our travel specialists. We pair verified guest reviews with a concierge-level booking experience, so every hotel you see here is one we'd stay in ourselves.",
   },
   {
-    question: "How does the buying process work?",
+    question: "How does booking work?",
     answer:
-      "Start with a private consultation with one of our estate specialists. From there we arrange viewings, handle due diligence, and coordinate with legal counsel through to closing.",
+      "Select your dates and guest count, then reserve directly through the listing — no fees, no middlemen. You'll receive confirmation and check-in details within minutes.",
   },
   {
-    question: "Can I schedule a private viewing?",
+    question: "What's your cancellation policy?",
     answer:
-      "Yes. Every listing offers private, by-appointment viewings arranged directly through your assigned specialist, with virtual walkthroughs available for international buyers.",
+      "Most stays offer free cancellation up to 48 hours before check-in. Exact terms are shown on each listing before you confirm your booking.",
   },
   {
-    question: "Are financing options available?",
+    question: "Is breakfast included?",
     answer:
-      "We partner with a small number of trusted mortgage and private banking partners who work exclusively with our buyers to structure financing discreetly.",
+      "It varies by property — look for the amenities listed on each hotel's page. Many of our boutique partners include breakfast as standard.",
   },
   {
-    question: "What's included in the asking price?",
+    question: "Can I book for a group or event?",
     answer:
-      "Each listing price reflects the property as shown, including any fixtures noted in the description. Furnishings, art, and vehicles are negotiated separately unless stated otherwise.",
+      "Yes. Reach out to our concierge team for group bookings, extended stays, or private events, and we'll coordinate directly with the property on your behalf.",
   },
   {
-    question: "How do I list my own property?",
+    question: "How do I list my own hotel?",
     answer:
       "Reach out through \"Become a host\" — our team will assess your property, arrange professional photography, and position it within our curated portfolio.",
   },
@@ -55,7 +55,7 @@ function PlusIcon({ open }: { open: boolean }) {
   );
 }
 
-export default function PropertyFAQSection() {
+export default function HotelFAQSection() {
   const [openIndex, setOpenIndex] = useState(0);
   const shouldReduceMotion = useReducedMotion();
 
@@ -64,9 +64,9 @@ export default function PropertyFAQSection() {
       <div className="mx-auto max-w-[1280px] rounded-[40px] bg-[#00261b] p-8 md:p-16 lg:p-20">
         <div className="mx-auto max-w-[820px] text-center">
           <h2 className={`${montserrat.className} text-[28px] font-semibold leading-tight text-white md:text-[36px]`}>
-            <span className="text-[#ffe088]">We believe</span> great real estate starts with asking the right
-            questions — <span className="text-white">about lifestyle, location, and the way a home shapes everyday
-            life.</span>
+            <span className="text-[#ffe088]">We believe</span> great hospitality starts with asking the right
+            questions — <span className="text-white">about comfort, service, and the way a stay shapes your
+            trip.</span>
           </h2>
         </div>
 
@@ -74,16 +74,16 @@ export default function PropertyFAQSection() {
           <div className="flex flex-col gap-4">
             <div className="relative h-[320px] w-full overflow-hidden rounded-[24px] lg:h-full lg:min-h-[420px]">
               <Image
-                src="/property/azure-cliffside-villa.jpg"
-                alt="Azure Cliffside Villa"
+                src="/hotel/hotel-dusk-pool.jpg"
+                alt="Labadi Seaside Suites"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
             <div>
-              <p className="text-sm text-white/50">Featured Development</p>
-              <p className="text-lg font-semibold text-white">Azure Cliffside Villa</p>
+              <p className="text-sm text-white/50">Featured Stay</p>
+              <p className="text-lg font-semibold text-white">Labadi Seaside Suites</p>
             </div>
           </div>
 
