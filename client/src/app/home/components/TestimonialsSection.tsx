@@ -84,7 +84,7 @@ export default function TestimonialsSection() {
 
   return (
     <section id="testimonials" className="w-full overflow-hidden bg-[#fcf9f8]">
-      <div className="mx-auto max-w-[1280px] px-8 py-16 md:py-24">
+      <div className="mx-auto max-w-[1280px] px-8 pt-16 md:pt-24">
         <div className="mb-12 flex items-end justify-between gap-6">
           <div className="flex flex-col gap-3">
             <p className="text-sm font-semibold uppercase tracking-[1.4px] text-[#be4d00]">Our Reviews</p>
