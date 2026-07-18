@@ -371,101 +371,103 @@ export default function AuthGateway({ initialMode }: AuthGatewayProps) {
       key="hero"
       layout={!shouldReduceMotion}
       transition={{ layout: { duration: 0.6, ease: EASE } }}
-      className="relative flex h-full items-center justify-center overflow-hidden"
+      className="relative flex h-full items-center justify-center p-3"
     >
-      <div className="absolute inset-0">
-        <motion.div
-          initial={shouldReduceMotion ? { scale: 1 } : { scale: 1.08 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.6, ease: EASE }}
-          className="absolute inset-0"
-        >
-          <Image
-            src="/auth-hero.jpg"
-            alt="Modern luxury estate at dusk"
-            fill
-            priority
-            className="object-cover"
-            sizes="50vw"
-          />
-        </motion.div>
-        <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,38,27,0.2)] to-[rgba(0,38,27,0.8)]" />
-      </div>
-
-      <div className={`relative flex h-full w-full flex-col items-start justify-between ${FLUID.heroPad}`}>
-        <motion.div {...fadeUp(0)} className="flex w-full items-center gap-2">
-          <div className={`relative shrink-0 ${FLUID.logoBox}`}>
-            <Image
-              src="/auth-logo-mark.png"
-              alt=""
-              fill
-              className="object-contain object-bottom [filter:brightness(0)_invert(1)]"
-            />
-          </div>
-          <p className={`${FLUID.brandText} font-bold leading-tight tracking-[-0.5px] text-white`}>
-            Festari Estates
-          </p>
-        </motion.div>
-
-        <AnimatePresence mode="wait" initial={false}>
+      <div className="relative h-full w-full overflow-hidden rounded-3xl">
+        <div className="absolute inset-0">
           <motion.div
-            key={mode}
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -16 }}
-            transition={{ duration: 0.4, ease: EASE }}
-            className={`flex w-full max-w-[576px] flex-col ${FLUID.heroGap}`}
+            initial={shouldReduceMotion ? { scale: 1 } : { scale: 1.08 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 1.6, ease: EASE }}
+            className="absolute inset-0"
           >
-            <h1 className={`${hero.headingClassName} text-white`}>
-              {hero.headingLines.map((line) => (
-                <span key={line} className="block">
-                  {line}
-                </span>
-              ))}
-            </h1>
-
-            <p className={`${FLUID.paragraph} max-w-[576px] leading-relaxed text-white/80`}>
-              {hero.description}
-            </p>
-
-            {hero.statsVariant === "list" ? (
-              <div className="flex w-full items-center gap-[clamp(1.25rem,3vw,2rem)] border-l-2 border-[#be4d00] pl-[clamp(1rem,2vw,1.625rem)]">
-                {hero.stats.map((stat) => (
-                  <div key={stat.label}>
-                    <p className={`${FLUID.statValue} font-bold leading-tight text-white`}>{stat.value}</p>
-                    <p className={`${FLUID.statLabel} leading-tight text-white/60`}>{stat.label}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex w-full items-start justify-center gap-[clamp(0.75rem,2vw,1.5rem)]">
-                {hero.stats.map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="flex flex-1 flex-col gap-1 rounded-xl border border-white/15 bg-white/5 px-[clamp(1rem,2vw,1.5rem)] py-[clamp(1rem,2.2vh,1.5rem)] backdrop-blur-[10px]"
-                  >
-                    <p className={`${FLUID.statValue} font-semibold leading-tight text-[#ffe088]`}>{stat.value}</p>
-                    <p className={`${FLUID.statLabel} font-semibold leading-tight tracking-[0.7px] text-white/70`}>
-                      {stat.label}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
+            <Image
+              src="/auth-hero.jpg"
+              alt="Modern luxury estate at dusk"
+              fill
+              priority
+              className="object-cover"
+              sizes="50vw"
+            />
           </motion.div>
-        </AnimatePresence>
+          <div className="absolute inset-0 bg-gradient-to-b from-[rgba(0,38,27,0.2)] to-[rgba(0,38,27,0.8)]" />
+        </div>
 
-        <motion.div {...fadeUp(0.35)} className="flex w-full items-center justify-between">
-          <p className={`${FLUID.footerText} leading-tight text-white/50`}>© 2026 Festari Estates Group</p>
-          <div className="flex items-center gap-4">
-            <Link href="/privacy" className={`${FLUID.footerText} leading-tight text-white/50 transition-colors hover:text-white`}>
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className={`${FLUID.footerText} leading-tight text-white/50 transition-colors hover:text-white`}>
-              Terms of Service
-            </Link>
-          </div>
-        </motion.div>
+        <div className={`relative flex h-full w-full flex-col items-start justify-between ${FLUID.heroPad}`}>
+          <motion.div {...fadeUp(0)} className="flex w-full items-center gap-2">
+            <div className={`relative shrink-0 ${FLUID.logoBox}`}>
+              <Image
+                src="/auth-logo-mark.png"
+                alt=""
+                fill
+                className="object-contain object-bottom [filter:brightness(0)_invert(1)]"
+              />
+            </div>
+            <p className={`${FLUID.brandText} font-bold leading-tight tracking-[-0.5px] text-white`}>
+              Festari Estates
+            </p>
+          </motion.div>
+
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={mode}
+              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -16 }}
+              transition={{ duration: 0.4, ease: EASE }}
+              className={`flex w-full max-w-[576px] flex-col ${FLUID.heroGap}`}
+            >
+              <h1 className={`${hero.headingClassName} text-white`}>
+                {hero.headingLines.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </h1>
+
+              <p className={`${FLUID.paragraph} max-w-[576px] leading-relaxed text-white/80`}>
+                {hero.description}
+              </p>
+
+              {hero.statsVariant === "list" ? (
+                <div className="flex w-full items-center gap-[clamp(1.25rem,3vw,2rem)] border-l-2 border-[#be4d00] pl-[clamp(1rem,2vw,1.625rem)]">
+                  {hero.stats.map((stat) => (
+                    <div key={stat.label}>
+                      <p className={`${FLUID.statValue} font-bold leading-tight text-white`}>{stat.value}</p>
+                      <p className={`${FLUID.statLabel} leading-tight text-white/60`}>{stat.label}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex w-full items-start justify-center gap-[clamp(0.75rem,2vw,1.5rem)]">
+                  {hero.stats.map((stat) => (
+                    <div
+                      key={stat.label}
+                      className="flex flex-1 flex-col gap-1 rounded-xl border border-white/15 bg-white/5 px-[clamp(1rem,2vw,1.5rem)] py-[clamp(1rem,2.2vh,1.5rem)] backdrop-blur-[10px]"
+                    >
+                      <p className={`${FLUID.statValue} font-semibold leading-tight text-[#ffe088]`}>{stat.value}</p>
+                      <p className={`${FLUID.statLabel} font-semibold leading-tight tracking-[0.7px] text-white/70`}>
+                        {stat.label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+
+          <motion.div {...fadeUp(0.35)} className="flex w-full items-center justify-between">
+            <p className={`${FLUID.footerText} leading-tight text-white/50`}>© 2026 Festari Estates Group</p>
+            <div className="flex items-center gap-4">
+              <Link href="/privacy" className={`${FLUID.footerText} leading-tight text-white/50 transition-colors hover:text-white`}>
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className={`${FLUID.footerText} leading-tight text-white/50 transition-colors hover:text-white`}>
+                Terms of Service
+              </Link>
+            </div>
+          </motion.div>
+        </div>
       </div>
     </motion.div>
   );
