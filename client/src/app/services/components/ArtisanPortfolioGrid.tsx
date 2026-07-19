@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import toast from "react-hot-toast";
+import Link from "next/link";
 import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
 import { ARTISAN_PROFILES, type ArtisanProfile } from "@/lib/artisanShowcase";
 
@@ -46,14 +46,13 @@ function ArtisanCard({ artisan }: { artisan: ArtisanProfile }) {
 
           <p className="line-clamp-2 text-base text-white/60">{artisan.bio}</p>
 
-          <button
-            type="button"
-            onClick={() => toast.success(`Opening ${artisan.name}'s portfolio…`)}
+          <Link
+            href={`/services/${artisan.id}`}
             className="flex items-center justify-center gap-2 rounded-lg border border-white/20 py-3.5 text-sm font-semibold tracking-[0.7px] text-white transition-colors hover:bg-white/10"
           >
             View Portfolio
             <ArrowIcon />
-          </button>
+          </Link>
         </div>
       </div>
     </StaggerItem>
