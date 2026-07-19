@@ -62,11 +62,36 @@ function ArtisanCard({ artisan }: { artisan: ArtisanProfile }) {
 export default function ArtisanPortfolioGrid() {
   return (
     <section id="portfolio" className="w-full bg-white px-5 py-16 md:px-16 md:py-24">
-      <StaggerContainer className="mx-auto grid max-w-[1152px] grid-cols-1 gap-6 md:grid-cols-3">
-        {ARTISAN_PROFILES.map((artisan) => (
-          <ArtisanCard key={artisan.id} artisan={artisan} />
-        ))}
-      </StaggerContainer>
+      <div className="mx-auto flex max-w-[1152px] flex-col gap-12">
+        <StaggerContainer className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {ARTISAN_PROFILES.map((artisan) => (
+            <ArtisanCard key={artisan.id} artisan={artisan} />
+          ))}
+        </StaggerContainer>
+
+        <div className="flex items-center justify-center gap-2" aria-hidden="true">
+          <span className="flex size-12 items-center justify-center rounded-full border border-[#c0c8c3] text-[#414944]">
+            <svg width="8" height="12" viewBox="0 0 8 12" fill="none">
+              <path d="M7 1 1 6l6 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+          {[1, 2, 3].map((page) => (
+            <span
+              key={page}
+              className={`flex size-12 items-center justify-center rounded-full text-base font-bold ${
+                page === 1 ? "bg-[#00261b] text-white" : "border border-[#c0c8c3] text-[#414944]"
+              }`}
+            >
+              {page}
+            </span>
+          ))}
+          <span className="flex size-12 items-center justify-center rounded-full border border-[#c0c8c3] text-[#414944]">
+            <svg width="8" height="12" viewBox="0 0 8 12" fill="none">
+              <path d="M1 1l6 5-6 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+        </div>
+      </div>
     </section>
   );
 }
