@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { label: "Hotels", href: "/hotel" },
   { label: "Artisans", href: "/services" },
   { label: "Pricings", href: "/pricing" },
+  { label: "Contact Us", href: "/contact" },
 ];
 
 export default function LandingNavbar({ overlay = false }: { overlay?: boolean }) {
