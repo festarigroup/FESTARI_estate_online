@@ -24,7 +24,7 @@ export default function WhoWeAreSection() {
               <span className="font-semibold text-[#00261b]">contemporary residences</span> where{" "}
               <span className="font-semibold text-[#00261b]">architecture, light and landscape</span> exist in{" "}
               <span className="font-semibold text-[#be4d00]">perfect balance</span>. Our focus is not just to
-              build houses — but to create spaces that{" "}
+              build houses, but to create spaces that{" "}
               <span className="font-semibold text-[#be4d00]">elevate living</span>.
             </p>
 

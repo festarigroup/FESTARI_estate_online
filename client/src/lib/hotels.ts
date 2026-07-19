@@ -12,7 +12,7 @@ export const HOTEL_HOST = {
   name: "Ama & Kwabena",
   role: "Superhost",
   yearsHosting: 6,
-  bio: "We personally inspect every stay in our portfolio and are on call throughout your visit — usually reachable within the hour.",
+  bio: "We personally inspect every stay in our portfolio and are on call throughout your visit, usually reachable within the hour.",
 };
 
 export type Hotel = {

@@ -79,7 +79,7 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
 
           <motion.button
             type="button"
-            onClick={() => toast.success(`Welcome to the ${plan.name} tier — our team will follow up shortly.`)}
+            onClick={() => toast.success(`Welcome to the ${plan.name} tier. Our team will follow up shortly.`)}
             whileHover={shouldReduceMotion ? undefined : { y: -1 }}
             whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
             className="rounded-xl bg-[#be4d00] px-4 py-3.5 text-lg text-white transition-colors hover:bg-[#a54300]"
@@ -114,7 +114,7 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
 
         <button
           type="button"
-          onClick={() => toast.success(`Thanks for your interest in the ${plan.name} tier — we'll be in touch.`)}
+          onClick={() => toast.success(`Thanks for your interest in the ${plan.name} tier. We'll be in touch.`)}
           className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3.5 text-lg text-[#06090e] transition-colors hover:bg-white"
         >
           {plan.cta}

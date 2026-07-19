@@ -15,7 +15,7 @@ const FAQS = [
   {
     question: "How does booking work?",
     answer:
-      "Select your dates and guest count, then reserve directly through the listing — no fees, no middlemen. You'll receive confirmation and check-in details within minutes.",
+      "Select your dates and guest count, then reserve directly through the listing: no fees, no middlemen. You'll receive confirmation and check-in details within minutes.",
   },
   {
     question: "What's your cancellation policy?",
@@ -25,7 +25,7 @@ const FAQS = [
   {
     question: "Is breakfast included?",
     answer:
-      "It varies by property — look for the amenities listed on each hotel's page. Many of our boutique partners include breakfast as standard.",
+      "It varies by property. Look for the amenities listed on each hotel's page. Many of our boutique partners include breakfast as standard.",
   },
   {
     question: "Can I book for a group or event?",
@@ -35,7 +35,7 @@ const FAQS = [
   {
     question: "How do I list my own hotel?",
     answer:
-      "Reach out through \"Become a host\" — our team will assess your property, arrange professional photography, and position it within our curated portfolio.",
+      "Reach out through \"Become a host.\" Our team will assess your property, arrange professional photography, and position it within our curated portfolio.",
   },
 ];
 
@@ -66,7 +66,7 @@ export default function HotelFAQSection() {
         <div className="mx-auto max-w-[820px] text-center">
           <h2 className={`${montserrat.className} text-[28px] font-semibold leading-tight text-white md:text-[36px]`}>
             <span className="text-[#ffe088]">We believe</span> great hospitality starts with asking the right
-            questions — <span className="text-white">about comfort, service, and the way a stay shapes your
+            questions <span className="text-white">about comfort, service, and the way a stay shapes your
             trip.</span>
           </h2>
         </div>

@@ -9,7 +9,29 @@ import PageTransition from "@/components/motion/PageTransition";
 import Reveal from "@/components/motion/Reveal";
 
 // Routes that render full-bleed, without the site sidebar/navbar/footer chrome.
-const BARE_ROUTES = ["/home", "/property", "/hotel", "/services", "/pricing", "/contact", "/login", "/signup", "/verify-otp", "/verify-otp/change-contact", "/forgot-password"];
+const BARE_ROUTES = [
+  "/home",
+  "/property",
+  "/hotel",
+  "/services",
+  "/pricing",
+  "/contact",
+  "/login",
+  "/signup",
+  "/verify-otp",
+  "/verify-otp/change-contact",
+  "/forgot-password",
+  "/about",
+  "/become-host",
+  "/artisans",
+  "/agents",
+  "/properties",
+  "/howitworks",
+  "/signin",
+  "/bookings",
+  "/sitemap",
+  "/privacy",
+];
 const BARE_ROUTE_PREFIXES = ["/property/", "/services/"];
 // Matches /hotel/[hotelId] but not nested routes like /hotel/[hotelId]/reserve,
 // which still uses the legacy dashboard chrome.

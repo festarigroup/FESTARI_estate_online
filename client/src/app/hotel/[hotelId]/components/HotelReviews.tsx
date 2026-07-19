@@ -17,7 +17,7 @@ const REVIEWS = [
     location: "London, UK",
     stay: "Stayed a week",
     quote:
-      "Quiet, well run, and exactly as described. The little touches — fresh flowers, a handwritten welcome note — made the stay feel personal.",
+      "Quiet, well run, and exactly as described. The little touches, like fresh flowers and a handwritten welcome note, made the stay feel personal.",
   },
   {
     name: "Priya Nair",

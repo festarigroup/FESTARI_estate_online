@@ -15,7 +15,7 @@ const TESTIMONIALS: Testimonial[] = [
     location: "Accra, Ghana",
   },
   {
-    quote: "Finding a vetted interior designer was effortless — three quotes within days, no back and forth.",
+    quote: "Finding a vetted interior designer was effortless: three quotes within days, no back and forth.",
     name: "James Chen",
     role: "Homeowner",
     location: "London, UK",

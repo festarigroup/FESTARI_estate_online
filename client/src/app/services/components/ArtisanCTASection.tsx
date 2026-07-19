@@ -25,7 +25,7 @@ export default function ArtisanCTASection() {
         <div className="flex items-center gap-6">
           <button
             type="button"
-            onClick={() => toast.success("Thanks for your interest — our guild team will reach out shortly.")}
+            onClick={() => toast.success("Thanks for your interest. Our guild team will reach out shortly.")}
             className="whitespace-nowrap rounded-xl bg-[#be4d00] px-4 py-3.5 text-lg text-white transition-colors hover:bg-[#a54300]"
           >
             Become artisan

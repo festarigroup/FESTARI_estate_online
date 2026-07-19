@@ -19,7 +19,7 @@ const FAQS = [
   {
     question: "Do you handle international property inquiries?",
     answer:
-      "Absolutely — our hubs in London, New York, and Tarkwa coordinate cross-border acquisitions, due diligence, and relocation support.",
+      "Absolutely. Our hubs in London, New York, and Tarkwa coordinate cross-border acquisitions, due diligence, and relocation support.",
   },
   {
     question: "Is there a dedicated concierge for Legacy members?",
@@ -29,7 +29,7 @@ const FAQS = [
   {
     question: "What information should I include in my message?",
     answer:
-      "Let us know the type of inquiry, your timeline, and any specific properties, hotels, or artisans you have in mind — the more context, the faster we can help.",
+      "Let us know the type of inquiry, your timeline, and any specific properties, hotels, or artisans you have in mind. The more context, the faster we can help.",
   },
 ];
 

@@ -129,7 +129,7 @@ export const PROPERTIES: Property[] = [
     parking: 1,
     description: [
       "Chelsea Heights Penthouse sits above King's Road with a wraparound terrace and an uninterrupted line of sight across the rooftops toward the City skyline.",
-      "The interior favours warm stone and brushed brass against a neutral palette, letting the view — rather than the finish — carry each room.",
+      "The interior favours warm stone and brushed brass against a neutral palette, letting the view, rather than the finish, carry each room.",
     ],
   },
   {
