@@ -1,7 +1,3 @@
-"use client";
-
-import { useRef } from "react";
-import { useReducedMotion } from "framer-motion";
 import { montserrat } from "@/app/home/landing-fonts";
 
 type Review = {
@@ -38,20 +34,6 @@ const REVIEWS: Review[] = [
   },
 ];
 
-function ArrowIcon({ direction }: { direction: "left" | "right" }) {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-      <path
-        d={direction === "left" ? "M15 6l-6 6 6 6" : "M9 6l6 6-6 6"}
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 function QuoteMarkIcon() {
   return (
     <svg width="28" height="22" viewBox="0 0 28 22" fill="none" className="text-[#c0c8c3]">
@@ -78,66 +60,43 @@ function AvatarFallback({ name }: { name: string }) {
   );
 }
 
-export default function ArtisanReviewsSection() {
-  const shouldReduceMotion = useReducedMotion();
-  const scrollerRef = useRef<HTMLDivElement>(null);
+function ReviewCard({ review }: { review: Review }) {
+  return (
+    <div className="flex w-[340px] shrink-0 flex-col gap-6 rounded-2xl bg-white p-8">
+      <div className="flex items-center justify-between gap-3">
+        <AvatarFallback name={review.name} />
+        <span className="rounded-full bg-[#f6f3f2] px-3 py-1.5 text-xs font-semibold tracking-[0.7px] text-[#414944]">
+          {review.role}
+        </span>
+      </div>
+      <QuoteMarkIcon />
+      <p className="min-h-[80px] text-lg font-medium leading-relaxed text-[#00261b]">{review.quote}</p>
+      <div>
+        <p className="text-sm font-semibold tracking-[0.7px] text-[#00261b]">{review.name}</p>
+        <p className="text-sm text-[#717974]">{review.location}</p>
+      </div>
+    </div>
+  );
+}
 
-  const scrollByCard = (direction: 1 | -1) => {
-    scrollerRef.current?.scrollBy({ left: direction * 380, behavior: shouldReduceMotion ? "auto" : "smooth" });
-  };
+export default function ArtisanReviewsSection() {
+  const cards = [...REVIEWS, ...REVIEWS];
 
   return (
-    <section className="w-full bg-black px-5 py-16 md:px-16 md:py-24">
-      <div className="mx-auto flex max-w-[1280px] flex-col gap-10">
-        <div className="flex flex-wrap items-end justify-between gap-6">
-          <div className="flex flex-col gap-3">
-            <p className="text-sm font-semibold uppercase tracking-[1.4px] text-white/60">Our Reviews</p>
-            <h2 className={`${montserrat.className} text-[32px] font-semibold text-white md:text-[40px]`}>
-              What Our Clients Say
-            </h2>
-          </div>
-          <div className="hidden items-center gap-4 sm:flex">
-            <button
-              type="button"
-              onClick={() => scrollByCard(-1)}
-              aria-label="Previous review"
-              className="flex size-12 items-center justify-center rounded-full border-2 border-[#c0c8c3] text-white transition-colors hover:bg-white/10"
-            >
-              <ArrowIcon direction="left" />
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollByCard(1)}
-              aria-label="Next review"
-              className="flex size-12 items-center justify-center rounded-full bg-[#be4d00] text-white transition-colors hover:bg-[#a54300]"
-            >
-              <ArrowIcon direction="right" />
-            </button>
-          </div>
+    <section className="w-full overflow-hidden bg-black py-16 md:py-24">
+      <div className="mx-auto max-w-[1280px] px-5 md:px-16">
+        <div className="flex flex-col gap-3">
+          <p className="text-sm font-semibold uppercase tracking-[1.4px] text-white/60">Our Reviews</p>
+          <h2 className={`${montserrat.className} text-[32px] font-semibold text-white md:text-[40px]`}>
+            What Our Clients Say
+          </h2>
         </div>
+      </div>
 
-        <div
-          ref={scrollerRef}
-          className="scrollbar-orange flex gap-6 overflow-x-auto scroll-smooth pb-2 [scroll-snap-type:x_mandatory]"
-        >
-          {REVIEWS.map((review) => (
-            <div
-              key={review.name}
-              className="flex w-[340px] shrink-0 flex-col gap-6 rounded-2xl bg-white p-8 [scroll-snap-align:start]"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <AvatarFallback name={review.name} />
-                <span className="rounded-full bg-[#f6f3f2] px-3 py-1.5 text-xs font-semibold tracking-[0.7px] text-[#414944]">
-                  {review.role}
-                </span>
-              </div>
-              <QuoteMarkIcon />
-              <p className="min-h-[80px] text-lg font-medium leading-relaxed text-[#00261b]">{review.quote}</p>
-              <div>
-                <p className="text-sm font-semibold tracking-[0.7px] text-[#00261b]">{review.name}</p>
-                <p className="text-sm text-[#717974]">{review.location}</p>
-              </div>
-            </div>
+      <div className="mt-10 w-full">
+        <div className="animate-marquee-slow flex w-max gap-6 px-5 md:px-16">
+          {cards.map((review, i) => (
+            <ReviewCard key={`${review.name}-${i}`} review={review} />
           ))}
         </div>
       </div>
