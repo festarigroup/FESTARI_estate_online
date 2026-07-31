@@ -1,1 +1,0 @@
-export type PropertyStatus = "pending" | "approved" | "rejected"
