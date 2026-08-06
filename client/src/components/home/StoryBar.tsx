@@ -1,13 +1,23 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { StoryAvatar } from "@/components/home/StoryAvatar";
+import { CreateStoryModal } from "@/components/home/CreateStoryModal";
+import { StoryViewer } from "@/components/home/StoryViewer";
 import { STORIES } from "@/lib/mock-data";
+import type { Story } from "@/types/home";
 
 /** Horizontal story rail ("Horizontal Story Bar" in Figma), with a scroll-next button. */
 export function StoryBar() {
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const [stories, setStories] = useState<Story[]>(STORIES);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+
+  function handleCreateStory(story: Story) {
+    setStories((prev) => [story, ...prev]);
+  }
 
   return (
     <div className="relative w-full shrink-0 rounded-xl bg-white p-4 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
@@ -15,6 +25,7 @@ export function StoryBar() {
         <div className="flex shrink-0 flex-col items-center gap-2">
           <button
             aria-label="Create a story"
+            onClick={() => setModalOpen(true)}
             className="flex size-14 items-center justify-center rounded-full border-2 border-dashed border-muted text-muted hover:border-brand-gold hover:text-brand-gold"
           >
             <DynamicIcon name="Plus" className="size-4" />
@@ -22,8 +33,8 @@ export function StoryBar() {
           <span className="text-[11px] font-medium text-ink">Create Story</span>
         </div>
 
-        {STORIES.map((story) => (
-          <StoryAvatar key={story.id} story={story} />
+        {stories.map((story, i) => (
+          <StoryAvatar key={story.id} story={story} onClick={() => setViewerIndex(i)} />
         ))}
       </div>
 
@@ -34,6 +45,20 @@ export function StoryBar() {
       >
         <DynamicIcon name="ChevronRight" className="size-4" />
       </button>
+
+      <CreateStoryModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onCreate={handleCreateStory}
+      />
+
+      {viewerIndex !== null && (
+        <StoryViewer
+          stories={stories}
+          initialIndex={viewerIndex}
+          onClose={() => setViewerIndex(null)}
+        />
+      )}
     </div>
   );
 }

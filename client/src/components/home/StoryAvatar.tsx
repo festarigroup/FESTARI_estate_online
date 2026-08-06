@@ -3,9 +3,9 @@ import { Badge } from "@/components/ui/Badge";
 import type { Story } from "@/types/home";
 
 /** One story bubble: ringed avatar, name, and an optional LIVE badge. */
-export function StoryAvatar({ story }: { story: Story }) {
+export function StoryAvatar({ story, onClick }: { story: Story; onClick: () => void }) {
   return (
-    <div className="flex shrink-0 flex-col items-center gap-2">
+    <button onClick={onClick} className="flex shrink-0 flex-col items-center gap-2">
       <div className="relative">
         <Avatar
           src={story.avatar}
@@ -23,6 +23,6 @@ export function StoryAvatar({ story }: { story: Story }) {
         )}
       </div>
       <span className="text-[11px] font-medium whitespace-nowrap text-ink">{story.name}</span>
-    </div>
+    </button>
   );
 }
