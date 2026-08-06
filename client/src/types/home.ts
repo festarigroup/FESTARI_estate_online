@@ -6,6 +6,12 @@ export interface Story {
   avatar: string;
   ringColor: "gold" | "live";
   isLive?: boolean;
+  /** Shown in the story viewer's header, e.g. "2h ago". Defaults to "Active now". */
+  postedAt?: string;
+  caption?: string;
+  /** Full-bleed photo the viewer opens to. Falls back to `avatar` — set this
+   * only when `avatar`'s asset isn't fit for full-screen (see mock-data.ts). */
+  storyImage?: string;
 }
 
 export interface PostAuthor {
@@ -22,6 +28,32 @@ export interface GalleryImage {
   alt: string;
 }
 
+/** Lighter than `PostAuthor` — comments don't carry a "2h ago • Accra"-style
+ * subtitle or a verified badge, just who said what. */
+export interface CommentAuthor {
+  name: string;
+  avatar?: string;
+  avatarIcon?: IconName;
+}
+
+export interface Comment {
+  id: string;
+  author: CommentAuthor;
+  body: string;
+  createdAt: string;
+}
+
+export interface PollOption {
+  id: string;
+  text: string;
+  votes: number;
+}
+
+export interface Poll {
+  question: string;
+  options: PollOption[];
+}
+
 export interface PropertyPost {
   id: string;
   kind: "property";
@@ -30,7 +62,8 @@ export interface PropertyPost {
   hashtags: string;
   images: GalleryImage[];
   totalImages: number;
-  reactions: { likes: number; comments: number; shares: number };
+  reactions: { likes: number; shares: number };
+  comments: Comment[];
 }
 
 export interface ServicePost {
@@ -39,9 +72,23 @@ export interface ServicePost {
   author: PostAuthor;
   body: string[];
   image: GalleryImage;
+  comments: Comment[];
 }
 
-export type FeedPost = PropertyPost | ServicePost;
+/** A post created through the composer modal — free-form text plus at most
+ * one attachment type (photos, a property/service tag, or a poll). */
+export interface GeneralPost {
+  id: string;
+  kind: "general";
+  author: PostAuthor;
+  body: string[];
+  images?: GalleryImage[];
+  poll?: Poll;
+  tag?: "property" | "service";
+  comments: Comment[];
+}
+
+export type FeedPost = PropertyPost | ServicePost | GeneralPost;
 
 export interface Category {
   id: string;

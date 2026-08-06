@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { cn } from "@/lib/cn";
+import { isLocalPreviewUrl } from "@/lib/is-local-preview-url";
 import { DynamicIcon, type IconName } from "@/components/ui/DynamicIcon";
 
 interface AvatarProps {
@@ -22,7 +23,22 @@ const RING_STYLES: Record<NonNullable<AvatarProps["ring"]>, string> = {
 
 /** Circular avatar image, optionally wrapped in a story-style colored ring. */
 export function Avatar({ src, alt, icon, size = 40, ring = "none", className }: AvatarProps) {
-  const image = src ? (
+  // next/image's optimizer can't fetch blob:/data: URLs (locally-picked files
+  // previewed before upload, e.g. a new story) — fall back to a plain <img>
+  // for those instead of erroring.
+  const isLocalPreview = !!src && isLocalPreviewUrl(src);
+
+  const image = !src ? (
+    <span
+      className="flex size-full items-center justify-center rounded-full bg-surface-muted-2"
+      title={alt}
+    >
+      <DynamicIcon name={icon ?? "Building2"} className="size-[42%] text-brand-navy" />
+    </span>
+  ) : isLocalPreview ? (
+    // eslint-disable-next-line @next/next/no-img-element -- blob:/data: preview, see above
+    <img src={src} alt={alt} className="size-full rounded-full object-cover" />
+  ) : (
     <Image
       src={src}
       alt={alt}
@@ -30,13 +46,6 @@ export function Avatar({ src, alt, icon, size = 40, ring = "none", className }: 
       height={size}
       className="size-full rounded-full object-cover"
     />
-  ) : (
-    <span
-      className="flex size-full items-center justify-center rounded-full bg-surface-muted-2"
-      title={alt}
-    >
-      <DynamicIcon name={icon ?? "Building2"} className="size-[42%] text-brand-navy" />
-    </span>
   );
 
   if (ring === "none") {

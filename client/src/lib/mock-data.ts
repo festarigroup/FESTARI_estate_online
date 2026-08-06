@@ -30,12 +30,18 @@ export const NAV_SECONDARY_ITEMS: NavItem[] = [
 ];
 
 export const STORIES: Story[] = [
-  { id: "ama-serwaa", name: "Ama Serwaa", avatar: "/images/avatar-ama-serwaa-story.png", ringColor: "gold" },
-  { id: "builders-gh", name: "Builders GH", avatar: "/images/avatar-builders-gh-story.png", ringColor: "live", isLive: true },
-  { id: "dee-interiors", name: "Dee Interiors", avatar: "/images/avatar-dee-interiors-story.png", ringColor: "gold" },
-  { id: "brightfix", name: "BrightFix", avatar: "/images/avatar-brightfix-story.png", ringColor: "gold" },
-  { id: "luxury-stays", name: "Luxury Stays", avatar: "/images/avatar-luxury-stays-story.png", ringColor: "gold" },
-  { id: "kojo-mensah", name: "Kojo Mensah", avatar: "/images/avatar-kojo-mensah-story.png", ringColor: "gold" },
+  { id: "ama-serwaa", name: "Ama Serwaa", avatar: "/images/avatar-ama-serwaa-story.png", ringColor: "gold", postedAt: "2h ago", caption: "House hunting all weekend 🏡" },
+  // avatar-builders-gh-story.png / avatar-dee-interiors-story.png are the
+  // same class of broken Figma asset as BrightFix's logo (see FeedPostCard):
+  // the exported "photo" is actually a fake app-mockup screenshot, not a
+  // real photo. Invisible cropped to a 56px circle, obviously wrong shown
+  // full-screen in the story viewer — storyImage substitutes an actual
+  // photo already in this asset pool, thematically fitting each business.
+  { id: "builders-gh", name: "Builders GH", avatar: "/images/avatar-builders-gh-story.png", storyImage: "/images/property-trending-1.png", ringColor: "live", isLive: true, postedAt: "Active now", caption: "Live from the East Legon site" },
+  { id: "dee-interiors", name: "Dee Interiors", avatar: "/images/avatar-dee-interiors-story.png", storyImage: "/images/post-house-thumb-2.png", ringColor: "gold", postedAt: "4h ago", caption: "New moodboard for a client reveal" },
+  { id: "brightfix", name: "BrightFix", avatar: "/images/avatar-brightfix-story.png", ringColor: "gold", postedAt: "5h ago" },
+  { id: "luxury-stays", name: "Luxury Stays", avatar: "/images/avatar-luxury-stays-story.png", ringColor: "gold", postedAt: "8h ago", caption: "Sunset check-ins hit different" },
+  { id: "kojo-mensah", name: "Kojo Mensah", avatar: "/images/avatar-kojo-mensah-story.png", ringColor: "gold", postedAt: "10h ago" },
 ];
 
 export const FEED_POSTS: FeedPost[] = [
@@ -59,7 +65,21 @@ export const FEED_POSTS: FeedPost[] = [
       { src: "/images/post-house-main.png", alt: "East Legon house exterior at dusk" },
     ],
     totalImages: 8,
-    reactions: { likes: 128, comments: 26, shares: 15 },
+    reactions: { likes: 128, shares: 15 },
+    comments: [
+      {
+        id: "post-1-comment-1",
+        author: { name: "Kojo Mensah", avatar: "/images/avatar-kojo-mensah-follow.png" },
+        body: "This is stunning! Is the pool heated?",
+        createdAt: "1h ago",
+      },
+      {
+        id: "post-1-comment-2",
+        author: { name: "Dee Interiors", avatar: "/images/avatar-dee-interiors-follow.png" },
+        body: "That kitchen island though 😍 gorgeous finishes.",
+        createdAt: "45m ago",
+      },
+    ],
   },
   {
     id: "post-2",
@@ -78,6 +98,14 @@ export const FEED_POSTS: FeedPost[] = [
       "Book us now and let's power your home safely. ⚡",
     ],
     image: { src: "/images/post-electrician.png", alt: "BrightFix electrician installing a chandelier" },
+    comments: [
+      {
+        id: "post-2-comment-1",
+        author: { name: "Builders GH", avatar: "/images/avatar-builders-gh-follow.png" },
+        body: "Do you cover Kumasi as well?",
+        createdAt: "2h ago",
+      },
+    ],
   },
 ];
 

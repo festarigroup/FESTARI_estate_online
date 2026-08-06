@@ -1,12 +1,19 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { PostHeader } from "@/components/home/PostHeader";
 import { PostEngagementBar } from "@/components/home/PostEngagementBar";
+import { CommentsSection } from "@/components/home/CommentsSection";
+import { usePostComments } from "@/hooks/usePostComments";
 import type { PropertyPost } from "@/types/home";
 
 /** "Article - Post: Property Listing" — body copy, image gallery, reactions, actions. */
 export function PropertyPostCard({ post }: { post: PropertyPost }) {
   const [main, thumb1, thumb2] = post.images;
+  const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.comments);
+  const [shares, setShares] = useState(post.reactions.shares);
 
   return (
     <article className="flex w-full shrink-0 flex-col overflow-hidden rounded-xl bg-white shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
@@ -49,12 +56,18 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
             <span className="text-sm text-muted">{post.reactions.likes} likes</span>
           </div>
           <div className="flex gap-4 text-sm text-muted">
-            <span>{post.reactions.comments} Comments</span>
-            <span>{post.reactions.shares} Shares</span>
+            <span>{comments.length} Comments</span>
+            <span>{shares} Shares</span>
           </div>
         </div>
 
-        <PostEngagementBar postAuthor={post.author.name} />
+        <PostEngagementBar
+          post={post}
+          commentsOpen={commentsOpen}
+          onToggleComments={toggleComments}
+          onShare={() => setShares((s) => s + 1)}
+        />
+        {commentsOpen && <CommentsSection comments={comments} onAddComment={addComment} />}
       </div>
     </article>
   );
