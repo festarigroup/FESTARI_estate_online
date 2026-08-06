@@ -31,14 +31,8 @@ export const NAV_SECONDARY_ITEMS: NavItem[] = [
 
 export const STORIES: Story[] = [
   { id: "ama-serwaa", name: "Ama Serwaa", avatar: "/images/avatar-ama-serwaa-story.png", ringColor: "gold", postedAt: "2h ago", caption: "House hunting all weekend 🏡" },
-  // avatar-builders-gh-story.png / avatar-dee-interiors-story.png are the
-  // same class of broken Figma asset as BrightFix's logo (see FeedPostCard):
-  // the exported "photo" is actually a fake app-mockup screenshot, not a
-  // real photo. Invisible cropped to a 56px circle, obviously wrong shown
-  // full-screen in the story viewer — storyImage substitutes an actual
-  // photo already in this asset pool, thematically fitting each business.
-  { id: "builders-gh", name: "Builders GH", avatar: "/images/avatar-builders-gh-story.png", storyImage: "/images/property-trending-1.png", ringColor: "live", isLive: true, postedAt: "Active now", caption: "Live from the East Legon site" },
-  { id: "dee-interiors", name: "Dee Interiors", avatar: "/images/avatar-dee-interiors-story.png", storyImage: "/images/post-house-thumb-2.png", ringColor: "gold", postedAt: "4h ago", caption: "New moodboard for a client reveal" },
+  { id: "builders-gh", name: "Builders GH", avatar: "/images/avatar-builders-gh-story.png", ringColor: "live", isLive: true, postedAt: "Active now", caption: "Live from the East Legon site" },
+  { id: "dee-interiors", name: "Dee Interiors", avatar: "/images/avatar-dee-interiors-story.png", ringColor: "gold", postedAt: "4h ago", caption: "New moodboard for a client reveal" },
   { id: "brightfix", name: "BrightFix", avatar: "/images/avatar-brightfix-story.png", ringColor: "gold", postedAt: "5h ago" },
   { id: "luxury-stays", name: "Luxury Stays", avatar: "/images/avatar-luxury-stays-story.png", ringColor: "gold", postedAt: "8h ago", caption: "Sunset check-ins hit different" },
   { id: "kojo-mensah", name: "Kojo Mensah", avatar: "/images/avatar-kojo-mensah-story.png", ringColor: "gold", postedAt: "10h ago" },
@@ -85,11 +79,8 @@ export const FEED_POSTS: FeedPost[] = [
     id: "post-2",
     kind: "service",
     author: {
-      // No `avatar`: BrightFix's logo asset didn't resolve to a usable image
-      // from the Figma file (exported bytes were an unrelated placeholder
-      // thumbnail) — falls back to the icon avatar instead of a wrong crop.
       name: "BrightFix Electricals",
-      avatarIcon: "Wrench",
+      avatar: "/images/avatar-brightfix-post.png",
       verified: true,
       subtitle: "4h ago • Service Provider",
     },
@@ -152,9 +143,7 @@ export const TRENDING_PROPERTIES: TrendingProperty[] = [
 ];
 
 export const TOP_SERVICE_PROVIDERS: ServiceProvider[] = [
-  // BrightFix's exported logo asset didn't resolve to a usable image from the
-  // Figma file either (see FEED_POSTS) — same icon fallback as the post author.
-  { id: "brightfix", name: "BrightFix", icon: "Wrench", rating: 4.9 },
+  { id: "brightfix", name: "BrightFix", avatar: "/images/avatar-brightfix-provider.png", rating: 4.9 },
   { id: "dee-interiors", name: "Dee Interiors", icon: "PencilRuler", rating: 4.8 },
   { id: "buildwell-gh", name: "BuildWell GH", icon: "HardHat", rating: 4.9 },
   { id: "fixright", name: "FixRight", icon: "Wrench", rating: 4.7 },

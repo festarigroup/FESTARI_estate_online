@@ -22,15 +22,14 @@ interface StoryViewerProps {
  * since that's the universal convention for "open a story."
  *
  * Reuses each story's avatar image as the full-bleed photo (via `storyImage`,
- * falling back to `avatar`): the app has no separate "story content" asset
- * for most people, so the same picture the rail shows is what plays here —
- * real for freshly-created stories, since that photo IS what the user just
- * picked. Two seeded stories (Builders GH, Dee Interiors) set `storyImage`
- * to a substitute photo instead, because their `avatar` asset turned out to
- * be a broken Figma placeholder (a fake app-mockup screenshot, not a real
- * photo — invisible cropped to a 56px circle, obviously wrong full-screen).
- * The rest were genuinely cropped for a 56px circle to begin with, so expect
- * softer detail blown up full-screen.
+ * falling back to `avatar`): the app has no separate "story content" asset,
+ * so the same picture the rail shows is what plays here — real for
+ * freshly-created stories, since that photo IS what the user just picked.
+ * `storyImage` exists as an escape hatch for a story whose `avatar` isn't
+ * fit for full-screen display (used earlier for two seeded stories whose
+ * Figma-exported avatar turned out to be a broken placeholder — see the
+ * asset-replacement notes in mock-data.ts's git history); no current story
+ * needs it now that those assets are fixed.
  */
 export function StoryViewer({ stories, initialIndex, onClose }: StoryViewerProps) {
   const [index, setIndex] = useState(initialIndex);
