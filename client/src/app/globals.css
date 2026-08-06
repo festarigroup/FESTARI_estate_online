@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8f9fa;
+  --foreground: #1a1a1a;
+
+  /* Festari brand tokens (from Figma variable defs + design context) */
+  --color-brand-navy: #001f3f;
+  --color-brand-navy-light: #2f486a;
+  --color-brand-gold: #c5a059;
+  --color-brand-rust: #d2691e;
+  --color-brand-blue: #3b82f6;
+
+  --color-ink: #1a1a1a;
+  --color-muted: #64748b;
+  --color-border-subtle: #e1e3e4;
+  --color-border: #d5d5d5;
+  --color-surface-muted: #f3f4f5;
+  --color-surface-muted-2: #edeeef;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-brand-navy: var(--color-brand-navy);
+  --color-brand-navy-light: var(--color-brand-navy-light);
+  --color-brand-gold: var(--color-brand-gold);
+  --color-brand-rust: var(--color-brand-rust);
+  --color-brand-blue: var(--color-brand-blue);
+
+  --color-ink: var(--color-ink);
+  --color-muted: var(--color-muted);
+  --color-border-subtle: var(--color-border-subtle);
+  --color-border: var(--color-border);
+  --color-surface-muted: var(--color-surface-muted);
+  --color-surface-muted-2: var(--color-surface-muted-2);
+
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-hanken-grotesk);
+  --font-display: var(--font-montserrat);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
