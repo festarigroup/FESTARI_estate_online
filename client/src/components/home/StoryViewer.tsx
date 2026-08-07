@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Avatar } from "@/components/ui/Avatar";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
@@ -24,42 +24,58 @@ interface StoryViewerProps {
  * progress bar segments the *current* group's items; finishing the last item
  * advances to the next person's group, same as the platforms this is modeled
  * on — a person with 3 stories plays all 3 before moving on.
+ *
+ * Position is tracked as a single flat index into every group's items,
+ * flattened end to end — deliberately *not* as separate groupIndex/itemIndex
+ * state, and deliberately *not* moved from inside a `setFlatIndex` functional
+ * updater either (an earlier version did both and regressed twice — see git
+ * history). Two pieces of state advanced by separate non-atomic branch
+ * checks can both read the same stale snapshot if two advances land in the
+ * same tick (a timer tick and a keypress, or two key-repeats before React
+ * re-renders) and both take the same branch, overshooting by one. And
+ * calling `onClose` — which updates the *parent*'s state — from inside a
+ * `setFlatIndex` updater runs it during that updater's evaluation, which
+ * React flags as "updating a component while rendering a different one."
+ *
+ * `positionRef` is the actual source of truth: a plain ref mutates
+ * synchronously and immediately, so N calls to goNext/goPrev in the same
+ * tick each see the previous call's result with no batching involved, and
+ * `onClose` only ever runs as a plain side effect of the click/keypress
+ * handler that called it — never from inside a state updater. `flatIndex`
+ * state exists purely to make React re-render with the ref's latest value.
  */
 export function StoryViewer({ groups, initialGroupIndex, onClose }: StoryViewerProps) {
-  const [groupIndex, setGroupIndex] = useState(initialGroupIndex);
-  const [itemIndex, setItemIndex] = useState(0);
+  const flat = useMemo(
+    () => groups.flatMap((g, groupIndex) => g.items.map((_, itemIndex) => ({ groupIndex, itemIndex }))),
+    [groups],
+  );
+  const initialFlatIndex = Math.max(
+    flat.findIndex((f) => f.groupIndex === initialGroupIndex),
+    0,
+  );
+  const positionRef = useRef(initialFlatIndex);
+  const [flatIndex, setFlatIndex] = useState(initialFlatIndex);
   const [progress, setProgress] = useState(0);
+  const { groupIndex, itemIndex } = flat[flatIndex];
   const group = groups[groupIndex];
-  // Clamp defensively: two keydown events firing back-to-back (key repeat)
-  // before React re-renders and rebinds the handler can otherwise call
-  // goNext/goPrev twice against the same stale itemIndex, walking it one
-  // past the group's real bounds for a single frame.
-  const item = group.items[itemIndex] ?? group.items[group.items.length - 1];
+  const item = group.items[itemIndex];
 
   function goNext() {
     setProgress(0);
-    if (itemIndex < group.items.length - 1) {
-      setItemIndex((i) => i + 1);
-      return;
-    }
-    if (groupIndex >= groups.length - 1) {
+    const next = positionRef.current + 1;
+    if (next >= flat.length) {
       onClose();
       return;
     }
-    setGroupIndex((g) => g + 1);
-    setItemIndex(0);
+    positionRef.current = next;
+    setFlatIndex(next);
   }
 
   function goPrev() {
     setProgress(0);
-    if (itemIndex > 0) {
-      setItemIndex((i) => i - 1);
-      return;
-    }
-    if (groupIndex === 0) return;
-    const prevItemCount = groups[groupIndex - 1].items.length;
-    setGroupIndex((g) => g - 1);
-    setItemIndex(prevItemCount - 1);
+    const prev = Math.max(positionRef.current - 1, 0);
+    positionRef.current = prev;
+    setFlatIndex(prev);
   }
 
   useEffect(() => {
@@ -74,9 +90,9 @@ export function StoryViewer({ groups, initialGroupIndex, onClose }: StoryViewerP
     }, TICK_MS);
     return () => clearInterval(interval);
     // Restart the timer whenever the current item changes — goNext/goPrev
-    // close over `groupIndex`/`itemIndex`, both listed as deps.
+    // close over `flat`, which never changes for the viewer's lifetime.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupIndex, itemIndex]);
+  }, [flatIndex]);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -86,13 +102,8 @@ export function StoryViewer({ groups, initialGroupIndex, onClose }: StoryViewerP
     }
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-    // Re-bind whenever the current position changes — goNext/goPrev decide
-    // "advance within group" vs "advance to next group" by reading
-    // groupIndex/itemIndex/group from this closure, so a stale binding (e.g.
-    // one left over from mount) can walk itemIndex past the current group's
-    // actual items.length. Same reasoning as the timer effect below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupIndex, itemIndex]);
+  }, []);
 
   if (typeof document === "undefined") return null;
 
