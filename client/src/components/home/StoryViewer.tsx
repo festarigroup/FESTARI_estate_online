@@ -56,6 +56,11 @@ export function StoryViewer({ groups, initialGroupIndex, onClose }: StoryViewerP
   const positionRef = useRef(initialFlatIndex);
   const [flatIndex, setFlatIndex] = useState(initialFlatIndex);
   const [progress, setProgress] = useState(0);
+  // Starts muted on every video — browsers block unmuted autoplay outright
+  // (no user gesture backs it), so forcing sound on by default would just
+  // fail silently. The speaker button is the user's own gesture to opt in.
+  const [muted, setMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { groupIndex, itemIndex } = flat[flatIndex];
   const group = groups[groupIndex];
   const item = group.items[itemIndex];
@@ -105,6 +110,22 @@ export function StoryViewer({ groups, initialGroupIndex, onClose }: StoryViewerP
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Landing on a new video slide while unmuted (the user opted in on a
+  // previous one) re-triggers autoplay outside any click, so the browser
+  // can legally block it again. Retry explicitly and fall back to muted —
+  // silent-but-playing beats stuck-and-silent.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.play().catch(() => {
+      if (!v.muted) {
+        v.muted = true;
+        setMuted(true);
+        v.play().catch(() => {});
+      }
+    });
+  }, [flatIndex]);
+
   if (typeof document === "undefined") return null;
 
   return createPortal(
@@ -137,18 +158,39 @@ export function StoryViewer({ groups, initialGroupIndex, onClose }: StoryViewerP
         </div>
 
         {item.type === "video" ? (
-          // autoPlay + muted + loop, no controls: tapping the left/right
+          // autoPlay + loop, no native controls: tapping the left/right
           // zones is still how you navigate (same as an image slide), so
-          // native video controls would just be dead weight fighting those
+          // visible video controls would just be dead weight fighting those
           // tap targets for the same gesture — same reasoning
-          // PostImageLightbox's grid preview avoids `controls` for.
-          <video key={item.id} src={item.image} autoPlay muted loop playsInline className="size-full object-contain" />
+          // PostImageLightbox's grid preview avoids `controls` for. Starts
+          // muted (see the `muted` state above); the speaker button below
+          // is the one control this view adds on top of that.
+          <video
+            key={item.id}
+            ref={videoRef}
+            src={item.image}
+            autoPlay
+            muted={muted}
+            loop
+            playsInline
+            className="size-full object-contain"
+          />
         ) : (
           // Plain <img>, not next/image: sources are either a blob: preview
           // (next/image can't optimize those) or a small fixed local asset —
           // either way there's no responsive/optimization benefit here.
           // eslint-disable-next-line @next/next/no-img-element
           <img src={item.image} alt={group.name} className="size-full object-contain" />
+        )}
+
+        {item.type === "video" && (
+          <button
+            aria-label={muted ? "Unmute" : "Mute"}
+            onClick={() => setMuted((m) => !m)}
+            className="absolute top-16 right-3 z-20 flex size-8 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70"
+          >
+            <DynamicIcon name={muted ? "VolumeX" : "Volume2"} className="size-4" />
+          </button>
         )}
 
         {item.caption && (

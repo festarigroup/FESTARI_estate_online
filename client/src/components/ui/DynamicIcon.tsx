@@ -45,6 +45,8 @@ import {
   ThumbsDown,
   ThumbsUp,
   Users,
+  Volume2,
+  VolumeX,
   Wrench,
   X,
   type LucideProps,
@@ -104,6 +106,8 @@ const ICONS = {
   ThumbsDown,
   ThumbsUp,
   Users,
+  Volume2,
+  VolumeX,
   Wrench,
   X,
 } as const;
