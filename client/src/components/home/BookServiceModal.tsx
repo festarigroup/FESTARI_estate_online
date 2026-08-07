@@ -4,6 +4,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
+import { DateTimeInput } from "@/components/ui/DateTimeInput";
 import { cn } from "@/lib/cn";
 
 interface BookServiceModalProps {
@@ -71,21 +72,11 @@ export function BookServiceModal({ open, onClose, providerName }: BookServiceMod
         <div className="grid grid-cols-2 gap-3">
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold text-ink">Preferred date</span>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className={INPUT_CLASS}
-            />
+            <DateTimeInput type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold text-ink">Preferred time</span>
-            <input
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              className={INPUT_CLASS}
-            />
+            <DateTimeInput type="time" value={time} onChange={(e) => setTime(e.target.value)} />
           </label>
         </div>
 
