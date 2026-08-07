@@ -17,7 +17,7 @@ const CURRENT_USER = { name: "Kwame", avatar: "/images/avatar-kwame-composer.png
  * rendered; only this slice needs the client-side state. */
 export function Feed() {
   const [posts, setPosts] = useState<ContentPost[]>(FEED_POSTS);
-  const { repostedIds } = useReposts();
+  const { reposts } = useReposts();
   const { isHidden } = useHiddenPosts();
 
   function addPost(post: ContentPost) {
@@ -34,10 +34,14 @@ export function Feed() {
   // where it already was further down, same as the platforms this is
   // modeled on. Looked up from `visiblePosts` since a repost always targets
   // something already in the feed (seed content or composer-created).
-  const repostCards: RepostedPost[] = repostedIds.flatMap((id) => {
-    const original = visiblePosts.find((p) => p.id === id);
+  // `thoughts` carries through from a "Repost with thoughts" — absent for
+  // a plain repost.
+  const repostCards: RepostedPost[] = reposts.flatMap(({ postId, thoughts }) => {
+    const original = visiblePosts.find((p) => p.id === postId);
     if (!original) return [];
-    return [{ id: `repost-${id}`, kind: "repost", repostedBy: CURRENT_USER, repostedAt: "Just now", original }];
+    return [
+      { id: `repost-${postId}`, kind: "repost", repostedBy: CURRENT_USER, repostedAt: "Just now", thoughts, original },
+    ];
   });
 
   const feed: FeedPost[] = [...repostCards, ...visiblePosts];

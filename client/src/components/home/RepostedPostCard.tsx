@@ -4,11 +4,12 @@ import { FeedPostCard } from "@/components/home/FeedPostCard";
 import type { RepostedPost } from "@/types/home";
 
 /** Wraps an existing feed post with a slim "X reposted this" attribution
- * line and renders the original post's own card, untouched, right beneath
- * it — not a Figma frame (no repost frame was provided); modeled on the
- * Facebook/LinkedIn convention where the repost note carries no engagement
- * row of its own. Reposting from inside that nested card re-targets
- * `original`, so a repost of a repost can't nest — see types/home.ts. */
+ * line, optional commentary from a "Repost with thoughts" (RepostButton),
+ * and the original post's own card, untouched, right beneath it — not a
+ * Figma frame (no repost frame was provided); modeled on the quote-repost
+ * convention. The wrapper itself carries no engagement row of its own.
+ * Reposting from inside the nested card re-targets `original`, so a repost
+ * of a repost can't nest — see types/home.ts. */
 export function RepostedPostCard({ post }: { post: RepostedPost }) {
   return (
     <div className="flex w-full flex-col gap-2">
@@ -24,6 +25,7 @@ export function RepostedPostCard({ post }: { post: RepostedPost }) {
           <span className="font-medium text-ink">{post.repostedBy.name}</span> reposted this · {post.repostedAt}
         </span>
       </div>
+      {post.thoughts && <p className="px-2 text-base leading-relaxed text-ink">{post.thoughts}</p>}
       <FeedPostCard post={post.original} />
     </div>
   );

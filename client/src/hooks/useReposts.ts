@@ -2,21 +2,29 @@
 
 import { useSyncExternalStore } from "react";
 
-const STORAGE_KEY = "festari:reposted-post-ids";
+const STORAGE_KEY = "festari:reposts";
+
+export interface RepostRecord {
+  postId: string;
+  /** Present for a "Repost with thoughts" — the commentary shown above the
+   * nested original in RepostedPostCard. Absent for a plain repost. */
+  thoughts?: string;
+}
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
 
 /**
- * Module-level store (see useSavedPosts for why) holding the ids of posts
- * the current user has reposted, most-recent-first — Feed reads this to
- * render a RepostedPost wrapper at the top of the feed for each one, and
- * every card's Repost button reads/writes the same list without a context
+ * Module-level store (see useSavedPosts for why) holding every post the
+ * current user has reposted, most-recent-first, each optionally carrying
+ * the commentary from a "Repost with thoughts" — Feed reads this to render
+ * a RepostedPost wrapper at the top of the feed for each one, and every
+ * card's Repost control reads/writes the same list without a context
  * provider. Persisted to localStorage so it survives a reload.
  */
-let cachedIds: string[] = typeof window !== "undefined" ? readFromStorage() : [];
+let cachedReposts: RepostRecord[] = typeof window !== "undefined" ? readFromStorage() : [];
 
-function readFromStorage(): string[] {
+function readFromStorage(): RepostRecord[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
@@ -25,10 +33,10 @@ function readFromStorage(): string[] {
   }
 }
 
-function writeToStorage(ids: string[]) {
-  cachedIds = ids;
+function writeToStorage(reposts: RepostRecord[]) {
+  cachedReposts = reposts;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(reposts));
   } catch {
     // storage full/disabled — the in-memory cache still reflects the change
     // for the rest of this session, just won't survive a reload.
@@ -42,28 +50,52 @@ function subscribe(listener: Listener) {
 }
 
 function getSnapshot() {
-  return cachedIds;
+  return cachedReposts;
 }
 
 // A stable (not freshly-allocated) empty array — useSyncExternalStore warns
 // if getServerSnapshot's result isn't referentially cached.
-const EMPTY_IDS: string[] = [];
+const EMPTY_REPOSTS: RepostRecord[] = [];
 
-function getServerSnapshot(): string[] {
-  return EMPTY_IDS;
+function getServerSnapshot(): RepostRecord[] {
+  return EMPTY_REPOSTS;
 }
 
 export function useReposts() {
-  const repostedIds = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const reposts = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  function isReposted(id: string) {
-    return repostedIds.includes(id);
+  function isReposted(postId: string) {
+    return reposts.some((r) => r.postId === postId);
   }
 
-  function toggleRepost(id: string) {
-    const already = repostedIds.includes(id);
-    writeToStorage(already ? repostedIds.filter((i) => i !== id) : [id, ...repostedIds]);
+  function getThoughts(postId: string) {
+    return reposts.find((r) => r.postId === postId)?.thoughts;
   }
 
-  return { repostedIds, isReposted, toggleRepost };
+  /** Adds (or replaces, moving to the front) a repost for postId — with
+   * `thoughts` for "Repost with thoughts", or without for a plain repost. */
+  function repost(postId: string, thoughts?: string) {
+    const rest = reposts.filter((r) => r.postId !== postId);
+    writeToStorage([{ postId, thoughts }, ...rest]);
+  }
+
+  function removeRepost(postId: string) {
+    writeToStorage(reposts.filter((r) => r.postId !== postId));
+  }
+
+  /** Plain toggle for the "already reposted → click removes it" path. */
+  function toggleRepost(postId: string) {
+    if (isReposted(postId)) removeRepost(postId);
+    else repost(postId);
+  }
+
+  return {
+    repostedIds: reposts.map((r) => r.postId),
+    reposts,
+    isReposted,
+    getThoughts,
+    repost,
+    removeRepost,
+    toggleRepost,
+  };
 }

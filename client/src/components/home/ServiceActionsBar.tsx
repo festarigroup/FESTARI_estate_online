@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { BookServiceModal } from "@/components/home/BookServiceModal";
-import { useReposts } from "@/hooks/useReposts";
+import { RepostButton } from "@/components/home/RepostButton";
 import { cn } from "@/lib/cn";
 
 interface ServiceActionsBarProps {
@@ -33,14 +32,6 @@ export function ServiceActionsBar({
 }: ServiceActionsBarProps) {
   const [liked, setLiked] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
-  const { isReposted, toggleRepost } = useReposts();
-  const reposted = isReposted(postId);
-
-  function handleRepost() {
-    const wasReposted = reposted;
-    toggleRepost(postId);
-    toast.success(wasReposted ? "Repost removed." : "Reposted to the top of your feed.");
-  }
 
   return (
     <div className="flex w-full items-center justify-between border-t border-border-subtle pt-[17px]">
@@ -66,16 +57,7 @@ export function ServiceActionsBar({
           <DynamicIcon name="MessageCircle" className="size-5" />
           {commentCount > 0 ? `Comment (${commentCount})` : "Comment"}
         </button>
-        <button
-          onClick={handleRepost}
-          className={cn(
-            "flex items-center gap-2 text-base font-medium",
-            reposted ? "text-brand-blue" : "text-muted hover:text-ink",
-          )}
-        >
-          <DynamicIcon name="Repeat2" className="size-5" />
-          {reposted ? "Reposted" : "Repost"}
-        </button>
+        <RepostButton postId={postId} />
       </div>
       <Button variant="navy" onClick={() => setBookingOpen(true)} className="rounded-lg">
         Book Service
