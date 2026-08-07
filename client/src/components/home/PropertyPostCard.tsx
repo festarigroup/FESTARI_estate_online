@@ -5,6 +5,7 @@ import Image from "next/image";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { PostHeader } from "@/components/home/PostHeader";
 import { PostEngagementBar } from "@/components/home/PostEngagementBar";
+import { PropertyEnquiryButton } from "@/components/home/PropertyEnquiryButton";
 import { CommentsSection } from "@/components/home/CommentsSection";
 import { PostImageLightbox } from "@/components/home/PostImageLightbox";
 import { usePostComments } from "@/hooks/usePostComments";
@@ -88,6 +89,7 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
           commentsOpen={commentsOpen}
           onToggleComments={toggleComments}
           onShare={() => setShares((s) => s + 1)}
+          cta={<PropertyEnquiryButton listerName={post.author.name} />}
         />
         {commentsOpen && <CommentsSection comments={comments} onAddComment={addComment} />}
       </div>

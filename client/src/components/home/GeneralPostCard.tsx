@@ -6,6 +6,7 @@ import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { PostHeader } from "@/components/home/PostHeader";
 import { PostEngagementBar } from "@/components/home/PostEngagementBar";
 import { ServiceActionsBar } from "@/components/home/ServiceActionsBar";
+import { PropertyEnquiryButton } from "@/components/home/PropertyEnquiryButton";
 import { CommentsSection } from "@/components/home/CommentsSection";
 import { PollBlock } from "@/components/home/PollBlock";
 import { PostImageLightbox } from "@/components/home/PostImageLightbox";
@@ -135,7 +136,12 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
           commentCount={comments.length}
         />
       ) : (
-        <PostEngagementBar post={post} commentsOpen={commentsOpen} onToggleComments={toggleComments} />
+        <PostEngagementBar
+          post={post}
+          commentsOpen={commentsOpen}
+          onToggleComments={toggleComments}
+          cta={post.tag === "property" ? <PropertyEnquiryButton listerName={post.author.name} /> : undefined}
+        />
       )}
       {commentsOpen && <CommentsSection comments={comments} onAddComment={addComment} />}
 

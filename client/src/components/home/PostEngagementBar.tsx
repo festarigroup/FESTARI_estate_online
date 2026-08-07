@@ -15,10 +15,15 @@ interface PostEngagementBarProps {
   /** Called after a real share completes (native share sheet or copy-to-clipboard),
    * so a parent that displays a share count (PropertyPostCard) can bump it. */
   onShare?: () => void;
+  /** Extra CTA rendered on the right, e.g. PropertyEnquiryButton for a
+   * property-tagged post — same "primary action" slot ServiceActionsBar's
+   * Book Service button occupies, just kept optional here since most
+   * posts don't have one. */
+  cta?: React.ReactNode;
 }
 
 /** Like / Comment / Repost / Share / Save action row, shared by every feed post variant. */
-export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShare }: PostEngagementBarProps) {
+export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShare, cta }: PostEngagementBarProps) {
   const [liked, setLiked] = useState(false);
   const { isSaved, toggleSave } = useSavedPosts();
   const { isReposted, toggleRepost } = useReposts();
@@ -68,8 +73,8 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
     toast.success(wasReposted ? "Repost removed." : "Reposted to the top of your feed.");
   }
 
-  return (
-    <div className="flex w-full items-center justify-between border-t border-border-subtle pt-[17px]">
+  const actions = (
+    <>
       <button
         onClick={() => setLiked((v) => !v)}
         className={cn(
@@ -118,6 +123,25 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
         <DynamicIcon name="Bookmark" className="size-5" fill={saved ? "currentColor" : "none"} />
         Save
       </button>
+    </>
+  );
+
+  // With no CTA (the common case), the five actions spread evenly across
+  // the full row exactly as before. With one, they cluster into a left
+  // group so the CTA gets real room on the right — a different spacing
+  // rule, which is why this branches instead of always wrapping in a group.
+  if (cta) {
+    return (
+      <div className="flex w-full items-center justify-between border-t border-border-subtle pt-[17px]">
+        <div className="flex items-center gap-4">{actions}</div>
+        {cta}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex w-full items-center justify-between border-t border-border-subtle pt-[17px]">
+      {actions}
     </div>
   );
 }
