@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { PostHeader } from "@/components/home/PostHeader";
 import { PostEngagementBar } from "@/components/home/PostEngagementBar";
 import { CommentsSection } from "@/components/home/CommentsSection";
 import { PollBlock } from "@/components/home/PollBlock";
+import { PostImageLightbox } from "@/components/home/PostImageLightbox";
 import { usePostComments } from "@/hooks/usePostComments";
 import { isLocalPreviewUrl } from "@/lib/is-local-preview-url";
 import type { GeneralPost } from "@/types/home";
@@ -17,6 +19,7 @@ const TAG_LABEL = { property: "Property listing", service: "Service post" } as c
  * match the two feed-post variants that are. */
 export function GeneralPostCard({ post }: { post: GeneralPost }) {
   const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.comments);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   return (
     <article className="flex w-full shrink-0 flex-col gap-4 rounded-xl bg-white p-6 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
@@ -40,9 +43,11 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
       {post.images && post.images.length > 0 && (
         <div className={post.images.length === 1 ? "" : "grid grid-cols-2 gap-1"}>
           {post.images.map((image, i) => (
-            <div
+            <button
               key={i}
-              className="relative aspect-square overflow-hidden rounded-lg"
+              aria-label={`View photo ${i + 1}`}
+              onClick={() => setLightboxIndex(i)}
+              className="relative aspect-square cursor-zoom-in overflow-hidden rounded-lg"
             >
               {isLocalPreviewUrl(image.src) ? (
                 // eslint-disable-next-line @next/next/no-img-element -- local blob: preview
@@ -50,7 +55,7 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
               ) : (
                 <Image src={image.src} alt={image.alt} fill className="object-cover" />
               )}
-            </div>
+            </button>
           ))}
         </div>
       )}
@@ -59,6 +64,14 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
 
       <PostEngagementBar post={post} commentsOpen={commentsOpen} onToggleComments={toggleComments} />
       {commentsOpen && <CommentsSection comments={comments} onAddComment={addComment} />}
+
+      {post.images && lightboxIndex !== null && (
+        <PostImageLightbox
+          images={post.images}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
     </article>
   );
 }

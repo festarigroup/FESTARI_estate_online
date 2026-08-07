@@ -1,17 +1,24 @@
 import type { IconName } from "@/components/ui/DynamicIcon";
 
+/** One slide within a user's story group — what the viewer actually displays. */
+export interface StoryItem {
+  id: string;
+  image: string;
+  /** Shown in the story viewer's header, e.g. "2h ago". Defaults to "Active now". */
+  postedAt?: string;
+  caption?: string;
+}
+
+/** A user's story rail bubble. Can hold multiple `items` — the rail shows one
+ * bubble per person, and the viewer plays through their items in sequence
+ * before advancing to the next person's group (Instagram/Facebook convention). */
 export interface Story {
   id: string;
   name: string;
   avatar: string;
   ringColor: "gold" | "live";
   isLive?: boolean;
-  /** Shown in the story viewer's header, e.g. "2h ago". Defaults to "Active now". */
-  postedAt?: string;
-  caption?: string;
-  /** Full-bleed photo the viewer opens to. Falls back to `avatar` — set this
-   * only when `avatar`'s asset isn't fit for full-screen (see mock-data.ts). */
-  storyImage?: string;
+  items: StoryItem[];
 }
 
 export interface PostAuthor {

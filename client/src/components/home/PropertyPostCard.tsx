@@ -6,6 +6,7 @@ import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { PostHeader } from "@/components/home/PostHeader";
 import { PostEngagementBar } from "@/components/home/PostEngagementBar";
 import { CommentsSection } from "@/components/home/CommentsSection";
+import { PostImageLightbox } from "@/components/home/PostImageLightbox";
 import { usePostComments } from "@/hooks/usePostComments";
 import type { PropertyPost } from "@/types/home";
 
@@ -14,6 +15,7 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
   const [main, thumb1, thumb2] = post.images;
   const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.comments);
   const [shares, setShares] = useState(post.reactions.shares);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   return (
     <article className="flex w-full shrink-0 flex-col overflow-hidden rounded-xl bg-white shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
@@ -28,19 +30,39 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
       </div>
 
       <div className="grid grid-cols-3 gap-1 px-1">
-        <div className="relative col-span-2 row-span-2 h-[280px] sm:h-[400px]">
+        <button
+          aria-label="View photo 1"
+          onClick={() => setLightboxIndex(0)}
+          className="relative col-span-2 row-span-2 h-[280px] cursor-zoom-in sm:h-[400px]"
+        >
           <Image src={main.src} alt={main.alt} fill className="object-cover" />
           <span className="absolute top-4 right-4 rounded bg-brand-navy/80 px-2 py-1 text-xs text-white">
             1/{post.totalImages}
           </span>
-        </div>
-        <div className="relative h-[137px] sm:h-[199px]">
+        </button>
+        <button
+          aria-label="View photo 2"
+          onClick={() => setLightboxIndex(1)}
+          className="relative h-[137px] cursor-zoom-in sm:h-[199px]"
+        >
           <Image src={thumb1.src} alt={thumb1.alt} fill className="object-cover" />
-        </div>
-        <div className="relative h-[137px] sm:h-[199px]">
+        </button>
+        <button
+          aria-label="View photo 3"
+          onClick={() => setLightboxIndex(2)}
+          className="relative h-[137px] cursor-zoom-in sm:h-[199px]"
+        >
           <Image src={thumb2.src} alt={thumb2.alt} fill className="object-cover" />
-        </div>
+        </button>
       </div>
+
+      {lightboxIndex !== null && (
+        <PostImageLightbox
+          images={post.images}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxIndex(null)}
+        />
+      )}
 
       <div className="flex w-full flex-col gap-6 p-6">
         <div className="flex w-full items-center justify-between">

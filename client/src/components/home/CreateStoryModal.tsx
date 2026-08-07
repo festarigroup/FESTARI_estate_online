@@ -6,12 +6,11 @@ import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
-import type { Story } from "@/types/home";
 
 interface CreateStoryModalProps {
   open: boolean;
   onClose: () => void;
-  onCreate: (story: Story) => void;
+  onCreate: (item: { image: string; caption?: string }) => void;
 }
 
 /** "Create Story" flow — pick an image, add a caption, share it to the rail. */
@@ -38,11 +37,7 @@ export function CreateStoryModal({ open, onClose, onCreate }: CreateStoryModalPr
   function handleShare() {
     if (!previewUrl) return;
     onCreate({
-      id: `story-${Date.now()}`,
-      name: "Kwame",
-      avatar: previewUrl,
-      ringColor: "gold",
-      postedAt: "Just now",
+      image: previewUrl,
       caption: caption.trim() || undefined,
     });
     toast.success("Your story is live for 24 hours.");

@@ -7,6 +7,7 @@ import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { Button } from "@/components/ui/Button";
 import { PostHeader } from "@/components/home/PostHeader";
 import { CommentsSection } from "@/components/home/CommentsSection";
+import { PostImageLightbox } from "@/components/home/PostImageLightbox";
 import { usePostComments } from "@/hooks/usePostComments";
 import { cn } from "@/lib/cn";
 import type { ServicePost } from "@/types/home";
@@ -14,6 +15,7 @@ import type { ServicePost } from "@/types/home";
 /** "Article - Post: Service/Promotion" — lighter footer with a direct booking CTA. */
 export function ServicePostCard({ post }: { post: ServicePost }) {
   const [liked, setLiked] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.comments);
 
   function handleBookService() {
@@ -30,9 +32,21 @@ export function ServicePostCard({ post }: { post: ServicePost }) {
         ))}
       </div>
 
-      <div className="relative h-64 w-full overflow-hidden rounded-xl border border-border-subtle">
+      <button
+        aria-label="View photo"
+        onClick={() => setLightboxOpen(true)}
+        className="relative h-64 w-full cursor-zoom-in overflow-hidden rounded-xl border border-border-subtle"
+      >
         <Image src={post.image.src} alt={post.image.alt} fill className="object-cover" />
-      </div>
+      </button>
+
+      {lightboxOpen && (
+        <PostImageLightbox
+          images={[post.image]}
+          initialIndex={0}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
 
       <div className="flex w-full items-center justify-between border-t border-border-subtle pt-[17px]">
         <div className="flex items-center gap-4">

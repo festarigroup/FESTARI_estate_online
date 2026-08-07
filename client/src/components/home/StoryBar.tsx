@@ -8,6 +8,10 @@ import { StoryViewer } from "@/components/home/StoryViewer";
 import { STORIES } from "@/lib/mock-data";
 import type { Story } from "@/types/home";
 
+/** The current (composer) user's own rail bubble — new stories they share
+ * get appended to this group instead of spawning a new bubble each time. */
+const CURRENT_USER_STORY_ID = "kwame";
+
 /** Horizontal story rail ("Horizontal Story Bar" in Figma), with a scroll-next button. */
 export function StoryBar() {
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -15,8 +19,22 @@ export function StoryBar() {
   const [modalOpen, setModalOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
-  function handleCreateStory(story: Story) {
-    setStories((prev) => [story, ...prev]);
+  function handleCreateStory({ image, caption }: { image: string; caption?: string }) {
+    setStories((prev) => {
+      const newItem = { id: `story-item-${Date.now()}`, image, postedAt: "Just now", caption };
+      const existing = prev.find((s) => s.id === CURRENT_USER_STORY_ID);
+      const rest = prev.filter((s) => s.id !== CURRENT_USER_STORY_ID);
+      const group: Story = existing
+        ? { ...existing, items: [...existing.items, newItem] }
+        : {
+            id: CURRENT_USER_STORY_ID,
+            name: "Kwame",
+            avatar: "/images/avatar-kwame-topnav.png",
+            ringColor: "gold",
+            items: [newItem],
+          };
+      return [group, ...rest];
+    });
   }
 
   return (
@@ -54,8 +72,8 @@ export function StoryBar() {
 
       {viewerIndex !== null && (
         <StoryViewer
-          stories={stories}
-          initialIndex={viewerIndex}
+          groups={stories}
+          initialGroupIndex={viewerIndex}
           onClose={() => setViewerIndex(null)}
         />
       )}

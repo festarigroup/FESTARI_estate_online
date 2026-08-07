@@ -10,47 +10,52 @@ const DURATION_MS = 5000;
 const TICK_MS = 50;
 
 interface StoryViewerProps {
-  stories: Story[];
-  initialIndex: number;
+  groups: Story[];
+  initialGroupIndex: number;
   onClose: () => void;
 }
 
-/**
- * Full-screen story viewer — tap the right half to advance, the left half to
+/** Full-screen story viewer — tap the right half to advance, the left half to
  * go back, or the dark margin outside the frame to close. Not a Figma frame
  * (the file only shows the collapsed rail); built Instagram/Facebook-style
  * since that's the universal convention for "open a story."
  *
- * Reuses each story's avatar image as the full-bleed photo (via `storyImage`,
- * falling back to `avatar`): the app has no separate "story content" asset,
- * so the same picture the rail shows is what plays here — real for
- * freshly-created stories, since that photo IS what the user just picked.
- * `storyImage` exists as an escape hatch for a story whose `avatar` isn't
- * fit for full-screen display (used earlier for two seeded stories whose
- * Figma-exported avatar turned out to be a broken placeholder — see the
- * asset-replacement notes in mock-data.ts's git history); no current story
- * needs it now that those assets are fixed.
+ * Each rail bubble is a `Story` group that can hold multiple `items`. The
+ * progress bar segments the *current* group's items; finishing the last item
+ * advances to the next person's group, same as the platforms this is modeled
+ * on — a person with 3 stories plays all 3 before moving on.
  */
-export function StoryViewer({ stories, initialIndex, onClose }: StoryViewerProps) {
-  const [index, setIndex] = useState(initialIndex);
+export function StoryViewer({ groups, initialGroupIndex, onClose }: StoryViewerProps) {
+  const [groupIndex, setGroupIndex] = useState(initialGroupIndex);
+  const [itemIndex, setItemIndex] = useState(0);
   const [progress, setProgress] = useState(0);
-  const story = stories[index];
-  const photo = story.storyImage ?? story.avatar;
+  const group = groups[groupIndex];
+  const item = group.items[itemIndex];
 
   function goNext() {
     setProgress(0);
-    setIndex((i) => {
-      if (i >= stories.length - 1) {
-        onClose();
-        return i;
-      }
-      return i + 1;
-    });
+    if (itemIndex < group.items.length - 1) {
+      setItemIndex((i) => i + 1);
+      return;
+    }
+    if (groupIndex >= groups.length - 1) {
+      onClose();
+      return;
+    }
+    setGroupIndex((g) => g + 1);
+    setItemIndex(0);
   }
 
   function goPrev() {
     setProgress(0);
-    setIndex((i) => Math.max(i - 1, 0));
+    if (itemIndex > 0) {
+      setItemIndex((i) => i - 1);
+      return;
+    }
+    if (groupIndex === 0) return;
+    const prevItemCount = groups[groupIndex - 1].items.length;
+    setGroupIndex((g) => g - 1);
+    setItemIndex(prevItemCount - 1);
   }
 
   useEffect(() => {
@@ -64,10 +69,10 @@ export function StoryViewer({ stories, initialIndex, onClose }: StoryViewerProps
       });
     }, TICK_MS);
     return () => clearInterval(interval);
-    // Restart the timer whenever the story changes — goNext/goPrev close
-    // over `stories.length`, which never changes for the viewer's lifetime.
+    // Restart the timer whenever the current item changes — goNext/goPrev
+    // close over `groupIndex`/`itemIndex`, both listed as deps.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index]);
+  }, [groupIndex, itemIndex]);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -88,11 +93,11 @@ export function StoryViewer({ stories, initialIndex, onClose }: StoryViewerProps
 
       <div className="relative flex h-[85vh] w-full max-w-[420px] flex-col overflow-hidden rounded-xl bg-black">
         <div className="absolute inset-x-3 top-3 z-20 flex gap-1">
-          {stories.map((s, i) => (
-            <div key={s.id} className="h-1 flex-1 overflow-hidden rounded-full bg-white/30">
+          {group.items.map((it, i) => (
+            <div key={it.id} className="h-1 flex-1 overflow-hidden rounded-full bg-white/30">
               <div
                 className="h-full bg-white"
-                style={{ width: `${i < index ? 100 : i === index ? progress : 0}%` }}
+                style={{ width: `${i < itemIndex ? 100 : i === itemIndex ? progress : 0}%` }}
               />
             </div>
           ))}
@@ -100,10 +105,10 @@ export function StoryViewer({ stories, initialIndex, onClose }: StoryViewerProps
 
         <div className="absolute inset-x-3 top-8 z-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Avatar src={story.avatar} alt={story.name} size={32} ring="gold" />
+            <Avatar src={group.avatar} alt={group.name} size={32} ring="gold" />
             <div>
-              <p className="text-sm font-semibold text-white">{story.name}</p>
-              <p className="text-xs text-white/70">{story.postedAt ?? "Active now"}</p>
+              <p className="text-sm font-semibold text-white">{group.name}</p>
+              <p className="text-xs text-white/70">{item.postedAt ?? "Active now"}</p>
             </div>
           </div>
           <button aria-label="Close" onClick={onClose} className="text-white/80 hover:text-white">
@@ -115,11 +120,11 @@ export function StoryViewer({ stories, initialIndex, onClose }: StoryViewerProps
             (next/image can't optimize those) or a small fixed local asset —
             either way there's no responsive/optimization benefit here. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={photo} alt={story.name} className="size-full object-contain" />
+        <img src={item.image} alt={group.name} className="size-full object-contain" />
 
-        {story.caption && (
+        {item.caption && (
           <p className="absolute inset-x-4 bottom-4 z-20 text-center text-sm text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.8)]">
-            {story.caption}
+            {item.caption}
           </p>
         )}
 

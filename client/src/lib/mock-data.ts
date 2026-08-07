@@ -30,12 +30,58 @@ export const NAV_SECONDARY_ITEMS: NavItem[] = [
 ];
 
 export const STORIES: Story[] = [
-  { id: "ama-serwaa", name: "Ama Serwaa", avatar: "/images/avatar-ama-serwaa-story.png", ringColor: "gold", postedAt: "2h ago", caption: "House hunting all weekend 🏡" },
-  { id: "builders-gh", name: "Builders GH", avatar: "/images/avatar-builders-gh-story.png", ringColor: "live", isLive: true, postedAt: "Active now", caption: "Live from the East Legon site" },
-  { id: "dee-interiors", name: "Dee Interiors", avatar: "/images/avatar-dee-interiors-story.png", ringColor: "gold", postedAt: "4h ago", caption: "New moodboard for a client reveal" },
-  { id: "brightfix", name: "BrightFix", avatar: "/images/avatar-brightfix-story.png", ringColor: "gold", postedAt: "5h ago" },
-  { id: "luxury-stays", name: "Luxury Stays", avatar: "/images/avatar-luxury-stays-story.png", ringColor: "gold", postedAt: "8h ago", caption: "Sunset check-ins hit different" },
-  { id: "kojo-mensah", name: "Kojo Mensah", avatar: "/images/avatar-kojo-mensah-story.png", ringColor: "gold", postedAt: "10h ago" },
+  {
+    id: "ama-serwaa",
+    name: "Ama Serwaa",
+    avatar: "/images/avatar-ama-serwaa-story.png",
+    ringColor: "gold",
+    items: [
+      { id: "ama-serwaa-1", image: "/images/story-ama-serwaa-1.jpg", postedAt: "2h ago", caption: "House hunting all weekend 🏡" },
+      { id: "ama-serwaa-2", image: "/images/story-ama-serwaa-2.jpg", postedAt: "1h ago", caption: "This kitchen though 😍" },
+    ],
+  },
+  {
+    id: "builders-gh",
+    name: "Builders GH",
+    avatar: "/images/avatar-builders-gh-story.png",
+    ringColor: "live",
+    isLive: true,
+    items: [
+      { id: "builders-gh-1", image: "/images/story-builders-gh-1.jpg", postedAt: "Active now", caption: "Live from the East Legon site" },
+      { id: "builders-gh-2", image: "/images/story-builders-gh-2.jpg", postedAt: "Active now", caption: "Frame's up, crew's on it 🏗️" },
+    ],
+  },
+  {
+    id: "dee-interiors",
+    name: "Dee Interiors",
+    avatar: "/images/avatar-dee-interiors-story.png",
+    ringColor: "gold",
+    items: [
+      { id: "dee-interiors-1", image: "/images/story-dee-interiors-1.jpg", postedAt: "4h ago", caption: "New moodboard for a client reveal" },
+      { id: "dee-interiors-2", image: "/images/story-dee-interiors-2.jpg", postedAt: "3h ago", caption: "Dining nook, wrapped up today" },
+    ],
+  },
+  {
+    id: "brightfix",
+    name: "BrightFix",
+    avatar: "/images/avatar-brightfix-story.png",
+    ringColor: "gold",
+    items: [{ id: "brightfix-1", image: "/images/avatar-brightfix-story.png", postedAt: "5h ago" }],
+  },
+  {
+    id: "luxury-stays",
+    name: "Luxury Stays",
+    avatar: "/images/avatar-luxury-stays-story.png",
+    ringColor: "gold",
+    items: [{ id: "luxury-stays-1", image: "/images/avatar-luxury-stays-story.png", postedAt: "8h ago", caption: "Sunset check-ins hit different" }],
+  },
+  {
+    id: "kojo-mensah",
+    name: "Kojo Mensah",
+    avatar: "/images/avatar-kojo-mensah-story.png",
+    ringColor: "gold",
+    items: [{ id: "kojo-mensah-1", image: "/images/avatar-kojo-mensah-story.png", postedAt: "10h ago" }],
+  },
 ];
 
 export const FEED_POSTS: FeedPost[] = [
@@ -54,9 +100,9 @@ export const FEED_POSTS: FeedPost[] = [
     ],
     hashtags: "#NewListing #EastLegon #ForSale #FestariEstates",
     images: [
-      { src: "/images/post-house-thumb-1.png", alt: "East Legon house living room" },
+      { src: "/images/post-house-thumb-1.jpg", alt: "East Legon house living room" },
       { src: "/images/post-house-thumb-2.png", alt: "East Legon house kitchen" },
-      { src: "/images/post-house-main.png", alt: "East Legon house exterior at dusk" },
+      { src: "/images/post-house-main.jpg", alt: "East Legon house exterior" },
     ],
     totalImages: 8,
     reactions: { likes: 128, shares: 15 },
@@ -134,7 +180,7 @@ export const TRENDING_PROPERTIES: TrendingProperty[] = [
     title: "3 Bedroom Apartment",
     location: "Airport Residential, Accra",
     price: "GHS 8,000 / month",
-    image: "/images/property-trending-2.png",
+    image: "/images/property-trending-2.jpg",
     listingType: "For Rent",
     beds: 3,
     baths: 3,
