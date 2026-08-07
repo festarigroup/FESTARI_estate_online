@@ -2,37 +2,26 @@
 
 import { useSyncExternalStore } from "react";
 
-const STORAGE_KEY = "festari:hidden-post-ids";
-
 type Listener = () => void;
 const listeners = new Set<Listener>();
 
 /**
- * Module-level store (see useSavedPosts for why) holding the ids of posts
- * the current user has dismissed via "Not interested" or "Report post" —
- * Feed filters these out of what renders. Persisted to localStorage so a
- * dismissal survives a reload, same as every other post-level preference
- * in this app.
+ * Module-level store (see useSavedPosts for the pattern) holding the ids
+ * of posts the current user has dismissed via "Not interested" or "Report
+ * post" — Feed filters these out of what renders.
+ *
+ * Deliberately IN-MEMORY ONLY, unlike useSavedPosts/useReposts — neither
+ * action is backed by a real moderation/feed-ranking system here, so
+ * persisting a hide forever (past the toast's few-second Undo window,
+ * with no page to review or restore it from — unlike Saved) would mean
+ * quietly losing seed content for good. A reload is the escape hatch: it
+ * puts every post back the way it started, same as everything else that
+ * isn't explicitly saved.
  */
-let cachedIds: string[] = typeof window !== "undefined" ? readFromStorage() : [];
+let cachedIds: string[] = [];
 
-function readFromStorage(): string[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeToStorage(ids: string[]) {
+function writeIds(ids: string[]) {
   cachedIds = ids;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
-  } catch {
-    // storage full/disabled — the in-memory cache still reflects the change
-    // for the rest of this session, just won't survive a reload.
-  }
   listeners.forEach((listener) => listener());
 }
 
@@ -59,11 +48,11 @@ export function useHiddenPosts() {
   }
 
   function hidePost(id: string) {
-    if (!hiddenIds.includes(id)) writeToStorage([id, ...hiddenIds]);
+    if (!hiddenIds.includes(id)) writeIds([id, ...hiddenIds]);
   }
 
   function unhidePost(id: string) {
-    writeToStorage(hiddenIds.filter((i) => i !== id));
+    writeIds(hiddenIds.filter((i) => i !== id));
   }
 
   return { hiddenIds, isHidden, hidePost, unhidePost };
