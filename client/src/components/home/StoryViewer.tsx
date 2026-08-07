@@ -30,7 +30,11 @@ export function StoryViewer({ groups, initialGroupIndex, onClose }: StoryViewerP
   const [itemIndex, setItemIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const group = groups[groupIndex];
-  const item = group.items[itemIndex];
+  // Clamp defensively: two keydown events firing back-to-back (key repeat)
+  // before React re-renders and rebinds the handler can otherwise call
+  // goNext/goPrev twice against the same stale itemIndex, walking it one
+  // past the group's real bounds for a single frame.
+  const item = group.items[itemIndex] ?? group.items[group.items.length - 1];
 
   function goNext() {
     setProgress(0);
@@ -82,8 +86,13 @@ export function StoryViewer({ groups, initialGroupIndex, onClose }: StoryViewerP
     }
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
+    // Re-bind whenever the current position changes — goNext/goPrev decide
+    // "advance within group" vs "advance to next group" by reading
+    // groupIndex/itemIndex/group from this closure, so a stale binding (e.g.
+    // one left over from mount) can walk itemIndex past the current group's
+    // actual items.length. Same reasoning as the timer effect below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [groupIndex, itemIndex]);
 
   if (typeof document === "undefined") return null;
 
