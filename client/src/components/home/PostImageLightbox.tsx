@@ -71,8 +71,19 @@ export function PostImageLightbox({ images, initialIndex, onClose }: PostImageLi
           </button>
         )}
 
-        {/* eslint-disable-next-line @next/next/no-img-element -- full-bleed lightbox has no fixed box for next/image to optimize toward, and sources may be blob: previews it can't fetch anyway */}
-        <img src={image.src} alt={image.alt} className="max-h-full max-w-full object-contain" />
+        {image.type === "video" ? (
+          <video
+            key={image.src}
+            src={image.src}
+            controls
+            autoPlay
+            playsInline
+            className="max-h-full max-w-full object-contain"
+          />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element -- full-bleed lightbox has no fixed box for next/image to optimize toward, and sources may be blob: previews it can't fetch anyway
+          <img src={image.src} alt={image.alt} className="max-h-full max-w-full object-contain" />
+        )}
 
         {hasMultiple && (
           <button

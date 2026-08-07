@@ -31,6 +31,11 @@ const TAG_NOTE: Record<TagType, string> = {
   venue: "This post will be tagged as a venue listing.",
 };
 
+interface MediaAttachment {
+  url: string;
+  type: "image" | "video";
+}
+
 interface CreatePostModalProps {
   open: boolean;
   onClose: () => void;
@@ -60,7 +65,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
     initialAttachment === "photo" || (!!initialAttachment && isTagType(initialAttachment)),
   );
   const [showPoll, setShowPoll] = useState(initialAttachment === "poll");
-  const [images, setImages] = useState<string[]>([]);
+  const [media, setMedia] = useState<MediaAttachment[]>([]);
   const [pollQuestion, setPollQuestion] = useState("");
   const [pollOptions, setPollOptions] = useState(["", ""]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -70,7 +75,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
     setTag(undefined);
     setShowPhotos(false);
     setShowPoll(false);
-    setImages([]);
+    setMedia([]);
     setPollQuestion("");
     setPollOptions(["", ""]);
   }
@@ -78,19 +83,25 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   // Cancel / backdrop click / Escape: nothing downstream is using these
   // blob URLs, so discard them here.
   function handleCancel() {
-    images.forEach((url) => URL.revokeObjectURL(url));
+    media.forEach((m) => URL.revokeObjectURL(m.url));
     resetState();
     onClose();
   }
 
   function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
-    setImages((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))]);
+    setMedia((prev) => [
+      ...prev,
+      ...files.map((f) => ({
+        url: URL.createObjectURL(f),
+        type: (f.type.startsWith("video/") ? "video" : "image") as "image" | "video",
+      })),
+    ]);
   }
 
-  function removeImage(url: string) {
+  function removeMedia(url: string) {
     URL.revokeObjectURL(url);
-    setImages((prev) => prev.filter((u) => u !== url));
+    setMedia((prev) => prev.filter((m) => m.url !== url));
   }
 
   function isAttachmentActive(type: AttachmentType) {
@@ -118,8 +129,8 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
         if (next) {
           setShowPoll(false);
         } else {
-          images.forEach((url) => URL.revokeObjectURL(url));
-          setImages([]);
+          media.forEach((m) => URL.revokeObjectURL(m.url));
+          setMedia([]);
         }
         return next;
       });
@@ -130,8 +141,8 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
       const next = !prev;
       if (next) {
         setShowPhotos(false);
-        images.forEach((url) => URL.revokeObjectURL(url));
-        setImages([]);
+        media.forEach((m) => URL.revokeObjectURL(m.url));
+        setMedia([]);
       }
       return next;
     });
@@ -144,7 +155,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   const trimmedOptions = pollOptions.map((o) => o.trim()).filter(Boolean);
   const canSubmit =
     body.trim().length > 0 ||
-    images.length > 0 ||
+    media.length > 0 ||
     (showPoll && pollQuestion.trim().length > 0 && trimmedOptions.length >= 2);
 
   function handleSubmit() {
@@ -154,7 +165,13 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
       kind: "general",
       author: { name: "Kwame", avatar: "/images/avatar-kwame-composer.png", subtitle: "Just now" },
       body: body.trim() ? body.trim().split("\n") : [],
-      images: images.length ? images.map((src) => ({ src, alt: "Photo attached to Kwame's post" })) : undefined,
+      images: media.length
+        ? media.map((m) => ({
+            src: m.url,
+            alt: m.type === "video" ? "Video attached to Kwame's post" : "Photo attached to Kwame's post",
+            type: m.type,
+          }))
+        : undefined,
       poll: showPoll && trimmedOptions.length >= 2
         ? {
             question: pollQuestion.trim(),
@@ -196,19 +213,28 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/*,video/*"
               multiple
               onChange={handleFilesSelected}
               className="hidden"
             />
             <div className="grid grid-cols-4 gap-2">
-              {images.map((url) => (
-                <div key={url} className="relative aspect-square overflow-hidden rounded-lg">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- local blob: preview */}
-                  <img src={url} alt="" className="size-full object-cover" />
+              {media.map((m) => (
+                <div key={m.url} className="relative aspect-square overflow-hidden rounded-lg bg-brand-navy">
+                  {m.type === "video" ? (
+                    <video src={m.url} muted playsInline className="size-full object-cover" />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element -- local blob: preview
+                    <img src={m.url} alt="" className="size-full object-cover" />
+                  )}
+                  {m.type === "video" && (
+                    <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                      <DynamicIcon name="Play" className="size-6 fill-white text-white drop-shadow" />
+                    </span>
+                  )}
                   <button
-                    onClick={() => removeImage(url)}
-                    aria-label="Remove photo"
+                    onClick={() => removeMedia(m.url)}
+                    aria-label="Remove attachment"
                     className="absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white"
                   >
                     <DynamicIcon name="X" className="size-3" />

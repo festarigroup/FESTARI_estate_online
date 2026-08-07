@@ -136,11 +136,20 @@ export function StoryViewer({ groups, initialGroupIndex, onClose }: StoryViewerP
           </button>
         </div>
 
-        {/* Plain <img>, not next/image: sources are either a blob: preview
-            (next/image can't optimize those) or a small fixed local asset —
-            either way there's no responsive/optimization benefit here. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={item.image} alt={group.name} className="size-full object-contain" />
+        {item.type === "video" ? (
+          // autoPlay + muted + loop, no controls: tapping the left/right
+          // zones is still how you navigate (same as an image slide), so
+          // native video controls would just be dead weight fighting those
+          // tap targets for the same gesture — same reasoning
+          // PostImageLightbox's grid preview avoids `controls` for.
+          <video key={item.id} src={item.image} autoPlay muted loop playsInline className="size-full object-contain" />
+        ) : (
+          // Plain <img>, not next/image: sources are either a blob: preview
+          // (next/image can't optimize those) or a small fixed local asset —
+          // either way there's no responsive/optimization benefit here.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={item.image} alt={group.name} className="size-full object-contain" />
+        )}
 
         {item.caption && (
           <p className="absolute inset-x-4 bottom-4 z-20 text-center text-sm text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.8)]">

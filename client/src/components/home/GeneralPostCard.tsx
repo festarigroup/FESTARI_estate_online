@@ -38,6 +38,23 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
   const images = post.images ?? [];
 
   function renderImage(image: (typeof images)[number]) {
+    if (image.type === "video") {
+      // No `controls` here: every caller renders this inside a <button> that
+      // opens the lightbox on click, and native video controls nested in a
+      // button fight that click for the same gesture. Muted preview + a play
+      // badge signals "this is a video"; PostImageLightbox is where it
+      // actually gets `controls` and plays.
+      return (
+        <>
+          <video src={image.src} muted playsInline className="size-full object-cover" />
+          <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <span className="flex size-10 items-center justify-center rounded-full bg-black/50">
+              <DynamicIcon name="Play" className="size-4 fill-white text-white" />
+            </span>
+          </span>
+        </>
+      );
+    }
     return isLocalPreviewUrl(image.src) ? (
       // eslint-disable-next-line @next/next/no-img-element -- local blob: preview
       <img src={image.src} alt={image.alt} className="size-full object-cover" />

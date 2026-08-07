@@ -19,9 +19,9 @@ export function StoryBar() {
   const [modalOpen, setModalOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
-  function handleCreateStory({ image, caption }: { image: string; caption?: string }) {
+  function handleCreateStory({ image, caption, type }: { image: string; caption?: string; type?: "image" | "video" }) {
     setStories((prev) => {
-      const newItem = { id: `story-item-${Date.now()}`, image, postedAt: "Just now", caption };
+      const newItem = { id: `story-item-${Date.now()}`, image, postedAt: "Just now", caption, type };
       const existing = prev.find((s) => s.id === CURRENT_USER_STORY_ID);
       const rest = prev.filter((s) => s.id !== CURRENT_USER_STORY_ID);
       const group: Story = existing

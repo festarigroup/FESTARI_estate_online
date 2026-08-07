@@ -4,6 +4,9 @@ import type { IconName } from "@/components/ui/DynamicIcon";
 export interface StoryItem {
   id: string;
   image: string;
+  /** Defaults to "image" when omitted — every seeded story predates video
+   * support, so none of them set this. */
+  type?: "image" | "video";
   /** Shown in the story viewer's header, e.g. "2h ago". Defaults to "Active now". */
   postedAt?: string;
   caption?: string;
@@ -33,6 +36,9 @@ export interface PostAuthor {
 export interface GalleryImage {
   src: string;
   alt: string;
+  /** Defaults to "image" when omitted — every seeded gallery item predates
+   * video support, so none of them set this. */
+  type?: "image" | "video";
 }
 
 /** Lighter than `PostAuthor` — comments don't carry a "2h ago • Accra"-style

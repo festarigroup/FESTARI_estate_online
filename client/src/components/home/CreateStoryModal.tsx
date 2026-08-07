@@ -10,12 +10,14 @@ import { DynamicIcon } from "@/components/ui/DynamicIcon";
 interface CreateStoryModalProps {
   open: boolean;
   onClose: () => void;
-  onCreate: (item: { image: string; caption?: string }) => void;
+  onCreate: (item: { image: string; caption?: string; type?: "image" | "video" }) => void;
 }
 
-/** "Create Story" flow — pick an image, add a caption, share it to the rail. */
+/** "Create Story" flow — pick a photo or video, add a caption, share it to
+ * the rail. */
 export function CreateStoryModal({ open, onClose, onCreate }: CreateStoryModalProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewType, setPreviewType] = useState<"image" | "video">("image");
   const [caption, setCaption] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -27,6 +29,7 @@ export function CreateStoryModal({ open, onClose, onCreate }: CreateStoryModalPr
     // free it.
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(URL.createObjectURL(file));
+    setPreviewType(file.type.startsWith("video/") ? "video" : "image");
   }
 
   // Cancel / backdrop click / Escape: nothing downstream is using this blob
@@ -43,6 +46,7 @@ export function CreateStoryModal({ open, onClose, onCreate }: CreateStoryModalPr
     onCreate({
       image: previewUrl,
       caption: caption.trim() || undefined,
+      type: previewType,
     });
     toast.success("Your story is live for 24 hours.");
     // Deliberately NOT revoking previewUrl — the story we just created now
@@ -66,7 +70,7 @@ export function CreateStoryModal({ open, onClose, onCreate }: CreateStoryModalPr
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/*,video/*"
           onChange={handleFileChange}
           className="hidden"
         />
@@ -74,10 +78,21 @@ export function CreateStoryModal({ open, onClose, onCreate }: CreateStoryModalPr
         {previewUrl ? (
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="relative mx-auto h-80 w-56 overflow-hidden rounded-xl"
+            className="relative mx-auto h-80 w-56 overflow-hidden rounded-xl bg-brand-navy"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element -- local blob: preview, next/image can't optimize it */}
-            <img src={previewUrl} alt="Story preview" className="size-full object-cover" />
+            {previewType === "video" ? (
+              <video src={previewUrl} muted playsInline className="size-full object-cover" />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element -- local blob: preview, next/image can't optimize it
+              <img src={previewUrl} alt="Story preview" className="size-full object-cover" />
+            )}
+            {previewType === "video" && (
+              <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                <span className="flex size-12 items-center justify-center rounded-full bg-black/50">
+                  <DynamicIcon name="Play" className="size-5 fill-white text-white" />
+                </span>
+              </span>
+            )}
           </button>
         ) : (
           <button
@@ -85,7 +100,7 @@ export function CreateStoryModal({ open, onClose, onCreate }: CreateStoryModalPr
             className="mx-auto flex h-80 w-56 flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-muted text-muted hover:border-brand-gold hover:text-brand-gold"
           >
             <DynamicIcon name="ImageIcon" className="size-8" />
-            <span className="text-sm font-medium">Choose a photo</span>
+            <span className="text-sm font-medium">Choose a photo or video</span>
           </button>
         )}
 
