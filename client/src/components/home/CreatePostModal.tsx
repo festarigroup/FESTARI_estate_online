@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
 import { DynamicIcon, type IconName } from "@/components/ui/DynamicIcon";
 import { cn } from "@/lib/cn";
-import type { FeedPost } from "@/types/home";
+import type { ContentPost } from "@/types/home";
 
 export type AttachmentType = "photo" | "property" | "service" | "poll";
 
@@ -27,7 +27,7 @@ const TAG_NOTE: Record<"property" | "service", string> = {
 interface CreatePostModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (post: FeedPost) => void;
+  onSubmit: (post: ContentPost) => void;
   /** Which attach button the composer was opened from, if any. */
   initialAttachment?: AttachmentType;
 }

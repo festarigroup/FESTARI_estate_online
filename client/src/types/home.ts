@@ -95,7 +95,22 @@ export interface GeneralPost {
   comments: Comment[];
 }
 
-export type FeedPost = PropertyPost | ServicePost | GeneralPost;
+/** Anything that carries its own body/comments/engagement bar — i.e. every
+ * feed item except a repost wrapper, which has none of its own. */
+export type ContentPost = PropertyPost | ServicePost | GeneralPost;
+
+/** A no-comment, no-caption "X reposted this" wrapper around an existing
+ * post — reposting a repost re-targets `original`, not the wrapper, so this
+ * never nests. */
+export interface RepostedPost {
+  id: string;
+  kind: "repost";
+  repostedBy: PostAuthor;
+  repostedAt: string;
+  original: ContentPost;
+}
+
+export type FeedPost = ContentPost | RepostedPost;
 
 export interface Category {
   id: string;

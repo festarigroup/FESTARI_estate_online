@@ -1,6 +1,6 @@
 import type {
   Category,
-  FeedPost,
+  ContentPost,
   FollowSuggestion,
   NavItem,
   ServiceProvider,
@@ -84,7 +84,7 @@ export const STORIES: Story[] = [
   },
 ];
 
-export const FEED_POSTS: FeedPost[] = [
+export const FEED_POSTS: ContentPost[] = [
   {
     id: "post-1",
     kind: "property",

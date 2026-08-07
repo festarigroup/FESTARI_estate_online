@@ -4,11 +4,12 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { useSavedPosts } from "@/hooks/useSavedPosts";
+import { useReposts } from "@/hooks/useReposts";
 import { cn } from "@/lib/cn";
-import type { FeedPost } from "@/types/home";
+import type { ContentPost } from "@/types/home";
 
 interface PostEngagementBarProps {
-  post: FeedPost;
+  post: ContentPost;
   commentsOpen: boolean;
   onToggleComments: () => void;
   /** Called after a real share completes (native share sheet or copy-to-clipboard),
@@ -16,11 +17,13 @@ interface PostEngagementBarProps {
   onShare?: () => void;
 }
 
-/** Like / Comment / Share / Save action row, shared by every feed post variant. */
+/** Like / Comment / Repost / Share / Save action row, shared by every feed post variant. */
 export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShare }: PostEngagementBarProps) {
   const [liked, setLiked] = useState(false);
   const { isSaved, toggleSave } = useSavedPosts();
+  const { isReposted, toggleRepost } = useReposts();
   const saved = isSaved(post.id);
+  const reposted = isReposted(post.id);
 
   async function handleShare() {
     const url = window.location.href;
@@ -59,6 +62,12 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
     toast.success(wasSaved ? "Removed from saved." : "Saved. Find it under Saved in the sidebar.");
   }
 
+  function handleRepost() {
+    const wasReposted = reposted;
+    toggleRepost(post.id);
+    toast.success(wasReposted ? "Repost removed." : "Reposted to the top of your feed.");
+  }
+
   return (
     <div className="flex w-full items-center justify-between border-t border-border-subtle pt-[17px]">
       <button
@@ -81,6 +90,16 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
       >
         <DynamicIcon name="MessageCircle" className="size-5" />
         Comment
+      </button>
+      <button
+        onClick={handleRepost}
+        className={cn(
+          "flex items-center gap-2 text-base font-medium",
+          reposted ? "text-brand-blue" : "text-muted hover:text-ink",
+        )}
+      >
+        <DynamicIcon name="Repeat2" className="size-5" />
+        {reposted ? "Reposted" : "Repost"}
       </button>
       <button
         onClick={handleShare}

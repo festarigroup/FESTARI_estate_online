@@ -9,6 +9,7 @@ import { PostHeader } from "@/components/home/PostHeader";
 import { CommentsSection } from "@/components/home/CommentsSection";
 import { PostImageLightbox } from "@/components/home/PostImageLightbox";
 import { usePostComments } from "@/hooks/usePostComments";
+import { useReposts } from "@/hooks/useReposts";
 import { cn } from "@/lib/cn";
 import type { ServicePost } from "@/types/home";
 
@@ -17,9 +18,17 @@ export function ServicePostCard({ post }: { post: ServicePost }) {
   const [liked, setLiked] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.comments);
+  const { isReposted, toggleRepost } = useReposts();
+  const reposted = isReposted(post.id);
 
   function handleBookService() {
     toast.success(`Booking request sent to ${post.author.name}.`);
+  }
+
+  function handleRepost() {
+    const wasReposted = reposted;
+    toggleRepost(post.id);
+    toast.success(wasReposted ? "Repost removed." : "Reposted to the top of your feed.");
   }
 
   return (
@@ -70,6 +79,16 @@ export function ServicePostCard({ post }: { post: ServicePost }) {
           >
             <DynamicIcon name="MessageCircle" className="size-5" />
             {comments.length > 0 ? `Comment (${comments.length})` : "Comment"}
+          </button>
+          <button
+            onClick={handleRepost}
+            className={cn(
+              "flex items-center gap-2 text-base font-medium",
+              reposted ? "text-brand-blue" : "text-muted hover:text-ink",
+            )}
+          >
+            <DynamicIcon name="Repeat2" className="size-5" />
+            {reposted ? "Reposted" : "Repost"}
           </button>
         </div>
         <Button variant="navy" onClick={handleBookService} className="rounded-lg">

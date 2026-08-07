@@ -4,12 +4,12 @@ import { useState } from "react";
 import { Avatar } from "@/components/ui/Avatar";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { CreatePostModal, ATTACHMENT_TYPES, type AttachmentType } from "@/components/home/CreatePostModal";
-import type { FeedPost } from "@/types/home";
+import type { ContentPost } from "@/types/home";
 
 /** "Post Composer" card: avatar + prompt input, plus quick-attach actions —
  * both open the same create-post modal, pre-selecting an attachment type
  * when opened from one of the four buttons below the input. */
-export function PostComposer({ onCreatePost }: { onCreatePost: (post: FeedPost) => void }) {
+export function PostComposer({ onCreatePost }: { onCreatePost: (post: ContentPost) => void }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [initialAttachment, setInitialAttachment] = useState<AttachmentType | undefined>();
 
