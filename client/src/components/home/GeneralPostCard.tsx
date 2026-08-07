@@ -39,7 +39,7 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
 
   return (
     <article className="flex w-full shrink-0 flex-col gap-4 rounded-xl bg-white p-6 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
-      <PostHeader author={post.author} />
+      <PostHeader post={post} />
 
       {post.tag && (
         <span className="flex w-fit items-center gap-1.5 rounded-full bg-surface-muted px-3 py-1 text-xs font-semibold text-brand-navy">

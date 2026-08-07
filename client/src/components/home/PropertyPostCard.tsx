@@ -20,7 +20,7 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
   return (
     <article className="flex w-full shrink-0 flex-col overflow-hidden rounded-xl bg-white shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
       <div className="flex flex-col gap-4 px-6 pt-6 pb-10">
-        <PostHeader author={post.author} />
+        <PostHeader post={post} />
         <div className="text-base leading-relaxed text-ink">
           {post.body.map((line) => (
             <p key={line}>{line}</p>

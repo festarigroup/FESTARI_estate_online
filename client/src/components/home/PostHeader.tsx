@@ -1,9 +1,12 @@
 import { Avatar } from "@/components/ui/Avatar";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
-import type { PostAuthor } from "@/types/home";
+import { PostOptionsMenu } from "@/components/home/PostOptionsMenu";
+import type { ContentPost } from "@/types/home";
 
 /** Shared post byline: avatar, name + verified badge, subtitle, and overflow menu. */
-export function PostHeader({ author }: { author: PostAuthor }) {
+export function PostHeader({ post }: { post: ContentPost }) {
+  const { author } = post;
+
   return (
     <div className="flex w-full items-start justify-between">
       <div className="flex items-center gap-3">
@@ -18,9 +21,7 @@ export function PostHeader({ author }: { author: PostAuthor }) {
           <p className="text-xs text-muted">{author.subtitle}</p>
         </div>
       </div>
-      <button aria-label="More options" className="pb-1.5 text-muted hover:text-ink">
-        <DynamicIcon name="MoreHorizontal" className="size-4 rotate-90" />
-      </button>
+      <PostOptionsMenu post={post} />
     </div>
   );
 }

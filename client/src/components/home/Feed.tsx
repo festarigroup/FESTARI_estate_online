@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { PostComposer } from "@/components/home/PostComposer";
 import { FeedPostCard } from "@/components/home/FeedPostCard";
 import { useReposts } from "@/hooks/useReposts";
+import { useHiddenPosts } from "@/hooks/useHiddenPosts";
 import { FEED_POSTS } from "@/lib/mock-data";
 import type { ContentPost, FeedPost, RepostedPost } from "@/types/home";
 
@@ -17,27 +18,29 @@ const CURRENT_USER = { name: "Kwame", avatar: "/images/avatar-kwame-composer.png
 export function Feed() {
   const [posts, setPosts] = useState<ContentPost[]>(FEED_POSTS);
   const { repostedIds } = useReposts();
+  const { isHidden } = useHiddenPosts();
 
   function addPost(post: ContentPost) {
     setPosts((prev) => [post, ...prev]);
   }
 
+  // "Not interested" / "Report post" filter a post out of view entirely —
+  // including its repost wrapper, if it has one, since a lookup against
+  // this filtered list is what repostCards builds from below.
+  const visiblePosts = posts.filter((p) => !isHidden(p.id));
+
   // Each active repost renders as its own wrapper card at the very top of
   // the feed, most-recently-reposted first — the original post stays right
   // where it already was further down, same as the platforms this is
-  // modeled on. Looked up from `posts` since a repost always targets
+  // modeled on. Looked up from `visiblePosts` since a repost always targets
   // something already in the feed (seed content or composer-created).
-  const repostCards = useMemo<RepostedPost[]>(
-    () =>
-      repostedIds.flatMap((id) => {
-        const original = posts.find((p) => p.id === id);
-        if (!original) return [];
-        return [{ id: `repost-${id}`, kind: "repost", repostedBy: CURRENT_USER, repostedAt: "Just now", original }];
-      }),
-    [repostedIds, posts],
-  );
+  const repostCards: RepostedPost[] = repostedIds.flatMap((id) => {
+    const original = visiblePosts.find((p) => p.id === id);
+    if (!original) return [];
+    return [{ id: `repost-${id}`, kind: "repost", repostedBy: CURRENT_USER, repostedAt: "Just now", original }];
+  });
 
-  const feed: FeedPost[] = [...repostCards, ...posts];
+  const feed: FeedPost[] = [...repostCards, ...visiblePosts];
 
   return (
     <>
