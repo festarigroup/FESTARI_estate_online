@@ -4,6 +4,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { BookServiceModal } from "@/components/home/BookServiceModal";
 import { useReposts } from "@/hooks/useReposts";
 import { cn } from "@/lib/cn";
 
@@ -31,6 +32,7 @@ export function ServiceActionsBar({
   commentCount,
 }: ServiceActionsBarProps) {
   const [liked, setLiked] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
   const { isReposted, toggleRepost } = useReposts();
   const reposted = isReposted(postId);
 
@@ -38,10 +40,6 @@ export function ServiceActionsBar({
     const wasReposted = reposted;
     toggleRepost(postId);
     toast.success(wasReposted ? "Repost removed." : "Reposted to the top of your feed.");
-  }
-
-  function handleBookService() {
-    toast.success(`Booking request sent to ${providerName}.`);
   }
 
   return (
@@ -79,9 +77,11 @@ export function ServiceActionsBar({
           {reposted ? "Reposted" : "Repost"}
         </button>
       </div>
-      <Button variant="navy" onClick={handleBookService} className="rounded-lg">
+      <Button variant="navy" onClick={() => setBookingOpen(true)} className="rounded-lg">
         Book Service
       </Button>
+
+      <BookServiceModal open={bookingOpen} onClose={() => setBookingOpen(false)} providerName={providerName} />
     </div>
   );
 }
