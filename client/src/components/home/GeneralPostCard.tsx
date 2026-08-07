@@ -5,6 +5,7 @@ import Image from "next/image";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { PostHeader } from "@/components/home/PostHeader";
 import { PostEngagementBar } from "@/components/home/PostEngagementBar";
+import { ServiceActionsBar } from "@/components/home/ServiceActionsBar";
 import { CommentsSection } from "@/components/home/CommentsSection";
 import { PollBlock } from "@/components/home/PollBlock";
 import { PostImageLightbox } from "@/components/home/PostImageLightbox";
@@ -121,7 +122,21 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
 
       {post.poll && <PollBlock poll={post.poll} />}
 
-      <PostEngagementBar post={post} commentsOpen={commentsOpen} onToggleComments={toggleComments} />
+      {post.tag === "service" ? (
+        // A service post is meant to drive a booking, not a share — same
+        // lighter footer + "Book Service" CTA as the seeded ServicePost
+        // variant, so a service post looks and behaves the same whichever
+        // way it was created.
+        <ServiceActionsBar
+          postId={post.id}
+          providerName={post.author.name}
+          commentsOpen={commentsOpen}
+          onToggleComments={toggleComments}
+          commentCount={comments.length}
+        />
+      ) : (
+        <PostEngagementBar post={post} commentsOpen={commentsOpen} onToggleComments={toggleComments} />
+      )}
       {commentsOpen && <CommentsSection comments={comments} onAddComment={addComment} />}
 
       {lightboxIndex !== null && (
