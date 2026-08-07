@@ -13,7 +13,11 @@ export function PropertyEnquiryButton({ listerName }: { listerName: string }) {
 
   return (
     <>
-      <Button variant="gold" onClick={() => setOpen(true)} className="rounded-lg">
+      {/* gold's variant styles carry no horizontal padding by default (every
+          other gold button in the app adds its own px-* for that reason) —
+          px-6 py-2 here matches Book Service's navy button exactly, so the
+          two CTAs share the same footprint and only differ by color. */}
+      <Button variant="gold" onClick={() => setOpen(true)} className="px-6 py-2">
         Make Enquiry
       </Button>
       <EnquiryModal open={open} onClose={() => setOpen(false)} listerName={listerName} />
