@@ -43,13 +43,19 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   const [pollOptions, setPollOptions] = useState(["", ""]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  function resetAndClose() {
-    images.forEach((url) => URL.revokeObjectURL(url));
+  function resetState() {
     setBody("");
     setAttachment(undefined);
     setImages([]);
     setPollQuestion("");
     setPollOptions(["", ""]);
+  }
+
+  // Cancel / backdrop click / Escape: nothing downstream is using these
+  // blob URLs, so discard them here.
+  function handleCancel() {
+    images.forEach((url) => URL.revokeObjectURL(url));
+    resetState();
     onClose();
   }
 
@@ -93,11 +99,17 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
       comments: [],
     });
     toast.success("Posted to your feed.");
-    resetAndClose();
+    // Deliberately NOT revoking `images` here — the post we just created
+    // now owns these blob URLs for as long as it's shown in the feed. (A
+    // previous version revoked them right here, which killed the preview
+    // the instant the post was created — the bug this comment guards
+    // against regressing.)
+    resetState();
+    onClose();
   }
 
   return (
-    <Modal open={open} onClose={resetAndClose} title="Create post">
+    <Modal open={open} onClose={handleCancel} title="Create post">
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <Avatar src="/images/avatar-kwame-composer.png" alt="Kwame" size={40} />
@@ -202,7 +214,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
         </div>
 
         <div className="flex justify-end gap-3">
-          <Button variant="ghost" onClick={resetAndClose}>
+          <Button variant="ghost" onClick={handleCancel}>
             Cancel
           </Button>
           <Button variant="navy" onClick={handleSubmit} disabled={!canSubmit} className="px-6">

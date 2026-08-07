@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
@@ -19,19 +19,23 @@ export function CreateStoryModal({ open, onClose, onCreate }: CreateStoryModalPr
   const [caption, setCaption] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Revoke the object URL when it's replaced or the modal unmounts, so we
-  // don't leak blob: references as the user tries a few photos.
-  useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
-
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Revoke whatever was picked before, if anything — it's being replaced
+    // and nothing downstream ever saw it, so this is the one safe place to
+    // free it.
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(URL.createObjectURL(file));
+  }
+
+  // Cancel / backdrop click / Escape: nothing downstream is using this blob
+  // URL, so discard it here.
+  function handleCancel() {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+    setCaption("");
+    onClose();
   }
 
   function handleShare() {
@@ -41,13 +45,18 @@ export function CreateStoryModal({ open, onClose, onCreate }: CreateStoryModalPr
       caption: caption.trim() || undefined,
     });
     toast.success("Your story is live for 24 hours.");
+    // Deliberately NOT revoking previewUrl — the story we just created now
+    // owns this blob URL for as long as it's shown in the rail/viewer.
+    // (A previous version revoked it right here, which killed the preview
+    // the instant the story was created — the bug this comment is guarding
+    // against regressing.)
     setPreviewUrl(null);
     setCaption("");
     onClose();
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Add to your story">
+    <Modal open={open} onClose={handleCancel} title="Add to your story">
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <Avatar src="/images/avatar-kwame-composer.png" alt="Kwame" size={40} />
@@ -88,7 +97,7 @@ export function CreateStoryModal({ open, onClose, onCreate }: CreateStoryModalPr
         />
 
         <div className="flex justify-end gap-3 pt-2">
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="ghost" onClick={handleCancel}>
             Cancel
           </Button>
           <Button variant="gold" onClick={handleShare} disabled={!previewUrl} className="px-6">
