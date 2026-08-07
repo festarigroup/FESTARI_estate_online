@@ -14,10 +14,10 @@ import type { GeneralPost } from "@/types/home";
 
 const TAG_LABEL = { property: "Property listing", service: "Service post" } as const;
 
-/** Above this many photos, a grid stops being readable — show a single
- * cover photo with a "1/N" badge instead (same convention as
- * PropertyPostCard's hero image) and let the lightbox's prev/next handle
- * paging through the rest as a slideshow. */
+/** The inline grid never shows more than this many tiles — beyond it, the
+ * hero tile gets a "1/N" badge (same convention as PropertyPostCard's hero
+ * image, which does this unconditionally against its own totalImages) and
+ * the lightbox's prev/next arrows are the slideshow through the rest. */
 const GRID_LIMIT = 3;
 
 /** Renders posts created through the composer modal (text + at most one of
@@ -56,22 +56,6 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
         </div>
       )}
 
-      {images.length > GRID_LIMIT && (
-        // Too many to grid legibly — one cover photo + a "1/N" badge, same
-        // convention as PropertyPostCard's hero image; the lightbox's
-        // prev/next arrows are the slideshow through the rest.
-        <button
-          aria-label="View photo 1"
-          onClick={() => setLightboxIndex(0)}
-          className="relative h-[280px] w-full cursor-zoom-in overflow-hidden rounded-lg sm:h-[400px]"
-        >
-          {renderImage(images[0])}
-          <span className="absolute top-4 right-4 rounded bg-brand-navy/80 px-2 py-1 text-xs text-white">
-            1/{images.length}
-          </span>
-        </button>
-      )}
-
       {images.length === 1 && (
         <button
           aria-label="View photo 1"
@@ -99,9 +83,12 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
         </div>
       )}
 
-      {images.length === 3 && (
+      {images.length >= GRID_LIMIT && (
         // One big photo on the left, the other two stacked on the right —
         // same mosaic as PropertyPostCard's hero image (Ama Serwaa's post).
+        // Always capped at exactly these 3 tiles: with more than 3 images
+        // total, the hero tile gets a "1/N" badge instead of growing the
+        // grid, and the lightbox pages through everything else.
         <div className="grid grid-cols-3 gap-1">
           <button
             aria-label="View photo 1"
@@ -109,6 +96,11 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
             className="relative col-span-2 row-span-2 h-[280px] cursor-zoom-in overflow-hidden rounded-lg sm:h-[400px]"
           >
             {renderImage(images[0])}
+            {images.length > GRID_LIMIT && (
+              <span className="absolute top-4 right-4 rounded bg-brand-navy/80 px-2 py-1 text-xs text-white">
+                1/{images.length}
+              </span>
+            )}
           </button>
           <button
             aria-label="View photo 2"
