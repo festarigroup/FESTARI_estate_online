@@ -18,7 +18,7 @@ const TAG_LABEL = { property: "Property listing", service: "Service post" } as c
  * cover photo with a "1/N" badge instead (same convention as
  * PropertyPostCard's hero image) and let the lightbox's prev/next handle
  * paging through the rest as a slideshow. */
-const GRID_LIMIT = 4;
+const GRID_LIMIT = 3;
 
 /** Renders posts created through the composer modal (text + at most one of
  * photos / a property-or-service tag / a poll) — not a Figma frame, built to
@@ -27,6 +27,15 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
   const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.comments);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const images = post.images ?? [];
+
+  function renderImage(image: (typeof images)[number]) {
+    return isLocalPreviewUrl(image.src) ? (
+      // eslint-disable-next-line @next/next/no-img-element -- local blob: preview
+      <img src={image.src} alt={image.alt} className="size-full object-cover" />
+    ) : (
+      <Image src={image.src} alt={image.alt} fill className="object-cover" />
+    );
+  }
 
   return (
     <article className="flex w-full shrink-0 flex-col gap-4 rounded-xl bg-white p-6 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
@@ -56,35 +65,65 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
           onClick={() => setLightboxIndex(0)}
           className="relative h-[280px] w-full cursor-zoom-in overflow-hidden rounded-lg sm:h-[400px]"
         >
-          {isLocalPreviewUrl(images[0].src) ? (
-            // eslint-disable-next-line @next/next/no-img-element -- local blob: preview
-            <img src={images[0].src} alt={images[0].alt} className="size-full object-cover" />
-          ) : (
-            <Image src={images[0].src} alt={images[0].alt} fill className="object-cover" />
-          )}
+          {renderImage(images[0])}
           <span className="absolute top-4 right-4 rounded bg-brand-navy/80 px-2 py-1 text-xs text-white">
             1/{images.length}
           </span>
         </button>
       )}
 
-      {images.length > 0 && images.length <= GRID_LIMIT && (
-        <div className={images.length === 1 ? "" : "grid grid-cols-2 gap-1"}>
+      {images.length === 1 && (
+        <button
+          aria-label="View photo 1"
+          onClick={() => setLightboxIndex(0)}
+          className="relative h-[280px] w-full cursor-zoom-in overflow-hidden rounded-lg sm:h-[400px]"
+        >
+          {renderImage(images[0])}
+        </button>
+      )}
+
+      {images.length === 2 && (
+        // Side by side, evenly split — nothing to stack with only one
+        // "other" photo.
+        <div className="grid grid-cols-2 gap-1">
           {images.map((image, i) => (
             <button
               key={i}
               aria-label={`View photo ${i + 1}`}
               onClick={() => setLightboxIndex(i)}
-              className="relative aspect-square cursor-zoom-in overflow-hidden rounded-lg"
+              className="relative h-[280px] cursor-zoom-in overflow-hidden rounded-lg sm:h-[400px]"
             >
-              {isLocalPreviewUrl(image.src) ? (
-                // eslint-disable-next-line @next/next/no-img-element -- local blob: preview
-                <img src={image.src} alt={image.alt} className="size-full object-cover" />
-              ) : (
-                <Image src={image.src} alt={image.alt} fill className="object-cover" />
-              )}
+              {renderImage(image)}
             </button>
           ))}
+        </div>
+      )}
+
+      {images.length === 3 && (
+        // One big photo on the left, the other two stacked on the right —
+        // same mosaic as PropertyPostCard's hero image (Ama Serwaa's post).
+        <div className="grid grid-cols-3 gap-1">
+          <button
+            aria-label="View photo 1"
+            onClick={() => setLightboxIndex(0)}
+            className="relative col-span-2 row-span-2 h-[280px] cursor-zoom-in overflow-hidden rounded-lg sm:h-[400px]"
+          >
+            {renderImage(images[0])}
+          </button>
+          <button
+            aria-label="View photo 2"
+            onClick={() => setLightboxIndex(1)}
+            className="relative h-[137px] cursor-zoom-in overflow-hidden rounded-lg sm:h-[199px]"
+          >
+            {renderImage(images[1])}
+          </button>
+          <button
+            aria-label="View photo 3"
+            onClick={() => setLightboxIndex(2)}
+            className="relative h-[137px] cursor-zoom-in overflow-hidden rounded-lg sm:h-[199px]"
+          >
+            {renderImage(images[2])}
+          </button>
         </div>
       )}
 
