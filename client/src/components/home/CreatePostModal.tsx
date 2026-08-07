@@ -36,7 +36,16 @@ interface CreatePostModalProps {
  * give those four buttons somewhere real to go. */
 export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: CreatePostModalProps) {
   const [body, setBody] = useState("");
-  const [attachment, setAttachment] = useState<AttachmentType | undefined>(initialAttachment);
+  // Property/Service is a tag, independent of whether photos are attached —
+  // a property or service post can optionally carry photos too, it's just
+  // never required. Photo and Poll stay mutually exclusive with each other
+  // (a poll-with-photos composer doesn't fit this layout), but neither is
+  // tied to the tag anymore.
+  const [tag, setTag] = useState<"property" | "service" | undefined>(
+    initialAttachment === "property" || initialAttachment === "service" ? initialAttachment : undefined,
+  );
+  const [showPhotos, setShowPhotos] = useState(initialAttachment === "photo");
+  const [showPoll, setShowPoll] = useState(initialAttachment === "poll");
   const [images, setImages] = useState<string[]>([]);
   const [pollQuestion, setPollQuestion] = useState("");
   const [pollOptions, setPollOptions] = useState(["", ""]);
@@ -44,7 +53,9 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
 
   function resetState() {
     setBody("");
-    setAttachment(undefined);
+    setTag(undefined);
+    setShowPhotos(false);
+    setShowPoll(false);
     setImages([]);
     setPollQuestion("");
     setPollOptions(["", ""]);
@@ -68,6 +79,42 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
     setImages((prev) => prev.filter((u) => u !== url));
   }
 
+  function isAttachmentActive(type: AttachmentType) {
+    if (type === "photo") return showPhotos;
+    if (type === "poll") return showPoll;
+    return tag === type;
+  }
+
+  function handleToggleAttachment(type: AttachmentType) {
+    if (type === "property" || type === "service") {
+      setTag((prev) => (prev === type ? undefined : type));
+      return;
+    }
+    if (type === "photo") {
+      setShowPhotos((prev) => {
+        const next = !prev;
+        if (next) {
+          setShowPoll(false);
+        } else {
+          images.forEach((url) => URL.revokeObjectURL(url));
+          setImages([]);
+        }
+        return next;
+      });
+      return;
+    }
+    // Poll
+    setShowPoll((prev) => {
+      const next = !prev;
+      if (next) {
+        setShowPhotos(false);
+        images.forEach((url) => URL.revokeObjectURL(url));
+        setImages([]);
+      }
+      return next;
+    });
+  }
+
   function updatePollOption(index: number, value: string) {
     setPollOptions((prev) => prev.map((o, i) => (i === index ? value : o)));
   }
@@ -76,7 +123,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   const canSubmit =
     body.trim().length > 0 ||
     images.length > 0 ||
-    (attachment === "poll" && pollQuestion.trim().length > 0 && trimmedOptions.length >= 2);
+    (showPoll && pollQuestion.trim().length > 0 && trimmedOptions.length >= 2);
 
   function handleSubmit() {
     if (!canSubmit) return;
@@ -85,16 +132,14 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
       kind: "general",
       author: { name: "Kwame", avatar: "/images/avatar-kwame-composer.png", subtitle: "Just now" },
       body: body.trim() ? body.trim().split("\n") : [],
-      images: attachment === "photo" && images.length
-        ? images.map((src) => ({ src, alt: "Photo attached to Kwame's post" }))
-        : undefined,
-      poll: attachment === "poll" && trimmedOptions.length >= 2
+      images: images.length ? images.map((src) => ({ src, alt: "Photo attached to Kwame's post" })) : undefined,
+      poll: showPoll && trimmedOptions.length >= 2
         ? {
             question: pollQuestion.trim(),
             options: trimmedOptions.map((text, i) => ({ id: `opt-${i}`, text, votes: 0 })),
           }
         : undefined,
-      tag: attachment === "property" || attachment === "service" ? attachment : undefined,
+      tag,
       comments: [],
     });
     toast.success("Posted to your feed.");
@@ -124,7 +169,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
           className="w-full resize-none rounded-lg border border-border-subtle p-3 text-base text-ink placeholder:text-muted focus:outline-2 focus:outline-brand-gold"
         />
 
-        {attachment === "photo" && (
+        {showPhotos && (
           <div className="flex flex-col gap-2">
             <input
               ref={fileInputRef}
@@ -159,13 +204,13 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
           </div>
         )}
 
-        {(attachment === "property" || attachment === "service") && (
+        {tag && (
           <p className="rounded-lg bg-surface-muted px-3 py-2 text-xs text-muted">
-            {TAG_NOTE[attachment]}
+            {TAG_NOTE[tag]}
           </p>
         )}
 
-        {attachment === "poll" && (
+        {showPoll && (
           <div className="flex flex-col gap-2 rounded-lg border border-border-subtle p-3">
             <input
               value={pollQuestion}
@@ -198,10 +243,10 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
           {ATTACHMENT_TYPES.map((item) => (
             <button
               key={item.type}
-              onClick={() => setAttachment((prev) => (prev === item.type ? undefined : item.type))}
+              onClick={() => handleToggleAttachment(item.type)}
               className={cn(
                 "flex items-center gap-2",
-                attachment === item.type ? "text-brand-gold" : "text-brand-navy/70 hover:text-brand-navy",
+                isAttachmentActive(item.type) ? "text-brand-gold" : "text-brand-navy/70 hover:text-brand-navy",
               )}
             >
               <DynamicIcon name={item.icon} className="size-5" />
