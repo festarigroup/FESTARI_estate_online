@@ -18,7 +18,6 @@ export const ATTACHMENT_TYPES: { type: AttachmentType; label: string; icon: Icon
   { type: "poll", label: "Poll", icon: "BarChart3" },
 ];
 
-const MAX_IMAGES = 4;
 const TAG_NOTE: Record<"property" | "service", string> = {
   property: "This post will be tagged as a property listing.",
   service: "This post will be tagged as a service post.",
@@ -60,7 +59,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   }
 
   function handleFilesSelected(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []).slice(0, MAX_IMAGES - images.length);
+    const files = Array.from(e.target.files ?? []);
     setImages((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))]);
   }
 
@@ -149,15 +148,13 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
                   </button>
                 </div>
               ))}
-              {images.length < MAX_IMAGES && (
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex aspect-square flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-muted text-muted hover:border-brand-gold hover:text-brand-gold"
-                >
-                  <DynamicIcon name="Plus" className="size-4" />
-                  <span className="text-[10px]">Add</span>
-                </button>
-              )}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex aspect-square flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-muted text-muted hover:border-brand-gold hover:text-brand-gold"
+              >
+                <DynamicIcon name="Plus" className="size-4" />
+                <span className="text-[10px]">Add</span>
+              </button>
             </div>
           </div>
         )}
