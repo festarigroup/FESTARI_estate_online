@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import { NavLink } from "@/components/layout/NavLink";
-import { Button } from "@/components/ui/Button";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { cn } from "@/lib/cn";
 import { NAV_ITEMS, NAV_SECONDARY_ITEMS } from "@/lib/mock-data";
@@ -56,11 +55,6 @@ export function SideNavBar({ open, onClose }: SideNavBarProps) {
         </div>
 
         <div className="flex flex-col gap-6 p-4">
-          <Button variant="gold" className="w-full">
-            <DynamicIcon name="Plus" className="size-5" />
-            <span>List a Property</span>
-          </Button>
-
           <div
             className="flex flex-col gap-2 rounded-xl border border-brand-navy-light p-4"
             style={{ backgroundImage: "linear-gradient(146deg, #2f486a 0%, #001f3f 100%)" }}
