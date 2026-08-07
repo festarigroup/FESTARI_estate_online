@@ -13,7 +13,10 @@ export function VenueReservationButton({ venueName }: { venueName: string }) {
 
   return (
     <>
-      <Button variant="gold" onClick={() => setOpen(true)} className="px-6 py-2">
+      {/* navy to match Book Service and Make Enquiry — every post's
+          "primary action" CTA shares the same color now, not just the same
+          footprint. */}
+      <Button variant="navy" onClick={() => setOpen(true)} className="rounded-lg">
         Make a Reservation
       </Button>
       <ReservationModal open={open} onClose={() => setOpen(false)} venueName={venueName} />
