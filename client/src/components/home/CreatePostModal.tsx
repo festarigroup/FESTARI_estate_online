@@ -9,18 +9,26 @@ import { DynamicIcon, type IconName } from "@/components/ui/DynamicIcon";
 import { cn } from "@/lib/cn";
 import type { ContentPost } from "@/types/home";
 
-export type AttachmentType = "photo" | "property" | "service" | "poll";
+export type AttachmentType = "photo" | "property" | "service" | "venue" | "poll";
 
 export const ATTACHMENT_TYPES: { type: AttachmentType; label: string; icon: IconName }[] = [
   { type: "photo", label: "Photo/Video", icon: "ImageIcon" },
   { type: "property", label: "Property", icon: "Building2" },
   { type: "service", label: "Service", icon: "Wrench" },
+  { type: "venue", label: "Venue", icon: "Landmark" },
   { type: "poll", label: "Poll", icon: "BarChart3" },
 ];
 
-const TAG_NOTE: Record<"property" | "service", string> = {
+type TagType = "property" | "service" | "venue";
+
+function isTagType(type: AttachmentType): type is TagType {
+  return type === "property" || type === "service" || type === "venue";
+}
+
+const TAG_NOTE: Record<TagType, string> = {
   property: "This post will be tagged as a property listing.",
   service: "This post will be tagged as a service post.",
+  venue: "This post will be tagged as a venue listing.",
 };
 
 interface CreatePostModalProps {
@@ -36,19 +44,20 @@ interface CreatePostModalProps {
  * give those four buttons somewhere real to go. */
 export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: CreatePostModalProps) {
   const [body, setBody] = useState("");
-  // Property/Service is a tag, independent of whether photos are attached —
-  // a property or service post can optionally carry photos too, it's just
+  // Property/Service/Venue is a tag, independent of whether photos are
+  // attached — a listing post can optionally carry photos too, it's just
   // never required. "Independent" means the photo picker isn't *gated*
-  // behind the tag, not that it stays hidden: picking either tag also
-  // surfaces the photo option immediately (see handleToggleAttachment and
-  // the initial state below), so the upload area doesn't need a second,
-  // separate click to appear. Photo and Poll stay mutually exclusive with
-  // each other (a poll-with-photos composer doesn't fit this layout).
-  const [tag, setTag] = useState<"property" | "service" | undefined>(
-    initialAttachment === "property" || initialAttachment === "service" ? initialAttachment : undefined,
+  // behind the tag, not that it stays hidden: picking any of the three tags
+  // also surfaces the photo option immediately (see handleToggleAttachment
+  // and the initial state below), so the upload area doesn't need a
+  // second, separate click to appear. Photo and Poll stay mutually
+  // exclusive with each other (a poll-with-photos composer doesn't fit
+  // this layout).
+  const [tag, setTag] = useState<TagType | undefined>(
+    initialAttachment && isTagType(initialAttachment) ? initialAttachment : undefined,
   );
   const [showPhotos, setShowPhotos] = useState(
-    initialAttachment === "photo" || initialAttachment === "property" || initialAttachment === "service",
+    initialAttachment === "photo" || (!!initialAttachment && isTagType(initialAttachment)),
   );
   const [showPoll, setShowPoll] = useState(initialAttachment === "poll");
   const [images, setImages] = useState<string[]>([]);
@@ -91,7 +100,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   }
 
   function handleToggleAttachment(type: AttachmentType) {
-    if (type === "property" || type === "service") {
+    if (isTagType(type)) {
       const turningOn = tag !== type;
       setTag(turningOn ? type : undefined);
       if (turningOn) {

@@ -83,7 +83,7 @@ export interface ServicePost {
 }
 
 /** A post created through the composer modal — free-form text plus at most
- * one attachment type (photos, a property/service tag, or a poll). */
+ * one attachment type (photos, a property/service/venue tag, or a poll). */
 export interface GeneralPost {
   id: string;
   kind: "general";
@@ -91,7 +91,7 @@ export interface GeneralPost {
   body: string[];
   images?: GalleryImage[];
   poll?: Poll;
-  tag?: "property" | "service";
+  tag?: "property" | "service" | "venue";
   comments: Comment[];
 }
 

@@ -7,14 +7,21 @@ import { PostHeader } from "@/components/home/PostHeader";
 import { PostEngagementBar } from "@/components/home/PostEngagementBar";
 import { ServiceActionsBar } from "@/components/home/ServiceActionsBar";
 import { PropertyEnquiryButton } from "@/components/home/PropertyEnquiryButton";
+import { VenueReservationButton } from "@/components/home/VenueReservationButton";
 import { CommentsSection } from "@/components/home/CommentsSection";
 import { PollBlock } from "@/components/home/PollBlock";
 import { PostImageLightbox } from "@/components/home/PostImageLightbox";
 import { usePostComments } from "@/hooks/usePostComments";
 import { isLocalPreviewUrl } from "@/lib/is-local-preview-url";
+import type { IconName } from "@/components/ui/DynamicIcon";
 import type { GeneralPost } from "@/types/home";
 
-const TAG_LABEL = { property: "Property listing", service: "Service post" } as const;
+const TAG_LABEL = { property: "Property listing", service: "Service post", venue: "Venue listing" } as const;
+const TAG_ICON: Record<keyof typeof TAG_LABEL, IconName> = {
+  property: "Building2",
+  service: "Wrench",
+  venue: "Landmark",
+};
 
 /** The inline grid never shows more than this many tiles — beyond it, the
  * hero tile gets a "1/N" badge (same convention as PropertyPostCard's hero
@@ -45,7 +52,7 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
 
       {post.tag && (
         <span className="flex w-fit items-center gap-1.5 rounded-full bg-surface-muted px-3 py-1 text-xs font-semibold text-brand-navy">
-          <DynamicIcon name={post.tag === "property" ? "Building2" : "Wrench"} className="size-3.5" />
+          <DynamicIcon name={TAG_ICON[post.tag]} className="size-3.5" />
           {TAG_LABEL[post.tag]}
         </span>
       )}
@@ -140,7 +147,13 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
           post={post}
           commentsOpen={commentsOpen}
           onToggleComments={toggleComments}
-          cta={post.tag === "property" ? <PropertyEnquiryButton listerName={post.author.name} /> : undefined}
+          cta={
+            post.tag === "property" ? (
+              <PropertyEnquiryButton listerName={post.author.name} />
+            ) : post.tag === "venue" ? (
+              <VenueReservationButton venueName={post.author.name} />
+            ) : undefined
+          }
         />
       )}
       {commentsOpen && <CommentsSection comments={comments} onAddComment={addComment} />}
