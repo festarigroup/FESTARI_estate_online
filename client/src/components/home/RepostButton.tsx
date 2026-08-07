@@ -37,7 +37,7 @@ export function RepostButton({ postId }: { postId: string }) {
         className="flex items-center gap-2 text-base font-medium text-brand-blue"
       >
         <DynamicIcon name="Repeat2" className="size-5" />
-        Reposted
+        <span className="sr-only sm:not-sr-only">Reposted</span>
       </button>
     );
   }
@@ -52,7 +52,7 @@ export function RepostButton({ postId }: { postId: string }) {
             className={cn("flex items-center gap-2 text-base font-medium", "text-muted hover:text-ink")}
           >
             <DynamicIcon name="Repeat2" className="size-5" />
-            Repost
+            <span className="sr-only sm:not-sr-only">Repost</span>
           </button>
         )}
       >

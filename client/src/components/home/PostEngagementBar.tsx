@@ -65,6 +65,10 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
     toast.success(wasSaved ? "Removed from saved." : "Saved. Find it under Saved in the sidebar.");
   }
 
+  // Labels collapse to icon-only below sm: (the row cramped up badly at
+  // phone widths with five text+icon actions competing for space) — sr-only
+  // rather than a plain hidden, so the label stays in the accessible name
+  // instead of leaving the button an unlabeled icon for screen readers.
   const actions = (
     <>
       <button
@@ -75,7 +79,7 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
         )}
       >
         <DynamicIcon name="Heart" className="size-5" fill={liked ? "currentColor" : "none"} />
-        Like
+        <span className="sr-only sm:not-sr-only">Like</span>
       </button>
       <button
         onClick={onToggleComments}
@@ -86,7 +90,7 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
         )}
       >
         <DynamicIcon name="MessageCircle" className="size-5" />
-        Comment
+        <span className="sr-only sm:not-sr-only">Comment</span>
       </button>
       <RepostButton postId={post.id} />
       <button
@@ -94,7 +98,7 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
         className="flex items-center gap-2 text-base font-medium text-muted hover:text-ink"
       >
         <DynamicIcon name="Share2" className="size-5" />
-        Share
+        <span className="sr-only sm:not-sr-only">Share</span>
       </button>
       <button
         onClick={handleSave}
@@ -104,7 +108,7 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
         )}
       >
         <DynamicIcon name="Bookmark" className="size-5" fill={saved ? "currentColor" : "none"} />
-        Save
+        <span className="sr-only sm:not-sr-only">Save</span>
       </button>
     </>
   );

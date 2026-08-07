@@ -22,7 +22,9 @@ interface ServiceActionsBarProps {
  * Figma file draws between the "Property Listing" and "Service/Promotion"
  * post variants. Shared by ServicePostCard and any GeneralPost tagged
  * "service" from the composer, so a service post looks and behaves the
- * same regardless of where it came from. */
+ * same regardless of where it came from. Like/Comment labels collapse to
+ * icon-only below sm: for the same cramped-mobile-row reason
+ * PostEngagementBar's do. */
 export function ServiceActionsBar({
   postId,
   providerName,
@@ -44,7 +46,7 @@ export function ServiceActionsBar({
           )}
         >
           <DynamicIcon name="Heart" className="size-5" fill={liked ? "currentColor" : "none"} />
-          Like
+          <span className="sr-only sm:not-sr-only">Like</span>
         </button>
         <button
           onClick={onToggleComments}
@@ -55,7 +57,9 @@ export function ServiceActionsBar({
           )}
         >
           <DynamicIcon name="MessageCircle" className="size-5" />
-          {commentCount > 0 ? `Comment (${commentCount})` : "Comment"}
+          <span className="sr-only sm:not-sr-only">
+            {commentCount > 0 ? `Comment (${commentCount})` : "Comment"}
+          </span>
         </button>
         <RepostButton postId={postId} />
       </div>
