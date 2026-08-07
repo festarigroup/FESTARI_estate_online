@@ -38,13 +38,18 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   const [body, setBody] = useState("");
   // Property/Service is a tag, independent of whether photos are attached —
   // a property or service post can optionally carry photos too, it's just
-  // never required. Photo and Poll stay mutually exclusive with each other
-  // (a poll-with-photos composer doesn't fit this layout), but neither is
-  // tied to the tag anymore.
+  // never required. "Independent" means the photo picker isn't *gated*
+  // behind the tag, not that it stays hidden: picking either tag also
+  // surfaces the photo option immediately (see handleToggleAttachment and
+  // the initial state below), so the upload area doesn't need a second,
+  // separate click to appear. Photo and Poll stay mutually exclusive with
+  // each other (a poll-with-photos composer doesn't fit this layout).
   const [tag, setTag] = useState<"property" | "service" | undefined>(
     initialAttachment === "property" || initialAttachment === "service" ? initialAttachment : undefined,
   );
-  const [showPhotos, setShowPhotos] = useState(initialAttachment === "photo");
+  const [showPhotos, setShowPhotos] = useState(
+    initialAttachment === "photo" || initialAttachment === "property" || initialAttachment === "service",
+  );
   const [showPoll, setShowPoll] = useState(initialAttachment === "poll");
   const [images, setImages] = useState<string[]>([]);
   const [pollQuestion, setPollQuestion] = useState("");
@@ -87,7 +92,15 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
 
   function handleToggleAttachment(type: AttachmentType) {
     if (type === "property" || type === "service") {
-      setTag((prev) => (prev === type ? undefined : type));
+      const turningOn = tag !== type;
+      setTag(turningOn ? type : undefined);
+      if (turningOn) {
+        // Surface the photo option immediately rather than requiring a
+        // separate click on Photo/Video — attaching one stays optional,
+        // it just shouldn't be an extra step to discover.
+        setShowPhotos(true);
+        setShowPoll(false);
+      }
       return;
     }
     if (type === "photo") {
