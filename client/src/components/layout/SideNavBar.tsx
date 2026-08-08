@@ -53,27 +53,6 @@ export function SideNavBar({ open, onClose }: SideNavBarProps) {
             <NavLink key={item.id} item={item} active={pathname === item.href} />
           ))}
         </div>
-
-        <div className="flex flex-col gap-6 p-4">
-          <div
-            className="flex flex-col gap-2 rounded-xl border border-brand-navy-light p-4"
-            style={{ backgroundImage: "linear-gradient(146deg, #2f486a 0%, #001f3f 100%)" }}
-          >
-            <p className="font-heading text-xs tracking-[1.2px] text-brand-gold uppercase">
-              Grow with Festari
-            </p>
-            <p className="text-xs text-white/70">Invite friends and earn premium rewards.</p>
-            <div className="flex items-center gap-2 pt-2">
-              <button className="rounded px-4 py-1.5 text-xs font-semibold text-brand-navy bg-white">
-                Invite Now
-              </button>
-              <div className="flex items-center">
-                <span className="size-6 rounded-full border-2 border-brand-navy bg-muted" />
-                <span className="-ml-2 size-6 rounded-full border-2 border-brand-navy bg-brand-gold" />
-              </div>
-            </div>
-          </div>
-        </div>
       </aside>
     </>
   );
