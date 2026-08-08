@@ -6,6 +6,7 @@ import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { PostHeader } from "@/components/home/PostHeader";
 import { PostEngagementBar } from "@/components/home/PostEngagementBar";
 import { ServiceActionsBar } from "@/components/home/ServiceActionsBar";
+import { BookServiceButton } from "@/components/home/BookServiceButton";
 import { PropertyEnquiryButton } from "@/components/home/PropertyEnquiryButton";
 import { VenueReservationButton } from "@/components/home/VenueReservationButton";
 import { CommentsSection } from "@/components/home/CommentsSection";
@@ -166,30 +167,31 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
 
       {post.poll && <PollBlock poll={post.poll} />}
 
-      {post.tag === "service" ? (
-        // A service post is meant to drive a booking, not a share — same
-        // lighter footer + "Book Service" CTA as the seeded ServicePost
-        // variant, so a service post looks and behaves the same whichever
-        // way it was created.
+      {post.tag === "service" || post.tag === "venue" ? (
+        // Service and venue posts both drive a direct booking action, not
+        // a share — same "Social Interactions & Actions" bar the Figma
+        // Service/Promotion post uses (node 3303:5412), so a venue post
+        // looks and behaves the same as a service post, not the heavier
+        // Property-style engagement row.
         <ServiceActionsBar
-          postId={post.id}
-          providerName={post.author.name}
+          post={post}
           commentsOpen={commentsOpen}
           onToggleComments={toggleComments}
           commentCount={comments.length}
+          cta={
+            post.tag === "service" ? (
+              <BookServiceButton providerName={post.author.name} />
+            ) : (
+              <VenueReservationButton venueName={post.author.name} />
+            )
+          }
         />
       ) : (
         <PostEngagementBar
           post={post}
           commentsOpen={commentsOpen}
           onToggleComments={toggleComments}
-          cta={
-            post.tag === "property" ? (
-              <PropertyEnquiryButton listerName={post.author.name} />
-            ) : post.tag === "venue" ? (
-              <VenueReservationButton venueName={post.author.name} />
-            ) : undefined
-          }
+          cta={post.tag === "property" ? <PropertyEnquiryButton listerName={post.author.name} /> : undefined}
         />
       )}
       {commentsOpen && <CommentsSection comments={comments} onAddComment={addComment} />}

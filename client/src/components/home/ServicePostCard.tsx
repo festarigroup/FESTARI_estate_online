@@ -6,6 +6,7 @@ import { PostHeader } from "@/components/home/PostHeader";
 import { CommentsSection } from "@/components/home/CommentsSection";
 import { PostImageLightbox } from "@/components/home/PostImageLightbox";
 import { ServiceActionsBar } from "@/components/home/ServiceActionsBar";
+import { BookServiceButton } from "@/components/home/BookServiceButton";
 import { usePostComments } from "@/hooks/usePostComments";
 import type { ServicePost } from "@/types/home";
 
@@ -41,11 +42,11 @@ export function ServicePostCard({ post }: { post: ServicePost }) {
       )}
 
       <ServiceActionsBar
-        postId={post.id}
-        providerName={post.author.name}
+        post={post}
         commentsOpen={commentsOpen}
         onToggleComments={toggleComments}
         commentCount={comments.length}
+        cta={<BookServiceButton providerName={post.author.name} />}
       />
 
       {commentsOpen && <CommentsSection comments={comments} onAddComment={addComment} />}

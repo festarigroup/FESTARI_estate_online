@@ -1,39 +1,47 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import toast from "react-hot-toast";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
-import { BookServiceModal } from "@/components/home/BookServiceModal";
 import { RepostButton } from "@/components/home/RepostButton";
+import { useSavedPosts } from "@/hooks/useSavedPosts";
+import { usePostShare } from "@/hooks/usePostShare";
 import { cn } from "@/lib/cn";
+import type { ContentPost } from "@/types/home";
 
 interface ServiceActionsBarProps {
-  postId: string;
-  /** Who "Book Service" sends the request to — the provider, not the viewer. */
-  providerName: string;
+  post: ContentPost;
   commentsOpen: boolean;
   onToggleComments: () => void;
   commentCount: number;
+  /** The post's one direct-action CTA — BookServiceButton for a service
+   * post, VenueReservationButton for a venue post. Same slot PostEngagementBar's
+   * `cta` prop is, just always present here rather than optional, since
+   * every post that reaches this bar has one. */
+  cta: React.ReactNode;
 }
 
-/** Like / Comment / Repost + a direct "Book Service" CTA — deliberately
- * lighter than PostEngagementBar (no Share/Save row): a service listing's
- * primary action is booking it, not sharing it, same distinction the
- * Figma file draws between the "Property Listing" and "Service/Promotion"
- * post variants. Shared by ServicePostCard and any GeneralPost tagged
- * "service" from the composer, so a service post looks and behaves the
- * same regardless of where it came from. Like/Comment labels collapse to
- * icon-only below sm: for the same cramped-mobile-row reason
- * PostEngagementBar's do. */
-export function ServiceActionsBar({
-  postId,
-  providerName,
-  commentsOpen,
-  onToggleComments,
-  commentCount,
-}: ServiceActionsBarProps) {
+/** Like / Comment / Repost / Share / Save + a direct booking CTA — the
+ * "Social Interactions & Actions" bar from the Figma Service/Promotion post
+ * (node 3340:1076), reproduced with this app's existing interactive
+ * Like/Comment/Save affordances (toggle + label) rather than Figma's
+ * static counts, since these buttons actually do something here. Shared by
+ * every post whose primary action is booking something directly rather
+ * than just sharing it — service posts and venue posts alike, the same
+ * distinction the Figma file draws between "Property Listing" and
+ * "Service/Promotion". Labels collapse to icon-only below sm: for the same
+ * cramped-mobile-row reason PostEngagementBar's do. */
+export function ServiceActionsBar({ post, commentsOpen, onToggleComments, commentCount, cta }: ServiceActionsBarProps) {
   const [liked, setLiked] = useState(false);
-  const [bookingOpen, setBookingOpen] = useState(false);
+  const { isSaved, toggleSave } = useSavedPosts();
+  const saved = isSaved(post.id);
+  const { handleShare } = usePostShare(post);
+
+  function handleSave() {
+    const wasSaved = saved;
+    toggleSave(post);
+    toast.success(wasSaved ? "Removed from saved." : "Saved. Find it under Saved in the sidebar.");
+  }
 
   return (
     <div className="flex w-full items-center justify-between border-t border-border-subtle pt-[17px]">
@@ -61,15 +69,33 @@ export function ServiceActionsBar({
             {commentCount > 0 ? `Comment (${commentCount})` : "Comment"}
           </span>
         </button>
-        <RepostButton postId={postId} />
+        <RepostButton postId={post.id} />
       </div>
-      {/* outline-gold matches the Figma "Book Service" button exactly
-          (node 3340:1102) -- a transparent pill, not a filled color. */}
-      <Button variant="outline-gold" onClick={() => setBookingOpen(true)}>
-        Book Service
-      </Button>
-
-      <BookServiceModal open={bookingOpen} onClose={() => setBookingOpen(false)} providerName={providerName} />
+      <div className="flex items-center gap-3">
+        {/* Circular icon buttons, not text+icon rows — matches Figma's
+            share/save buttons on this bar exactly (nodes 3340:1087/1090),
+            distinct from PostEngagementBar's labeled style. */}
+        <button
+          aria-label="Share"
+          onClick={handleShare}
+          className="flex size-9 items-center justify-center rounded-full border border-[#e9ecef] text-muted hover:bg-surface-muted"
+        >
+          <DynamicIcon name="Share2" className="size-4" />
+        </button>
+        <button
+          aria-label={saved ? "Remove from saved" : "Save"}
+          onClick={handleSave}
+          className={cn(
+            "flex size-9 items-center justify-center rounded-full border",
+            saved
+              ? "border-[rgba(119,90,25,0.3)] bg-[rgba(254,212,136,0.2)] text-brand-gold-dark"
+              : "border-[#e9ecef] text-muted hover:bg-surface-muted",
+          )}
+        >
+          <DynamicIcon name="Bookmark" className="size-4" fill={saved ? "currentColor" : "none"} />
+        </button>
+        {cta}
+      </div>
     </div>
   );
 }

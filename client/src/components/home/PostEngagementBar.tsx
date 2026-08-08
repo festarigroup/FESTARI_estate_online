@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { RepostButton } from "@/components/home/RepostButton";
 import { useSavedPosts } from "@/hooks/useSavedPosts";
+import { usePostShare } from "@/hooks/usePostShare";
 import { cn } from "@/lib/cn";
 import type { ContentPost } from "@/types/home";
 
@@ -27,37 +28,7 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
   const [liked, setLiked] = useState(false);
   const { isSaved, toggleSave } = useSavedPosts();
   const saved = isSaved(post.id);
-
-  async function handleShare() {
-    const url = window.location.href;
-    const shareData: ShareData = {
-      title: `${post.author.name} on Festari Estates`,
-      text: post.body[0] ?? `A post from ${post.author.name} on Festari Estates`,
-      url,
-    };
-
-    if (navigator.share && (navigator.canShare?.(shareData) ?? true)) {
-      try {
-        await navigator.share(shareData);
-        onShare?.();
-      } catch (err) {
-        // AbortError just means the user dismissed the native share sheet —
-        // not a failure worth surfacing.
-        if ((err as Error)?.name !== "AbortError") {
-          toast.error("Couldn't share this post.");
-        }
-      }
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(url);
-      toast.success("Link copied to clipboard.");
-      onShare?.();
-    } catch {
-      toast.error("Couldn't copy the link.");
-    }
-  }
+  const { handleShare } = usePostShare(post, onShare);
 
   function handleSave() {
     const wasSaved = saved;
