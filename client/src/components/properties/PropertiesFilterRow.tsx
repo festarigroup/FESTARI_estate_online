@@ -39,6 +39,8 @@ interface PropertiesFilterRowProps {
   onLocationChange: (value: string) => void;
   activeFilterCount: number;
   onClearFilters: () => void;
+  mapExpanded: boolean;
+  onToggleMapView: () => void;
 }
 
 const ALL_TYPES = "All Types";
@@ -50,8 +52,11 @@ const ALL_LOCATIONS = "All Locations";
  * PROPERTY_LISTINGS client-side (see PropertiesBrowser, which owns the
  * actual filtering logic — this component is just the UI for it). "All
  * Filters" resets everything at once, enabled only once a filter is
- * active. "Map View" stays decorative — the feed and map are already both
- * visible side by side on desktop, so there's nothing for it to toggle. */
+ * active. "Map View" toggles PropertiesBrowser's expanded map layout —
+ * swaps to "List View" once expanded, so there's always an obvious way
+ * back. Sticky below the fixed TopNavBar so the filters (and the map
+ * toggle) stay reachable while scrolling a long results list — not a
+ * Figma spec, just this app's own call, same as ConciergeCard's. */
 export function PropertiesFilterRow({
   propertyType,
   propertyTypeOptions,
@@ -64,9 +69,11 @@ export function PropertiesFilterRow({
   onLocationChange,
   activeFilterCount,
   onClearFilters,
+  mapExpanded,
+  onToggleMapView,
 }: PropertiesFilterRowProps) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+    <div className="sticky top-[73px] z-10 flex flex-wrap items-center justify-between gap-3 bg-background py-3">
       <div className="flex flex-wrap items-center gap-3">
         <Dropdown
           align="left"
@@ -109,9 +116,12 @@ export function PropertiesFilterRow({
             </span>
           )}
         </button>
-        <button className="flex items-center gap-2 rounded-full bg-brand-navy px-4 py-2 text-xs font-semibold text-white shadow-sm">
-          <DynamicIcon name="Layers" className="size-3.5" />
-          Map View
+        <button
+          onClick={onToggleMapView}
+          className="flex items-center gap-2 rounded-full bg-brand-navy px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-navy-light"
+        >
+          <DynamicIcon name={mapExpanded ? "Building2" : "Layers"} className="size-3.5" />
+          {mapExpanded ? "List View" : "Map View"}
         </button>
       </div>
     </div>

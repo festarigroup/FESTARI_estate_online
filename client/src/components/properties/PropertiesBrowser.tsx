@@ -39,6 +39,7 @@ export function PropertiesBrowser({ listings }: { listings: PropertyPost[] }) {
   const [propertyType, setPropertyType] = useState(ALL_TYPES);
   const [priceRange, setPriceRange] = useState(ANY_PRICE);
   const [location, setLocation] = useState(ALL_LOCATIONS);
+  const [mapExpanded, setMapExpanded] = useState(false);
 
   const propertyTypeOptions = useMemo(
     () => [ALL_TYPES, ...new Set(listings.map((l) => l.propertyType))],
@@ -81,28 +82,36 @@ export function PropertiesBrowser({ listings }: { listings: PropertyPost[] }) {
         onLocationChange={setLocation}
         activeFilterCount={activeFilterCount}
         onClearFilters={handleClearFilters}
+        mapExpanded={mapExpanded}
+        onToggleMapView={() => setMapExpanded((v) => !v)}
       />
 
-      <div className="grid grid-cols-1 gap-6 pt-2 lg:grid-cols-12">
-        <div className="flex flex-col gap-6 pb-12 lg:col-span-7">
-          {filtered.length > 0 ? (
-            filtered.map((listing) => <PropertyListingCard key={listing.id} listing={listing} />)
-          ) : (
-            <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border-subtle bg-white py-16 text-center">
-              <span className="flex size-12 items-center justify-center rounded-full bg-surface-muted">
-                <DynamicIcon name="Search" className="size-5 text-muted" />
-              </span>
-              <p className="text-sm font-semibold text-ink">No properties match these filters</p>
-              <button onClick={handleClearFilters} className="text-sm font-semibold text-brand-navy hover:underline">
-                Clear filters
-              </button>
-            </div>
-          )}
+      {mapExpanded ? (
+        <div className="pt-2 pb-12">
+          <PropertyMapPanel listings={filtered} expanded onCollapse={() => setMapExpanded(false)} />
         </div>
-        <div className="lg:col-span-5">
-          <PropertyMapPanel listings={filtered} />
+      ) : (
+        <div className="grid grid-cols-1 gap-6 pt-2 lg:grid-cols-12">
+          <div className="flex flex-col gap-6 pb-12 lg:col-span-7">
+            {filtered.length > 0 ? (
+              filtered.map((listing) => <PropertyListingCard key={listing.id} listing={listing} />)
+            ) : (
+              <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border-subtle bg-white py-16 text-center">
+                <span className="flex size-12 items-center justify-center rounded-full bg-surface-muted">
+                  <DynamicIcon name="Search" className="size-5 text-muted" />
+                </span>
+                <p className="text-sm font-semibold text-ink">No properties match these filters</p>
+                <button onClick={handleClearFilters} className="text-sm font-semibold text-brand-navy hover:underline">
+                  Clear filters
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="lg:col-span-5">
+            <PropertyMapPanel listings={filtered} onExpand={() => setMapExpanded(true)} />
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
