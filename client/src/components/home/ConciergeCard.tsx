@@ -13,18 +13,11 @@ const FEATURES = [
 ];
 
 /** "Concierge Card" — the agency management pitch with a faded portrait
- * backdrop. Sticky on desktop, flush against the fixed TopNavBar
- * (top-[73px], its exact height — same offset the Properties page's
- * sticky filter row uses): it stays pinned in place while the rest of the
- * sidebar rail scrolls up and out of view behind it — confirmed as the
- * intended behavior, not a bug to fix. Not a Figma spec, just this app's
- * own call.
- *
- * The offset has to be flush, not top-[89px] (73 + a 16px gap, which is
- * what an earlier pass used) — that gap gave scrolling content a sliver of
- * space to peek through just below the navbar for a moment before this
- * card's own top edge caught up to it, instead of vanishing the instant it
- * would reach the sticky region.
+ * backdrop. Sticky on desktop (below the fixed TopNavBar, same top-[89px]
+ * offset PropertyMapPanel uses): it stays pinned in place while the rest
+ * of the sidebar rail scrolls up and out of view behind it — confirmed as
+ * the intended behavior, not a bug to fix. Not a Figma spec, just this
+ * app's own call.
  *
  * `z-10` matters once it's stuck: TrendingProperties/WhoToFollow further
  * down the rail wrap their own thumbnails in `position: relative` (for
@@ -34,7 +27,7 @@ const FEATURES = [
  * sticky card as they scroll past underneath it. */
 export function ConciergeCard() {
   return (
-    <div className="relative z-10 w-full shrink-0 overflow-hidden rounded-xl bg-brand-navy p-8 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)] lg:sticky lg:top-[73px]">
+    <div className="relative z-10 w-full shrink-0 overflow-hidden rounded-xl bg-brand-navy p-8 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)] lg:sticky lg:top-[89px]">
       <Image
         src="/images/concierge-portrait.png"
         alt=""
