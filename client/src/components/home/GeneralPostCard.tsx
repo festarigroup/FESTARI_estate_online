@@ -38,6 +38,15 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const images = post.images ?? [];
 
+  // Matches PropertyListingCard's exact badge (Figma node 3340:2487) —
+  // shown on the first/hero tile only, same placement as that card.
+  const listingBadge =
+    post.tag === "property" && post.propertyDetails ? (
+      <span className="absolute top-4 left-4 rounded bg-brand-gold-dark px-2 py-1 text-[10px] font-semibold tracking-[0.5px] text-white uppercase shadow-sm">
+        {post.propertyDetails.listingType}
+      </span>
+    ) : null;
+
   function renderImage(image: (typeof images)[number]) {
     if (image.type === "video") {
       // No `controls` here: every caller renders this inside a <button> that
@@ -90,6 +99,7 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
           className="relative h-[280px] w-full cursor-zoom-in overflow-hidden rounded-lg sm:h-[400px]"
         >
           {renderImage(images[0])}
+          {listingBadge}
         </button>
       )}
 
@@ -105,6 +115,7 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
               className="relative h-[280px] cursor-zoom-in overflow-hidden rounded-lg sm:h-[400px]"
             >
               {renderImage(image)}
+              {i === 0 && listingBadge}
             </button>
           ))}
         </div>
@@ -123,6 +134,7 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
             className="relative col-span-2 row-span-2 h-[280px] cursor-zoom-in overflow-hidden rounded-lg sm:h-[400px]"
           >
             {renderImage(images[0])}
+            {listingBadge}
             {images.length > GRID_LIMIT && (
               <span className="absolute top-4 right-4 rounded bg-brand-navy/80 px-2 py-1 text-xs text-white">
                 1/{images.length}
@@ -143,6 +155,33 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
           >
             {renderImage(images[2])}
           </button>
+        </div>
+      )}
+
+      {post.tag === "property" && post.propertyDetails && (
+        // "Property Metadata Strip" (Figma node 3340:936/2446) — same
+        // facts and same look as PropertyListingCard's on the Properties
+        // page, so a property posted from here carries the same
+        // information as one seeded there.
+        <div className="-mx-6 flex items-center justify-between border-y border-[#e9ecef] bg-[#f8f9fa] px-6 py-3">
+          <div>
+            <p className="font-heading text-2xl font-semibold text-ink">{post.propertyDetails.price}</p>
+            <p className="text-[13px] text-muted">{post.propertyDetails.propertyType}</p>
+          </div>
+          <div className="flex items-center gap-4 text-[13px] text-ink/80">
+            <span className="flex items-center gap-1">
+              <DynamicIcon name="BedDouble" className="size-3.5" />
+              {post.propertyDetails.beds}
+            </span>
+            <span className="flex items-center gap-1">
+              <DynamicIcon name="Bath" className="size-3.5" />
+              {post.propertyDetails.baths}
+            </span>
+            <span className="flex items-center gap-1">
+              <DynamicIcon name="Ruler" className="size-3.5" />
+              {post.propertyDetails.areaSqm} sqm
+            </span>
+          </div>
         </div>
       )}
 

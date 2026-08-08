@@ -115,6 +115,25 @@ export interface VenueDetails {
   bedrooms: number;
 }
 
+/** The structured facts a property post carries beyond its free-form
+ * caption — the same facts the Properties page's "Property Metadata
+ * Strip" shows for every listing there (see PropertyPost/
+ * PropertyListingCard). Required whenever `tag === "property"` (enforced
+ * in CreatePostModal, not by the type system). */
+export interface PropertyDetails {
+  listingType: "For Sale" | "For Rent";
+  /** Free text, not a number: a sale price and a rental rate ("GHS
+   * 8,000 / month") don't share one unit the way a venue's nightly rate
+   * does, so this stays whatever the poster actually types. */
+  price: string;
+  /** e.g. "4 Bedroom Detached House" — the metadata strip's subtitle. */
+  propertyType: string;
+  location: string;
+  beds: number;
+  baths: number;
+  areaSqm: number;
+}
+
 /** A post created through the composer modal — free-form text plus at most
  * one attachment type (photos, a property/service/venue tag, or a poll). */
 export interface GeneralPost {
@@ -125,6 +144,8 @@ export interface GeneralPost {
   images?: GalleryImage[];
   poll?: Poll;
   tag?: "property" | "service" | "venue";
+  /** Only set when `tag === "property"`. */
+  propertyDetails?: PropertyDetails;
   /** Only set when `tag === "venue"`. */
   venueDetails?: VenueDetails;
   comments: Comment[];

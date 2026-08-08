@@ -78,6 +78,17 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   const [venueLocation, setVenueLocation] = useState("");
   const [venuePricePerNight, setVenuePricePerNight] = useState("");
   const [venueBedrooms, setVenueBedrooms] = useState("");
+  // Only read/required when tag === "property" — the same facts the
+  // Properties page's metadata strip shows for every listing there (see
+  // PropertyPost/PropertyListingCard), so a property posted from here
+  // carries the same information as one seeded for that page.
+  const [propertyListingType, setPropertyListingType] = useState<"For Sale" | "For Rent">("For Sale");
+  const [propertyPrice, setPropertyPrice] = useState("");
+  const [propertyType, setPropertyType] = useState("");
+  const [propertyLocation, setPropertyLocation] = useState("");
+  const [propertyBeds, setPropertyBeds] = useState("");
+  const [propertyBaths, setPropertyBaths] = useState("");
+  const [propertyAreaSqm, setPropertyAreaSqm] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function resetState() {
@@ -92,6 +103,13 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
     setVenueLocation("");
     setVenuePricePerNight("");
     setVenueBedrooms("");
+    setPropertyListingType("For Sale");
+    setPropertyPrice("");
+    setPropertyType("");
+    setPropertyLocation("");
+    setPropertyBeds("");
+    setPropertyBaths("");
+    setPropertyAreaSqm("");
   }
 
   // Cancel / backdrop click / Escape: nothing downstream is using these
@@ -176,12 +194,23 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
     venueLocation.trim().length > 0 &&
     Number(venuePricePerNight) > 0 &&
     Number(venueBedrooms) > 0;
+  // Same reasoning as venueFieldsValid: a buyer/renter can't act on a bare
+  // caption, so these are what's actually required to post a property.
+  const propertyFieldsValid =
+    propertyType.trim().length > 0 &&
+    propertyLocation.trim().length > 0 &&
+    propertyPrice.trim().length > 0 &&
+    Number(propertyBeds) > 0 &&
+    Number(propertyBaths) > 0 &&
+    Number(propertyAreaSqm) > 0;
   const canSubmit =
     tag === "venue"
       ? venueFieldsValid
-      : body.trim().length > 0 ||
-        media.length > 0 ||
-        (showPoll && pollQuestion.trim().length > 0 && trimmedOptions.length >= 2);
+      : tag === "property"
+        ? propertyFieldsValid
+        : body.trim().length > 0 ||
+          media.length > 0 ||
+          (showPoll && pollQuestion.trim().length > 0 && trimmedOptions.length >= 2);
 
   function handleSubmit() {
     if (!canSubmit) return;
@@ -204,6 +233,18 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
           }
         : undefined,
       tag,
+      propertyDetails:
+        tag === "property"
+          ? {
+              listingType: propertyListingType,
+              price: propertyPrice.trim(),
+              propertyType: propertyType.trim(),
+              location: propertyLocation.trim(),
+              beds: Number(propertyBeds),
+              baths: Number(propertyBaths),
+              areaSqm: Number(propertyAreaSqm),
+            }
+          : undefined,
       venueDetails:
         tag === "venue"
           ? {
@@ -286,10 +327,101 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
           </div>
         )}
 
-        {tag && tag !== "venue" && (
+        {tag === "service" && (
           <p className="rounded-lg bg-surface-muted px-3 py-2 text-xs text-muted">
-            {TAG_NOTE[tag]}
+            {TAG_NOTE.service}
           </p>
+        )}
+
+        {tag === "property" && (
+          <div className="flex flex-col gap-3 rounded-lg border border-border-subtle p-3">
+            <p className="text-xs text-muted">
+              {TAG_NOTE.property} Add the details buyers or renters need before reaching out.
+            </p>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-ink">Listing type</span>
+              <div className="flex gap-2">
+                {(["For Sale", "For Rent"] as const).map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setPropertyListingType(type)}
+                    className={cn(
+                      "flex-1 rounded-lg border px-3 py-2 text-sm font-semibold",
+                      propertyListingType === type
+                        ? "border-brand-navy bg-brand-navy text-white"
+                        : "border-border-subtle text-ink hover:bg-surface-muted",
+                    )}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-ink">Property type</span>
+              <input
+                value={propertyType}
+                onChange={(e) => setPropertyType(e.target.value)}
+                placeholder="e.g. 4 Bedroom Detached House"
+                className={FIELD_CLASS}
+              />
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-ink">Location</span>
+              <input
+                value={propertyLocation}
+                onChange={(e) => setPropertyLocation(e.target.value)}
+                placeholder="e.g. East Legon, Accra"
+                className={FIELD_CLASS}
+              />
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-ink">Price</span>
+              <input
+                value={propertyPrice}
+                onChange={(e) => setPropertyPrice(e.target.value)}
+                placeholder={propertyListingType === "For Sale" ? "e.g. GHS 3,450,000" : "e.g. GHS 8,000 / month"}
+                className={FIELD_CLASS}
+              />
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-semibold text-ink">Beds</span>
+                <input
+                  type="number"
+                  min="1"
+                  value={propertyBeds}
+                  onChange={(e) => setPropertyBeds(e.target.value)}
+                  placeholder="e.g. 4"
+                  className={FIELD_CLASS}
+                />
+              </label>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-semibold text-ink">Baths</span>
+                <input
+                  type="number"
+                  min="1"
+                  step="0.5"
+                  value={propertyBaths}
+                  onChange={(e) => setPropertyBaths(e.target.value)}
+                  placeholder="e.g. 4.5"
+                  className={FIELD_CLASS}
+                />
+              </label>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-semibold text-ink">Area (sqm)</span>
+                <input
+                  type="number"
+                  min="1"
+                  value={propertyAreaSqm}
+                  onChange={(e) => setPropertyAreaSqm(e.target.value)}
+                  placeholder="e.g. 420"
+                  className={FIELD_CLASS}
+                />
+              </label>
+            </div>
+          </div>
         )}
 
         {tag === "venue" && (
