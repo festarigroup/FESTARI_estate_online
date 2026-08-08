@@ -14,18 +14,16 @@ import type {
 
 export const NAV_ITEMS: NavItem[] = [
   { id: "home", label: "Home", icon: "Home", href: "/" },
-  { id: "properties", label: "Properties", icon: "Building2", href: "/properties" },
+  { id: "properties", label: "Property", icon: "Building2", href: "/properties" },
   { id: "stay", label: "Stay (Hotels)", icon: "BedDouble", href: "/stay" },
   { id: "craftwork", label: "Craftwork", icon: "Hammer", href: "/craftwork" },
   { id: "professionals", label: "Professionals", icon: "Users", href: "/professionals" },
-  { id: "pricing", label: "Pricing", icon: "Banknote", href: "/pricing" },
   { id: "messages", label: "Messages", icon: "Mail", href: "/messages", badgeCount: 12 },
   { id: "notifications", label: "Notifications", icon: "Bell", href: "/notifications", badgeCount: 23 },
-  { id: "services", label: "Services", icon: "Settings2", href: "/services" },
+  { id: "saved", label: "Saved", icon: "Bookmark", href: "/saved" },
 ];
 
 export const NAV_SECONDARY_ITEMS: NavItem[] = [
-  { id: "saved", label: "Saved", icon: "Bookmark", href: "/saved" },
   { id: "activity", label: "My Activity", icon: "History", href: "/activity" },
 ];
 
