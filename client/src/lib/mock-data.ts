@@ -125,6 +125,7 @@ const AMA_SERWAA_LISTING: PropertyPost = {
   ],
   price: "GHS 3,450,000",
   propertyType: "4 Bedroom Detached House",
+  location: "East Legon, Accra",
   listingType: "For Sale",
   beds: 4,
   baths: 4.5,
@@ -230,10 +231,42 @@ export const PROPERTY_LISTINGS: PropertyPost[] = [
     comments: [],
     price: "GHS 8,000 / month",
     propertyType: "3 Bedroom Apartment",
+    location: "Airport Residential, Accra",
     listingType: "For Rent",
     beds: 3,
     baths: 3,
     areaSqm: 120,
+  },
+  // Third listing so the Properties page's filters (property type,
+  // price range, location) have more than two data points to actually
+  // narrow down — reuses the "5 Bedroom House" details already seeded
+  // in TRENDING_PROPERTIES, attributed to Builders GH since they're
+  // already established elsewhere as a construction company.
+  {
+    id: "listing-3",
+    kind: "property",
+    author: {
+      name: "Builders GH",
+      avatar: "/images/avatar-builders-gh-follow.png",
+      verified: true,
+      subtitle: "1d ago • East Legon, Accra",
+    },
+    body: [
+      "Brand new 5 bedroom family home, freshly built and move-in ready.",
+      "Spacious compound with room for a pool and garden.",
+    ],
+    hashtags: "#NewBuild #EastLegon #ForSale #FestariEstates",
+    images: [{ src: "/images/property-trending-1.png", alt: "East Legon 5 bedroom house exterior" }],
+    totalImages: 6,
+    reactions: { likes: 42, shares: 3 },
+    comments: [],
+    price: "GHS 3,450,000",
+    propertyType: "5 Bedroom House",
+    location: "East Legon, Accra",
+    listingType: "For Sale",
+    beds: 5,
+    baths: 5,
+    areaSqm: 350,
   },
 ];
 

@@ -102,7 +102,10 @@ export function Dropdown({ trigger, children, align = "right" }: DropdownProps) 
 }
 
 interface DropdownItemProps {
-  icon: IconName;
+  /** Omit for a plain text option (e.g. a filter's list of choices) —
+   * every existing caller passes one (an action's own icon), but that's
+   * not universal enough to require. */
+  icon?: IconName;
   label: string;
   onClick: () => void;
   className?: string;
@@ -124,7 +127,7 @@ export function DropdownItem({ icon, label, onClick, className }: DropdownItemPr
         className,
       )}
     >
-      <DynamicIcon name={icon} className="size-4 text-muted" />
+      {icon && <DynamicIcon name={icon} className="size-4 text-muted" />}
       {label}
     </button>
   );

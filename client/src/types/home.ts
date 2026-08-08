@@ -84,6 +84,10 @@ export interface PropertyPost {
    * does, since the listing page is where these facts actually matter. */
   price: string;
   propertyType: string;
+  /** Separate from `author.subtitle`'s "2h ago • East Legon, Accra" —
+   * that's display text, this is what the Properties page's Location
+   * filter actually matches against. */
+  location: string;
   listingType: "For Sale" | "For Rent";
   beds: number;
   baths: number;

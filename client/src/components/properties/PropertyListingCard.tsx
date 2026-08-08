@@ -6,8 +6,10 @@ import Link from "next/link";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { PostHeader } from "@/components/home/PostHeader";
 import { PostImageLightbox } from "@/components/home/PostImageLightbox";
+import { CommentsSection } from "@/components/home/CommentsSection";
 import { useSavedPosts } from "@/hooks/useSavedPosts";
 import { usePostShare } from "@/hooks/usePostShare";
+import { usePostComments } from "@/hooks/usePostComments";
 import { cn } from "@/lib/cn";
 import type { PropertyPost } from "@/types/home";
 
@@ -26,6 +28,7 @@ export function PropertyListingCard({ listing }: { listing: PropertyPost }) {
   const { isSaved, toggleSave } = useSavedPosts();
   const saved = isSaved(listing.id);
   const { handleShare } = usePostShare(listing);
+  const { comments, commentsOpen, toggleComments, addComment } = usePostComments(listing.comments);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const images = listing.images;
 
@@ -155,13 +158,17 @@ export function PropertyListingCard({ listing }: { listing: PropertyPost }) {
             <DynamicIcon name="Heart" className="size-5" fill={liked ? "currentColor" : "none"} />
             {likeCount}
           </button>
-          <Link
-            href={`/properties/${listing.id}`}
-            className="flex items-center gap-2 text-xs font-semibold text-[#44474e] hover:text-ink"
+          <button
+            onClick={toggleComments}
+            aria-expanded={commentsOpen}
+            className={cn(
+              "flex items-center gap-2 text-xs font-semibold",
+              commentsOpen ? "text-brand-navy" : "text-[#44474e] hover:text-ink",
+            )}
           >
             <DynamicIcon name="MessageCircle" className="size-5" />
-            {listing.comments.length}
-          </Link>
+            {comments.length}
+          </button>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -194,6 +201,12 @@ export function PropertyListingCard({ listing }: { listing: PropertyPost }) {
           </Link>
         </div>
       </div>
+
+      {commentsOpen && (
+        <div className="px-4 pb-4">
+          <CommentsSection comments={comments} onAddComment={addComment} />
+        </div>
+      )}
 
       {lightboxIndex !== null && (
         <PostImageLightbox images={images} initialIndex={lightboxIndex} onClose={() => setLightboxIndex(null)} />
