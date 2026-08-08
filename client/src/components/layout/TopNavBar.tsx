@@ -14,7 +14,10 @@ export function TopNavBar({ onMenuClick }: TopNavBarProps) {
     <header className="fixed inset-x-0 top-0 z-50 flex h-[73px] items-center justify-between gap-4 border-b border-brand-navy-light bg-brand-navy px-4 shadow-lg sm:px-6 lg:px-10">
       <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-[68px]">
         <MenuButton onClick={onMenuClick} />
-        <Link href="/" className="flex shrink-0 items-center gap-2">
+        {/* Hidden below lg — that's where the hamburger takes over and the
+            brand lives in the SideNavBar drawer instead, so it isn't shown
+            in two places (or nowhere, mid-transition) at once. */}
+        <Link href="/" className="hidden shrink-0 items-center gap-2 lg:flex">
           <Image src="/images/logo-festari.png" alt="" width={31} height={40} className="h-10 w-auto" />
           <span className="hidden font-display text-base font-bold tracking-[-0.5px] text-white sm:inline">
             Festari Estates
