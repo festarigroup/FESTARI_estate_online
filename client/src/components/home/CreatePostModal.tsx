@@ -76,7 +76,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   // so this is the minimum a venue listing can't be posted without.
   const [venueName, setVenueName] = useState("");
   const [venueLocation, setVenueLocation] = useState("");
-  const [venuePrice, setVenuePrice] = useState("");
+  const [venuePricePerNight, setVenuePricePerNight] = useState("");
   const [venueCapacity, setVenueCapacity] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -90,7 +90,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
     setPollOptions(["", ""]);
     setVenueName("");
     setVenueLocation("");
-    setVenuePrice("");
+    setVenuePricePerNight("");
     setVenueCapacity("");
   }
 
@@ -174,7 +174,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   const venueFieldsValid =
     venueName.trim().length > 0 &&
     venueLocation.trim().length > 0 &&
-    venuePrice.trim().length > 0 &&
+    Number(venuePricePerNight) > 0 &&
     Number(venueCapacity) > 0;
   const canSubmit =
     tag === "venue"
@@ -209,7 +209,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
           ? {
               name: venueName.trim(),
               location: venueLocation.trim(),
-              price: venuePrice.trim(),
+              pricePerNight: Number(venuePricePerNight),
               capacity: Number(venueCapacity),
             }
           : undefined,
@@ -317,11 +317,13 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
             </label>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs font-semibold text-ink">Price</span>
+                <span className="text-xs font-semibold text-ink">Price per night (GHS)</span>
                 <input
-                  value={venuePrice}
-                  onChange={(e) => setVenuePrice(e.target.value)}
-                  placeholder="e.g. GH₵2,500 / event"
+                  type="number"
+                  min="1"
+                  value={venuePricePerNight}
+                  onChange={(e) => setVenuePricePerNight(e.target.value)}
+                  placeholder="e.g. 2500"
                   className={FIELD_CLASS}
                 />
               </label>

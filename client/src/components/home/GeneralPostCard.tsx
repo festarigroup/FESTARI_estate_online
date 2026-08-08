@@ -81,7 +81,9 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
         <div className="flex flex-col gap-1 rounded-lg border border-border-subtle p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h4 className="text-sm font-semibold text-ink">{post.venueDetails.name}</h4>
-            <span className="text-sm font-semibold text-brand-navy">{post.venueDetails.price}</span>
+            <span className="text-sm font-semibold text-brand-navy">
+              GHS {post.venueDetails.pricePerNight.toLocaleString()} / night
+            </span>
           </div>
           <p className="text-xs text-muted">{post.venueDetails.location}</p>
           <span className="flex items-center gap-1 text-xs text-muted">

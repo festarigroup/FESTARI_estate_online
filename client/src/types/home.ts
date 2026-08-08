@@ -95,7 +95,10 @@ export interface ServicePost {
 export interface VenueDetails {
   name: string;
   location: string;
-  price: string;
+  /** GHS, nightly — every venue reservation is date-based (see
+   * ReservationModal), so the rate is always per night, not a free-text
+   * price that could be per-event or per-hour. */
+  pricePerNight: number;
   capacity: number;
 }
 
