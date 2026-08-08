@@ -63,7 +63,9 @@ export function ServiceActionsBar({
         </button>
         <RepostButton postId={postId} />
       </div>
-      <Button variant="navy" onClick={() => setBookingOpen(true)} className="rounded-lg">
+      {/* outline-gold matches the Figma "Book Service" button exactly
+          (node 3340:1102) -- a transparent pill, not a filled color. */}
+      <Button variant="outline-gold" onClick={() => setBookingOpen(true)}>
         Book Service
       </Button>
 

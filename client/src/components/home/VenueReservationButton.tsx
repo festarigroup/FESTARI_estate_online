@@ -13,10 +13,10 @@ export function VenueReservationButton({ venueName }: { venueName: string }) {
 
   return (
     <>
-      {/* navy to match Book Service and Make Enquiry — every post's
-          "primary action" CTA shares the same color now, not just the same
-          footprint. */}
-      <Button variant="navy" onClick={() => setOpen(true)} className="rounded-lg">
+      {/* outline-gold matches the Figma "Book Service" button (node
+          3340:1102) — every post's "primary action" CTA now shares that
+          same transparent-pill style, not an invented solid navy. */}
+      <Button variant="outline-gold" onClick={() => setOpen(true)}>
         Make a Reservation
       </Button>
       <ReservationModal open={open} onClose={() => setOpen(false)} venueName={venueName} />

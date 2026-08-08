@@ -8,6 +8,10 @@
   --color-brand-navy: #001f3f;
   --color-brand-navy-light: #2f486a;
   --color-brand-gold: #c5a059;
+  /* Darker, text/border-safe shade of the same gold hue -- the exact color
+     the Figma "Book Service" pill button uses for its outline/label, since
+     brand-gold itself reads too light for 12px text on a white card. */
+  --color-brand-gold-dark: #775a19;
   --color-brand-rust: #d2691e;
   --color-brand-blue: #3b82f6;
 
@@ -26,6 +30,7 @@
   --color-brand-navy: var(--color-brand-navy);
   --color-brand-navy-light: var(--color-brand-navy-light);
   --color-brand-gold: var(--color-brand-gold);
+  --color-brand-gold-dark: var(--color-brand-gold-dark);
   --color-brand-rust: var(--color-brand-rust);
   --color-brand-blue: var(--color-brand-blue);
 
