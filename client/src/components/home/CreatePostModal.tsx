@@ -77,7 +77,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   const [venueName, setVenueName] = useState("");
   const [venueLocation, setVenueLocation] = useState("");
   const [venuePricePerNight, setVenuePricePerNight] = useState("");
-  const [venueCapacity, setVenueCapacity] = useState("");
+  const [venueBedrooms, setVenueBedrooms] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function resetState() {
@@ -91,7 +91,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
     setVenueName("");
     setVenueLocation("");
     setVenuePricePerNight("");
-    setVenueCapacity("");
+    setVenueBedrooms("");
   }
 
   // Cancel / backdrop click / Escape: nothing downstream is using these
@@ -167,7 +167,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   }
 
   const trimmedOptions = pollOptions.map((o) => o.trim()).filter(Boolean);
-  // A venue listing's required facts (name/location/price/capacity) stand in
+  // A venue listing's required facts (name/location/price/bedrooms) stand in
   // for the usual "you need a caption, photo, or poll" gate — a guest can't
   // request a reservation off a bare caption, so these are what's actually
   // required to post one. Caption/photos stay optional extras on top.
@@ -175,7 +175,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
     venueName.trim().length > 0 &&
     venueLocation.trim().length > 0 &&
     Number(venuePricePerNight) > 0 &&
-    Number(venueCapacity) > 0;
+    Number(venueBedrooms) > 0;
   const canSubmit =
     tag === "venue"
       ? venueFieldsValid
@@ -210,7 +210,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
               name: venueName.trim(),
               location: venueLocation.trim(),
               pricePerNight: Number(venuePricePerNight),
-              capacity: Number(venueCapacity),
+              bedrooms: Number(venueBedrooms),
             }
           : undefined,
       comments: [],
@@ -328,13 +328,13 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
                 />
               </label>
               <label className="flex flex-col gap-1.5">
-                <span className="text-xs font-semibold text-ink">Capacity</span>
+                <span className="text-xs font-semibold text-ink">Bedrooms</span>
                 <input
                   type="number"
                   min="1"
-                  value={venueCapacity}
-                  onChange={(e) => setVenueCapacity(e.target.value)}
-                  placeholder="e.g. 150"
+                  value={venueBedrooms}
+                  onChange={(e) => setVenueBedrooms(e.target.value)}
+                  placeholder="e.g. 4"
                   className={FIELD_CLASS}
                 />
               </label>

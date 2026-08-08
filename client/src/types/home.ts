@@ -99,7 +99,9 @@ export interface VenueDetails {
    * ReservationModal), so the rate is always per night, not a free-text
    * price that could be per-event or per-hour. */
   pricePerNight: number;
-  capacity: number;
+  /** Matches the "4 Bedrooms" stat on the Figma metadata strip (node
+   * 3340:936) — a venue's equivalent of a property's bedroom count. */
+  bedrooms: number;
 }
 
 /** A post created through the composer modal — free-form text plus at most

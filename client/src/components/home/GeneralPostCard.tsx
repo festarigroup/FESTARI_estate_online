@@ -150,10 +150,9 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
         // "Property Metadata Strip" from Figma (node 3340:936, part of
         // "Article - Post 1: Property Listing" — node 3303:5351) — a
         // full-bleed light strip between the gallery and the action bar,
-        // price + context on the left, the one key stat on the right.
-        // Applied here the same way Figma applies it to a property
-        // listing's price/bedrooms; a venue's equivalent stat is its
-        // guest capacity.
+        // price + context on the left, the one key stat on the right
+        // (that post shows "4 Bedrooms"; a venue's equivalent stat is its
+        // own bedroom count, not guest capacity).
         <div className="-mx-6 flex items-center justify-between border-y border-[#e9ecef] bg-[#f8f9fa] px-6 py-3">
           <div>
             <p className="font-heading text-2xl font-semibold text-ink">
@@ -164,8 +163,8 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
             </p>
           </div>
           <div className="flex items-center gap-1.5 text-[13px] text-ink/70">
-            <DynamicIcon name="Users" className="size-4" />
-            Up to {post.venueDetails.capacity} guests
+            <DynamicIcon name="BedDouble" className="size-4" />
+            {post.venueDetails.bedrooms} Bedrooms
           </div>
         </div>
       )}
