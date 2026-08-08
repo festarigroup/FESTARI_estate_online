@@ -74,6 +74,23 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
         </span>
       )}
 
+      {post.tag === "venue" && post.venueDetails && (
+        // Same "title + price row, location, stats row" shape as the
+        // Trending Properties widget — the facts a guest needs before
+        // tapping Make a Reservation, up front rather than buried in prose.
+        <div className="flex flex-col gap-1 rounded-lg border border-border-subtle p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h4 className="text-sm font-semibold text-ink">{post.venueDetails.name}</h4>
+            <span className="text-sm font-semibold text-brand-navy">{post.venueDetails.price}</span>
+          </div>
+          <p className="text-xs text-muted">{post.venueDetails.location}</p>
+          <span className="flex items-center gap-1 text-xs text-muted">
+            <DynamicIcon name="Users" className="size-3" />
+            Up to {post.venueDetails.capacity} guests
+          </span>
+        </div>
+      )}
+
       {post.body.length > 0 && (
         <div className="text-base leading-relaxed text-ink">
           {post.body.map((line, i) => (

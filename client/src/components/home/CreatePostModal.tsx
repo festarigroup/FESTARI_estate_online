@@ -31,6 +31,9 @@ const TAG_NOTE: Record<TagType, string> = {
   venue: "This post will be tagged as a venue listing.",
 };
 
+const FIELD_CLASS =
+  "w-full rounded-lg border border-border-subtle px-3 py-2 text-sm text-ink placeholder:text-muted focus:outline-2 focus:outline-brand-gold";
+
 interface MediaAttachment {
   url: string;
   type: "image" | "video";
@@ -68,6 +71,13 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   const [media, setMedia] = useState<MediaAttachment[]>([]);
   const [pollQuestion, setPollQuestion] = useState("");
   const [pollOptions, setPollOptions] = useState(["", ""]);
+  // Only read/required when tag === "venue" — what a guest needs before
+  // requesting a reservation (see VenueReservationButton/ReservationModal),
+  // so this is the minimum a venue listing can't be posted without.
+  const [venueName, setVenueName] = useState("");
+  const [venueLocation, setVenueLocation] = useState("");
+  const [venuePrice, setVenuePrice] = useState("");
+  const [venueCapacity, setVenueCapacity] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function resetState() {
@@ -78,6 +88,10 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
     setMedia([]);
     setPollQuestion("");
     setPollOptions(["", ""]);
+    setVenueName("");
+    setVenueLocation("");
+    setVenuePrice("");
+    setVenueCapacity("");
   }
 
   // Cancel / backdrop click / Escape: nothing downstream is using these
@@ -153,10 +167,21 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   }
 
   const trimmedOptions = pollOptions.map((o) => o.trim()).filter(Boolean);
+  // A venue listing's required facts (name/location/price/capacity) stand in
+  // for the usual "you need a caption, photo, or poll" gate — a guest can't
+  // request a reservation off a bare caption, so these are what's actually
+  // required to post one. Caption/photos stay optional extras on top.
+  const venueFieldsValid =
+    venueName.trim().length > 0 &&
+    venueLocation.trim().length > 0 &&
+    venuePrice.trim().length > 0 &&
+    Number(venueCapacity) > 0;
   const canSubmit =
-    body.trim().length > 0 ||
-    media.length > 0 ||
-    (showPoll && pollQuestion.trim().length > 0 && trimmedOptions.length >= 2);
+    tag === "venue"
+      ? venueFieldsValid
+      : body.trim().length > 0 ||
+        media.length > 0 ||
+        (showPoll && pollQuestion.trim().length > 0 && trimmedOptions.length >= 2);
 
   function handleSubmit() {
     if (!canSubmit) return;
@@ -179,6 +204,15 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
           }
         : undefined,
       tag,
+      venueDetails:
+        tag === "venue"
+          ? {
+              name: venueName.trim(),
+              location: venueLocation.trim(),
+              price: venuePrice.trim(),
+              capacity: Number(venueCapacity),
+            }
+          : undefined,
       comments: [],
     });
     toast.success("Posted to your feed.");
@@ -252,10 +286,58 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
           </div>
         )}
 
-        {tag && (
+        {tag && tag !== "venue" && (
           <p className="rounded-lg bg-surface-muted px-3 py-2 text-xs text-muted">
             {TAG_NOTE[tag]}
           </p>
+        )}
+
+        {tag === "venue" && (
+          <div className="flex flex-col gap-3 rounded-lg border border-border-subtle p-3">
+            <p className="text-xs text-muted">
+              {TAG_NOTE.venue} Add the details a guest needs before requesting a reservation.
+            </p>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-ink">Venue name</span>
+              <input
+                value={venueName}
+                onChange={(e) => setVenueName(e.target.value)}
+                placeholder="e.g. The Palm Garden Events Center"
+                className={FIELD_CLASS}
+              />
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-ink">Location</span>
+              <input
+                value={venueLocation}
+                onChange={(e) => setVenueLocation(e.target.value)}
+                placeholder="e.g. East Legon, Accra"
+                className={FIELD_CLASS}
+              />
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-semibold text-ink">Price</span>
+                <input
+                  value={venuePrice}
+                  onChange={(e) => setVenuePrice(e.target.value)}
+                  placeholder="e.g. GH₵2,500 / event"
+                  className={FIELD_CLASS}
+                />
+              </label>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-semibold text-ink">Capacity</span>
+                <input
+                  type="number"
+                  min="1"
+                  value={venueCapacity}
+                  onChange={(e) => setVenueCapacity(e.target.value)}
+                  placeholder="e.g. 150"
+                  className={FIELD_CLASS}
+                />
+              </label>
+            </div>
+          </div>
         )}
 
         {showPoll && (

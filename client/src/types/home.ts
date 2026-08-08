@@ -88,6 +88,17 @@ export interface ServicePost {
   comments: Comment[];
 }
 
+/** The structured facts a venue post carries beyond its free-form caption —
+ * what a guest needs before requesting a reservation. Required whenever
+ * `tag === "venue"` (enforced in CreatePostModal, not by the type system,
+ * since a plain photo/property/service post never has this at all). */
+export interface VenueDetails {
+  name: string;
+  location: string;
+  price: string;
+  capacity: number;
+}
+
 /** A post created through the composer modal — free-form text plus at most
  * one attachment type (photos, a property/service/venue tag, or a poll). */
 export interface GeneralPost {
@@ -98,6 +109,8 @@ export interface GeneralPost {
   images?: GalleryImage[];
   poll?: Poll;
   tag?: "property" | "service" | "venue";
+  /** Only set when `tag === "venue"`. */
+  venueDetails?: VenueDetails;
   comments: Comment[];
 }
 
