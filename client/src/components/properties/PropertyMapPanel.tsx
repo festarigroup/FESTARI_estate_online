@@ -3,17 +3,20 @@ import { cn } from "@/lib/cn";
 import type { PropertyPost } from "@/types/home";
 
 /** Right: Interactive Map (Desktop Sticky) — Figma node 3340:2569.
- * Decorative only: Figma's own map layer is named "Map Canvas Area...
- * Using generic tailwind gradient to simulate if image fails", i.e. even
- * the design mock isn't a real map — there's no map provider (Google
- * Maps/Mapbox) wired into this app, and adding one wasn't part of this
- * request. This reproduces the toolbar/pins/"Search this area" chrome
- * over a flat gradient so the page isn't missing the whole right column,
- * without pretending to be a functional map. */
+ * Not a live/interactive map: there's no map provider (Google Maps/Mapbox)
+ * wired into this app, and adding one wasn't part of this request. What
+ * IS reproduced faithfully is the actual exported map image Figma uses for
+ * its own "Map Canvas Area" (node 3340:2571, downloaded to
+ * public/images/property-map-canvas.png) — a flat gradient stood in for
+ * it in an earlier pass, which is why the map looked blank; every other
+ * post/story image in this app comes from a real exported asset, so this
+ * one should too. The toolbar/pins/"Search this area" chrome sits on top,
+ * same as before. */
 export function PropertyMapPanel({ listings }: { listings: PropertyPost[] }) {
   // Spread pins out over the canvas rather than pinning them to the exact
-  // Figma coordinates (which were relative to Accra's real street grid,
-  // an image this app doesn't have) — position is illustrative here.
+  // Figma coordinates (which were relative to Accra's real street grid at
+  // Figma's own map zoom/pan, which this static image doesn't reproduce
+  // pixel-for-pixel) — position is illustrative here.
   const positions = [
     { top: "28%", left: "38%" },
     { top: "58%", left: "62%" },
@@ -22,10 +25,14 @@ export function PropertyMapPanel({ listings }: { listings: PropertyPost[] }) {
 
   return (
     <div className="hidden overflow-hidden rounded-xl border border-border-subtle bg-[#e3e2e5] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)] lg:sticky lg:top-[89px] lg:block lg:h-[calc(100vh-113px)]">
-      <div
-        className="relative size-full"
-        style={{ backgroundImage: "linear-gradient(135deg, #dcdae0 0%, #eceaf0 100%)" }}
-      >
+      <div className="relative size-full bg-[url('/images/property-map-canvas.png')] bg-cover bg-center">
+        {/* Subtle navy tint over the map, matching Figma's own overlay on
+            this layer (node 3340:2572). */}
+        <div
+          className="pointer-events-none absolute inset-0 mix-blend-multiply"
+          style={{ backgroundImage: "linear-gradient(109deg, rgba(1,28,58,0) 0%, rgba(1,28,58,0.05) 100%)" }}
+        />
+
         <div className="absolute inset-x-4 top-4 flex items-start justify-between">
           <span className="flex items-center gap-1.5 rounded-lg border border-border-subtle bg-white/90 px-3 py-2 text-xs font-semibold text-ink shadow-sm backdrop-blur-sm">
             <DynamicIcon name="MapPin" className="size-3.5" />
