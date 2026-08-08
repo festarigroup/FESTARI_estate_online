@@ -13,15 +13,9 @@ const FEATURES = [
 ];
 
 /** "Concierge Card" — the agency management pitch with a faded portrait
- * backdrop.
- *
- * Not sticky on its own anymore: a first attempt made just this card
- * sticky, which pins it at a fixed screen position for as long as the
- * whole sidebar rail is in view — every widget below it then scrolls up
- * and disappears underneath it as you scroll, which reads as broken even
- * though it's correct CSS. The rail (HomePage's `<aside>`) sticks as one
- * unit instead, so this card stays reachable without anything passing
- * behind it. */
+ * backdrop. Scrolls normally with the rest of the sidebar rail — an
+ * earlier pass made it (then the whole rail) sticky, but that was reverted
+ * at explicit request back to plain scrolling. */
 export function ConciergeCard() {
   return (
     <div className="relative w-full shrink-0 overflow-hidden rounded-xl bg-brand-navy p-8 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
