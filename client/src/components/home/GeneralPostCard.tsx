@@ -75,25 +75,6 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
         </span>
       )}
 
-      {post.tag === "venue" && post.venueDetails && (
-        // Same "title + price row, location, stats row" shape as the
-        // Trending Properties widget — the facts a guest needs before
-        // tapping Make a Reservation, up front rather than buried in prose.
-        <div className="flex flex-col gap-1 rounded-lg border border-border-subtle p-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h4 className="text-sm font-semibold text-ink">{post.venueDetails.name}</h4>
-            <span className="text-sm font-semibold text-brand-navy">
-              GHS {post.venueDetails.pricePerNight.toLocaleString()} / night
-            </span>
-          </div>
-          <p className="text-xs text-muted">{post.venueDetails.location}</p>
-          <span className="flex items-center gap-1 text-xs text-muted">
-            <DynamicIcon name="Users" className="size-3" />
-            Up to {post.venueDetails.capacity} guests
-          </span>
-        </div>
-      )}
-
       {post.body.length > 0 && (
         <div className="text-base leading-relaxed text-ink">
           {post.body.map((line, i) => (
@@ -162,6 +143,30 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
           >
             {renderImage(images[2])}
           </button>
+        </div>
+      )}
+
+      {post.tag === "venue" && post.venueDetails && (
+        // "Property Metadata Strip" from Figma (node 3340:936, part of
+        // "Article - Post 1: Property Listing" — node 3303:5351) — a
+        // full-bleed light strip between the gallery and the action bar,
+        // price + context on the left, the one key stat on the right.
+        // Applied here the same way Figma applies it to a property
+        // listing's price/bedrooms; a venue's equivalent stat is its
+        // guest capacity.
+        <div className="-mx-6 flex items-center justify-between border-y border-[#e9ecef] bg-[#f8f9fa] px-6 py-3">
+          <div>
+            <p className="font-heading text-2xl font-semibold text-ink">
+              GHS {post.venueDetails.pricePerNight.toLocaleString()} / night
+            </p>
+            <p className="text-[13px] text-muted">
+              {post.venueDetails.name} • {post.venueDetails.location}
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5 text-[13px] text-ink/70">
+            <DynamicIcon name="Users" className="size-4" />
+            Up to {post.venueDetails.capacity} guests
+          </div>
         </div>
       )}
 
