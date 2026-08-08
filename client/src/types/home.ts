@@ -77,6 +77,17 @@ export interface PropertyPost {
   totalImages: number;
   reactions: { likes: number; shares: number };
   comments: Comment[];
+  /** Full-listing facts shown on the Properties page's "Property Metadata
+   * Strip" (Figma node 3340:936/2446) — PropertyPostCard's Home-feed
+   * presentation of this same post doesn't render these (its CTA was
+   * removed at explicit request; see git history), but PropertyListingCard
+   * does, since the listing page is where these facts actually matter. */
+  price: string;
+  propertyType: string;
+  listingType: "For Sale" | "For Rent";
+  beds: number;
+  baths: number;
+  areaSqm: number;
 }
 
 export interface ServicePost {

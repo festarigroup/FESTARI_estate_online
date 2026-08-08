@@ -3,6 +3,7 @@ import type {
   ContentPost,
   FollowSuggestion,
   NavItem,
+  PropertyPost,
   ServiceProvider,
   Story,
   TrendingProperty,
@@ -82,43 +83,56 @@ export const STORIES: Story[] = [
   },
 ];
 
-export const FEED_POSTS: ContentPost[] = [
-  {
-    id: "post-1",
-    kind: "property",
-    author: {
-      name: "Ama Serwaa",
-      avatar: "/images/avatar-ama-serwaa-post.png",
-      verified: true,
-      subtitle: "2h ago • Accra",
-    },
-    body: [
-      "Just listed this beautiful 4 bedroom house in East Legon. Spacious, modern",
-      "and in a prime location. DM for enquiries or click to view more details.",
-    ],
-    hashtags: "#NewListing #EastLegon #ForSale #FestariEstates",
-    images: [
-      { src: "/images/post-house-thumb-1.jpg", alt: "East Legon house living room" },
-      { src: "/images/post-house-thumb-2.png", alt: "East Legon house kitchen" },
-      { src: "/images/post-house-main.jpg", alt: "East Legon house exterior" },
-    ],
-    totalImages: 8,
-    reactions: { likes: 128, shares: 15 },
-    comments: [
-      {
-        id: "post-1-comment-1",
-        author: { name: "Kojo Mensah", avatar: "/images/avatar-kojo-mensah-follow.png" },
-        body: "This is stunning! Is the pool heated?",
-        createdAt: "1h ago",
-      },
-      {
-        id: "post-1-comment-2",
-        author: { name: "Dee Interiors", avatar: "/images/avatar-dee-interiors-follow.png" },
-        body: "That kitchen island though 😍 gorgeous finishes.",
-        createdAt: "45m ago",
-      },
-    ],
+// Ama Serwaa's listing appears both in the Home feed (via FEED_POSTS,
+// rendered by PropertyPostCard) and on the Properties page (via
+// PROPERTY_LISTINGS, rendered by PropertyListingCard) -- same underlying
+// post, same `id`, so Saving it on one page correctly reflects on the
+// other (both read/write the same useSavedPosts store, keyed by id).
+const AMA_SERWAA_LISTING: PropertyPost = {
+  id: "post-1",
+  kind: "property",
+  author: {
+    name: "Ama Serwaa",
+    avatar: "/images/avatar-ama-serwaa-post.png",
+    verified: true,
+    subtitle: "2h ago • East Legon, Accra",
   },
+  body: [
+    "Just listed this beautiful 4 bedroom house in East Legon. Spacious, modern",
+    "and in a prime location. DM for enquiries or click to view more details.",
+  ],
+  hashtags: "#NewListing #EastLegon #ForSale #FestariEstates",
+  images: [
+    { src: "/images/post-house-thumb-1.jpg", alt: "East Legon house living room" },
+    { src: "/images/post-house-thumb-2.png", alt: "East Legon house kitchen" },
+    { src: "/images/post-house-main.jpg", alt: "East Legon house exterior" },
+  ],
+  totalImages: 8,
+  reactions: { likes: 128, shares: 15 },
+  comments: [
+    {
+      id: "post-1-comment-1",
+      author: { name: "Kojo Mensah", avatar: "/images/avatar-kojo-mensah-follow.png" },
+      body: "This is stunning! Is the pool heated?",
+      createdAt: "1h ago",
+    },
+    {
+      id: "post-1-comment-2",
+      author: { name: "Dee Interiors", avatar: "/images/avatar-dee-interiors-follow.png" },
+      body: "That kitchen island though 😍 gorgeous finishes.",
+      createdAt: "45m ago",
+    },
+  ],
+  price: "GHS 3,450,000",
+  propertyType: "4 Bedroom Detached House",
+  listingType: "For Sale",
+  beds: 4,
+  baths: 4.5,
+  areaSqm: 420,
+};
+
+export const FEED_POSTS: ContentPost[] = [
+  AMA_SERWAA_LISTING,
   {
     id: "post-2",
     kind: "service",
@@ -179,6 +193,43 @@ export const TRENDING_PROPERTIES: TrendingProperty[] = [
     location: "Airport Residential, Accra",
     price: "GHS 8,000 / month",
     image: "/images/property-trending-2.jpg",
+    listingType: "For Rent",
+    beds: 3,
+    baths: 3,
+    areaSqm: 120,
+  },
+];
+
+// Full listing posts for the Properties page (node 3340:1485) —
+// AMA_SERWAA_LISTING is the same object FEED_POSTS renders (see its own
+// comment above); this second one reuses the "3 Bedroom Apartment" details
+// already seeded in TRENDING_PROPERTIES, attributed to Kojo Mensah since
+// he's already established elsewhere as a real estate agent. Only one real
+// photo exists for it (property-trending-2.jpg) — PropertyListingCard's
+// media grid adapts to however many images a listing actually has rather
+// than padding out fake extra tiles with an unrelated property's photo.
+export const PROPERTY_LISTINGS: PropertyPost[] = [
+  AMA_SERWAA_LISTING,
+  {
+    id: "listing-2",
+    kind: "property",
+    author: {
+      name: "Kojo Mensah",
+      avatar: "/images/avatar-kojo-mensah-follow.png",
+      verified: true,
+      subtitle: "5h ago • Airport Residential, Accra",
+    },
+    body: [
+      "Modern 3 bedroom apartment available for rent in a secure, gated community.",
+      "Fully furnished, 24/7 power backup, and parking for two cars.",
+    ],
+    hashtags: "#ForRent #AirportResidential #FestariEstates",
+    images: [{ src: "/images/property-trending-2.jpg", alt: "Airport Residential apartment interior" }],
+    totalImages: 5,
+    reactions: { likes: 64, shares: 6 },
+    comments: [],
+    price: "GHS 8,000 / month",
+    propertyType: "3 Bedroom Apartment",
     listingType: "For Rent",
     beds: 3,
     baths: 3,
