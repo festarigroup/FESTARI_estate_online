@@ -1,201 +1,137 @@
-# Home Feed — Required DB Schema
+# Home Feed — DB Schema
 
-Companion to [home-feed-api-endpoints.md](home-feed-api-endpoints.md). Specs the Django models
-needed to back the Home screen's real data, following the exact conventions already used across
-`server/apps/*/models.py`: UUID primary keys (`default=uuid.uuid4, editable=False`), FKs to
-`settings.AUTH_USER_MODEL`, `TextChoices` for enums, `auto_now_add`/`auto_now` timestamps, and
-`JSONField(default=list, blank=True)` for media URL lists.
+Companion to [home-feed-api-endpoints.md](home-feed-api-endpoints.md). Documents the actual
+Drizzle ORM tables backing the feed/social/notifications/messaging surface, as built in
+`server/src/app/db/schema/*.ts` — this is a Node/Drizzle/PostgreSQL backend, not Django, so there
+are no Django-style model classes; every table below is a `pgTable(...)` definition.
 
-None of the models below exist yet — searched `server/apps/**/models.py` and there is currently
-no feed, social-graph, notification, or messaging app. Suggested as a new `apps/feed` app (plus
-two small additions to the existing `properties` and `artisans` apps).
-
----
-
-## New app: `apps/feed`
-
-### `Story`
-| Field | Type | Notes |
-|---|---|---|
-| `id` | `UUIDField` | PK, `default=uuid.uuid4` |
-| `author` | `FK → User` | `related_name="stories"`, `on_delete=CASCADE` |
-| `media_url` | `URLField` | image or video, uploaded via Supabase storage per platform convention |
-| `caption` | `CharField(max_length=255, blank=True)` | |
-| `created_at` | `DateTimeField(auto_now_add=True)` | |
-| `expires_at` | `DateTimeField` | set to `created_at + 24h` on save |
-
-### `StoryView`
-| Field | Type | Notes |
-|---|---|---|
-| `id` | `UUIDField` | PK |
-| `story` | `FK → Story` | `related_name="views"` |
-| `viewer` | `FK → User` | `related_name="story_views"` |
-| `viewed_at` | `DateTimeField(auto_now_add=True)` | |
-
-`unique_together = ("story", "viewer")` — one view record per viewer.
-
-### `Post`
-| Field | Type | Notes |
-|---|---|---|
-| `id` | `UUIDField` | PK |
-| `author` | `FK → User` | `related_name="posts"` |
-| `kind` | `CharField` + `TextChoices` | `PROPERTY`, `SERVICE`, `GENERAL` |
-| `body` | `TextField` | |
-| `hashtags` | `CharField(max_length=255, blank=True)` | stored as raw text (`"#A #B #C"`), matching how the Figma copy renders it as one styled line — parse client-side if per-tag linking is ever needed |
-| `linked_property` | `FK → properties.Property`, `null=True, blank=True` | set when `kind = PROPERTY` |
-| `linked_artisan` | `FK → artisans.ArtisanProfile`, `null=True, blank=True` | set when `kind = SERVICE` |
-| `created_at` | `DateTimeField(auto_now_add=True)` | |
-| `updated_at` | `DateTimeField(auto_now=True)` | |
-
-`likes_count` / `comments_count` / `shares_count`: **don't** store these as columns — compute
-via `annotate(Count(...))` in the list view's queryset, same as `Property.views_count` is the
-one exception in this codebase that *is* stored (because it's write-heavy/increment-only, unlike
-likes which need dedup via `PostLike`).
-
-### `PostImage`
-| Field | Type | Notes |
-|---|---|---|
-| `id` | `UUIDField` | PK |
-| `post` | `FK → Post` | `related_name="images"` |
-| `image_url` | `URLField` | |
-| `position` | `PositiveSmallIntegerField(default=0)` | drives the 1-big + N-thumbnail gallery layout |
-
-### `PostLike`
-| Field | Type | Notes |
-|---|---|---|
-| `id` | `UUIDField` | PK |
-| `post` | `FK → Post` | `related_name="likes"` |
-| `user` | `FK → User` | `related_name="post_likes"` |
-| `created_at` | `DateTimeField(auto_now_add=True)` | |
-
-`unique_together = ("post", "user")`.
-
-### `PostComment`
-| Field | Type | Notes |
-|---|---|---|
-| `id` | `UUIDField` | PK |
-| `post` | `FK → Post` | `related_name="comments"` |
-| `author` | `FK → User` | |
-| `body` | `TextField` | |
-| `created_at` | `DateTimeField(auto_now_add=True)` | |
-
-### `PostShare`
-| Field | Type | Notes |
-|---|---|---|
-| `id` | `UUIDField` | PK |
-| `post` | `FK → Post` | `related_name="shares"` |
-| `user` | `FK → User` | |
-| `created_at` | `DateTimeField(auto_now_add=True)` | |
-
-No `unique_together` — a user can share the same post more than once (matches "Share" being a
-repeatable action, unlike Like/Save).
-
-### `SavedPost`
-| Field | Type | Notes |
-|---|---|---|
-| `id` | `UUIDField` | PK |
-| `post` | `FK → Post` | `related_name="saved_by"` |
-| `user` | `FK → User` | `related_name="saved_posts"` |
-| `created_at` | `DateTimeField(auto_now_add=True)` | |
-
-`unique_together = ("post", "user")`.
+Shared conventions across every table in this schema (not repeated per-table below):
+`id: uuid("id").primaryKey().defaultRandom()`; `created_at`/`updated_at` as
+`timestamp().defaultNow().notNull()` (bumped manually in the owning service's `update()`, no DB
+trigger); foreign keys via `.references(() => table.id, { onDelete: ... })`; enums via
+`pgEnum(...)` (defined once in `schema/enums.ts`, not per-table).
 
 ---
 
-## New app: `apps/social`
+## `schema/feed.ts`
 
-### `Follow`
-| Field | Type | Notes |
+### `stories`
+| Column | Type | Notes |
 |---|---|---|
-| `id` | `UUIDField` | PK |
-| `follower` | `FK → User` | `related_name="following"` |
-| `following` | `FK → User` | `related_name="followers"` |
-| `created_at` | `DateTimeField(auto_now_add=True)` | |
+| `author_id` | uuid → `users.id`, cascade | |
+| `media_url` | text | Supabase Storage public URL |
+| `caption` | varchar(255), nullable | |
+| `expires_at` | timestamp | set to `created_at + 24h` in `storiesService.create`, not a DB default |
 
-`unique_together = ("follower", "following")`. Add a `CheckConstraint` (or validate in the
-serializer) so `follower != following`.
+### `story_views`
+`story_id` → `stories.id` cascade, `viewer_id` → `users.id` cascade, `viewed_at`.
+Unique on `(story_id, viewer_id)` — one view record per viewer.
+
+### `posts`
+| Column | Type | Notes |
+|---|---|---|
+| `author_id` | uuid → `users.id`, cascade | |
+| `kind` | `post_kind` enum: `property \| service \| general` | |
+| `body` | text | |
+| `hashtags` | text, nullable | raw text, e.g. `"#A #B #C"` — not parsed into per-tag rows |
+| `linked_property_id` | uuid → `properties.id`, set null | set when `kind = property` |
+| `linked_artisan_id` | uuid → `artisan_profiles.id`, set null | set when `kind = service` |
+
+`likes_count`/`comments_count`/`shares_count` are **not** columns — computed via correlated
+`count(*)` subqueries in `postsService`'s `withCounts()` helper at query time. `is_liked`/
+`is_saved` are computed the same way against the requesting user, when authenticated. The one
+exception to "don't denormalize" anywhere in this schema is `properties.views_count`, which is a
+stored incrementing counter (write-heavy, no dedup needed, unlike likes).
+
+### `post_images`
+`post_id` → `posts.id` cascade, `image_url`, `position: smallint` (drives gallery ordering).
+
+### `post_likes`
+`post_id` → `posts.id` cascade, `user_id` → `users.id` cascade. Unique on `(post_id, user_id)`.
+
+### `post_comments`
+`post_id` → `posts.id` cascade, `author_id` → `users.id`, `body`.
+
+### `post_shares`
+`post_id` → `posts.id` cascade, `user_id` → `users.id`. **No** unique constraint — a user can
+share the same post more than once (repeatable action, unlike Like/Save).
+
+### `saved_posts`
+`post_id` → `posts.id` cascade, `user_id` → `users.id` cascade. Unique on `(post_id, user_id)`.
 
 ---
 
-## New app: `apps/notifications`
+## `schema/social.ts`
 
-### `Notification`
-| Field | Type | Notes |
-|---|---|---|
-| `id` | `UUIDField` | PK |
-| `recipient` | `FK → User` | `related_name="notifications"` |
-| `actor` | `FK → User`, `null=True` | who triggered it (null for system notifications) |
-| `verb` | `CharField` + `TextChoices` | `LIKE`, `COMMENT`, `FOLLOW`, `BOOKING`, `INQUIRY`, `HIRE_REQUEST` |
-| `target_type` | `CharField(max_length=32)` | e.g. `"post"`, `"property"`, `"hotel_booking"` |
-| `target_id` | `UUIDField` | generic FK avoided on purpose — keep this app decoupled from every other app it might notify about |
-| `is_read` | `BooleanField(default=False)` | |
-| `created_at` | `DateTimeField(auto_now_add=True)` | |
+### `follows`
+`follower_id` / `following_id` → `users.id`, both cascade. Unique on `(follower_id,
+following_id)`, plus a Postgres `CHECK (follower_id <> following_id)` constraint.
 
 ---
 
-## New app: `apps/messaging`
+## `schema/notifications.ts`
 
-### `Conversation`
-| Field | Type | Notes |
+### `notifications`
+| Column | Type | Notes |
 |---|---|---|
-| `id` | `UUIDField` | PK |
-| `participants` | `ManyToManyField(User, related_name="conversations")` | 1:1 DMs for now (2 participants); shape allows group chat later |
-| `created_at` | `DateTimeField(auto_now_add=True)` | |
-| `updated_at` | `DateTimeField(auto_now=True)` | bump on new message, used to sort the conversation list |
+| `recipient_id` | uuid → `users.id`, cascade | |
+| `actor_id` | uuid → `users.id`, set null, nullable | who triggered it; null for system notifications |
+| `verb` | `notification_verb` enum: `like \| comment \| follow \| booking \| inquiry \| hire_request \| message \| system` | |
+| `target_type` | text, nullable | e.g. `"post"`, `"property"`, `"hotel_booking"`, `"conversation"` |
+| `target_id` | uuid, nullable | **no FK** — deliberately decoupled so this table doesn't reference every domain it might notify about |
+| `channel` | `notification_channel` enum: `in_app \| email \| sms \| whatsapp` | |
+| `title`, `body` | text | |
+| `data` | jsonb, nullable | |
+| `is_read` | boolean | |
+| `sent_at`, `read_at` | timestamp, nullable | |
 
-### `Message`
-| Field | Type | Notes |
-|---|---|---|
-| `id` | `UUIDField` | PK |
-| `conversation` | `FK → Conversation` | `related_name="messages"` |
-| `sender` | `FK → User` | |
-| `body` | `TextField` | |
-| `is_read` | `BooleanField(default=False)` | |
-| `created_at` | `DateTimeField(auto_now_add=True)` | |
+One table serves both transactional notifications (booking/inquiry/hire_request) and social ones
+(like/comment/follow/message) — merged on purpose to avoid duplicate unread-count logic across
+two tables. Every producer emits through a single `notificationsService.notify()` call.
+
+### `user_notification_preferences`
+One row per user (`user_id` unique FK). Channel toggles: `in_app_enabled`, `email_enabled`,
+`sms_enabled`, `whatsapp_enabled`. Domain toggles: `booking_enabled`, `inquiry_enabled`,
+`hire_request_enabled`, `social_enabled`, `message_enabled`, `system_enabled`. Plus `frequency`
+(`daily | weekly | monthly | never`).
 
 ---
 
-## Additions to existing models
+## `schema/messaging.ts`
 
-### `properties.Property`
-Needed so `CategoryGrid` and `TrendingProperties` can query real data instead of being hardcoded
-copy. Neither field exists on the current model (`title`, `description`, `price`, `location`,
-`is_featured`, `status`, `media_urls`, `views_count`).
+### `conversations`
+No columns beyond id/timestamps — `updated_at` is bumped on every new message and drives the
+conversation-list sort order.
 
-| Field | Type | Notes |
-|---|---|---|
-| `listing_type` | `CharField` + `TextChoices` | `FOR_SALE`, `FOR_RENT`, `SHORT_STAY` — drives the "FOR SALE"/"FOR RENT" badge on trending cards and the category filter |
-| `property_type` | `CharField` + `TextChoices` | `LAND`, `HOME`, `APARTMENT`, `OFFICE` — the other half of `CategoryGrid` |
-| `bedrooms` | `PositiveSmallIntegerField(null=True, blank=True)` | `api-reference.md` already documents `?bedrooms=2` as a filter, but the field isn't on the model — needed for the bed/bath/sqm row on `TrendingProperties` too |
-| `bathrooms` | `PositiveSmallIntegerField(null=True, blank=True)` | same gap as above, no existing doc reference |
-| `area_sqm` | `PositiveIntegerField(null=True, blank=True)` | |
+### `conversation_participants`
+Composite primary key `(conversation_id, user_id)` — the Drizzle translation of a
+many-to-many relationship. Shaped for a future group chat (more than 2 participants), though
+nothing in the app creates one yet — `messagingService.findOrCreateOneToOne` always inserts
+exactly 2 rows.
 
-### `artisans.ArtisanProfile`
-Needed so `TopServiceProviders` can show a real rating instead of a hardcoded number.
-`api-reference.md` already documents `?rating=4` and `-ordering=-rating` as artisan filters, but
-there is no rating field or review model anywhere in `apps/artisans` today — this is a
-pre-existing doc/schema gap, not something new introduced by the Home feed.
-
-Add a review model rather than a self-reported field:
-
-#### `ArtisanReview` (new model in `apps/artisans`)
-| Field | Type | Notes |
-|---|---|---|
-| `id` | `UUIDField` | PK |
-| `artisan` | `FK → ArtisanProfile` | `related_name="reviews"` |
-| `reviewer` | `FK → User` | |
-| `rating` | `PositiveSmallIntegerField` | 1–5, validate with `MinValueValidator(1)` / `MaxValueValidator(5)` |
-| `comment` | `TextField(blank=True)` | |
-| `created_at` | `DateTimeField(auto_now_add=True)` | |
-
-`ArtisanProfile.average_rating` can then be an annotated value (`reviews.aggregate(Avg("rating"))`)
-in the queryset backing `GET /api/v1/artisans/top/`, same pattern recommended above for
-`Post.likes_count` — don't denormalize onto the model unless read volume ends up requiring it.
+### `messages`
+`conversation_id` → `conversations.id` cascade, `sender_id` → `users.id`, `body`, `is_read`.
 
 ---
 
-## Out of scope here
-- **Migrations** aren't included — generate via `makemigrations` once the models above are
-  reviewed and adjusted; not guessing at migration dependency ordering in a doc.
-- **Poll model** (Post Composer's "Poll" attach type) isn't specced — see the note in
-  [home-feed-api-endpoints.md](home-feed-api-endpoints.md#out-of-scope-here).
+## Fields added to existing tables for the feed
+
+### `schema/properties.ts` — `properties`
+Beyond the base listing fields (`title`, `description`, `price`, `location`, `is_featured`,
+`status`, `views_count`), the feed/category surface needs:
+`listing_type` (`for_sale | for_rent | short_stay`), `property_type` (`land | home | apartment |
+office`), `bedrooms`, `bathrooms`, `area_sqm` — all present on the table as built.
+
+### `schema/artisans.ts` — `artisan_profiles` + `artisan_reviews`
+`artisan_profiles.id` **is** the owning user's id (FK + PK in one, one profile per account) — not
+a separate generated id. `average_rating` is not a column; `artisan_reviews` (`artisan_id`,
+`reviewer_id`, `rating: 1-5` with a Postgres `CHECK`, `comment`) backs a computed
+`AVG(rating)`/`COUNT(*)` in `artisansService.getTop()` / `getRatingSummary()`.
+
+---
+
+## Out of scope
+- **Poll model** — the Create Post modal's "Poll" attachment type has no backing table; posts of
+  that shape stay local-only on the client.
+- **Venue post kind** — `posts.kind` is only `property | service | general`; there's no `venue`
+  value and no venue-specific fields anywhere in this schema.

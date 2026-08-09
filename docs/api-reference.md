@@ -2,338 +2,218 @@
 
 ## Base URL
 ```
-http://localhost:8000/api/
+http://localhost:3030/api/v1/
 ```
+(`PORT` and `API_BASE_URL` are configurable via `server/.env` — 3030 is this repo's default.)
+
+## Stack
+Node.js + TypeScript + Express 5, Drizzle ORM (PostgreSQL), Joi validation. Not Django —
+this document describes the current backend under `server/src`, which replaced an earlier
+Django REST Framework implementation.
 
 ## Authentication
-All API requests require authentication except for registration and login endpoints.
-
-### Headers
+Every endpoint below is public unless marked **Auth required**. Authenticated requests send:
 ```
-Authorization: Bearer <jwt_token>
-Content-Type: application/json
+Authorization: Bearer <access_token>
 ```
+Access tokens expire after 1 day; refresh tokens after 7 days. There is no session cookie —
+tokens are issued in the JSON body of register/login/google/verify-otp responses and must be
+stored and sent by the client. A user can hold multiple roles at once (e.g. `buyer` and
+`artisan`); the JWT payload carries `roles: string[]`, not a single role.
 
-## API Endpoints
-
-### Authentication
-- `POST /api/auth/register/` - User registration
-- `POST /api/auth/login/` - User login
-- `POST /api/auth/oauth-login/` - OAuth login/register (Google, Apple)
-- `POST /api/auth/refresh/` - Refresh JWT token
-- `POST /api/auth/forgot-password/` - Password reset request
-- `POST /api/auth/reset-password/` - Password reset confirmation
-- `GET /api/auth/profile/` - Get user profile
-- `PUT /api/auth/profile/` - Update user profile
-
-### Properties
-- `GET /api/properties/` - List properties (with filters)
-- `POST /api/properties/` - Create property (Manager/Admin only)
-- `GET /api/properties/{id}/` - Get property details
-- `PUT /api/properties/{id}/` - Update property (Manager/Admin only)
-- `DELETE /api/properties/{id}/` - Delete property (Admin only)
-- `POST /api/properties/{id}/images/` - Upload property images
-
-### Property Inquiries
-- `GET /api/common/property-inquiries/` - List property inquiries
-- `POST /api/common/property-inquiries/` - Create property inquiry
-- `GET /api/common/property-inquiries/{id}/` - Get inquiry details
-- `PUT /api/common/property-inquiries/{id}/mark-read/` - Mark inquiry as read
-- `DELETE /api/common/property-inquiries/{id}/` - Delete inquiry (Admin only)
-
-### Hotels
-- `GET /api/hotels/` - List hotels
-- `POST /api/hotels/` - Create hotel (Manager/Admin only)
-- `GET /api/hotels/{id}/` - Get hotel details
-- `PUT /api/hotels/{id}/` - Update hotel (Manager/Admin only)
-- `DELETE /api/hotels/{id}/` - Delete hotel (Admin only)
-- `PUT /api/hotels/{id}/approve/` - Approve hotel (Admin only)
-- `PUT /api/hotels/{id}/reject/` - Reject hotel (Admin only)
-
-### Hotel Bookings
-- `GET /api/hotels/{hotel_id}/bookings/` - List hotel bookings
-- `POST /api/hotels/{hotel_id}/bookings/` - Create booking
-- `GET /api/hotels/bookings/{id}/` - Get booking details
-- `PUT /api/hotels/bookings/{id}/` - Update booking
-- `DELETE /api/hotels/bookings/{id}/` - Cancel booking
-
-### Artisans
-- `GET /api/artisans/` - List artisans (with filters)
-- `POST /api/artisans/` - Register as artisan
-- `GET /api/artisans/{id}/` - Get artisan profile
-- `PUT /api/artisans/{id}/` - Update artisan profile
-- `DELETE /api/artisans/{id}/` - Delete artisan profile (Admin only)
-- `PUT /api/artisans/{id}/approve/` - Approve artisan (Admin only)
-- `PUT /api/artisans/{id}/reject/` - Reject artisan (Admin only)
-
-### Artisan Inquiries
-- `GET /api/common/artisan-inquiries/` - List artisan inquiries
-- `POST /api/common/artisan-inquiries/` - Create artisan inquiry
-- `GET /api/common/artisan-inquiries/{id}/` - Get inquiry details
-- `PUT /api/common/artisan-inquiries/{id}/mark-read/` - Mark inquiry as read
-- `DELETE /api/common/artisan-inquiries/{id}/` - Delete inquiry (Admin only)
-
-### Subscriptions
-- `GET /api/subscriptions/plans/` - List subscription plans
-- `POST /api/subscriptions/subscribe/` - Subscribe to plan
-- `GET /api/subscriptions/my-subscription/` - Get current subscription
-- `PUT /api/subscriptions/cancel/` - Cancel subscription
-- `GET /api/subscriptions/history/` - Subscription history
-
-### Payments
-- `GET /api/payments/` - List user payments
-- `POST /api/payments/initiate/` - Initiate payment
-- `GET /api/payments/{id}/` - Get payment details
-- `POST /api/payments/webhook/` - Payment webhook (Paystack)
-- `POST /api/payments/verify/{reference}/` - Verify payment
-
-### Dashboard (Admin/Manager)
-- `GET /api/dashboard/stats/` - Platform statistics
-- `GET /api/dashboard/recent-activity/` - Recent platform activity
-- `GET /api/dashboard/pending-approvals/` - Items pending approval
+Roles: `buyer`, `estate_manager`, `hotel_manager`, `artisan`, `admin`.
 
 ## Response Formats
 
-### Success Response
+### Success
 ```json
-{
-  "status": "success",
-  "data": { ... },
-  "message": "Operation completed successfully"
-}
+{ "success": true, "data": { ... }, "message": "Optional human-readable message" }
 ```
 
-### Error Response
+### Error
 ```json
-{
-  "status": "error",
-  "message": "Error description",
-  "errors": { ... }
-}
+{ "success": false, "error": { "code": "SOME_CODE", "message": "What went wrong" } }
 ```
 
-### Paginated Response
-```json
-{
-  "status": "success",
-  "data": {
-    "count": 100,
-    "next": "http://localhost:8000/api/properties/?page=2",
-    "previous": null,
-    "results": [ ... ]
-  }
-}
-```
-
-## Filtering & Sorting
-
-### Properties
-- `?location=city` - Filter by location
-- `?property_type=apartment` - Filter by type
-- `?min_price=100000` - Minimum price
-- `?max_price=500000` - Maximum price
-- `?bedrooms=2` - Number of bedrooms
-- `?ordering=-created_at` - Sort by creation date (desc)
-
-### Artisans
-- `?service_type=plumbing` - Filter by service type
-- `?location=city` - Filter by location
-- `?rating=4` - Minimum rating
-- `?ordering=-rating` - Sort by rating
-
-### Bookings
-- `?status=confirmed` - Filter by status
-- `?check_in_date=2024-01-01` - Filter by check-in date
-- `?ordering=-created_at` - Sort by creation date
-
-## File Upload
-
-### Image Upload
-- **Endpoint**: `POST /api/properties/{id}/images/`
-- **Content-Type**: `multipart/form-data`
-- **Fields**:
-  - `image`: Image file (JPEG, PNG, max 5MB)
-  - `alt_text`: Optional description
-
-### Document Upload
-- **Endpoint**: `POST /api/artisans/{id}/documents/`
-- **Content-Type**: `multipart/form-data`
-- **Fields**:
-  - `document`: PDF file (max 10MB)
-  - `document_type`: Type of document
-
-## Webhooks
-
-### Paystack Payment Webhook
-- **Endpoint**: `POST /api/payments/webhook/`
-- **Headers**:
-  - `X-Paystack-Signature`: Webhook signature
-- **Events**: `charge.success`, `charge.failed`, `transfer.success`
-
-## OAuth Authentication (Google & Apple)
-
-### Overview
-Users can authenticate using Google or Apple OAuth via Supabase Auth. The backend handles token verification and user creation/login.
-
-### Endpoint: OAuth Login/Register
-**POST** `/api/auth/oauth-login/`
-
-**Request**:
-```json
-{
-  "provider": "google",
-  "token": "supabase-oauth-access-token"
-}
-```
-
-**Parameters**:
-- `provider` (string, required): OAuth provider - `google` or `apple`
-- `token` (string, required): Access token returned by Supabase Auth after OAuth callback
-
-**Response** (201 Created):
+### Paginated list
+List endpoints that accept `current_page`/`limit` return:
 ```json
 {
   "success": true,
-  "message": "Successfully authenticated with google",
   "data": {
-    "user": {
-      "id": "uuid-user-id",
-      "email": "user@example.com",
-      "first_name": "John",
-      "last_name": "Doe",
-      "username": "john_doe_abc123",
-      "role": "buyer",
-      "is_verified": true
-    },
-    "tokens": {
-      "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-      "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-    },
-    "provider": "google",
-    "created": true
+    "items": [ ... ],
+    "metadata": { "total": 100, "pages": 5, "current_page": 1, "limit": 20 }
   }
 }
 ```
 
-**Error Response** (401 Unauthorized):
-```json
-{
-  "success": false,
-  "message": "Invalid or expired OAuth token"
-}
-```
+## Auth — `/auth`
+- `POST /auth/register` — `{ firstname, lastname, email, password, roles: string[] }`. Creates
+  an unverified account and emails a 6-digit OTP. **Login is blocked until verified.**
+- `POST /auth/login` — `{ email, password }` → `{ accessToken, refreshToken, sessionId, user }`.
+- `POST /auth/google` — `{ idToken, role }`. Verifies a Google ID token, creates the account on
+  first sign-in (pre-verified), adds `role` if the account doesn't already have it. Same token
+  response shape as login.
+- `POST /auth/verify-otp` — `{ email, otp, purpose: "email_verification" | "password_reset" }`.
+- `POST /auth/resend-otp` — `{ email, purpose }`.
+- `POST /auth/forgot-password` — `{ email }`. Emails a password-reset OTP.
+- `POST /auth/reset-password` — `{ email, otp, newPassword }`. Revokes all existing sessions.
+- `POST /auth/refresh-token` — `{ refreshToken }` → `{ accessToken }`.
+- `POST /auth/logout` **Auth required** — `{ sessionId? }`. Revokes one session, or all sessions
+  if `sessionId` is omitted.
 
-### Frontend Implementation
+## Users — `/users`
+- `GET /users` — paginated list.
+- `GET /users/find?authKey=email|phone&authValue=...` — look up a user by email or phone.
+- `GET /users/me` **Auth required**
+- `POST /users/me/accept-terms` **Auth required**
+- `POST /users/me/avatar` **Auth required** — `multipart/form-data`, field `avatar` (JPEG/PNG/WebP, max 5MB).
+- `GET /users/:id`
+- `PATCH /users/:id` **Auth required** — self only.
 
-1. **Initialize Supabase Auth**: Use Supabase JS client with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+## Properties — `/properties`
+- `GET /properties?location=&property_type=&listing_type=&min_price=&max_price=&bedrooms=&ordering=`
+- `POST /properties` **Auth required** — gated by the caller's subscription `max_properties` limit.
+- `GET /properties/:id`
+- `PUT /properties/:id` **Auth required** — owner or admin.
+- `DELETE /properties/:id` **Auth required** — owner or admin.
+- `PUT /properties/:id/approve` **Admin only**
+- `PUT /properties/:id/reject` **Admin only**
+- `POST /properties/:id/images` **Auth required** — `multipart/form-data`, field `image` + `position`. Gated by the caller's `max_images` limit.
+- `DELETE /properties/:id/images/:imageId` **Auth required**
+- `GET /properties/categories` — listing-type counts for the category grid.
+- `GET /properties/trending?limit=2`
+- `GET /properties/wishlist` **Auth required**
+- `POST /properties/:id/wishlist` **Auth required**
+- `DELETE /properties/:id/wishlist` **Auth required**
 
-2. **Trigger OAuth Flow**:
-```javascript
-const { data, error } = await supabase.auth.signInWithOAuth({
-  provider: 'google', // or 'apple'
-  options: { redirectTo: 'http://localhost:3000/auth/callback' }
-});
-```
+`listing_type`: `for_sale | for_rent | short_stay`. `property_type`: `land | home | apartment | office`.
+`status` (moderation): `pending | approved | rejected` — public list/detail only return `approved`.
 
-3. **Handle Callback**: After user authenticates with Google/Apple, Supabase redirects to the redirect URL with a session token
+## Hotels — `/hotels`
+- `GET /hotels?location=`
+- `POST /hotels` **Auth required** — gated by `max_hotels`.
+- `GET /hotels/:id`
+- `PUT /hotels/:id` / `DELETE /hotels/:id` **Auth required** — owner or admin.
+- `PUT /hotels/:id/approve` / `PUT /hotels/:id/reject` **Admin only**
+- `POST /hotels/:id/images` **Auth required** — same shape as property images.
+- `DELETE /hotels/:id/images/:imageId` **Auth required**
+- `GET /hotels/:hotelId/bookings` **Auth required** — hotel owner or admin.
+- `POST /hotels/:hotelId/bookings` **Auth required** — `{ check_in, check_out, guests }`; total price computed server-side from nights × `price_per_night`.
+- `GET /hotels/bookings/me` **Auth required**
+- `GET /hotels/bookings/:id` **Auth required** — booker, hotel owner, or admin.
+- `PUT /hotels/bookings/:id` **Auth required** — hotel owner or admin, updates `status`.
+- `DELETE /hotels/bookings/:id` **Auth required** — booker or admin, cancels.
 
-4. **Send Token to Backend**:
-```javascript
-const { data } = await supabase.auth.getSession();
-const token = data?.session?.access_token;
+## Artisans — `/artisans`
+- `GET /artisans?service_type=`
+- `GET /artisans/top?limit=4` — ranked by average review rating.
+- `GET /artisans/:id` — includes `average_rating`, `review_count`, and the review list.
+- `POST /artisans` **Auth required** — creates the caller's own artisan profile (one per account).
+- `PUT /artisans/:id` / `DELETE /artisans/:id` **Auth required** — owner or admin.
+- `PUT /artisans/:id/approve` / `PUT /artisans/:id/reject` **Admin only**
+- `POST /artisans/:id/hire` **Auth required** — `{ message }`. Free request — no payment is
+  collected at hire time; that's a follow-up action once the artisan accepts.
+- `GET /artisans/hire-requests/me` **Auth required** — requests the caller has sent.
+- `GET /artisans/:id/hire-requests` **Auth required** — artisan or admin, requests they've received.
+- `PUT /artisans/hire-requests/:id` **Auth required** — artisan or admin, `{ status: "accepted" | "rejected" | "completed" }`.
+- `POST /artisans/:id/reviews` **Auth required** — `{ rating: 1-5, comment? }`.
 
-const response = await fetch('/api/auth/oauth-login/', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    provider: 'google',
-    token: token
-  }),
-  credentials: 'include' // Include cookies for JWT
-});
+## Inquiries — `/common`
+- `POST /common/property-inquiries` — `{ property_id, name, email, phone?, message }`. No auth
+  required to send one; `user_id` is attached automatically when the caller is signed in.
+- `GET /common/property-inquiries?property_id=` **Auth required** — property owner or admin.
+- `GET /common/property-inquiries/:id` **Auth required**
+- `PUT /common/property-inquiries/:id/mark-read` **Auth required**
+- `DELETE /common/property-inquiries/:id` **Admin only**
+- `POST /common/artisan-inquiries` — `{ artisan_id, name, email, phone?, message }`.
+- `GET /common/artisan-inquiries?artisan_id=` **Auth required** — artisan or admin.
+- `GET /common/artisan-inquiries/:id` **Auth required**
+- `PUT /common/artisan-inquiries/:id/mark-read` **Auth required**
+- `DELETE /common/artisan-inquiries/:id` **Admin only**
 
-const result = await response.json();
-// Use result.data.tokens.access for subsequent API calls
-```
+## Subscriptions — `/subscriptions`
+- `GET /subscriptions/plans`
+- `POST /subscriptions/plans` **Admin only** — create a plan.
+- `POST /subscriptions/subscribe` **Auth required** — creates a pending subscription + Paystack payment.
+- `GET /subscriptions/my-subscription` **Auth required**
+- `PUT /subscriptions/cancel` **Auth required**
+- `GET /subscriptions/history` **Auth required**
 
-### Backend Configuration
+Plans carry the feature-gating limits enforced elsewhere: `max_properties`, `max_hotels`,
+`max_images`, `max_videos`, `can_feature_properties`. A user with no active subscription gets a
+small free-tier default (see `subscriptionLimitService`).
 
-Required environment variables (`.env`):
-```env
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-SUPABASE_JWT_SECRET=your-supabase-jwt-secret
-```
+## Payments — `/payments`
+- `POST /payments/webhook` — Paystack webhook, verified by signature, not by auth token.
+- `GET /payments` **Auth required** — the caller's own payments.
+- `POST /payments/initiate` **Auth required** — `{ payment_type: "subscription" | "property" | "hotel_booking" | "artisan_hire", amount, ... }`, returns a Paystack authorization URL.
+- `GET /payments/verify/:reference` **Auth required**
+- `GET /payments/:id` **Auth required**
 
-**Note**: You do NOT need to configure OAuth provider client IDs on the backend. Supabase handles all OAuth provider configuration (Google, Apple) on their dashboard. The backend only verifies the JWT token returned by Supabase.
+All payments — subscriptions, hotel bookings, artisan hires — go through this one generic table
+and flow. There is no stored wallet/balance anywhere in this platform.
 
-### Setup Steps
+## Home Feed — `/feed`
+See [home-feed-api-endpoints.md](home-feed-api-endpoints.md) for the full endpoint list (stories,
+posts, likes, comments, shares, saves).
 
-1. **Supabase Configuration** (one-time setup):
-   - Go to your Supabase project dashboard
-   - Navigate to Authentication → Providers
-   - Enable Google provider and enter your Google OAuth credentials
-   - Enable Apple provider and enter your Apple OAuth credentials
-   - Add your frontend redirect URL to the allowlist (e.g., `http://localhost:3000/auth/callback`)
+## Social — `/social`
+All **Auth required**.
+- `GET /social/suggestions?limit=5`
+- `POST /social/follow/:userId` / `DELETE /social/follow/:userId`
+- `GET /social/following`
+- `GET /social/followers`
 
-2. **Backend Requirements**:
-   - Set the three environment variables above
-   - Restart the backend server
+## Notifications — `/notifications`
+All **Auth required**.
+- `GET /notifications/preferences` / `PUT /notifications/preferences`
+- `GET /notifications?limit=&offset=`
+- `GET /notifications/unread-count` → `{ count }`
+- `PUT /notifications/:id/read`
+- `PUT /notifications/read-all`
+- `DELETE /notifications/:id`
+- `DELETE /notifications/clear-all`
 
-3. **Frontend Requirements**:
-   - Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`
-   - Import Supabase client: `import { createClient } from '@supabase/supabase-js'`
-   - Call the OAuth login endpoint after obtaining the token
+Every like, comment, follow, booking, inquiry, hire request, and message emits one of these
+through a single `notificationsService.notify()` call, distinguished by `verb` (`like | comment |
+follow | booking | inquiry | hire_request | message | system`) and a decoupled
+`target_type`/`target_id` pair (no foreign key — the notifications table stays independent of
+every domain it might reference).
 
-### User Data Storage
+## Messages — `/messages`
+All **Auth required**. 1:1 conversations only (the schema allows group chat later, nothing
+in this app creates one yet).
+- `GET /messages/conversations`
+- `POST /messages/conversations` — `{ participant_id }`, finds or creates the 1:1 conversation.
+- `GET /messages/conversations/:id`
+- `POST /messages/conversations/:id/messages` — `{ body }`.
+- `GET /messages/unread-count` → `{ count }`
 
-When a user authenticates via OAuth:
-- **First-time users**: A new user account is created in the database
-  - Email: From OAuth provider
-  - Username: Auto-generated (email prefix + random suffix)
-  - First/Last Name: Extracted from OAuth profile if available
-  - is_verified: Set to `true` (OAuth users are pre-verified)
-  - oauth_provider: Stores the provider name (`google` or `apple`)
+## Dashboard — `/dashboard`
+**Admin only.**
+- `GET /dashboard/stats` — platform counts, active subscriptions, revenue by payment type.
+- `GET /dashboard/recent-activity`
+- `GET /dashboard/pending-approvals` — properties/hotels/artisans awaiting moderation.
 
-- **Existing users**: Account is updated and user is logged in
-  - oauth_provider: Updated if different from previous login
-  - is_verified: Ensured to be `true`
+## File Upload
+Every image upload endpoint (`properties/:id/images`, `hotels/:id/images`,
+`feed/posts/:id/images`, `feed/stories`) is `multipart/form-data`, stored in Supabase Storage,
+and limited to JPEG/PNG/WebP (plus MP4/MOV/WebM for stories, up to 20MB). Feature-limited
+resources (properties, hotels) are additionally gated by the caller's subscription plan.
 
-### JWT Tokens
-
-After successful OAuth authentication, the backend returns both access and refresh tokens:
-- **Access Token**: Valid for ~24 hours, use for API requests
-- **Refresh Token**: Use to obtain new access tokens when expired
-
-Both tokens are also set as secure, HTTP-only cookies for cookie-based auth.
-
-## Rate Limiting
-- **Authenticated requests**: 1000/hour
-- **Unauthenticated requests**: 100/hour
-- **File uploads**: 50/hour
+## Webhooks
+### Paystack
+- **Endpoint**: `POST /api/v1/payments/webhook`
+- **Header**: `X-Paystack-Signature`
+- Deduplicated by event id (`paystack_webhook_events` table) so a redelivered webhook is a no-op.
 
 ## Error Codes
-- `400`: Bad Request - Invalid input data
-- `401`: Unauthorized - Missing or invalid authentication
-- `403`: Forbidden - Insufficient permissions
-- `404`: Not Found - Resource doesn't exist
-- `409`: Conflict - Resource already exists
-- `422`: Unprocessable Entity - Validation errors
-- `429`: Too Many Requests - Rate limit exceeded
-- `500`: Internal Server Error - Server error
+- `400` Bad Request · `401` Unauthorized · `403` Forbidden · `404` Not Found ·
+  `409` Conflict (e.g. duplicate email) · `429` Too Many Requests (OTP rate limiting) ·
+  `500` Internal Server Error
 
-## SDKs & Libraries
-- **Python**: `requests` library for API calls
-- **JavaScript**: `axios` or `fetch` for frontend integration
-- **Postman Collection**: Available in `/docs/postman_collection.json`
-
-## Testing
-- **Base URL for testing**: `http://localhost:8000/api`
-- **Test credentials**: Available in development environment
-- **API documentation**: Interactive Swagger UI at `/api/docs/`
-
-## Support
-For API support or questions:
-- Email: support@festariestate.com
-- Documentation: `/docs/`
-- Issues: GitHub repository
+## API Documentation
+Interactive Swagger UI is served at `/api-docs` (JSDoc source: `server/src/app/docs/*.docs.ts`,
+currently covering auth/payments/notifications/example — the newer domains below aren't
+annotated yet).

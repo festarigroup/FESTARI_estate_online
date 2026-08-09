@@ -2,72 +2,18 @@ services:
   server:
     build:
       context: ./server
-      dockerfile: festari_backend/Dockerfile
-    container_name: django_api
-    volumes:
-      - ./server:/app
-    ports:
-      - "8000:8000"
-    env_file:
-      - ./server/festari_backend/.env
-    environment:
-      - PYTHONPATH=/app
-    depends_on:
-      - db
-      - redis
-
-  worker:
-    build:
-      context: ./server
-      dockerfile: festari_backend/Dockerfile
-    container_name: django_worker
-    volumes:
-      - ./server:/app
-    env_file:
-      - ./server/festari_backend/.env
-    environment:
-      - PYTHONPATH=/app
-    depends_on:
-      - db
-      - redis
-    command: ["celery", "-A", "festari_backend.celery_app", "worker", "--loglevel=info", "--concurrency=1"]
-
-  beat:
-    build:
-      context: ./server
-      dockerfile: festari_backend/Dockerfile
-    container_name: django_beat
-    volumes:
-      - ./server:/app
-    env_file:
-      - ./server/festari_backend/.env
-    environment:
-      - PYTHONPATH=/app
-    depends_on:
-      - db
-      - redis
-    command: ["celery", "-A", "festari_backend.celery_app", "beat", "--loglevel=info"]
-
-  client:
-    build:
-      context: ./client
       dockerfile: Dockerfile
-    container_name: nextjs_app
-    # volumes:
-    #   - ./client:/app
-    #   - /app/node_modules
-    ports:
-      - "3000:3000"
+    container_name: festari_api
     env_file:
-      - ./client/.env.local
+      - ./server/.env
+    ports:
+      - "3030:3030"
     depends_on:
-      - server
+      - db
 
   db:
     image: postgres
-    container_name: postgres_db
-    # volumes:
-    #   - postgres_data:/var/lib/postgresql/data
+    container_name: festari_db
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -75,16 +21,8 @@ services:
       - PGDATA=/var/lib/postgresql/data
     ports:
       - "5432:5432"
-
-  redis:
-    image: redis
-    container_name: redis_cache
-    ports:
-      - "6379:6379"
     volumes:
-      - redis_data:/data
-    command: redis-server --appendonly yes
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  redis_data:
-  # postgres_data:
+  postgres_data:
