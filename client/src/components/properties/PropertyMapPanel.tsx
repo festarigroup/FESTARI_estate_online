@@ -33,6 +33,11 @@ interface PropertyMapPanelProps {
    * Omit to hide that link entirely — the Stay page has no per-venue detail
    * route yet, so its map just doesn't offer one. */
   detailHref?: (id: string) => string;
+  /** Overrides the mini map's sticky `top`/`height` for callers whose page
+   * doesn't stack a sticky filter row above it the way Properties does —
+   * the Stay page's map sits in its own column, not below one, so it only
+   * needs to clear TopNavBar itself, not TopNavBar-plus-filter-row. */
+  className?: string;
 }
 
 /** Right: Interactive Map (Desktop Sticky) — Figma node 3340:2569.
@@ -48,7 +53,14 @@ interface PropertyMapPanelProps {
  * (photo, price, a link into it), and the whole thing can expand from the
  * sidebar-sized mini map into a full-width view via either the filter
  * row's "Map View" button or clicking the map's own location badge. */
-export function PropertyMapPanel({ listings, expanded, onExpand, onCollapse, detailHref }: PropertyMapPanelProps) {
+export function PropertyMapPanel({
+  listings,
+  expanded,
+  onExpand,
+  onCollapse,
+  detailHref,
+  className,
+}: PropertyMapPanelProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = listings.find((l) => l.id === selectedId) ?? null;
 
@@ -68,7 +80,12 @@ export function PropertyMapPanel({ listings, expanded, onExpand, onCollapse, det
         "overflow-hidden rounded-xl border border-border-subtle bg-[#e3e2e5] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]",
         expanded
           ? "block h-[75vh] w-full"
-          : "hidden lg:sticky lg:top-[131px] lg:block lg:h-[calc(100vh-155px)]",
+          // 170px clears TopNavBar (112px) plus PropertiesFilterRow's own
+          // sticky height (58px) stacked above this in the same column —
+          // callers without that filter row above them (Stay) override via
+          // `className` to just the 112px clearance instead.
+          : "hidden lg:sticky lg:top-[170px] lg:block lg:h-[calc(100vh-194px)]",
+        className,
       )}
     >
       <div className="relative size-full bg-[url('/images/property-map-canvas.png')] bg-cover bg-center">

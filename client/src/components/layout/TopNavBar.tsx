@@ -54,8 +54,11 @@ export function TopNavBar({ onMenuClick }: TopNavBarProps) {
   return (
     <header
       className={
+        // Full width at every breakpoint (Figma node 3393:18013 spans edge
+        // to edge, just inset by margin — the sidebar starts *below* this,
+        // not beside it, so this never needs to dodge --sidebar-w).
         "fixed left-0 right-0 top-0 z-50 flex h-[73px] items-center justify-between gap-4 border-b border-brand-navy-light bg-brand-navy px-4 shadow-lg sm:px-6 " +
-        "lg:left-[calc(var(--sidebar-w)+48px)] lg:right-6 lg:top-6 lg:h-16 lg:rounded-[24px] lg:border lg:border-[#e2e8f0] lg:bg-white lg:px-6 lg:shadow-none"
+        "lg:left-6 lg:right-6 lg:top-6 lg:h-16 lg:rounded-[24px] lg:border lg:border-[#e2e8f0] lg:bg-white lg:px-6 lg:shadow-none"
       }
     >
       <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-6">

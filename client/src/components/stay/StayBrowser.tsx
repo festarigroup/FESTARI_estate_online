@@ -76,19 +76,24 @@ export function StayBrowser({ initialListings }: { initialListings: GeneralPost[
 
   return (
     <>
-      <StayCategoryNav active={category} onSelect={setCategory} />
-      <StayFilterRow
-        whereTo={whereTo}
-        onWhereToChange={setWhereTo}
-        dates={dates}
-        onDatesChange={setDates}
-        guests={guests}
-        guestOptions={GUEST_OPTIONS}
-        onGuestsChange={setGuests}
-        priceRange={priceRange}
-        priceRangeOptions={PRICE_RANGES.map((r) => r.label)}
-        onPriceRangeChange={setPriceRange}
-      />
+      {/* Sticky, same pattern as PropertiesFilterRow — clears TopNavBar's
+          73px mobile header / 112px desktop card+margin so this pins right
+          below it instead of under it. */}
+      <div className="sticky top-[73px] z-10 flex flex-col gap-4 bg-background pt-2 pb-3 lg:top-[112px]">
+        <StayCategoryNav active={category} onSelect={setCategory} />
+        <StayFilterRow
+          whereTo={whereTo}
+          onWhereToChange={setWhereTo}
+          dates={dates}
+          onDatesChange={setDates}
+          guests={guests}
+          guestOptions={GUEST_OPTIONS}
+          onGuestsChange={setGuests}
+          priceRange={priceRange}
+          priceRangeOptions={PRICE_RANGES.map((r) => r.label)}
+          onPriceRangeChange={setPriceRange}
+        />
+      </div>
 
       <PostComposer onCreatePost={addPost} />
 

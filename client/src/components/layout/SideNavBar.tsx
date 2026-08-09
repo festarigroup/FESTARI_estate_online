@@ -44,7 +44,11 @@ export function SideNavBar({ open, onClose, collapsed, onToggleCollapse }: SideN
       <aside
         className={cn(
           "fixed inset-y-0 left-0 z-[55] flex w-64 flex-col border-r border-brand-navy-light bg-brand-navy transition-transform",
-          "lg:inset-y-auto lg:top-6 lg:bottom-6 lg:left-6 lg:z-40 lg:w-[var(--sidebar-w)] lg:translate-x-0 lg:rounded-[24px] lg:border lg:border-[#e6e7ec] lg:bg-white lg:transition-[width]",
+          // Starts *below* TopNavBar (top-[112px] = its 24px margin + 64px
+          // height + 24px gap), not beside it — matches Figma, where the
+          // Sidebar sits under the full-width Top Nav rather than the two
+          // living side by side from the very top.
+          "lg:inset-y-auto lg:top-[112px] lg:bottom-6 lg:left-6 lg:z-40 lg:w-[var(--sidebar-w)] lg:translate-x-0 lg:rounded-[24px] lg:border lg:border-[#e6e7ec] lg:bg-white lg:transition-[width]",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
