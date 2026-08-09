@@ -15,7 +15,14 @@ interface TopNavBarProps {
   onMenuClick: () => void;
 }
 
-/** Persistent header ("Header - TopNavBar" in Figma): logo, search, and user actions. */
+/** Persistent header ("Header - TopNavBar" in Figma): logo, search, and user
+ * actions. `lg:rounded-[30px]` (node 3379:5462) is desktop-only, matching
+ * SideNavBar's own "floating panel" treatment and this app's standing
+ * desktop-only scope — the mobile bar stays sharp-cornered, edge-to-edge.
+ * No matching `overflow-hidden` here (unlike SideNavBar): every child stays
+ * inset within the header's own padding, so nothing needs clipping to
+ * respect the rounded corners — and clipping would cut off the sign-out
+ * dropdown below, which renders past the header's own bottom edge. */
 export function TopNavBar({ onMenuClick }: TopNavBarProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -42,7 +49,7 @@ export function TopNavBar({ onMenuClick }: TopNavBarProps) {
   }
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 flex h-[73px] items-center justify-between gap-4 border-b border-brand-navy-light bg-brand-navy px-4 shadow-lg sm:px-6 lg:px-10">
+    <header className="fixed inset-x-0 top-0 z-50 flex h-[73px] items-center justify-between gap-4 border-b border-brand-navy-light bg-brand-navy px-4 shadow-lg sm:px-6 lg:rounded-[30px] lg:px-10">
       <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-[68px]">
         <MenuButton onClick={onMenuClick} />
         {/* Hidden below lg — that's where the hamburger takes over and the
