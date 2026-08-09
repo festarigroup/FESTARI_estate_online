@@ -66,7 +66,7 @@ export default function StayPage() {
           expanded={mapExpanded}
           onExpand={() => setMapExpanded(true)}
           onCollapse={() => setMapExpanded(false)}
-          className="lg:top-[88px] lg:h-[calc(100vh-112px)]"
+          className="lg:top-16 lg:h-[calc(100vh-88px)]"
         />
 
         {!mapExpanded && (

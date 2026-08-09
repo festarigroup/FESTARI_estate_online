@@ -80,12 +80,13 @@ export function StayBrowser({ initialListings }: { initialListings: GeneralPost[
 
   return (
     <>
-      {/* Sticky only at `lg:`, where it clears TopNavBar's 88px offset;
-          below that it just scrolls normally rather than permanently
-          pinning this much taller block (title included) over a small
-          viewport. bg-background keeps feed cards scrolling behind it from
-          showing through while it's pinned. */}
-      <div className="flex flex-col gap-6 bg-background pt-2 pb-3 lg:sticky lg:top-[88px] lg:z-10">
+      {/* Sticky only at `lg:`, flush against TopNavBar's own height (no
+          extra gap, same as PropertiesFilterRow) — below that it just
+          scrolls normally rather than permanently pinning this much taller
+          block (title included) over a small viewport. bg-background keeps
+          feed cards scrolling behind it from showing through while it's
+          pinned. */}
+      <div className="flex flex-col gap-6 bg-background pt-2 pb-3 lg:sticky lg:top-16 lg:z-10">
         <div className="flex flex-col gap-1">
           <h1 className="text-[30px] font-bold tracking-[-0.9px] text-[#334154]">Stay (Hotels)</h1>
           <p className="text-sm text-[#475568]">Discover hotels, resorts, and unique stays shared by the community.</p>

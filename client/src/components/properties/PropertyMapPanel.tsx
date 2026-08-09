@@ -80,11 +80,11 @@ export function PropertyMapPanel({
         "overflow-hidden rounded-xl border border-border-subtle bg-[#e3e2e5] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]",
         expanded
           ? "block h-[75vh] w-full"
-          // 146px clears TopNavBar (88px) plus PropertiesFilterRow's own
-          // sticky height (58px) stacked above this in the same column —
-          // callers without that filter row above them (Stay) override via
-          // `className` to just the 88px clearance instead.
-          : "hidden lg:sticky lg:top-[146px] lg:block lg:h-[calc(100vh-170px)]",
+          // 122px clears TopNavBar (64px, flush) plus PropertiesFilterRow's
+          // own sticky height (58px) stacked above this in the same
+          // column — callers without that filter row above them (Stay)
+          // override via `className` to just the 64px clearance instead.
+          : "hidden lg:sticky lg:top-[122px] lg:block lg:h-[calc(100vh-146px)]",
         className,
       )}
     >

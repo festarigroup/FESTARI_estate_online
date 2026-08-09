@@ -56,7 +56,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsed((v) => !v)}
         />
-        <main className="pt-[73px] lg:pt-[88px] lg:pr-6 lg:pb-6 lg:pl-[calc(var(--sidebar-w)+48px)]">
+        <main className="pt-[73px] lg:pt-16 lg:pr-6 lg:pb-6 lg:pl-[calc(var(--sidebar-w)+48px)]">
           {children}
         </main>
       </div>
