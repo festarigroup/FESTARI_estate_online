@@ -1,1 +1,0 @@
-ALTER TABLE "subscription_plans" ALTER COLUMN "amount_saved" DROP NOT NULL;

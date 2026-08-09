@@ -1,1 +1,0 @@
-ALTER TABLE "payment_transactions" RENAME COLUMN "paystack_reference" TO "reference";
