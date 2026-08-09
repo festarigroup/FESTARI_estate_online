@@ -4,13 +4,13 @@ import { PropertyImageInsert, PropertyInsert } from "#app/types/PropertyTypes.js
 import { and, asc, desc, eq, gte, lte, sql } from "drizzle-orm";
 
 type PropertyFilters = {
-  location?: string;
-  property_type?: string;
-  listing_type?: string;
-  min_price?: number;
-  max_price?: number;
-  bedrooms?: number;
-  ordering?: string;
+  location?: string | undefined;
+  property_type?: string | undefined;
+  listing_type?: string | undefined;
+  min_price?: number | undefined;
+  max_price?: number | undefined;
+  bedrooms?: number | undefined;
+  ordering?: string | undefined;
 };
 
 class PropertiesService {
@@ -26,12 +26,12 @@ class PropertiesService {
     const where = and(...conditions);
     const orderColumn = filters.ordering === "created_at" ? asc(properties.created_at) : desc(properties.created_at);
 
-    const [items, [{ count }]] = await Promise.all([
+    const [items, countRows] = await Promise.all([
       db.select().from(properties).where(where).orderBy(orderColumn).limit(limit).offset(offset),
       db.select({ count: sql<number>`count(*)::int` }).from(properties).where(where),
     ]);
 
-    return { items, total: count };
+    return { items, total: countRows[0]?.count ?? 0 };
   }
 
   async getById(id: string) {

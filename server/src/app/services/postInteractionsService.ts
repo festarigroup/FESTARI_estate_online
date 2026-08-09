@@ -18,7 +18,7 @@ class PostInteractionsService {
   }
 
   async listComments(postId: string, limit: number, offset: number) {
-    const [items, [{ count }]] = await Promise.all([
+    const [items, countRows] = await Promise.all([
       db
         .select({
           ...getTableColumns(postComments),
@@ -41,7 +41,7 @@ class PostInteractionsService {
         .where(eq(postComments.post_id, postId)),
     ]);
 
-    return { items, total: count };
+    return { items, total: countRows[0]?.count ?? 0 };
   }
 
   async getCommentById(id: string) {

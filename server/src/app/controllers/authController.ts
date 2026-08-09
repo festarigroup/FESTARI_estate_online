@@ -12,6 +12,7 @@ import type { Request, Response } from "express";
 import { db } from "#app/db/db.js";
 import { comparePassword, hashPassword } from "#app/utils/crypto.js";
 import { UserRow, UserWithRoles } from "#app/types/UserTypes.js";
+import { RoleRow } from "#app/types/RoleTypes.js";
 import { OAuth2Client } from "google-auth-library";
 
 const MAX_OTP_ATTEMPTS = 5;
@@ -161,7 +162,7 @@ export const registerUser = asyncErrorHandler(async (req: Request, res: Response
     });
 
     for (const role of roles as string[]) {
-      await rolesService.createRoleTx(tx, { user_id: user!.id, role });
+      await rolesService.createRoleTx(tx, { user_id: user!.id, role: role as RoleRow["role"] });
     }
 
     otpRaw = await issueOtp(tx, user!.id, "email_verification");

@@ -29,7 +29,7 @@ class PostsService {
   async list(kind: string | undefined, limit: number, offset: number, currentUserId?: string) {
     const where = kind ? eq(posts.kind, kind as any) : undefined;
 
-    const [items, [{ count }]] = await Promise.all([
+    const [items, countRows] = await Promise.all([
       db
         .select({
           ...getTableColumns(posts),
@@ -50,7 +50,7 @@ class PostsService {
       db.select({ count: sql<number>`count(*)::int` }).from(posts).where(where),
     ]);
 
-    return { items, total: count };
+    return { items, total: countRows[0]?.count ?? 0 };
   }
 
   async getById(id: string, currentUserId?: string) {

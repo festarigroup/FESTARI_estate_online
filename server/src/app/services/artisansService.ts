@@ -13,11 +13,11 @@ class ArtisansService {
       ? and(eq(artisanProfiles.status, "approved"), eq(artisanProfiles.service_type, serviceType))
       : eq(artisanProfiles.status, "approved");
 
-    const [items, [{ value }]] = await Promise.all([
+    const [items, countRows] = await Promise.all([
       db.select().from(artisanProfiles).where(where).orderBy(desc(artisanProfiles.created_at)).limit(limit).offset(offset),
       db.select({ value: sql<number>`count(*)::int` }).from(artisanProfiles).where(where),
     ]);
-    return { items, total: value };
+    return { items, total: countRows[0]?.value ?? 0 };
   }
 
   async getById(id: string) {
@@ -75,6 +75,7 @@ class ArtisansService {
 
   async createHireRequest(row: ArtisanHireRequestInsert) {
     const [hire] = await db.insert(artisanHireRequests).values(row).returning();
+    if (!hire) throw new Error("Failed to create hire request");
     return hire;
   }
 

@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import {
   assertSupabaseConfigured,
   supabaseAdmin,
@@ -27,7 +28,7 @@ export async function uploadMedia(params: {
   pathPrefix: string;
   fileBuffer: Buffer;
   contentType: string;
-  fileName: string;
+  fileName?: string;
   allowVideo?: boolean;
 }): Promise<string> {
   assertSupabaseConfigured();
@@ -45,7 +46,9 @@ export async function uploadMedia(params: {
     );
   }
 
-  const path = `${params.pathPrefix}/${Date.now()}-${params.fileName}`;
+  const extension = normalizedType.split("/")[1] ?? "bin";
+  const fileName = params.fileName ?? `${crypto.randomUUID()}.${extension}`;
+  const path = `${params.pathPrefix}/${Date.now()}-${fileName}`;
 
   const { error: uploadError } = await supabaseAdmin!.storage
     .from(supabaseMediaBucket)

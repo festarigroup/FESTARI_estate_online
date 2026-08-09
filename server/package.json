@@ -22,7 +22,6 @@
     "db:migrate": "drizzle-kit migrate",
     "db:migrate:run": "tsx --env-file=.env.development src/db/migrate.ts",
     "db:seed": "tsx --env-file=.env.development src/db/seed.ts",
-    "db:setup:postgis": "tsx --env-file=.env.development src/db/setupPostgis.ts",
     "db:push": "drizzle-kit push",
     "db:run:all": "drizzle-kit generate && drizzle-kit migrate && tsx --env-file=.env.development src/db/migrate.ts && drizzle-kit push",
     "db:introspect": "drizzle-kit introspect"

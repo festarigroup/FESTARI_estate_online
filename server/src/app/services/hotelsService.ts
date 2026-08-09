@@ -9,11 +9,11 @@ class HotelsService {
       ? and(eq(hotels.status, "approved"), sql`${hotels.location} ILIKE ${"%" + location + "%"}`)
       : eq(hotels.status, "approved");
 
-    const [items, [{ count }]] = await Promise.all([
+    const [items, countRows] = await Promise.all([
       db.select().from(hotels).where(where).orderBy(desc(hotels.created_at)).limit(limit).offset(offset),
       db.select({ count: sql<number>`count(*)::int` }).from(hotels).where(where),
     ]);
-    return { items, total: count };
+    return { items, total: countRows[0]?.count ?? 0 };
   }
 
   async getById(id: string) {
@@ -71,6 +71,7 @@ class HotelsService {
 
   async createBooking(row: HotelBookingInsert) {
     const [booking] = await db.insert(hotelBookings).values(row).returning();
+    if (!booking) throw new Error("Failed to create booking");
     return booking;
   }
 

@@ -30,7 +30,7 @@ export const createPropertyInquiry = asyncErrorHandler(async (req: Request, res:
   notificationsService
     .notify({
       recipientId: property.owner_id,
-      actorId: req.user?.id,
+      actorId: req.user?.id ?? null,
       verb: "inquiry",
       targetType: "property",
       targetId: propertyId,
@@ -104,7 +104,7 @@ export const createArtisanInquiry = asyncErrorHandler(async (req: Request, res: 
   notificationsService
     .notify({
       recipientId: artisan.id,
-      actorId: req.user?.id,
+      actorId: req.user?.id ?? null,
       verb: "inquiry",
       targetType: "artisan",
       targetId: artisanId,

@@ -52,7 +52,7 @@ export function sanitizeAnswer(answer: string) {
 export function hashAnswer(answer: string) {
   const normalized = sanitizeAnswer(answer);
   return crypto
-    .createHmac("sha256", ENCRYPTION_SECRET)
+    .createHmac("sha256", ENCRYPTION_SECRET!)
     .update(normalized)
     .digest("hex");
 }
