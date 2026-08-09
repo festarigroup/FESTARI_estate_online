@@ -1,36 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { SideNavBar } from "@/components/layout/SideNavBar";
 import { TopNavBar } from "@/components/layout/TopNavBar";
-import { useAuth } from "@/context/AuthContext";
 
 /**
- * Wraps every authenticated route with the persistent header + sidebar chrome
- * from the Figma "Home" screen, and owns the mobile drawer open/close state
- * shared between the hamburger button (header) and the drawer (sidebar).
- * Also gates every route behind auth — redirects to /login once we know
- * there's no signed-in user.
+ * Wraps every route with the persistent header + sidebar chrome from the
+ * Figma "Home" screen, and owns the mobile drawer open/close state shared
+ * between the hamburger button (header) and the drawer (sidebar).
+ *
+ * Auth gating is disabled for now, at explicit request: the real backend
+ * isn't hosted anywhere reachable yet, so `useAuth()`'s `user` is always
+ * null regardless of who's actually "logged in" — redirecting to /login on
+ * that basis would block every route, including "/", rather than just the
+ * ones that should genuinely require a session. TopNavBar still calls
+ * `useAuth()` itself and degrades gracefully with no user (falls back to
+ * "Account", skips the unread-count fetches), so nothing here crashes
+ * without one.
+ *
+ * Once the API is deployed, restore the gate — see git history (this file,
+ * pre-"skip auth for all dashboard routes") for the previous
+ * `useAuth()` + redirect-on-no-user version.
  */
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, loading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace("/login");
-    }
-  }, [loading, user, router]);
-
-  if (loading || !user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-sm text-muted">Loading...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
