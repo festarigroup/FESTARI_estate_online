@@ -57,6 +57,7 @@ export const notificationVerbEnum = pgEnum("notification_verb", [
   "booking",
   "inquiry",
   "hire_request",
+  "message",
   "system",
 ]);
 
