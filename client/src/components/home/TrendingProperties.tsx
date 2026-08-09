@@ -1,17 +1,32 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { SidebarWidgetHeader } from "@/components/home/SidebarWidgetHeader";
-import { TRENDING_PROPERTIES } from "@/lib/mock-data";
+import { getTrending } from "@/lib/api/properties";
+import { mapTrendingProperty } from "@/lib/adapters";
+import type { TrendingProperty } from "@/types/home";
 
 /** "Trending Properties" widget — thumbnail + price + stats for each listing. */
 export function TrendingProperties() {
+  const [properties, setProperties] = useState<TrendingProperty[]>([]);
+
+  useEffect(() => {
+    getTrending()
+      .then((items) => setProperties(items.map(mapTrendingProperty)))
+      .catch(() => {});
+  }, []);
+
+  if (properties.length === 0) return null;
+
   return (
     <div className="flex w-full shrink-0 flex-col gap-6 rounded-xl border border-border bg-white p-6">
       <SidebarWidgetHeader title="Trending Properties" seeAllHref="/properties" />
       <div className="flex w-full flex-col gap-4">
-        {TRENDING_PROPERTIES.map((property) => (
+        {properties.map((property) => (
           <Link
             key={property.id}
             href={`/properties/${property.id}`}

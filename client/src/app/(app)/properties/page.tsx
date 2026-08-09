@@ -1,5 +1,10 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { PropertiesBrowser } from "@/components/properties/PropertiesBrowser";
-import { PROPERTY_LISTINGS } from "@/lib/mock-data";
+import { listPosts } from "@/lib/api/feed";
+import { mapPost } from "@/lib/adapters";
+import type { PropertyPost } from "@/types/home";
 
 /** "Properties" page — Figma node 3340:1485. Header, then PropertiesBrowser
  * owns the filter row + the split layout: a scrollable feed of listing
@@ -8,6 +13,16 @@ import { PROPERTY_LISTINGS } from "@/lib/mock-data";
  * standing scope decision — below `lg:` the map just stacks under the
  * feed instead of sitting beside it. */
 export default function PropertiesPage() {
+  const [listings, setListings] = useState<PropertyPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    listPosts({ kind: "property", limit: 50 })
+      .then(({ items }) => setListings(items.map(mapPost).filter((p): p is PropertyPost => p.kind === "property")))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className="mx-auto flex max-w-[1400px] flex-col gap-4 px-4 py-6 sm:px-6 lg:px-10">
       <div className="flex flex-col gap-1">
@@ -15,7 +30,11 @@ export default function PropertiesPage() {
         <p className="text-sm text-muted">Discover properties shared by owners, agents and developers.</p>
       </div>
 
-      <PropertiesBrowser listings={PROPERTY_LISTINGS} />
+      {loading ? (
+        <p className="py-8 text-center text-sm text-muted">Loading properties...</p>
+      ) : (
+        <PropertiesBrowser listings={listings} />
+      )}
     </div>
   );
 }

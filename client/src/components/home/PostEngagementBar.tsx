@@ -6,6 +6,7 @@ import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { RepostButton } from "@/components/home/RepostButton";
 import { useSavedPosts } from "@/hooks/useSavedPosts";
 import { usePostShare } from "@/hooks/usePostShare";
+import { likePost, unlikePost } from "@/lib/api/feed";
 import { cn } from "@/lib/cn";
 import type { ContentPost } from "@/types/home";
 
@@ -25,10 +26,17 @@ interface PostEngagementBarProps {
 
 /** Like / Comment / Repost / Share / Save action row, shared by every feed post variant. */
 export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShare, cta }: PostEngagementBarProps) {
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(!!post.isLiked);
   const { isSaved, toggleSave } = useSavedPosts();
   const saved = isSaved(post.id);
   const { handleShare } = usePostShare(post, onShare);
+
+  function handleToggleLike() {
+    const next = !liked;
+    setLiked(next);
+    const request = next ? likePost(post.id) : unlikePost(post.id);
+    request.catch(() => setLiked(!next));
+  }
 
   function handleSave() {
     const wasSaved = saved;
@@ -43,7 +51,7 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
   const actions = (
     <>
       <button
-        onClick={() => setLiked((v) => !v)}
+        onClick={handleToggleLike}
         className={cn(
           "flex items-center gap-2 text-base font-medium",
           liked ? "text-brand-rust" : "text-muted hover:text-ink",

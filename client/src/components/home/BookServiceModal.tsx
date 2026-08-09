@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { DateTimeInput } from "@/components/ui/DateTimeInput";
+import { hireArtisan } from "@/lib/api/artisans";
+import { ApiError } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 
 interface BookServiceModalProps {
@@ -12,6 +14,10 @@ interface BookServiceModalProps {
   onClose: () => void;
   /** Who the booking request goes to. */
   providerName: string;
+  /** The real artisan_profiles.id to send the hire request against. Omitted
+   * for posts that predate real artisan linkage — the form still submits
+   * locally (toast only) in that case. */
+  artisanId?: string;
 }
 
 const INPUT_CLASS =
@@ -21,12 +27,13 @@ const INPUT_CLASS =
  * provider. Not a Figma frame (the file only shows the collapsed CTA);
  * built to give that button somewhere real to go, same reasoning as the
  * story/post composer modals. */
-export function BookServiceModal({ open, onClose, providerName }: BookServiceModalProps) {
-  const [name, setName] = useState("Kwame");
+export function BookServiceModal({ open, onClose, providerName, artisanId }: BookServiceModalProps) {
+  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [notes, setNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const canSubmit = name.trim().length > 0 && phone.trim().length > 0 && date.length > 0;
 
@@ -38,12 +45,29 @@ export function BookServiceModal({ open, onClose, providerName }: BookServiceMod
     onClose();
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!canSubmit) return;
-    toast.success(
-      `Booking request sent to ${providerName} for ${date}${time ? ` at ${time}` : ""}. They'll reach out to confirm.`,
-    );
-    resetAndClose();
+
+    const summary = `Booking request from ${name} (${phone}) for ${date}${time ? ` at ${time}` : ""}.${
+      notes.trim() ? ` Notes: ${notes.trim()}` : ""
+    }`;
+
+    if (!artisanId) {
+      toast.success(`Booking request sent to ${providerName} for ${date}${time ? ` at ${time}` : ""}. They'll reach out to confirm.`);
+      resetAndClose();
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await hireArtisan(artisanId, summary);
+      toast.success(`Booking request sent to ${providerName} for ${date}${time ? ` at ${time}` : ""}. They'll reach out to confirm.`);
+      resetAndClose();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Couldn't send your booking request.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -95,8 +119,8 @@ export function BookServiceModal({ open, onClose, providerName }: BookServiceMod
           <Button variant="ghost" onClick={resetAndClose}>
             Cancel
           </Button>
-          <Button variant="gold" onClick={handleSubmit} disabled={!canSubmit} className="px-6">
-            Send Request
+          <Button variant="gold" onClick={handleSubmit} disabled={!canSubmit || submitting} className="px-6">
+            {submitting ? "Sending..." : "Send Request"}
           </Button>
         </div>
       </div>

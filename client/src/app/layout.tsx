@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Hanken_Grotesk, Montserrat, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
 
 const inter = Inter({
@@ -40,8 +41,10 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${hankenGrotesk.variable} ${montserrat.variable} ${jetbrainsMono.variable} antialiased`}
       >
-        {children}
-        <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
+        <AuthProvider>
+          {children}
+          <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
+        </AuthProvider>
       </body>
     </html>
   );

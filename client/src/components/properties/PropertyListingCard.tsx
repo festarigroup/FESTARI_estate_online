@@ -10,6 +10,7 @@ import { CommentsSection } from "@/components/home/CommentsSection";
 import { useSavedPosts } from "@/hooks/useSavedPosts";
 import { usePostShare } from "@/hooks/usePostShare";
 import { usePostComments } from "@/hooks/usePostComments";
+import { likePost, unlikePost } from "@/lib/api/feed";
 import { cn } from "@/lib/cn";
 import type { PropertyPost } from "@/types/home";
 
@@ -23,18 +24,24 @@ import type { PropertyPost } from "@/types/home";
  * was removed at explicit request earlier, so that decision is left alone
  * rather than reintroduced through a shared component. */
 export function PropertyListingCard({ listing }: { listing: PropertyPost }) {
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(!!listing.isLiked);
   const [likeCount, setLikeCount] = useState(listing.reactions.likes);
   const { isSaved, toggleSave } = useSavedPosts();
   const saved = isSaved(listing.id);
   const { handleShare } = usePostShare(listing);
-  const { comments, commentsOpen, toggleComments, addComment } = usePostComments(listing.comments);
+  const { comments, commentsOpen, toggleComments, addComment } = usePostComments(listing.id, listing.comments);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const images = listing.images;
 
   function handleLike() {
-    setLiked((v) => !v);
-    setLikeCount((c) => (liked ? c - 1 : c + 1));
+    const next = !liked;
+    setLiked(next);
+    setLikeCount((c) => (next ? c + 1 : c - 1));
+    const request = next ? likePost(listing.id) : unlikePost(listing.id);
+    request.catch(() => {
+      setLiked(!next);
+      setLikeCount((c) => (next ? c - 1 : c + 1));
+    });
   }
 
   const badge = (

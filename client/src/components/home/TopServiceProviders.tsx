@@ -1,15 +1,30 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Avatar } from "@/components/ui/Avatar";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { SidebarWidgetHeader } from "@/components/home/SidebarWidgetHeader";
-import { TOP_SERVICE_PROVIDERS } from "@/lib/mock-data";
+import { getTop } from "@/lib/api/artisans";
+import { mapServiceProvider } from "@/lib/adapters";
+import type { ServiceProvider } from "@/types/home";
 
 /** "Top Service Providers" widget — avatar/icon, name, and star rating per provider. */
 export function TopServiceProviders() {
+  const [providers, setProviders] = useState<ServiceProvider[]>([]);
+
+  useEffect(() => {
+    getTop()
+      .then((items) => setProviders(items.map(mapServiceProvider)))
+      .catch(() => {});
+  }, []);
+
+  if (providers.length === 0) return null;
+
   return (
     <div className="flex w-full shrink-0 flex-col gap-6 rounded-xl border border-border bg-white p-6">
       <SidebarWidgetHeader title="Top Service Providers" seeAllHref="/professionals" />
       <div className="flex w-full items-start justify-center gap-2">
-        {TOP_SERVICE_PROVIDERS.map((provider) => (
+        {providers.map((provider) => (
           <div key={provider.id} className="flex flex-1 flex-col items-center gap-2">
             <Avatar src={provider.avatar} icon={provider.icon} alt={provider.name} size={48} />
             <span className="text-center text-[9px] font-semibold text-ink">{provider.name}</span>

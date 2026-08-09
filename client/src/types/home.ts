@@ -70,6 +70,11 @@ export interface Poll {
 export interface PropertyPost {
   id: string;
   kind: "property";
+  /** The linked real-estate listing's id (properties.id) — set when this
+   * post was created from real backend data, used to send enquiries/wishlist
+   * actions against the actual property rather than the post. */
+  propertyId?: string;
+  isLiked?: boolean;
   author: PostAuthor;
   body: string[];
   hashtags: string;
@@ -97,6 +102,11 @@ export interface PropertyPost {
 export interface ServicePost {
   id: string;
   kind: "service";
+  /** The linked artisan profile's id (artisan_profiles.id) — set when this
+   * post was created from real backend data, used to send hire requests
+   * against the actual artisan rather than the post. */
+  providerId?: string;
+  isLiked?: boolean;
   author: PostAuthor;
   body: string[];
   image: GalleryImage;
@@ -143,6 +153,7 @@ export interface PropertyDetails {
 export interface GeneralPost {
   id: string;
   kind: "general";
+  isLiked?: boolean;
   author: PostAuthor;
   body: string[];
   images?: GalleryImage[];
@@ -150,6 +161,10 @@ export interface GeneralPost {
   tag?: "property" | "service" | "venue";
   /** Only set when `tag === "property"`. */
   propertyDetails?: PropertyDetails;
+  /** The real backend properties.id created for a `tag === "property"` post
+   * — set when the composer successfully created a matching listing, used
+   * to send enquiries against the actual property. */
+  propertyId?: string;
   /** Only set when `tag === "venue"`. */
   venueDetails?: VenueDetails;
   comments: Comment[];

@@ -6,6 +6,11 @@ import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
 import { DynamicIcon, type IconName } from "@/components/ui/DynamicIcon";
+import { useAuth } from "@/context/AuthContext";
+import * as feedApi from "@/lib/api/feed";
+import * as propertiesApi from "@/lib/api/properties";
+import { mapPost } from "@/lib/adapters";
+import { ApiError } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 import type { ContentPost } from "@/types/home";
 
@@ -37,6 +42,7 @@ const FIELD_CLASS =
 interface MediaAttachment {
   url: string;
   type: "image" | "video";
+  file: File;
 }
 
 interface CreatePostModalProps {
@@ -51,7 +57,9 @@ interface CreatePostModalProps {
  * type. Not a Figma frame (the file only shows the collapsed bar); built to
  * give those four buttons somewhere real to go. */
 export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: CreatePostModalProps) {
+  const { user } = useAuth();
   const [body, setBody] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   // Property/Service/Venue is a tag, independent of whether photos are
   // attached — a listing post can optionally carry photos too, it's just
   // never required. "Independent" means the photo picker isn't *gated*
@@ -127,6 +135,7 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
       ...files.map((f) => ({
         url: URL.createObjectURL(f),
         type: (f.type.startsWith("video/") ? "video" : "image") as "image" | "video",
+        file: f,
       })),
     ]);
   }
@@ -212,26 +221,31 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
           media.length > 0 ||
           (showPoll && pollQuestion.trim().length > 0 && trimmedOptions.length >= 2);
 
-  function handleSubmit() {
-    if (!canSubmit) return;
-    onSubmit({
+  const authorName = [user?.firstname, user?.lastname].filter(Boolean).join(" ") || "You";
+
+  // Venue and poll attachments have no backend counterpart yet (no venue
+  // post kind, no poll model) — those two keep posting a local-only object,
+  // same as before. Photo/property/service posts go through the real API.
+  function buildLocalPost(): ContentPost {
+    return {
       id: `post-${Date.now()}`,
       kind: "general",
-      author: { name: "Kwame", avatar: "/images/avatar-kwame-composer.png", subtitle: "Just now" },
+      author: { name: authorName, avatar: user?.profile_picture ?? undefined, subtitle: "Just now" },
       body: body.trim() ? body.trim().split("\n") : [],
       images: media.length
         ? media.map((m) => ({
             src: m.url,
-            alt: m.type === "video" ? "Video attached to Kwame's post" : "Photo attached to Kwame's post",
+            alt: m.type === "video" ? `Video attached to ${authorName}'s post` : `Photo attached to ${authorName}'s post`,
             type: m.type,
           }))
         : undefined,
-      poll: showPoll && trimmedOptions.length >= 2
-        ? {
-            question: pollQuestion.trim(),
-            options: trimmedOptions.map((text, i) => ({ id: `opt-${i}`, text, votes: 0 })),
-          }
-        : undefined,
+      poll:
+        showPoll && trimmedOptions.length >= 2
+          ? {
+              question: pollQuestion.trim(),
+              options: trimmedOptions.map((text, i) => ({ id: `opt-${i}`, text, votes: 0 })),
+            }
+          : undefined,
       tag,
       propertyDetails:
         tag === "property"
@@ -255,30 +269,80 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
             }
           : undefined,
       comments: [],
-    });
-    toast.success("Posted to your feed.");
-    // Deliberately NOT revoking `images` here — the post we just created
-    // now owns these blob URLs for as long as it's shown in the feed. (A
-    // previous version revoked them right here, which killed the preview
-    // the instant the post was created — the bug this comment guards
-    // against regressing.)
-    resetState();
-    onClose();
+    };
+  }
+
+  async function handleSubmit() {
+    if (!canSubmit || submitting) return;
+
+    if (tag === "venue" || showPoll) {
+      onSubmit(buildLocalPost());
+      toast.success("Posted to your feed.");
+      // Deliberately NOT revoking `images` here — the post we just created
+      // now owns these blob URLs for as long as it's shown in the feed.
+      resetState();
+      onClose();
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      let linkedPropertyId: string | undefined;
+      if (tag === "property") {
+        const numericPrice = Number(propertyPrice.replace(/[^0-9.]/g, "")) || 0;
+        const property = await propertiesApi.createProperty({
+          title: propertyType.trim(),
+          price: numericPrice,
+          location: propertyLocation.trim(),
+          listing_type: propertyListingType === "For Sale" ? "for_sale" : "for_rent",
+          property_type: "home",
+          bedrooms: Number(propertyBeds) || undefined,
+          bathrooms: Number(propertyBaths) || undefined,
+          area_sqm: Number(propertyAreaSqm) || undefined,
+        });
+        linkedPropertyId = property.id;
+      }
+
+      const created = await feedApi.createPost({
+        kind: tag === "property" ? "property" : tag === "service" ? "service" : "general",
+        body: body.trim(),
+        linked_property_id: linkedPropertyId,
+      });
+
+      const imageFiles = media.filter((m) => m.type === "image");
+      for (const [index, attachment] of imageFiles.entries()) {
+        try {
+          await feedApi.uploadPostImage(created.id, attachment.file, index);
+        } catch {
+          // one failed image upload shouldn't block the rest of the post
+        }
+      }
+
+      const full = await feedApi.getPost(created.id);
+      onSubmit(mapPost(full));
+      toast.success("Posted to your feed.");
+      resetState();
+      onClose();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Couldn't create your post.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
     <Modal open={open} onClose={handleCancel} title="Create post">
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-3">
-          <Avatar src="/images/avatar-kwame-composer.png" alt="Kwame" size={40} />
-          <span className="font-heading text-sm text-ink">Kwame</span>
+          <Avatar src={user?.profile_picture ?? undefined} alt={authorName} size={40} />
+          <span className="font-heading text-sm text-ink">{authorName}</span>
         </div>
 
         <textarea
           autoFocus
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          placeholder="What's on your mind, Kwame?"
+          placeholder={`What's on your mind, ${authorName}?`}
           rows={4}
           className="w-full resize-none rounded-lg border border-border-subtle p-3 text-base text-ink placeholder:text-muted focus:outline-2 focus:outline-brand-gold"
         />
@@ -523,8 +587,8 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
           <Button variant="ghost" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button variant="navy" onClick={handleSubmit} disabled={!canSubmit} className="px-6">
-            Post
+          <Button variant="navy" onClick={handleSubmit} disabled={!canSubmit || submitting} className="px-6">
+            {submitting ? "Posting..." : "Post"}
           </Button>
         </div>
       </div>

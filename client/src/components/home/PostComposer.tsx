@@ -4,14 +4,17 @@ import { useState } from "react";
 import { Avatar } from "@/components/ui/Avatar";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { CreatePostModal, ATTACHMENT_TYPES, type AttachmentType } from "@/components/home/CreatePostModal";
+import { useAuth } from "@/context/AuthContext";
 import type { ContentPost } from "@/types/home";
 
 /** "Post Composer" card: avatar + prompt input, plus quick-attach actions —
  * both open the same create-post modal, pre-selecting an attachment type
  * when opened from one of the four buttons below the input. */
 export function PostComposer({ onCreatePost }: { onCreatePost: (post: ContentPost) => void }) {
+  const { user } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [initialAttachment, setInitialAttachment] = useState<AttachmentType | undefined>();
+  const firstName = user?.firstname || "there";
 
   function openModal(attachment?: AttachmentType) {
     setInitialAttachment(attachment);
@@ -21,12 +24,12 @@ export function PostComposer({ onCreatePost }: { onCreatePost: (post: ContentPos
   return (
     <div className="flex w-full shrink-0 flex-col gap-6 rounded-xl bg-white p-6 drop-shadow-[0px_4px_6px_rgba(0,31,63,0.08)]">
       <div className="flex w-full items-center gap-4">
-        <Avatar src="/images/avatar-kwame-composer.png" alt="Kwame" size={48} />
+        <Avatar src={user?.profile_picture ?? undefined} alt={firstName} size={48} />
         <button
           onClick={() => openModal()}
           className="flex-1 rounded-full bg-surface-muted px-6 py-3 text-left text-base text-muted hover:bg-border-subtle"
         >
-          What&apos;s on your mind, Kwame?
+          What&apos;s on your mind, {firstName}?
         </button>
       </div>
 

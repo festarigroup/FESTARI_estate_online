@@ -1,40 +1,38 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { StoryAvatar } from "@/components/home/StoryAvatar";
 import { CreateStoryModal } from "@/components/home/CreateStoryModal";
 import { StoryViewer } from "@/components/home/StoryViewer";
-import { STORIES } from "@/lib/mock-data";
+import { createStory, listStories } from "@/lib/api/feed";
+import { mapStoriesToGroups } from "@/lib/adapters";
+import { ApiError } from "@/lib/api/client";
 import type { Story } from "@/types/home";
-
-/** The current (composer) user's own rail bubble — new stories they share
- * get appended to this group instead of spawning a new bubble each time. */
-const CURRENT_USER_STORY_ID = "kwame";
 
 /** Horizontal story rail ("Horizontal Story Bar" in Figma), with a scroll-next button. */
 export function StoryBar() {
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const [stories, setStories] = useState<Story[]>(STORIES);
+  const [stories, setStories] = useState<Story[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
-  function handleCreateStory({ image, caption, type }: { image: string; caption?: string; type?: "image" | "video" }) {
-    setStories((prev) => {
-      const newItem = { id: `story-item-${Date.now()}`, image, postedAt: "Just now", caption, type };
-      const existing = prev.find((s) => s.id === CURRENT_USER_STORY_ID);
-      const rest = prev.filter((s) => s.id !== CURRENT_USER_STORY_ID);
-      const group: Story = existing
-        ? { ...existing, items: [...existing.items, newItem] }
-        : {
-            id: CURRENT_USER_STORY_ID,
-            name: "Kwame",
-            avatar: "/images/avatar-kwame-topnav.png",
-            ringColor: "gold",
-            items: [newItem],
-          };
-      return [group, ...rest];
-    });
+  useEffect(() => {
+    listStories()
+      .then((apiStories) => setStories(mapStoriesToGroups(apiStories)))
+      .catch(() => {});
+  }, []);
+
+  async function handleCreateStory({ file, caption }: { file: File; caption?: string }) {
+    try {
+      await createStory(file, caption);
+      const apiStories = await listStories();
+      setStories(mapStoriesToGroups(apiStories));
+      toast.success("Your story is live for 24 hours.");
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Couldn't share your story.");
+    }
   }
 
   return (

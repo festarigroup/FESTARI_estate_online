@@ -4,6 +4,9 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
+import { useAuth } from "@/context/AuthContext";
+import { createPropertyInquiry } from "@/lib/api/inquiries";
+import { ApiError } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 
 interface EnquiryModalProps {
@@ -11,6 +14,10 @@ interface EnquiryModalProps {
   onClose: () => void;
   /** Who the enquiry goes to — the lister/agent, not the viewer. */
   listerName: string;
+  /** The real properties.id to send the enquiry against. Omitted for posts
+   * that predate real property linkage — the form still submits locally
+   * (toast only) in that case. */
+  propertyId?: string;
 }
 
 const INPUT_CLASS =
@@ -22,25 +29,47 @@ const DEFAULT_MESSAGE = "Hi, I'm interested in this listing. Could you share mor
  * sent to the lister. Not a Figma frame (the file only shows the
  * collapsed post card); mirrors BookServiceModal's shape since both are
  * "reach the poster directly" forms, just for a different post kind. */
-export function EnquiryModal({ open, onClose, listerName }: EnquiryModalProps) {
-  const [name, setName] = useState("Kwame");
+export function EnquiryModal({ open, onClose, listerName, propertyId }: EnquiryModalProps) {
+  const { user } = useAuth();
+  const [name, setName] = useState(() => [user?.firstname, user?.lastname].filter(Boolean).join(" ") || "");
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(user?.email ?? "");
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
+  const [submitting, setSubmitting] = useState(false);
 
-  const canSubmit = name.trim().length > 0 && phone.trim().length > 0 && message.trim().length > 0;
+  const canSubmit = name.trim().length > 0 && email.trim().length > 0 && message.trim().length > 0;
 
   function resetAndClose() {
     setPhone("");
-    setEmail("");
     setMessage(DEFAULT_MESSAGE);
     onClose();
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!canSubmit) return;
-    toast.success(`Enquiry sent to ${listerName}. They'll be in touch.`);
-    resetAndClose();
+
+    if (!propertyId) {
+      toast.success(`Enquiry sent to ${listerName}. They'll be in touch.`);
+      resetAndClose();
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await createPropertyInquiry({
+        property_id: propertyId,
+        name: name.trim(),
+        email: email.trim(),
+        phone: phone.trim() || undefined,
+        message: message.trim(),
+      });
+      toast.success(`Enquiry sent to ${listerName}. They'll be in touch.`);
+      resetAndClose();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Couldn't send your enquiry.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -67,7 +96,7 @@ export function EnquiryModal({ open, onClose, listerName }: EnquiryModalProps) {
             />
           </label>
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold text-ink">Email (optional)</span>
+            <span className="text-xs font-semibold text-ink">Email</span>
             <input
               type="email"
               value={email}
@@ -92,8 +121,8 @@ export function EnquiryModal({ open, onClose, listerName }: EnquiryModalProps) {
           <Button variant="ghost" onClick={resetAndClose}>
             Cancel
           </Button>
-          <Button variant="gold" onClick={handleSubmit} disabled={!canSubmit} className="px-6">
-            Send Enquiry
+          <Button variant="gold" onClick={handleSubmit} disabled={!canSubmit || submitting} className="px-6">
+            {submitting ? "Sending..." : "Send Enquiry"}
           </Button>
         </div>
       </div>

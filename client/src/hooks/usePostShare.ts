@@ -1,6 +1,7 @@
 "use client";
 
 import toast from "react-hot-toast";
+import { sharePost } from "@/lib/api/feed";
 import type { ContentPost } from "@/types/home";
 
 /**
@@ -8,9 +9,16 @@ import type { ContentPost } from "@/types/home";
  * PostEngagementBar and ServiceActionsBar both needed the identical
  * behavior (ServiceActionsBar didn't have a Share action at all until
  * venue posts needed the same "Social Interactions & Actions" bar Figma's
- * Service/Promotion post uses, which does have one).
+ * Service/Promotion post uses, which does have one). Also records the share
+ * against the post on the backend, best-effort — a failed record shouldn't
+ * block the share the user just completed.
  */
 export function usePostShare(post: ContentPost, onShare?: () => void) {
+  function recordShare() {
+    sharePost(post.id).catch(() => {});
+    onShare?.();
+  }
+
   async function handleShare() {
     const url = window.location.href;
     const shareData: ShareData = {
@@ -22,7 +30,7 @@ export function usePostShare(post: ContentPost, onShare?: () => void) {
     if (navigator.share && (navigator.canShare?.(shareData) ?? true)) {
       try {
         await navigator.share(shareData);
-        onShare?.();
+        recordShare();
       } catch (err) {
         // AbortError just means the user dismissed the native share sheet —
         // not a failure worth surfacing.
@@ -36,7 +44,7 @@ export function usePostShare(post: ContentPost, onShare?: () => void) {
     try {
       await navigator.clipboard.writeText(url);
       toast.success("Link copied to clipboard.");
-      onShare?.();
+      recordShare();
     } catch {
       toast.error("Couldn't copy the link.");
     }

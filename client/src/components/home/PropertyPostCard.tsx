@@ -12,8 +12,8 @@ import type { PropertyPost } from "@/types/home";
 
 /** "Article - Post: Property Listing" — body copy, image gallery, reactions, actions. */
 export function PropertyPostCard({ post }: { post: PropertyPost }) {
-  const [main, thumb1, thumb2] = post.images;
-  const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.comments);
+  const images = post.images;
+  const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.id, post.comments);
   const [shares, setShares] = useState(post.reactions.shares);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
@@ -29,36 +29,63 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-1 px-1">
+      {images.length === 1 && (
         <button
           aria-label="View photo 1"
           onClick={() => setLightboxIndex(0)}
-          className="relative col-span-2 row-span-2 h-[280px] cursor-zoom-in sm:h-[400px]"
+          className="relative h-[280px] w-full cursor-zoom-in sm:h-[400px]"
         >
-          <Image src={main.src} alt={main.alt} fill className="object-cover" />
-          <span className="absolute top-4 right-4 rounded bg-brand-navy/80 px-2 py-1 text-xs text-white">
-            1/{post.totalImages}
-          </span>
+          <Image src={images[0].src} alt={images[0].alt} fill className="object-cover" />
         </button>
-        <button
-          aria-label="View photo 2"
-          onClick={() => setLightboxIndex(1)}
-          className="relative h-[137px] cursor-zoom-in sm:h-[199px]"
-        >
-          <Image src={thumb1.src} alt={thumb1.alt} fill className="object-cover" />
-        </button>
-        <button
-          aria-label="View photo 3"
-          onClick={() => setLightboxIndex(2)}
-          className="relative h-[137px] cursor-zoom-in sm:h-[199px]"
-        >
-          <Image src={thumb2.src} alt={thumb2.alt} fill className="object-cover" />
-        </button>
-      </div>
+      )}
+
+      {images.length === 2 && (
+        <div className="grid grid-cols-2 gap-1 px-1">
+          {images.map((image, i) => (
+            <button
+              key={i}
+              aria-label={`View photo ${i + 1}`}
+              onClick={() => setLightboxIndex(i)}
+              className="relative h-[280px] cursor-zoom-in sm:h-[400px]"
+            >
+              <Image src={image.src} alt={image.alt} fill className="object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+
+      {images.length >= 3 && (
+        <div className="grid grid-cols-3 gap-1 px-1">
+          <button
+            aria-label="View photo 1"
+            onClick={() => setLightboxIndex(0)}
+            className="relative col-span-2 row-span-2 h-[280px] cursor-zoom-in sm:h-[400px]"
+          >
+            <Image src={images[0].src} alt={images[0].alt} fill className="object-cover" />
+            <span className="absolute top-4 right-4 rounded bg-brand-navy/80 px-2 py-1 text-xs text-white">
+              1/{images.length}
+            </span>
+          </button>
+          <button
+            aria-label="View photo 2"
+            onClick={() => setLightboxIndex(1)}
+            className="relative h-[137px] cursor-zoom-in sm:h-[199px]"
+          >
+            <Image src={images[1].src} alt={images[1].alt} fill className="object-cover" />
+          </button>
+          <button
+            aria-label="View photo 3"
+            onClick={() => setLightboxIndex(2)}
+            className="relative h-[137px] cursor-zoom-in sm:h-[199px]"
+          >
+            <Image src={images[2].src} alt={images[2].alt} fill className="object-cover" />
+          </button>
+        </div>
+      )}
 
       {lightboxIndex !== null && (
         <PostImageLightbox
-          images={post.images}
+          images={images}
           initialIndex={lightboxIndex}
           onClose={() => setLightboxIndex(null)}
         />

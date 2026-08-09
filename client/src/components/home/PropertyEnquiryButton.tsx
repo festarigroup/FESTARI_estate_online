@@ -8,7 +8,7 @@ import { EnquiryModal } from "@/components/home/EnquiryModal";
  * right — self-contained so PropertyPostCard/GeneralPostCard just drop it
  * in as PostEngagementBar's `cta` prop without owning any modal state
  * themselves. */
-export function PropertyEnquiryButton({ listerName }: { listerName: string }) {
+export function PropertyEnquiryButton({ listerName, propertyId }: { listerName: string; propertyId?: string }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -19,7 +19,7 @@ export function PropertyEnquiryButton({ listerName }: { listerName: string }) {
       <Button variant="outline-gold" onClick={() => setOpen(true)}>
         Make Enquiry
       </Button>
-      <EnquiryModal open={open} onClose={() => setOpen(false)} listerName={listerName} />
+      <EnquiryModal open={open} onClose={() => setOpen(false)} listerName={listerName} propertyId={propertyId} />
     </>
   );
 }

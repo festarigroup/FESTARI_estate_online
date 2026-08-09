@@ -11,7 +11,7 @@ import { BookServiceModal } from "@/components/home/BookServiceModal";
  * ServiceActionsBar once that bar needed to render a *different* CTA for
  * venue posts (VenueReservationButton) — the bar itself doesn't know or
  * care which one it's holding. */
-export function BookServiceButton({ providerName }: { providerName: string }) {
+export function BookServiceButton({ providerName, artisanId }: { providerName: string; artisanId?: string }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -21,7 +21,7 @@ export function BookServiceButton({ providerName }: { providerName: string }) {
       <Button variant="outline-gold" onClick={() => setOpen(true)}>
         Book Service
       </Button>
-      <BookServiceModal open={open} onClose={() => setOpen(false)} providerName={providerName} />
+      <BookServiceModal open={open} onClose={() => setOpen(false)} providerName={providerName} artisanId={artisanId} />
     </>
   );
 }

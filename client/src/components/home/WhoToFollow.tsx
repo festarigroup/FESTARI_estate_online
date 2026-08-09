@@ -1,39 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Avatar } from "@/components/ui/Avatar";
 import { SidebarWidgetHeader } from "@/components/home/SidebarWidgetHeader";
 import { cn } from "@/lib/cn";
-import { FOLLOW_SUGGESTIONS } from "@/lib/mock-data";
+import { getSuggestions, followUser, unfollowUser } from "@/lib/api/social";
+import { mapFollowSuggestion } from "@/lib/adapters";
+import type { FollowSuggestion } from "@/types/home";
 
 /** "Who to follow" widget — suggested people/businesses with a Follow toggle each. */
 export function WhoToFollow() {
+  const [people, setPeople] = useState<FollowSuggestion[]>([]);
   const [followed, setFollowed] = useState<Set<string>>(new Set());
 
+  useEffect(() => {
+    getSuggestions()
+      .then((suggestions) => setPeople(suggestions.map(mapFollowSuggestion)))
+      .catch(() => {});
+  }, []);
+
   function toggleFollow(id: string, name: string) {
-    // Compute the flip first — state updaters must stay pure (React's Strict
-    // Mode double-invokes them in dev), so the toast side effect lives here.
     const willFollow = !followed.has(id);
-    if (willFollow) {
-      toast.success(`You're now following ${name}.`);
-    }
     setFollowed((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
+
+    const request = willFollow ? followUser(id) : unfollowUser(id);
+    request
+      .then(() => {
+        if (willFollow) toast.success(`You're now following ${name}.`);
+      })
+      .catch(() => {
+        setFollowed((prev) => {
+          const next = new Set(prev);
+          if (willFollow) next.delete(id);
+          else next.add(id);
+          return next;
+        });
+      });
   }
+
+  if (people.length === 0) return null;
 
   return (
     <div className="flex w-full shrink-0 flex-col gap-6 rounded-xl border border-border bg-white p-6">
       <SidebarWidgetHeader title="Who to follow" seeAllHref="/professionals" />
       <div className="flex w-full flex-col gap-4">
-        {FOLLOW_SUGGESTIONS.map((person) => {
+        {people.map((person) => {
           const isFollowed = followed.has(person.id);
           return (
             <div key={person.id} className="flex w-full items-center justify-between">

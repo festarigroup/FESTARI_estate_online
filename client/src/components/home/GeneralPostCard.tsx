@@ -34,7 +34,7 @@ const GRID_LIMIT = 3;
  * photos / a property-or-service tag / a poll) — not a Figma frame, built to
  * match the two feed-post variants that are. */
 export function GeneralPostCard({ post }: { post: GeneralPost }) {
-  const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.comments);
+  const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.id, post.comments);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const images = post.images ?? [];
 
@@ -234,7 +234,11 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
           post={post}
           commentsOpen={commentsOpen}
           onToggleComments={toggleComments}
-          cta={post.tag === "property" ? <PropertyEnquiryButton listerName={post.author.name} /> : undefined}
+          cta={
+            post.tag === "property" ? (
+              <PropertyEnquiryButton listerName={post.author.name} propertyId={post.propertyId} />
+            ) : undefined
+          }
         />
       )}
       {commentsOpen && <CommentsSection comments={comments} onAddComment={addComment} />}

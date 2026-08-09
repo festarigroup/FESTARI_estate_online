@@ -1,71 +1,48 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState } from "react";
+import * as feedApi from "@/lib/api/feed";
+import { mapPost } from "@/lib/adapters";
+import { useAuth } from "@/context/AuthContext";
 import type { FeedPost } from "@/types/home";
 
-const STORAGE_KEY = "festari:saved-posts";
-
-type Listener = () => void;
-const listeners = new Set<Listener>();
-
-/**
- * Module-level store (not React state) so every card's Save button reads and
- * writes the same list without needing a context provider — persisted to
- * localStorage so it survives a reload. `useSyncExternalStore` keeps the
- * server/first-client-render snapshot at `[]` (no `window` during SSR) and
- * then reconciles to the real localStorage contents post-hydration, which is
- * exactly the case it's designed for — no manual "mounted" effect needed.
- */
-let cachedPosts: FeedPost[] = typeof window !== "undefined" ? readFromStorage() : [];
-
-function readFromStorage(): FeedPost[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeToStorage(posts: FeedPost[]) {
-  cachedPosts = posts;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-  } catch {
-    // storage full/disabled — the in-memory cache still reflects the change
-    // for the rest of this session, just won't survive a reload.
-  }
-  listeners.forEach((listener) => listener());
-}
-
-function subscribe(listener: Listener) {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-}
-
-function getSnapshot() {
-  return cachedPosts;
-}
-
-// A stable (not freshly-allocated) empty array — useSyncExternalStore warns
-// if getServerSnapshot's result isn't referentially cached, since a new []
-// on every call looks like an infinite-loop bug from the inside.
-const EMPTY_POSTS: FeedPost[] = [];
-
-function getServerSnapshot(): FeedPost[] {
-  return EMPTY_POSTS;
-}
-
+/** Saved-posts state, backed by the real /feed/saved endpoint. Loaded once
+ * per signed-in session and kept in sync optimistically as posts are
+ * saved/unsaved from anywhere in the app. */
 export function useSavedPosts() {
-  const savedPosts = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const { user } = useAuth();
+  const [savedPosts, setSavedPosts] = useState<FeedPost[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  const load = useCallback(async () => {
+    if (!user) return;
+    try {
+      const posts = await feedApi.listSavedPosts();
+      setSavedPosts(posts.map(mapPost));
+    } catch {
+      // leave whatever was already loaded
+    } finally {
+      setLoaded(true);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user && !loaded) load();
+  }, [user, loaded, load]);
 
   function isSaved(id: string) {
     return savedPosts.some((p) => p.id === id);
   }
 
   function toggleSave(post: FeedPost) {
-    const already = savedPosts.some((p) => p.id === post.id);
-    writeToStorage(already ? savedPosts.filter((p) => p.id !== post.id) : [post, ...savedPosts]);
+    const already = isSaved(post.id);
+    setSavedPosts((prev) => (already ? prev.filter((p) => p.id !== post.id) : [post, ...prev]));
+
+    const request = already ? feedApi.unsavePost(post.id) : feedApi.savePost(post.id);
+    request.catch(() => {
+      // roll back on failure
+      setSavedPosts((prev) => (already ? [post, ...prev] : prev.filter((p) => p.id !== post.id)));
+    });
   }
 
   return { savedPosts, isSaved, toggleSave };
