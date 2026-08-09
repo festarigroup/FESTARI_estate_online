@@ -68,7 +68,7 @@ async function issueOtp(
 }
 
 const googleClient = new OAuth2Client();
-const GOOGLE_AUDIENCES = [process.env.GOOGLE_WEB_CLIENT_ID, process.env.GOOGLE_CLIENT_ID].filter(
+const GOOGLE_AUDIENCES = [process.env.GOOGLE_CLIENT_ID].filter(
   (id): id is string => Boolean(id),
 );
 

@@ -36,7 +36,6 @@ REFRESH_TOKEN=jwt-refresh-secret
 API_BASE_URL=http://localhost:3030/api/v1
 RESEND_API_KEY=re_...              # OTP emails
 GOOGLE_CLIENT_ID=...                # Google Sign-In (web client id)
-GOOGLE_WEB_CLIENT_ID=...
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 SUPABASE_AVATAR_BUCKET=avatars
