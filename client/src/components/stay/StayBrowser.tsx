@@ -27,15 +27,15 @@ const PRICE_RANGES: { label: string; test: (n: number) => boolean }[] = [
 ];
 
 /** Owns the Stay page's title, category tabs, filter row, and venue feed —
- * Figma node 3393:16310's "Feed Column". The title/tabs/filters are now
- * grouped into one card (node 3405:18724 — Figma names it "Post Composer",
- * reusing that component's own card styling as a wrapper, but there's no
- * actual composer bar rendered on this screen anymore: posting now goes
- * through TopNavBar's global "+ Create Post" button instead, see
- * PostComposerContext). Venue posts have no backend counterpart yet (see
- * CreatePostModal), so `listings` starts from the seeded STAY_LISTINGS mock
- * and only grows locally as that global composer creates new venue posts
- * this session. */
+ * Figma node 3393:16310's "Feed Column". Figma itself wraps the title/tabs/
+ * filters in a card (node 3405:18724), but that treatment was explicitly
+ * dropped here at request — this renders as a plain sticky block instead.
+ * There's also no separate composer bar rendered on this screen anymore:
+ * posting now goes through TopNavBar's global "+ Create Post" button
+ * instead, see PostComposerContext. Venue posts have no backend
+ * counterpart yet (see CreatePostModal), so `listings` starts from the
+ * seeded STAY_LISTINGS mock and only grows locally as that global composer
+ * creates new venue posts this session. */
 export function StayBrowser({ initialListings }: { initialListings: GeneralPost[] }) {
   const [listings, setListings] = useState(initialListings);
   const [category, setCategory] = useState<StayCategory>(STAY_CATEGORIES[0].id);
@@ -80,11 +80,12 @@ export function StayBrowser({ initialListings }: { initialListings: GeneralPost[
 
   return (
     <>
-      {/* Card wrapper (Figma node 3405:18724) — sticky only at `lg:`, where
-          it clears TopNavBar's 88px offset; below that it just scrolls
-          normally rather than permanently pinning this much taller block
-          (title included) over a small viewport. */}
-      <div className="flex flex-col gap-6 rounded-[39px] border border-border bg-white p-6 lg:sticky lg:top-[88px] lg:z-10">
+      {/* Sticky only at `lg:`, where it clears TopNavBar's 88px offset;
+          below that it just scrolls normally rather than permanently
+          pinning this much taller block (title included) over a small
+          viewport. bg-background keeps feed cards scrolling behind it from
+          showing through while it's pinned. */}
+      <div className="flex flex-col gap-6 bg-background pt-2 pb-3 lg:sticky lg:top-[88px] lg:z-10">
         <div className="flex flex-col gap-1">
           <h1 className="text-[30px] font-bold tracking-[-0.9px] text-[#334154]">Stay (Hotels)</h1>
           <p className="text-sm text-[#475568]">Discover hotels, resorts, and unique stays shared by the community.</p>
