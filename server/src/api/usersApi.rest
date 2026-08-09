@@ -1,0 +1,44 @@
+@host = http://localhost:3030
+@baseUrl = {{host}}/api/v1/users
+@authToken = REPLACE_WITH_ACCESS_TOKEN
+
+### List users
+GET {{baseUrl}}?limit=20&current_page=1
+
+### Find a user by email
+GET {{baseUrl}}/find?authKey=email&authValue=ama@example.com
+
+### Get current user
+GET {{baseUrl}}/me
+Authorization: Bearer {{authToken}}
+
+### Accept terms
+POST {{baseUrl}}/me/accept-terms
+Authorization: Bearer {{authToken}}
+
+### Upload avatar
+# Select an image file with the REST Client's file picker, or POST via curl/Postman —
+# this extension doesn't support multipart file bodies directly.
+POST {{baseUrl}}/me/avatar
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="avatar"; filename="avatar.jpg"
+Content-Type: image/jpeg
+
+< ./avatar.jpg
+--boundary--
+
+### Get a user by id
+GET {{baseUrl}}/REPLACE_WITH_USER_ID
+
+### Update current user
+PATCH {{baseUrl}}/REPLACE_WITH_USER_ID
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "firstname": "Ama",
+  "lastname": "Owusu"
+}

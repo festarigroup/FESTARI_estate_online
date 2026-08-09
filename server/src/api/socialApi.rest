@@ -1,0 +1,23 @@
+@host = http://localhost:3030
+@baseUrl = {{host}}/api/v1/social
+@authToken = REPLACE_WITH_ACCESS_TOKEN
+
+### Who to follow
+GET {{baseUrl}}/suggestions?limit=5
+Authorization: Bearer {{authToken}}
+
+### Follow a user
+POST {{baseUrl}}/follow/REPLACE_WITH_USER_ID
+Authorization: Bearer {{authToken}}
+
+### Unfollow a user
+DELETE {{baseUrl}}/follow/REPLACE_WITH_USER_ID
+Authorization: Bearer {{authToken}}
+
+### Who I follow
+GET {{baseUrl}}/following
+Authorization: Bearer {{authToken}}
+
+### Who follows me
+GET {{baseUrl}}/followers
+Authorization: Bearer {{authToken}}

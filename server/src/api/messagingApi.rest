@@ -1,0 +1,34 @@
+@host = http://localhost:3030
+@baseUrl = {{host}}/api/v1/messages
+@authToken = REPLACE_WITH_ACCESS_TOKEN
+
+### List conversations
+GET {{baseUrl}}/conversations
+Authorization: Bearer {{authToken}}
+
+### Start (or find) a 1:1 conversation
+# @name startConversation
+POST {{baseUrl}}/conversations
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "participant_id": "REPLACE_WITH_USER_ID"
+}
+
+### Get a conversation
+GET {{baseUrl}}/conversations/{{startConversation.response.body.data.id}}
+Authorization: Bearer {{authToken}}
+
+### Send a message
+POST {{baseUrl}}/conversations/{{startConversation.response.body.data.id}}/messages
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "body": "Hi, is this property still available?"
+}
+
+### Unread count
+GET {{baseUrl}}/unread-count
+Authorization: Bearer {{authToken}}

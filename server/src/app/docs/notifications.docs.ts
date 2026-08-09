@@ -2,7 +2,11 @@
  * @swagger
  * tags:
  *   name: Notifications
- *   description: In-app notifications and delivery preferences
+ *   description: |
+ *     In-app notifications and delivery preferences. One unified table backs
+ *     every notification kind — likes, comments, follows, bookings,
+ *     inquiries, hire requests, messages, and system notices — distinguished
+ *     by `verb` and a decoupled `target_type`/`target_id` pair.
  */
 
 /**
@@ -10,7 +14,6 @@
  * /notifications:
  *   get:
  *     summary: List notifications
- *     description: Returns stored in-app notifications for the authenticated user.
  *     tags: [Notifications]
  *     security:
  *       - bearerAuth: []
@@ -46,11 +49,24 @@
  *                           id:
  *                             type: string
  *                             format: uuid
+ *                           actor_id:
+ *                             type: string
+ *                             format: uuid
+ *                             nullable: true
+ *                           verb:
+ *                             type: string
+ *                             enum: [like, comment, follow, booking, inquiry, hire_request, message, system]
+ *                           target_type:
+ *                             type: string
+ *                             nullable: true
+ *                             example: post
+ *                           target_id:
+ *                             type: string
+ *                             format: uuid
+ *                             nullable: true
  *                           title:
  *                             type: string
  *                           body:
- *                             type: string
- *                           type:
  *                             type: string
  *                           is_read:
  *                             type: boolean
@@ -84,7 +100,7 @@
  *                 data:
  *                   type: object
  *                   properties:
- *                     unreadCount:
+ *                     count:
  *                       type: integer
  *       401:
  *         description: Unauthorized
@@ -94,7 +110,7 @@
  * @swagger
  * /notifications/{id}/read:
  *   put:
- *     summary: Mark notification as read
+ *     summary: Mark one notification as read
  *     tags: [Notifications]
  *     security:
  *       - bearerAuth: []
@@ -118,7 +134,7 @@
  * @swagger
  * /notifications/read-all:
  *   put:
- *     summary: Mark all notifications as read
+ *     summary: Mark every notification as read
  *     tags: [Notifications]
  *     security:
  *       - bearerAuth: []
@@ -157,7 +173,7 @@
  * @swagger
  * /notifications/clear-all:
  *   delete:
- *     summary: Clear all notifications
+ *     summary: Delete every notification
  *     tags: [Notifications]
  *     security:
  *       - bearerAuth: []
@@ -178,7 +194,11 @@
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: User notification preferences
+ *         description: Preferences for the current user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/NotificationPreferences'
  *       401:
  *         description: Unauthorized
  *   put:
@@ -187,15 +207,45 @@
  *     security:
  *       - bearerAuth: []
  *     requestBody:
- *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             description: Partial preference object (push, email, sms toggles)
+ *             $ref: '#/components/schemas/NotificationPreferences'
  *     responses:
  *       200:
  *         description: Preferences updated
  *       401:
  *         description: Unauthorized
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     NotificationPreferences:
+ *       type: object
+ *       properties:
+ *         frequency:
+ *           type: string
+ *           enum: [daily, weekly, monthly, never]
+ *         in_app_enabled:
+ *           type: boolean
+ *         email_enabled:
+ *           type: boolean
+ *         sms_enabled:
+ *           type: boolean
+ *         whatsapp_enabled:
+ *           type: boolean
+ *         booking_enabled:
+ *           type: boolean
+ *         inquiry_enabled:
+ *           type: boolean
+ *         hire_request_enabled:
+ *           type: boolean
+ *         social_enabled:
+ *           type: boolean
+ *         message_enabled:
+ *           type: boolean
+ *         system_enabled:
+ *           type: boolean
  */

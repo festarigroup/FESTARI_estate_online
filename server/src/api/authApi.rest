@@ -1,0 +1,85 @@
+@host = http://localhost:3030
+@baseUrl = {{host}}/api/v1/auth
+
+### Register
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "firstname": "Ama",
+  "lastname": "Serwaa",
+  "email": "ama@example.com",
+  "password": "correct-horse-battery-staple",
+  "roles": ["buyer"]
+}
+
+### Verify OTP (check server logs / your inbox for the code)
+POST {{baseUrl}}/verify-otp
+Content-Type: application/json
+
+{
+  "email": "ama@example.com",
+  "otp": "REPLACE_WITH_CODE",
+  "purpose": "email_verification"
+}
+
+### Resend OTP
+POST {{baseUrl}}/resend-otp
+Content-Type: application/json
+
+{
+  "email": "ama@example.com",
+  "purpose": "email_verification"
+}
+
+### Login
+# @name login
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "ama@example.com",
+  "password": "correct-horse-battery-staple"
+}
+
+### Google sign-in
+POST {{baseUrl}}/google
+Content-Type: application/json
+
+{
+  "idToken": "REPLACE_WITH_GOOGLE_ID_TOKEN",
+  "role": "buyer"
+}
+
+### Forgot password
+POST {{baseUrl}}/forgot-password
+Content-Type: application/json
+
+{
+  "email": "ama@example.com"
+}
+
+### Reset password
+POST {{baseUrl}}/reset-password
+Content-Type: application/json
+
+{
+  "email": "ama@example.com",
+  "otp": "REPLACE_WITH_CODE",
+  "newPassword": "a-new-strong-password"
+}
+
+### Refresh token
+POST {{baseUrl}}/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "{{login.response.body.data.refreshToken}}"
+}
+
+### Logout (revokes every session for this account)
+POST {{baseUrl}}/logout
+Authorization: Bearer {{login.response.body.data.accessToken}}
+Content-Type: application/json
+
+{}

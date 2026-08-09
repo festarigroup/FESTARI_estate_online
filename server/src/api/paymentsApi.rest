@@ -1,162 +1,45 @@
 @host = http://localhost:3030
 @baseUrl = {{host}}/api/v1/payments
+@authToken = REPLACE_WITH_ACCESS_TOKEN
 
-###
-# Create Paystack Plan
-POST {{baseUrl}}/plans
+### List my payments
+GET {{baseUrl}}
+Authorization: Bearer {{authToken}}
+
+### Initiate a payment
+# @name initiate
+POST {{baseUrl}}/initiate
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
-  "name": "Premium Plan",
-  "description": {
-    "features": [
-      "Access to premium content",
-      "Priority support",
-      "No ads"
-    ]
-  },
-  "interval": "monthly",
-  "amount": 100,
-  "amountSaved": 20
+  "payment_type": "hotel_booking",
+  "target_id": "REPLACE_WITH_BOOKING_ID",
+  "amount": 2550,
+  "metadata": { "note": "3 nights at The Palm Garden Hotel" }
 }
 
-###
-# Initialize Transaction
-POST {{baseUrl}}/initialize
+### Verify a payment
+GET {{baseUrl}}/verify/{{initiate.response.body.data.reference}}
+Authorization: Bearer {{authToken}}
+
+### Get a payment by id
+GET {{baseUrl}}/REPLACE_WITH_PAYMENT_ID
+Authorization: Bearer {{authToken}}
+
+### Paystack webhook (simulated — real calls come from Paystack, signed)
+POST {{baseUrl}}/webhook
 Content-Type: application/json
-
-{
-  "walletId": "550e8400-e29b-41d4-a716-446655440000",
-  "email": "test@example.com",
-  "amount": 50,
-  "metadata": {
-    "purpose": "wallet_funding"
-  }
-}
-
-###
-# Verify Payment
-GET {{baseUrl}}/verify/T7x8A9bC123456
-
-###
-# Create Paystack Customer
-POST {{baseUrl}}/customer
-Content-Type: application/json
-
-{
-  "email": "andyansong82@gmail.com",
-  "first_name": "john doe",
-  "last_name": "john doe",
-  "phone": "+233789456123"
-}
-
-# {
-#     "customer_code": "CUS_fnmhn6uqu3ar4jc",
-# }
-
-###
-# Subscribe Customer To Plan
-POST {{baseUrl}}/subscribe
-Content-Type: application/json
-
-{
-  "customer": "CUS_xxxxxxxxx",
-  "planCode": "PLN_xxxxxxxxx",
-  "authorization": "AUTH_xxxxxxxxx"
-}
-
-###
-# Paystack Webhook Test
-POST {{baseUrl}}/webhook/paystack
-Content-Type: application/json
-x-paystack-signature: test-signature
+X-Paystack-Signature: test-signature
 
 {
   "event": "charge.success",
   "data": {
-    "reference": "T7x8A9bC123456",
+    "reference": "REPLACE_WITH_REFERENCE",
     "status": "success",
-    "amount": 5000,
+    "amount": 255000,
     "customer": {
-      "email": "test@example.com"
+      "email": "ama@example.com"
     }
   }
-}
-
-@baseUrl = {{baseUrl}}
-
-###
-POST {{baseUrl}}/initialize
-Content-Type: application/json
-
-{
-  "walletId": "walletId}}",
-  "email": "test@example.com",
-  "amount": 50
-}
-
-###
-GET {{baseUrl}}/verify/fafafa
-
-###
-# 1. Create Plan
-POST http://localhost:3000/api/payments/plans
-Content-Type: application/json
-
-{
-  "name": "Gold Plan",
-  "amount": 200,
-  "interval": "monthly"
-}
-
-###
-# 2. Initialize Payment
-POST http://localhost:3000/api/payments/initialize
-Content-Type: application/json
-
-{
-  "walletId": "550e8400-e29b-41d4-a716-446655440000",
-  "email": "john@example.com",
-  "amount": 200,
-  "metadata": {
-    "type": "subscription"
-  }
-}
-
-###
-# Copy authorization_url from response
-# Open in browser and complete payment
-
-###
-# 3. Verify Payment
-GET http://localhost:3000/api/payments/verify/PASTE_REFERENCE_HERE
-
-###
-# 4. Subscribe User
-POST http://localhost:3000/api/payments/subscribe
-Content-Type: application/json
-
-{
-  "customer": "CUS_xxxxxxxxx",
-  "planCode": "PLN_xxxxxxxxx",
-  "authorization": "AUTH_xxxxxxxxx"
-}
-
-
-###
-# List Plans
-GET {{baseUrl}}/plans
-
-###
-# Fetch Transaction By Reference
-GET {{baseUrl}}/transactions/T7x8A9bC123456
-
-###
-# Cancel Subscription
-POST {{baseUrl}}/subscriptions/disable
-Content-Type: application/json
-
-{
-  "subscriptionCode": "SUB_xxxxxxxxx",
-  "emailToken": "xxxxxxxxx"
 }

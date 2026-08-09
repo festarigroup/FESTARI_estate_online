@@ -1,0 +1,59 @@
+@host = http://localhost:3030
+@baseUrl = {{host}}/api/v1/common
+@authToken = REPLACE_WITH_ACCESS_TOKEN
+
+### Send a property inquiry (no account required)
+POST {{baseUrl}}/property-inquiries
+Content-Type: application/json
+
+{
+  "property_id": "REPLACE_WITH_PROPERTY_ID",
+  "name": "Kwame Mensah",
+  "email": "kwame@example.com",
+  "phone": "0241234567",
+  "message": "Hi, I'm interested in this listing. Could you share more details?"
+}
+
+### List property inquiries (owner/admin)
+GET {{baseUrl}}/property-inquiries?property_id=REPLACE_WITH_PROPERTY_ID
+Authorization: Bearer {{authToken}}
+
+### Get a property inquiry
+GET {{baseUrl}}/property-inquiries/REPLACE_WITH_INQUIRY_ID
+Authorization: Bearer {{authToken}}
+
+### Mark a property inquiry read
+PUT {{baseUrl}}/property-inquiries/REPLACE_WITH_INQUIRY_ID/mark-read
+Authorization: Bearer {{authToken}}
+
+### Delete a property inquiry (admin)
+DELETE {{baseUrl}}/property-inquiries/REPLACE_WITH_INQUIRY_ID
+Authorization: Bearer {{authToken}}
+
+### Send an artisan inquiry (no account required)
+POST {{baseUrl}}/artisan-inquiries
+Content-Type: application/json
+
+{
+  "artisan_id": "REPLACE_WITH_ARTISAN_ID",
+  "name": "Kwame Mensah",
+  "email": "kwame@example.com",
+  "phone": "0241234567",
+  "message": "Do you handle commercial rewiring jobs?"
+}
+
+### List artisan inquiries (artisan/admin)
+GET {{baseUrl}}/artisan-inquiries?artisan_id=REPLACE_WITH_ARTISAN_ID
+Authorization: Bearer {{authToken}}
+
+### Get an artisan inquiry
+GET {{baseUrl}}/artisan-inquiries/REPLACE_WITH_INQUIRY_ID
+Authorization: Bearer {{authToken}}
+
+### Mark an artisan inquiry read
+PUT {{baseUrl}}/artisan-inquiries/REPLACE_WITH_INQUIRY_ID/mark-read
+Authorization: Bearer {{authToken}}
+
+### Delete an artisan inquiry (admin)
+DELETE {{baseUrl}}/artisan-inquiries/REPLACE_WITH_INQUIRY_ID
+Authorization: Bearer {{authToken}}

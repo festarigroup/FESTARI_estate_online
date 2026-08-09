@@ -1,0 +1,47 @@
+@host = http://localhost:3030
+@baseUrl = {{host}}/api/v1/subscriptions
+@authToken = REPLACE_WITH_ACCESS_TOKEN
+
+### List plans
+GET {{baseUrl}}/plans
+
+### Create a plan (admin)
+POST {{baseUrl}}/plans
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Premium Plan",
+  "description": {
+    "features": ["Feature properties", "20 images per listing", "Priority support"]
+  },
+  "interval": "monthly",
+  "amount": 100,
+  "amountSaved": 20,
+  "max_properties": 20,
+  "max_hotels": 5,
+  "max_images": 20,
+  "max_videos": 5,
+  "can_feature_properties": true
+}
+
+### Subscribe to a plan
+POST {{baseUrl}}/subscribe
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "planCode": "PLN_xxxxxxxxx"
+}
+
+### Get my subscription
+GET {{baseUrl}}/my-subscription
+Authorization: Bearer {{authToken}}
+
+### Cancel subscription
+PUT {{baseUrl}}/cancel
+Authorization: Bearer {{authToken}}
+
+### Subscription history
+GET {{baseUrl}}/history
+Authorization: Bearer {{authToken}}

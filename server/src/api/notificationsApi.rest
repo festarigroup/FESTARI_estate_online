@@ -1,0 +1,45 @@
+@host = http://localhost:3030
+@baseUrl = {{host}}/api/v1/notifications
+@authToken = REPLACE_WITH_ACCESS_TOKEN
+
+### List notifications
+GET {{baseUrl}}?limit=50&offset=0
+Authorization: Bearer {{authToken}}
+
+### Unread count
+GET {{baseUrl}}/unread-count
+Authorization: Bearer {{authToken}}
+
+### Mark one as read
+PUT {{baseUrl}}/REPLACE_WITH_NOTIFICATION_ID/read
+Authorization: Bearer {{authToken}}
+
+### Mark all as read
+PUT {{baseUrl}}/read-all
+Authorization: Bearer {{authToken}}
+
+### Delete one
+DELETE {{baseUrl}}/REPLACE_WITH_NOTIFICATION_ID
+Authorization: Bearer {{authToken}}
+
+### Clear all
+DELETE {{baseUrl}}/clear-all
+Authorization: Bearer {{authToken}}
+
+### Get preferences
+GET {{baseUrl}}/preferences
+Authorization: Bearer {{authToken}}
+
+### Update preferences
+PUT {{baseUrl}}/preferences
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "frequency": "daily",
+  "email_enabled": true,
+  "sms_enabled": false,
+  "whatsapp_enabled": false,
+  "social_enabled": true,
+  "message_enabled": true
+}

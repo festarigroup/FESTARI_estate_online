@@ -1,9 +1,19 @@
 /**
  * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Registration, login, OTP verification, and token refresh
+ */
+
+/**
+ * @swagger
  * /auth/register:
  *   post:
- *     summary: Register a new user
- *     description: Create a new user account with email or phone and send OTP for verification
+ *     summary: Register a new account
+ *     description: |
+ *       Creates an unverified account and emails a 6-digit OTP for verification.
+ *       Login is blocked until the account is verified via `/auth/verify-otp`.
+ *       A user can hold multiple roles at once — `roles` is an array, not a single value.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -11,216 +21,32 @@
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - authKey
- *               - authValue
- *               - role
+ *             required: [firstname, lastname, email, password, roles]
  *             properties:
- *               authKey:
+ *               firstname:
  *                 type: string
- *                 enum: [email, phone]
- *                 description: Authentication key type
- *               authValue:
+ *               lastname:
  *                 type: string
- *                 description: Email address or phone number
- *               role:
+ *               email:
  *                 type: string
- *                 enum: [driver, customer]
- *                 description: User role
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 minLength: 8
+ *               roles:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   enum: [buyer, estate_manager, hotel_manager, artisan, admin]
  *             example:
- *               authKey: "phone"
- *               authValue: "+233509895421"
- *               role: "customer"
+ *               firstname: "Ama"
+ *               lastname: "Serwaa"
+ *               email: "ama@example.com"
+ *               password: "correct-horse-battery-staple"
+ *               roles: ["buyer"]
  *     responses:
  *       201:
- *         description: User registered successfully, OTP sent
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   type: object
- *                   properties:
- *                     user:
- *                       type: object
- *                       properties:
- *                         id:
- *                           type: string
- *                           format: uuid
- *                         email:
- *                           type: string
- *                         phone:
- *                           type: string
- *                         role:
- *                           type: string
- *                           enum: [customer, admin, driver]
- *                         is_active:
- *                           type: boolean
- *                         verified:
- *                           type: boolean
- *       400:
- *         description: Bad request
- */
-
-/**
- * @swagger
- * /auth/verify-otp:
- *   post:
- *     summary: Verify OTP and complete login/registration
- *     description: Verify the OTP sent to user's email or phone and generate access/refresh tokens
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - authKey
- *               - authValue
- *               - otp
- *               - purpose
- *             properties:
- *               authKey:
- *                 type: string
- *                 enum: [email, phone]
- *               authValue:
- *                 type: string
- *               otp:
- *                 type: string
- *                 description: 4-digit OTP code
- *               purpose:
- *                 type: string
- *                 enum: [login, password_reset, email_verification, payment]
- *             example:
- *               authKey: "phone"
- *               authValue: "+233509895421"
- *               otp: "7859"
- *               purpose: "login"
- *     responses:
- *       200:
- *         description: OTP verified successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   type: object
- *                   properties:
- *                     accessToken:
- *                       type: string
- *                       description: JWT access token
- *                     refreshToken:
- *                       type: string
- *                       description: JWT refresh token
- *                     user:
- *                       type: object
- *       400:
- *         description: Invalid credentials or OTP
- *       429:
- *         description: Too many failed attempts
- */
-
-/**
- * @swagger
- * /auth/welcome-context:
- *   get:
- *     summary: Get welcome context from prior sessions
- *     description: |
- *       Returns whether this is the user's first login and details about their
- *       previous sign-in contact (email, phone, or Google) from prior sessions.
- *     tags: [Auth]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: authKey
- *         required: true
- *         schema:
- *           type: string
- *           enum: [email, phone, google]
- *       - in: query
- *         name: authValue
- *         required: true
- *         schema:
- *           type: string
- *         description: Contact used for the current login
- *       - in: query
- *         name: sessionId
- *         schema:
- *           type: string
- *           format: uuid
- *         description: Current session ID to exclude from prior session lookup
- *     responses:
- *       200:
- *         description: Welcome context
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   type: object
- *                   properties:
- *                     isFirstLogin:
- *                       type: boolean
- *                     previousLogin:
- *                       type: object
- *                       nullable: true
- *                       properties:
- *                         authKey:
- *                           type: string
- *                         authValue:
- *                           type: string
- *                     matchesCurrentLogin:
- *                       type: boolean
- *       400:
- *         description: Missing authKey or authValue
- *       401:
- *         description: Unauthorized
- */
-
-/**
- * @swagger
- * /auth/resend-otp:
- *   post:
- *     summary: Resend OTP to user
- *     description: Request a new OTP code to be sent via SMS or email
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - authKey
- *               - authValue
- *               - purpose
- *             properties:
- *               authKey:
- *                 type: string
- *                 enum: [email, phone]
- *               authValue:
- *                 type: string
- *               purpose:
- *                 type: string
- *                 enum: [login, password_reset, email_verification, payment]
- *             example:
- *               authKey: "phone"
- *               authValue: "+233509895421"
- *               purpose: "login"
- *     responses:
- *       200:
- *         description: OTP sent successfully
+ *         description: Account created, OTP sent
  *         content:
  *           application/json:
  *             schema:
@@ -230,16 +56,22 @@
  *                   type: boolean
  *                 message:
  *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
  *       400:
- *         description: Invalid credentials
+ *         description: Validation error
+ *       409:
+ *         description: An account with this email already exists
  */
 
 /**
  * @swagger
- * /auth/refresh-token:
+ * /auth/login:
  *   post:
- *     summary: Refresh access token
- *     description: Generate a new access token using a valid refresh token
+ *     summary: Log in with email and password
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -247,17 +79,213 @@
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - refreshToken
+ *             required: [email, password]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Signed in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthTokenResponse'
+ *       401:
+ *         description: Invalid email or password
+ *       403:
+ *         description: Email not yet verified
+ */
+
+/**
+ * @swagger
+ * /auth/google:
+ *   post:
+ *     summary: Sign in (or register) with Google
+ *     description: |
+ *       Verifies a Google ID token server-side. First-time sign-in creates a
+ *       pre-verified account; `role` is added to the account if it doesn't
+ *       already have it. Not Supabase-based — the token is verified directly
+ *       against Google via `google-auth-library`.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [idToken, role]
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *                 description: Google ID token from the client-side sign-in flow
+ *               role:
+ *                 type: string
+ *                 enum: [buyer, estate_manager, hotel_manager, artisan, admin]
+ *     responses:
+ *       200:
+ *         description: Signed in (existing account)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthTokenResponse'
+ *       201:
+ *         description: Account created and signed in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthTokenResponse'
+ *       401:
+ *         description: Invalid Google token
+ */
+
+/**
+ * @swagger
+ * /auth/verify-otp:
+ *   post:
+ *     summary: Verify an OTP
+ *     description: Used for both email verification and password reset, distinguished by `purpose`.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, otp, purpose]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               otp:
+ *                 type: string
+ *                 example: "482913"
+ *               purpose:
+ *                 type: string
+ *                 enum: [email_verification, password_reset]
+ *     responses:
+ *       200:
+ *         description: OTP verified
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Invalid, expired, or already-used OTP
+ *       429:
+ *         description: Too many failed attempts — request a new OTP
+ */
+
+/**
+ * @swagger
+ * /auth/resend-otp:
+ *   post:
+ *     summary: Resend an OTP
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, purpose]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               purpose:
+ *                 type: string
+ *                 enum: [email_verification, password_reset]
+ *     responses:
+ *       200:
+ *         description: OTP sent
+ *       400:
+ *         description: No account found for this email
+ */
+
+/**
+ * @swagger
+ * /auth/forgot-password:
+ *   post:
+ *     summary: Request a password-reset OTP
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses:
+ *       200:
+ *         description: Reset code sent
+ *       400:
+ *         description: No account found for this email
+ */
+
+/**
+ * @swagger
+ * /auth/reset-password:
+ *   post:
+ *     summary: Reset password with an OTP
+ *     description: Revokes every existing session (refresh token) for the account on success.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, otp, newPassword]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               otp:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *                 minLength: 8
+ *     responses:
+ *       200:
+ *         description: Password reset — all sessions revoked, sign in again
+ *       400:
+ *         description: Invalid or expired OTP
+ */
+
+/**
+ * @swagger
+ * /auth/refresh-token:
+ *   post:
+ *     summary: Exchange a refresh token for a new access token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [refreshToken]
  *             properties:
  *               refreshToken:
  *                 type: string
- *                 description: Valid JWT refresh token
- *             example:
- *               refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
  *     responses:
  *       200:
- *         description: New access token generated
+ *         description: New access token
  *         content:
  *           application/json:
  *             schema:
@@ -270,6 +298,83 @@
  *                   properties:
  *                     accessToken:
  *                       type: string
- *       400:
- *         description: Invalid refresh token
+ *       401:
+ *         description: Refresh token invalid or expired
+ */
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Log out
+ *     description: Revokes one session (if `sessionId` is given) or every session for the account.
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               sessionId:
+ *                 type: string
+ *                 format: uuid
+ *     responses:
+ *       200:
+ *         description: Logged out
+ *       401:
+ *         description: Unauthorized
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         firstname:
+ *           type: string
+ *         lastname:
+ *           type: string
+ *         email:
+ *           type: string
+ *         phone:
+ *           type: string
+ *           nullable: true
+ *         profile_picture:
+ *           type: string
+ *           nullable: true
+ *         is_active:
+ *           type: boolean
+ *         verified:
+ *           type: boolean
+ *         roles:
+ *           type: array
+ *           items:
+ *             type: string
+ *         created_at:
+ *           type: string
+ *           format: date-time
+ *     AuthTokenResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *         data:
+ *           type: object
+ *           properties:
+ *             accessToken:
+ *               type: string
+ *             refreshToken:
+ *               type: string
+ *             sessionId:
+ *               type: string
+ *               format: uuid
+ *             user:
+ *               $ref: '#/components/schemas/User'
  */

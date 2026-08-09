@@ -1,0 +1,15 @@
+@host = http://localhost:3030
+@baseUrl = {{host}}/api/v1/dashboard
+@authToken = REPLACE_WITH_ADMIN_ACCESS_TOKEN
+
+### Platform stats
+GET {{baseUrl}}/stats
+Authorization: Bearer {{authToken}}
+
+### Recent activity
+GET {{baseUrl}}/recent-activity
+Authorization: Bearer {{authToken}}
+
+### Pending approvals
+GET {{baseUrl}}/pending-approvals
+Authorization: Bearer {{authToken}}

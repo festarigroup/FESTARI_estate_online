@@ -1,0 +1,86 @@
+@host = http://localhost:3030
+@baseUrl = {{host}}/api/v1/properties
+@authToken = REPLACE_WITH_ACCESS_TOKEN
+
+### List properties
+GET {{baseUrl}}?listing_type=for_sale&property_type=apartment&min_price=100000&max_price=500000
+
+### Category counts
+GET {{baseUrl}}/categories
+
+### Trending properties
+GET {{baseUrl}}/trending?limit=2
+
+### Wishlist
+GET {{baseUrl}}/wishlist
+Authorization: Bearer {{authToken}}
+
+### Get a property
+GET {{baseUrl}}/REPLACE_WITH_PROPERTY_ID
+
+### Create a property
+# @name createProperty
+POST {{baseUrl}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "title": "4 Bedroom Detached House",
+  "description": "Newly built, gated community, East Legon.",
+  "price": 3450000,
+  "location": "East Legon, Accra",
+  "listing_type": "for_sale",
+  "property_type": "home",
+  "bedrooms": 4,
+  "bathrooms": 4,
+  "area_sqm": 420
+}
+
+### Update a property
+PUT {{baseUrl}}/REPLACE_WITH_PROPERTY_ID
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "price": 3300000
+}
+
+### Delete a property
+DELETE {{baseUrl}}/REPLACE_WITH_PROPERTY_ID
+Authorization: Bearer {{authToken}}
+
+### Approve a property (admin)
+PUT {{baseUrl}}/REPLACE_WITH_PROPERTY_ID/approve
+Authorization: Bearer {{authToken}}
+
+### Reject a property (admin)
+PUT {{baseUrl}}/REPLACE_WITH_PROPERTY_ID/reject
+Authorization: Bearer {{authToken}}
+
+### Upload a property image
+POST {{baseUrl}}/REPLACE_WITH_PROPERTY_ID/images
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="image"; filename="listing.jpg"
+Content-Type: image/jpeg
+
+< ./listing.jpg
+--boundary
+Content-Disposition: form-data; name="position"
+
+0
+--boundary--
+
+### Delete a property image
+DELETE {{baseUrl}}/REPLACE_WITH_PROPERTY_ID/images/REPLACE_WITH_IMAGE_ID
+Authorization: Bearer {{authToken}}
+
+### Add to wishlist
+POST {{baseUrl}}/REPLACE_WITH_PROPERTY_ID/wishlist
+Authorization: Bearer {{authToken}}
+
+### Remove from wishlist
+DELETE {{baseUrl}}/REPLACE_WITH_PROPERTY_ID/wishlist
+Authorization: Bearer {{authToken}}

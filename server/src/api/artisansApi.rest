@@ -1,0 +1,80 @@
+@host = http://localhost:3030
+@baseUrl = {{host}}/api/v1/artisans
+@authToken = REPLACE_WITH_ACCESS_TOKEN
+
+### List artisans
+GET {{baseUrl}}?service_type=plumbing
+
+### Top artisans by rating
+GET {{baseUrl}}/top?limit=4
+
+### Get an artisan profile
+GET {{baseUrl}}/REPLACE_WITH_ARTISAN_ID
+
+### Create the caller's artisan profile
+POST {{baseUrl}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "service_type": "plumbing",
+  "bio": "10 years fixing leaks and installing fixtures across Accra.",
+  "location": "Accra"
+}
+
+### Update an artisan profile
+PUT {{baseUrl}}/REPLACE_WITH_ARTISAN_ID
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "bio": "Updated bio"
+}
+
+### Delete an artisan profile
+DELETE {{baseUrl}}/REPLACE_WITH_ARTISAN_ID
+Authorization: Bearer {{authToken}}
+
+### Approve an artisan profile (admin)
+PUT {{baseUrl}}/REPLACE_WITH_ARTISAN_ID/approve
+Authorization: Bearer {{authToken}}
+
+### Reject an artisan profile (admin)
+PUT {{baseUrl}}/REPLACE_WITH_ARTISAN_ID/reject
+Authorization: Bearer {{authToken}}
+
+### Send a hire request (free — no payment collected here)
+POST {{baseUrl}}/REPLACE_WITH_ARTISAN_ID/hire
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "message": "Hi, I have a leaking kitchen sink — are you free this week?"
+}
+
+### My hire requests (sent)
+GET {{baseUrl}}/hire-requests/me
+Authorization: Bearer {{authToken}}
+
+### Hire requests received (artisan/admin)
+GET {{baseUrl}}/REPLACE_WITH_ARTISAN_ID/hire-requests
+Authorization: Bearer {{authToken}}
+
+### Update a hire request's status (artisan/admin)
+PUT {{baseUrl}}/hire-requests/REPLACE_WITH_HIRE_REQUEST_ID
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "status": "accepted"
+}
+
+### Leave a review
+POST {{baseUrl}}/REPLACE_WITH_ARTISAN_ID/reviews
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "rating": 5,
+  "comment": "Fixed it in 20 minutes, great work."
+}

@@ -1,0 +1,95 @@
+@host = http://localhost:3030
+@baseUrl = {{host}}/api/v1/hotels
+@authToken = REPLACE_WITH_ACCESS_TOKEN
+
+### List hotels
+GET {{baseUrl}}?location=Accra
+
+### Get a hotel
+GET {{baseUrl}}/REPLACE_WITH_HOTEL_ID
+
+### Create a hotel
+POST {{baseUrl}}
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "The Palm Garden Hotel",
+  "description": "Boutique hotel in East Legon.",
+  "location": "East Legon, Accra",
+  "amenities": { "wifi": true, "pool": true, "parking": true },
+  "price_per_night": 850
+}
+
+### Update a hotel
+PUT {{baseUrl}}/REPLACE_WITH_HOTEL_ID
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "price_per_night": 900
+}
+
+### Delete a hotel
+DELETE {{baseUrl}}/REPLACE_WITH_HOTEL_ID
+Authorization: Bearer {{authToken}}
+
+### Approve a hotel (admin)
+PUT {{baseUrl}}/REPLACE_WITH_HOTEL_ID/approve
+Authorization: Bearer {{authToken}}
+
+### Reject a hotel (admin)
+PUT {{baseUrl}}/REPLACE_WITH_HOTEL_ID/reject
+Authorization: Bearer {{authToken}}
+
+### Upload a hotel image
+POST {{baseUrl}}/REPLACE_WITH_HOTEL_ID/images
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="image"; filename="hotel.jpg"
+Content-Type: image/jpeg
+
+< ./hotel.jpg
+--boundary--
+
+### Delete a hotel image
+DELETE {{baseUrl}}/REPLACE_WITH_HOTEL_ID/images/REPLACE_WITH_IMAGE_ID
+Authorization: Bearer {{authToken}}
+
+### List a hotel's bookings (owner/admin)
+GET {{baseUrl}}/REPLACE_WITH_HOTEL_ID/bookings
+Authorization: Bearer {{authToken}}
+
+### Create a booking
+POST {{baseUrl}}/REPLACE_WITH_HOTEL_ID/bookings
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "check_in": "2026-09-01",
+  "check_out": "2026-09-04",
+  "guests": 2
+}
+
+### My bookings
+GET {{baseUrl}}/bookings/me
+Authorization: Bearer {{authToken}}
+
+### Get a booking
+GET {{baseUrl}}/bookings/REPLACE_WITH_BOOKING_ID
+Authorization: Bearer {{authToken}}
+
+### Update a booking's status (owner/admin)
+PUT {{baseUrl}}/bookings/REPLACE_WITH_BOOKING_ID
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "status": "confirmed"
+}
+
+### Cancel a booking
+DELETE {{baseUrl}}/bookings/REPLACE_WITH_BOOKING_ID
+Authorization: Bearer {{authToken}}

@@ -1,0 +1,131 @@
+@host = http://localhost:3030
+@baseUrl = {{host}}/api/v1/feed
+@authToken = REPLACE_WITH_ACCESS_TOKEN
+
+### List stories
+GET {{baseUrl}}/stories
+
+### Create a story
+POST {{baseUrl}}/stories
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="media"; filename="story.jpg"
+Content-Type: image/jpeg
+
+< ./story.jpg
+--boundary
+Content-Disposition: form-data; name="caption"
+
+House hunting all weekend
+--boundary--
+
+### Get a story
+GET {{baseUrl}}/stories/REPLACE_WITH_STORY_ID
+
+### Record a story view
+POST {{baseUrl}}/stories/REPLACE_WITH_STORY_ID/view
+Authorization: Bearer {{authToken}}
+
+### Delete a story
+DELETE {{baseUrl}}/stories/REPLACE_WITH_STORY_ID
+Authorization: Bearer {{authToken}}
+
+### List posts
+GET {{baseUrl}}/posts?kind=property&current_page=1&limit=20
+
+### Get a post
+GET {{baseUrl}}/posts/REPLACE_WITH_POST_ID
+
+### Create a general post
+POST {{baseUrl}}/posts
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "kind": "general",
+  "body": "Excited to be part of the Festari community!",
+  "hashtags": "#FestariEstates"
+}
+
+### Create a property post (link an existing property)
+POST {{baseUrl}}/posts
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "kind": "property",
+  "body": "Just listed this beautiful 4 bedroom house...",
+  "hashtags": "#NewListing #EastLegon #ForSale",
+  "linked_property_id": "REPLACE_WITH_PROPERTY_ID"
+}
+
+### Update a post
+PUT {{baseUrl}}/posts/REPLACE_WITH_POST_ID
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "body": "Updated caption"
+}
+
+### Delete a post
+DELETE {{baseUrl}}/posts/REPLACE_WITH_POST_ID
+Authorization: Bearer {{authToken}}
+
+### Upload a post image
+POST {{baseUrl}}/posts/REPLACE_WITH_POST_ID/images
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="image"; filename="post.jpg"
+Content-Type: image/jpeg
+
+< ./post.jpg
+--boundary
+Content-Disposition: form-data; name="position"
+
+0
+--boundary--
+
+### Like a post
+POST {{baseUrl}}/posts/REPLACE_WITH_POST_ID/like
+Authorization: Bearer {{authToken}}
+
+### Unlike a post
+DELETE {{baseUrl}}/posts/REPLACE_WITH_POST_ID/like
+Authorization: Bearer {{authToken}}
+
+### List comments
+GET {{baseUrl}}/posts/REPLACE_WITH_POST_ID/comments
+
+### Add a comment
+POST {{baseUrl}}/posts/REPLACE_WITH_POST_ID/comments
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "body": "This looks amazing!"
+}
+
+### Delete a comment
+DELETE {{baseUrl}}/comments/REPLACE_WITH_COMMENT_ID
+Authorization: Bearer {{authToken}}
+
+### Record a share
+POST {{baseUrl}}/posts/REPLACE_WITH_POST_ID/share
+Authorization: Bearer {{authToken}}
+
+### Save a post
+POST {{baseUrl}}/posts/REPLACE_WITH_POST_ID/save
+Authorization: Bearer {{authToken}}
+
+### Unsave a post
+DELETE {{baseUrl}}/posts/REPLACE_WITH_POST_ID/save
+Authorization: Bearer {{authToken}}
+
+### List my saved posts
+GET {{baseUrl}}/saved
+Authorization: Bearer {{authToken}}
