@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "navy" | "gold" | "ghost" | "pill" | "outline-gold";
+  variant?: "navy" | "gold" | "ghost" | "pill" | "outline-gold" | "gold-pill";
 }
 
 const VARIANT_STYLES: Record<NonNullable<ButtonProps["variant"]>, string> = {
@@ -17,6 +17,10 @@ const VARIANT_STYLES: Record<NonNullable<ButtonProps["variant"]>, string> = {
   // actually specifies instead of an invented solid navy.
   "outline-gold":
     "border border-brand-gold-dark text-brand-gold-dark hover:bg-brand-gold-dark/5 rounded-full px-[21px] py-[9px] text-xs font-semibold tracking-[0.24px]",
+  // The Stay page's "Reserve" CTA (node 3387:8909) -- a filled gold pill,
+  // distinct from "outline-gold": solid brand-gold background, smaller
+  // rounded-full padding than the "gold" variant's rounded-lg buttons use.
+  "gold-pill": "bg-brand-gold text-brand-navy hover:brightness-95 rounded-full px-6 py-2",
 };
 
 /** Base button — extend via `variant` and `className`, never fork a one-off style. */

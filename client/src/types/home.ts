@@ -113,6 +113,15 @@ export interface ServicePost {
   comments: Comment[];
 }
 
+/** The Stay page's category tabs (Figma node 3387:8856) — every venue post
+ * belongs to exactly one, so the tabs actually have something to filter. */
+export type StayCategory = "Hotel" | "Resort" | "Apartment" | "Event Venue" | "Short Stay";
+
+/** Amenity chips on a Stay listing card's metadata strip (Figma node
+ * 3387:8880, which shows WiFi/Pool/Dining — the rest of this set is this
+ * app's own reasonable extension of that same idea, not pulled from Figma). */
+export type Amenity = "WiFi" | "Pool" | "Dining" | "Parking" | "Gym" | "AC";
+
 /** The structured facts a venue post carries beyond its free-form caption —
  * what a guest needs before requesting a reservation. Required whenever
  * `tag === "venue"` (enforced in CreatePostModal, not by the type system,
@@ -127,6 +136,16 @@ export interface VenueDetails {
   /** Matches the "4 Bedrooms" stat on the Figma metadata strip (node
    * 3340:936) — a venue's equivalent of a property's bedroom count. */
   bedrooms: number;
+  /** Which Stay page tab this venue shows up under (Figma node 3387:8856). */
+  category: StayCategory;
+  /** Aggregate guest rating out of 5 (Figma node 3387:8896, "4.9"). There's
+   * no review system yet to compute this from, so it's only ever set on
+   * seeded/mock venues — a freshly posted venue starts unrated and the Stay
+   * card just omits the rating pill until reviews exist. */
+  rating?: number;
+  /** Amenity chips (Figma node 3387:8880). Optional — defaults to none for
+   * a freshly posted venue. */
+  amenities?: Amenity[];
 }
 
 /** The structured facts a property post carries beyond its free-form
@@ -167,6 +186,12 @@ export interface GeneralPost {
   propertyId?: string;
   /** Only set when `tag === "venue"`. */
   venueDetails?: VenueDetails;
+  /** Seed-only starting counts for the Stay listing page's visible like/
+   * share numbers (Figma node 3384:8330), the same role PropertyPost's own
+   * `reactions` plays for PropertyListingCard. Omitted (and treated as 0)
+   * for anything posted through the composer — every other GeneralPost
+   * variant has never needed a visible count, just a toggle. */
+  reactions?: { likes: number; shares: number };
   comments: Comment[];
 }
 
