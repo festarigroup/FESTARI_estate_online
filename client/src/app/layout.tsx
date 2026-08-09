@@ -1,18 +1,33 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
-import DesktopScreenGuard from "@/components/DesktopScreenGuard";
-import AppShell from "@/components/layout/AppShell";
+import { Inter, Hanken_Grotesk, Montserrat, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  display: "swap",
+});
+
+const hankenGrotesk = Hanken_Grotesk({
+  variable: "--font-hanken-grotesk",
+  subsets: ["latin"],
+});
+
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
+  subsets: ["latin"],
+  weight: ["600", "700"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
+  weight: ["500"],
 });
 
 export const metadata: Metadata = {
-  title: "Festari Estate",
-  description: "Festari Estate Online",
+  title: "Festari Estates",
+  description: "Ghana's real estate super-app: buy, rent, stay, and hire trusted professionals.",
 };
 
 export default function RootLayout({
@@ -22,11 +37,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${plusJakartaSans.className} min-h-screen bg-gray-50`}>
+      <body
+        className={`${inter.variable} ${hankenGrotesk.variable} ${montserrat.variable} ${jetbrainsMono.variable} antialiased`}
+      >
+        {children}
         <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
-        <DesktopScreenGuard>
-          <AppShell>{children}</AppShell>
-        </DesktopScreenGuard>
       </body>
     </html>
   );

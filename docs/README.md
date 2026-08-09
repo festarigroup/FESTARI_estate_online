@@ -31,6 +31,16 @@ Complete setup and deployment guide including:
 - Troubleshooting common issues
 - Security checklist
 
+### [home-feed-api-endpoints.md](home-feed-api-endpoints.md)
+Endpoints required to unmock the Home feed screen (`client/`'s `(app)/page.tsx`): stories,
+feed posts, likes/comments/shares/saves, follow suggestions, categories, trending properties,
+top service providers, notifications, and messages.
+
+### [home-feed-db-schema.md](home-feed-db-schema.md)
+Companion Django model schema for the above — new `feed`, `social`, `notifications`, and
+`messaging` apps, plus the fields `properties.Property` and `artisans.ArtisanProfile` are
+missing to support them.
+
 ## Additional Resources
 
 ### Main Project README
