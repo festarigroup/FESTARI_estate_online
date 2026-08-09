@@ -4,7 +4,7 @@ import { Dropdown, DropdownItem } from "@/components/ui/Dropdown";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 
 const PILL_INPUT_CLASS =
-  "flex h-9 items-center gap-2 rounded-full border border-[#e9ecef] bg-white px-4 text-xs font-semibold text-ink placeholder:text-[#44474e] placeholder:font-semibold focus:outline-2 focus:outline-brand-gold";
+  "flex h-9 shrink-0 items-center gap-2 rounded-full border border-[#e9ecef] bg-white px-4 text-xs font-semibold text-ink placeholder:text-[#44474e] placeholder:font-semibold focus:outline-2 focus:outline-brand-gold";
 
 interface FilterPillButtonProps {
   label: string;
@@ -46,7 +46,13 @@ interface StayFilterRowProps {
  * way as PropertiesFilterRow, all four pills sticking together as one row.
  * (An earlier pass tried splitting Price Range out onto its own line so
  * only three of the four pills stuck; that's reverted here in favor of
- * matching Properties' layout exactly — one consolidated sticky bar.) */
+ * matching Properties' layout exactly — one consolidated sticky bar.)
+ *
+ * flex-nowrap + overflow-x-auto, not flex-wrap: at narrower desktop widths
+ * (confirmed via testing around 1024-1200px, where the feed column itself
+ * is only a fraction of that) four pills don't fit on one line, and
+ * flex-wrap was dropping Price Range onto its own row. Scrolling
+ * horizontally keeps all four pills on the one row Figma shows instead. */
 export function StayFilterRow({
   whereTo,
   onWhereToChange,
@@ -60,7 +66,7 @@ export function StayFilterRow({
   onPriceRangeChange,
 }: StayFilterRowProps) {
   return (
-    <div className="flex flex-wrap items-center gap-3 bg-background lg:sticky lg:top-16 lg:z-10 lg:py-1">
+    <div className="flex flex-nowrap items-center gap-3 overflow-x-auto bg-background lg:sticky lg:top-16 lg:z-10 lg:py-1">
       <label className={PILL_INPUT_CLASS}>
         <DynamicIcon name="MapPin" className="size-4 text-[#44474e]" />
         <input
@@ -71,11 +77,13 @@ export function StayFilterRow({
         />
       </label>
 
-      <Dropdown align="left" trigger={(bind) => <FilterPillButton label={guests} bind={bind} />}>
-        {guestOptions.map((option) => (
-          <DropdownItem key={option} label={option} onClick={() => onGuestsChange(option)} />
-        ))}
-      </Dropdown>
+      <div className="shrink-0">
+        <Dropdown align="left" trigger={(bind) => <FilterPillButton label={guests} bind={bind} />}>
+          {guestOptions.map((option) => (
+            <DropdownItem key={option} label={option} onClick={() => onGuestsChange(option)} />
+          ))}
+        </Dropdown>
+      </div>
 
       <label className={PILL_INPUT_CLASS}>
         <DynamicIcon name="Calendar" className="size-4 text-[#44474e]" />
@@ -87,11 +95,13 @@ export function StayFilterRow({
         />
       </label>
 
-      <Dropdown align="left" trigger={(bind) => <FilterPillButton label={priceRange} bind={bind} />}>
-        {priceRangeOptions.map((option) => (
-          <DropdownItem key={option} label={option} onClick={() => onPriceRangeChange(option)} />
-        ))}
-      </Dropdown>
+      <div className="shrink-0">
+        <Dropdown align="left" trigger={(bind) => <FilterPillButton label={priceRange} bind={bind} />}>
+          {priceRangeOptions.map((option) => (
+            <DropdownItem key={option} label={option} onClick={() => onPriceRangeChange(option)} />
+          ))}
+        </Dropdown>
+      </div>
     </div>
   );
 }
