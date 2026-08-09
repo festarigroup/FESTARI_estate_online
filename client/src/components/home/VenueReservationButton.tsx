@@ -4,20 +4,30 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { ReservationModal } from "@/components/home/ReservationModal";
 
-/** The "Make a Reservation" CTA a venue post's engagement bar renders on
- * the right — self-contained so PropertyPostCard/GeneralPostCard just drop
- * it in as PostEngagementBar's `cta` prop without owning any modal state
+interface VenueReservationButtonProps {
+  venueName: string;
+  /** Defaults to the Figma "Book Service" outline-pill style (node
+   * 3340:1102), matching every other post's "primary action" CTA. The
+   * Stay listing page's own card (node 3387:8909) instead uses a filled
+   * gold pill labeled "Reserve" — same modal, different button chrome. */
+  variant?: "outline-gold" | "gold-pill";
+  label?: string;
+}
+
+/** The "Make a Reservation" / "Reserve" CTA a venue post renders — self-
+ * contained so callers just drop it in without owning any modal state
  * themselves. Same shape as PropertyEnquiryButton, just for venues. */
-export function VenueReservationButton({ venueName }: { venueName: string }) {
+export function VenueReservationButton({
+  venueName,
+  variant = "outline-gold",
+  label = "Make a Reservation",
+}: VenueReservationButtonProps) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      {/* outline-gold matches the Figma "Book Service" button (node
-          3340:1102) — every post's "primary action" CTA now shares that
-          same transparent-pill style, not an invented solid navy. */}
-      <Button variant="outline-gold" onClick={() => setOpen(true)}>
-        Make a Reservation
+      <Button variant={variant} onClick={() => setOpen(true)}>
+        {label}
       </Button>
       <ReservationModal open={open} onClose={() => setOpen(false)} venueName={venueName} />
     </>
