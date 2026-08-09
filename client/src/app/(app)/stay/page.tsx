@@ -41,19 +41,21 @@ export default function StayPage() {
   return (
     <div
       className={cn(
-        // No top padding -- the last pass made TopNavBar's clearance flush
-        // for the sticky filters specifically, but the page's own py-6 was
-        // still stacking an extra 24px above the title too, which read as
-        // way more gap than intended. pb-6 keeps the bottom margin.
+        // py-6 top matches Properties' own gap below TopNavBar exactly
+        // (both pages sit under the same 64px <main> clearance, so the
+        // extra 24px here is what actually creates the breathing room
+        // below it -- dropping it entirely, like an earlier pass did,
+        // left Stay's title flush while Properties' stayed at a 24px
+        // gap, which read as inconsistent between the two pages).
         //
-        // No lg:px either, for the same reason on the *horizontal* axis:
+        // No lg:px, for the same reason on the *horizontal* axis:
         // DashboardShell's <main> already clears SideNavBar with its own
         // 24px gap built in (lg:pl-[sidebar-w+48px]) plus a 24px right
         // margin (lg:pr-6) -- adding lg:px-10 on top of that doubled the
         // margin on both sides to ~64px, well past Figma's ~24-36px. Below
         // `lg` there's no floating sidebar to clear, so px-4/sm:px-6 still
         // apply there as this page's only source of side margin.
-        "mx-auto flex max-w-[1400px] flex-col gap-6 px-4 pb-6 sm:px-6 lg:gap-6 lg:px-0",
+        "mx-auto flex max-w-[1400px] flex-col gap-6 px-4 py-6 sm:px-6 lg:gap-6 lg:px-0",
         !mapExpanded && "lg:flex-row lg:items-start",
       )}
     >
@@ -65,20 +67,31 @@ export default function StayPage() {
 
       <aside className={cn("flex w-full flex-col gap-6", mapExpanded ? "pb-12" : "pb-12 lg:w-1/3")}>
         {!mapExpanded && (
-          <button
-            onClick={() => setMapExpanded(true)}
-            className="flex items-center gap-2 self-end rounded-full bg-brand-navy px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-navy-light"
-          >
-            <DynamicIcon name="Layers" className="size-3.5" />
-            Full Map View
-          </button>
+          // Sticky at the same top-16 offset as StayFilterRow's own sticky
+          // trio, so this stays visible ("inline with the filters") while
+          // scrolling instead of scrolling away before the map does. Needs
+          // to be a *direct* flex-col child of <aside> for the sticky
+          // offset to actually clamp -- see StayFilterRow's doc comment
+          // for the Chromium quirk that requires this.
+          <div className="flex justify-end lg:sticky lg:top-16 lg:z-10">
+            <button
+              onClick={() => setMapExpanded(true)}
+              className="flex items-center gap-2 rounded-full bg-brand-navy px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-navy-light"
+            >
+              <DynamicIcon name="Layers" className="size-3.5" />
+              Full Map View
+            </button>
+          </div>
         )}
         <PropertyMapPanel
           listings={MAP_LISTINGS}
           expanded={mapExpanded}
           onExpand={() => setMapExpanded(true)}
           onCollapse={() => setMapExpanded(false)}
-          className="lg:top-16 lg:h-[calc(100vh-88px)]"
+          // Follows right below the sticky button above it: 64 (button's
+          // own stuck top) + 32 (its measured height) + 24 (the aside's
+          // gap-6 between them) = 120, instead of just top-16/64 alone.
+          className="lg:top-[120px] lg:h-[calc(100vh-144px)]"
         />
 
         {!mapExpanded && (

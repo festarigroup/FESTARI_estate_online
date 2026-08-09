@@ -8,7 +8,10 @@ import { TopServiceProviders } from "@/components/home/TopServiceProviders";
 
 export default function HomePage() {
   return (
-    <div className="mx-auto flex max-w-[1400px] flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:items-start lg:gap-6 lg:px-10">
+    // No lg:px -- <main> (DashboardShell) already clears SideNavBar with its
+    // own 24px gap built in and gives a 24px right margin; adding lg:px-10
+    // on top of that doubled the margin on both sides past Figma's ~24px.
+    <div className="mx-auto flex max-w-[1400px] flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:items-start lg:gap-6 lg:px-0">
       <section className="flex w-full flex-col gap-6 lg:w-2/3">
         <StoryBar />
         <Feed />

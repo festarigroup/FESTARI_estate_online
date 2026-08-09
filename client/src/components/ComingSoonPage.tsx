@@ -29,7 +29,9 @@ export function ComingSoonPage({ icon, title, description }: ComingSoonPageProps
   }
 
   return (
-    <div className="mx-auto flex max-w-[900px] flex-col items-center gap-6 px-4 py-20 text-center sm:px-6 lg:px-10">
+    // No lg:px -- <main> already provides the sidebar clearance and right
+    // margin, so this doesn't need to stack another lg:px-10 on top.
+    <div className="mx-auto flex max-w-[900px] flex-col items-center gap-6 px-4 py-20 text-center sm:px-6 lg:px-0">
       <span className="flex size-16 items-center justify-center rounded-full bg-surface-muted">
         <DynamicIcon name={icon} className="size-7 text-brand-navy" />
       </span>

@@ -13,7 +13,10 @@ export default function SavedPage() {
   const { savedPosts } = useSavedPosts();
 
   return (
-    <div className="mx-auto flex max-w-[900px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-10">
+    // No lg:px -- same reasoning as Home/Properties/Stay: <main> already
+    // provides the sidebar clearance and right margin, so this doesn't
+    // need to stack another lg:px-10 on top.
+    <div className="mx-auto flex max-w-[900px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-0">
       <h1 className="font-heading text-xl text-ink">Saved</h1>
 
       {savedPosts.length === 0 ? (
