@@ -73,7 +73,7 @@ export function PropertiesFilterRow({
   onToggleMapView,
 }: PropertiesFilterRowProps) {
   return (
-    <div className="sticky top-[73px] z-10 flex flex-wrap items-center justify-between gap-3 bg-background py-3">
+    <div className="sticky top-[73px] z-10 flex flex-wrap items-center justify-between gap-3 bg-background py-3 lg:top-16">
       <div className="flex flex-wrap items-center gap-3">
         <Dropdown
           align="left"

@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { PostComposer } from "@/components/home/PostComposer";
 import { FeedPostCard } from "@/components/home/FeedPostCard";
 import { useReposts } from "@/hooks/useReposts";
 import { useHiddenPosts } from "@/hooks/useHiddenPosts";
 import { useAuth } from "@/context/AuthContext";
+import { useRegisterPostComposerHandler } from "@/context/PostComposerContext";
 import * as feedApi from "@/lib/api/feed";
 import { mapPost } from "@/lib/adapters";
 import type { ContentPost, FeedPost, RepostedPost } from "@/types/home";
@@ -28,9 +29,13 @@ export function Feed() {
       .finally(() => setLoading(false));
   }, []);
 
-  function addPost(post: ContentPost) {
+  const addPost = useCallback((post: ContentPost) => {
     setPosts((prev) => [post, ...prev]);
-  }
+  }, []);
+
+  // Lets TopNavBar's global "+ Create Post" button (Figma node 3393:18030)
+  // land its posts here whenever the Home feed is the mounted page.
+  useRegisterPostComposerHandler(addPost);
 
   const CURRENT_USER = {
     name: [user?.firstname, user?.lastname].filter(Boolean).join(" ") || "You",

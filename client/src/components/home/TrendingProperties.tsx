@@ -8,6 +8,7 @@ import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { SidebarWidgetHeader } from "@/components/home/SidebarWidgetHeader";
 import { getTrending } from "@/lib/api/properties";
 import { mapTrendingProperty } from "@/lib/adapters";
+import { TRENDING_PROPERTIES } from "@/lib/mock-data";
 import type { TrendingProperty } from "@/types/home";
 
 /** "Trending Properties" widget — thumbnail + price + stats for each listing. */
@@ -15,9 +16,12 @@ export function TrendingProperties() {
   const [properties, setProperties] = useState<TrendingProperty[]>([]);
 
   useEffect(() => {
+    // Falls back to mock listings when the API is unreachable or empty
+    // (e.g. no backend hosted yet) so this widget isn't the only one that
+    // silently disappears from the sidebar rail.
     getTrending()
-      .then((items) => setProperties(items.map(mapTrendingProperty)))
-      .catch(() => {});
+      .then((items) => setProperties(items.length > 0 ? items.map(mapTrendingProperty) : TRENDING_PROPERTIES))
+      .catch(() => setProperties(TRENDING_PROPERTIES));
   }, []);
 
   if (properties.length === 0) return null;

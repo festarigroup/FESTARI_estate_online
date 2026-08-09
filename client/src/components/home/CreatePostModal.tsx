@@ -11,8 +11,9 @@ import * as feedApi from "@/lib/api/feed";
 import * as propertiesApi from "@/lib/api/properties";
 import { mapPost } from "@/lib/adapters";
 import { ApiError } from "@/lib/api/client";
+import { AMENITIES, STAY_CATEGORIES } from "@/lib/mock-data";
 import { cn } from "@/lib/cn";
-import type { ContentPost } from "@/types/home";
+import type { Amenity, ContentPost, StayCategory } from "@/types/home";
 
 export type AttachmentType = "photo" | "property" | "service" | "venue" | "poll";
 
@@ -86,6 +87,12 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   const [venueLocation, setVenueLocation] = useState("");
   const [venuePricePerNight, setVenuePricePerNight] = useState("");
   const [venueBedrooms, setVenueBedrooms] = useState("");
+  // Which Stay page tab (Figma node 3387:8856) this venue lands under, plus
+  // its optional amenity chips (node 3387:8880) -- category is required so
+  // every venue can actually be filtered into one of those tabs; amenities
+  // stay optional, same as a fresh listing having none yet.
+  const [venueCategory, setVenueCategory] = useState<StayCategory | "">("");
+  const [venueAmenities, setVenueAmenities] = useState<Amenity[]>([]);
   // Only read/required when tag === "property" — the same facts the
   // Properties page's metadata strip shows for every listing there (see
   // PropertyPost/PropertyListingCard), so a property posted from here
@@ -111,6 +118,8 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
     setVenueLocation("");
     setVenuePricePerNight("");
     setVenueBedrooms("");
+    setVenueCategory("");
+    setVenueAmenities([]);
     setPropertyListingType("For Sale");
     setPropertyPrice("");
     setPropertyType("");
@@ -193,6 +202,12 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
     setPollOptions((prev) => prev.map((o, i) => (i === index ? value : o)));
   }
 
+  function toggleVenueAmenity(amenity: Amenity) {
+    setVenueAmenities((prev) =>
+      prev.includes(amenity) ? prev.filter((a) => a !== amenity) : [...prev, amenity],
+    );
+  }
+
   const trimmedOptions = pollOptions.map((o) => o.trim()).filter(Boolean);
   // A venue listing's required facts (name/location/price/bedrooms) stand in
   // for the usual "you need a caption, photo, or poll" gate — a guest can't
@@ -202,7 +217,8 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
     venueName.trim().length > 0 &&
     venueLocation.trim().length > 0 &&
     Number(venuePricePerNight) > 0 &&
-    Number(venueBedrooms) > 0;
+    Number(venueBedrooms) > 0 &&
+    venueCategory !== "";
   // Same reasoning as venueFieldsValid: a buyer/renter can't act on a bare
   // caption, so these are what's actually required to post a property.
   const propertyFieldsValid =
@@ -260,12 +276,14 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
             }
           : undefined,
       venueDetails:
-        tag === "venue"
+        tag === "venue" && venueCategory !== ""
           ? {
               name: venueName.trim(),
               location: venueLocation.trim(),
               pricePerNight: Number(venuePricePerNight),
               bedrooms: Number(venueBedrooms),
+              category: venueCategory,
+              amenities: venueAmenities.length > 0 ? venueAmenities : undefined,
             }
           : undefined,
       comments: [],
@@ -511,6 +529,23 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
                 className={FIELD_CLASS}
               />
             </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-ink">Category</span>
+              <select
+                value={venueCategory}
+                onChange={(e) => setVenueCategory(e.target.value as StayCategory)}
+                className={FIELD_CLASS}
+              >
+                <option value="" disabled>
+                  Select a category
+                </option>
+                {STAY_CATEGORIES.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.label}
+                  </option>
+                ))}
+              </select>
+            </label>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-1.5">
                 <span className="text-xs font-semibold text-ink">Price per night (GHS)</span>
@@ -534,6 +569,30 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
                   className={FIELD_CLASS}
                 />
               </label>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-ink">Amenities (optional)</span>
+              <div className="flex flex-wrap gap-2">
+                {AMENITIES.map((amenity) => {
+                  const active = venueAmenities.includes(amenity.id);
+                  return (
+                    <button
+                      key={amenity.id}
+                      type="button"
+                      onClick={() => toggleVenueAmenity(amenity.id)}
+                      className={cn(
+                        "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold",
+                        active
+                          ? "border-brand-gold-dark bg-brand-gold-dark/10 text-brand-gold-dark"
+                          : "border-border-subtle text-muted hover:bg-surface-muted",
+                      )}
+                    >
+                      <DynamicIcon name={amenity.icon} className="size-3.5" />
+                      {amenity.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}

@@ -24,7 +24,10 @@ export default function PropertiesPage() {
   }, []);
 
   return (
-    <div className="mx-auto flex max-w-[1400px] flex-col gap-4 px-4 py-6 sm:px-6 lg:px-10">
+    // No lg:px -- <main> already clears SideNavBar with its own 24px gap
+    // and gives a 24px right margin; stacking lg:px-10 on top doubled the
+    // margin past Figma's ~24px on both sides.
+    <div className="mx-auto flex max-w-[1400px] flex-col gap-4 px-4 py-6 sm:px-6 lg:px-0">
       <div className="flex flex-col gap-1">
         <h1 className="font-heading text-[28px] font-semibold text-ink">Properties</h1>
         <p className="text-sm text-muted">Discover properties shared by owners, agents and developers.</p>
