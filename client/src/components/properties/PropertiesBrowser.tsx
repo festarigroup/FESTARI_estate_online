@@ -88,7 +88,12 @@ export function PropertiesBrowser({ listings }: { listings: PropertyPost[] }) {
 
       {mapExpanded ? (
         <div className="pt-2 pb-12">
-          <PropertyMapPanel listings={filtered} expanded onCollapse={() => setMapExpanded(false)} />
+          <PropertyMapPanel
+            listings={filtered}
+            expanded
+            onCollapse={() => setMapExpanded(false)}
+            detailHref={(id) => `/properties/${id}`}
+          />
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 pt-2 lg:grid-cols-12">
@@ -108,7 +113,11 @@ export function PropertiesBrowser({ listings }: { listings: PropertyPost[] }) {
             )}
           </div>
           <div className="lg:col-span-5">
-            <PropertyMapPanel listings={filtered} onExpand={() => setMapExpanded(true)} />
+            <PropertyMapPanel
+              listings={filtered}
+              onExpand={() => setMapExpanded(true)}
+              detailHref={(id) => `/properties/${id}`}
+            />
           </div>
         </div>
       )}
