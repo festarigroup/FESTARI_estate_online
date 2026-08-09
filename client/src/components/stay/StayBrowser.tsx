@@ -2,9 +2,8 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { StayCategoryNav } from "@/components/stay/StayCategoryNav";
-import { FilterPillButton, StayFilterRow } from "@/components/stay/StayFilterRow";
+import { StayFilterRow } from "@/components/stay/StayFilterRow";
 import { StayListingCard } from "@/components/stay/StayListingCard";
-import { Dropdown, DropdownItem } from "@/components/ui/Dropdown";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { useRegisterPostComposerHandler } from "@/context/PostComposerContext";
 import { STAY_CATEGORIES } from "@/lib/mock-data";
@@ -28,19 +27,15 @@ const PRICE_RANGES: { label: string; test: (n: number) => boolean }[] = [
 ];
 
 /** Owns the Stay page's title, category tabs, filter row, and venue feed —
- * Figma node 3393:16310's "Feed Column". Figma wraps the title/tabs/filters
- * in one card and makes all of it sticky together, but per explicit
- * request only Where to?/Guests/Add dates stick here — the title, category
- * tabs, and Price Range all scroll away normally along with the feed.
- * Price Range renders as its own top-level element right after
- * StayFilterRow rather than inside it, on its own line rather than sharing
- * that exact row — see StayFilterRow's doc comment for the Chromium sticky
- * quirk that forces this split. There's also no separate composer bar
- * rendered on this screen anymore: posting now goes through TopNavBar's
- * global "+ Create Post" button instead, see PostComposerContext. Venue
- * posts have no backend counterpart yet (see CreatePostModal), so
- * `listings` starts from the seeded STAY_LISTINGS mock and only grows
- * locally as that global composer creates new venue posts this session. */
+ * Figma node 3393:16310's "Feed Column". The title and category tabs
+ * scroll away normally with the feed; StayFilterRow's own root is the
+ * sticky element, positioned the same way as PropertiesFilterRow (see its
+ * doc comment). There's also no separate composer bar rendered on this
+ * screen anymore: posting now goes through TopNavBar's global
+ * "+ Create Post" button instead, see PostComposerContext. Venue posts
+ * have no backend counterpart yet (see CreatePostModal), so `listings`
+ * starts from the seeded STAY_LISTINGS mock and only grows locally as that
+ * global composer creates new venue posts this session. */
 export function StayBrowser({ initialListings }: { initialListings: GeneralPost[] }) {
   const [listings, setListings] = useState(initialListings);
   const [category, setCategory] = useState<StayCategory>(STAY_CATEGORIES[0].id);
@@ -92,8 +87,6 @@ export function StayBrowser({ initialListings }: { initialListings: GeneralPost[
 
       <StayCategoryNav active={category} onSelect={setCategory} />
 
-      {/* Sticky (lg:) -- see StayFilterRow's own doc comment for why Price
-          Range isn't passed in here too. */}
       <StayFilterRow
         whereTo={whereTo}
         onWhereToChange={setWhereTo}
@@ -102,15 +95,10 @@ export function StayBrowser({ initialListings }: { initialListings: GeneralPost[
         guests={guests}
         guestOptions={GUEST_OPTIONS}
         onGuestsChange={setGuests}
+        priceRange={priceRange}
+        priceRangeOptions={PRICE_RANGES.map((r) => r.label)}
+        onPriceRangeChange={setPriceRange}
       />
-
-      <div>
-        <Dropdown align="left" trigger={(bind) => <FilterPillButton label={priceRange} bind={bind} />}>
-          {PRICE_RANGES.map((r) => (
-            <DropdownItem key={r.label} label={r.label} onClick={() => setPriceRange(r.label)} />
-          ))}
-        </Dropdown>
-      </div>
 
       <div className="flex w-full flex-col gap-6">
         {filtered.length > 0 ? (
