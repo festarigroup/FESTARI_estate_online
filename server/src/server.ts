@@ -2,8 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import app from "#app/app";
 import { createServer } from "http";
-import "#app/jobs/scheduleProcessor.js";
-import "#app/jobs/binFullProcessor.js";
+import "#app/jobs/expireSubscriptions.js";
 
 const PORT = Number(process.env.PORT ?? 1234);
 
