@@ -8,6 +8,11 @@ import subscriptionsRouter from "./subscriptionsRoute.js";
 import propertiesRouter from "./propertiesRoute.js";
 import hotelsRouter from "./hotelsRoute.js";
 import artisansRouter from "./artisansRoute.js";
+import inquiriesRouter from "./inquiriesRoute.js";
+import feedRouter from "./feedRoute.js";
+import socialRouter from "./socialRoute.js";
+import messagingRouter from "./messagingRoute.js";
+import dashboardRouter from "./dashboardRoute.js";
 
 const router = Router();
 
@@ -20,5 +25,10 @@ router.use("/subscriptions", subscriptionsRouter);
 router.use("/properties", propertiesRouter);
 router.use("/hotels", hotelsRouter);
 router.use("/artisans", artisansRouter);
+router.use("/common", inquiriesRouter);
+router.use("/feed", feedRouter);
+router.use("/social", socialRouter);
+router.use("/messages", messagingRouter);
+router.use("/dashboard", dashboardRouter);
 
 export default router;
