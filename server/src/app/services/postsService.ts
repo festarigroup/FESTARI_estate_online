@@ -1,15 +1,17 @@
 import { db } from "#app/db/db.js";
 import {
+  artisanProfiles,
   postComments,
   postImages,
   postLikes,
-  postShares,
   posts,
+  postShares,
+  properties,
   savedPosts,
   users,
 } from "#app/db/schema/index.js";
 import { PostImageInsert, PostInsert } from "#app/types/FeedTypes.js";
-import { and, desc, eq, getTableColumns, sql } from "drizzle-orm";
+import { desc, eq, getTableColumns, inArray, sql } from "drizzle-orm";
 
 function withCounts(currentUserId?: string) {
   return {
@@ -25,24 +27,56 @@ function withCounts(currentUserId?: string) {
   };
 }
 
+function baseSelection(currentUserId?: string) {
+  return {
+    ...getTableColumns(posts),
+    author: {
+      id: users.id,
+      firstname: users.firstname,
+      lastname: users.lastname,
+      profile_picture: users.profile_picture,
+    },
+    linked_property: {
+      id: properties.id,
+      title: properties.title,
+      price: properties.price,
+      location: properties.location,
+      listing_type: properties.listing_type,
+      property_type: properties.property_type,
+      bedrooms: properties.bedrooms,
+      bathrooms: properties.bathrooms,
+      area_sqm: properties.area_sqm,
+    },
+    linked_artisan: {
+      id: artisanProfiles.id,
+      service_type: artisanProfiles.service_type,
+    },
+    ...withCounts(currentUserId),
+  };
+}
+
+function withJoins<T extends ReturnType<typeof db.select>>(query: T) {
+  return (query as any)
+    .from(posts)
+    .innerJoin(users, eq(users.id, posts.author_id))
+    .leftJoin(properties, eq(properties.id, posts.linked_property_id))
+    .leftJoin(artisanProfiles, eq(artisanProfiles.id, posts.linked_artisan_id));
+}
+
+function normalizeLinkedRows(rows: any[]) {
+  return rows.map((row) => ({
+    ...row,
+    linked_property: row.linked_property?.id ? row.linked_property : null,
+    linked_artisan: row.linked_artisan?.id ? row.linked_artisan : null,
+  }));
+}
+
 class PostsService {
   async list(kind: string | undefined, limit: number, offset: number, currentUserId?: string) {
     const where = kind ? eq(posts.kind, kind as any) : undefined;
 
     const [items, countRows] = await Promise.all([
-      db
-        .select({
-          ...getTableColumns(posts),
-          author: {
-            id: users.id,
-            firstname: users.firstname,
-            lastname: users.lastname,
-            profile_picture: users.profile_picture,
-          },
-          ...withCounts(currentUserId),
-        })
-        .from(posts)
-        .innerJoin(users, eq(users.id, posts.author_id))
+      withJoins(db.select(baseSelection(currentUserId)))
         .where(where)
         .orderBy(desc(posts.created_at))
         .limit(limit)
@@ -50,24 +84,12 @@ class PostsService {
       db.select({ count: sql<number>`count(*)::int` }).from(posts).where(where),
     ]);
 
-    return { items, total: countRows[0]?.count ?? 0 };
+    return { items: normalizeLinkedRows(items), total: countRows[0]?.count ?? 0 };
   }
 
   async getById(id: string, currentUserId?: string) {
-    const [post] = await db
-      .select({
-        ...getTableColumns(posts),
-        author: {
-          id: users.id,
-          firstname: users.firstname,
-          lastname: users.lastname,
-          profile_picture: users.profile_picture,
-        },
-        ...withCounts(currentUserId),
-      })
-      .from(posts)
-      .innerJoin(users, eq(users.id, posts.author_id))
-      .where(eq(posts.id, id));
+    const rows = await withJoins(db.select(baseSelection(currentUserId))).where(eq(posts.id, id));
+    const [post] = normalizeLinkedRows(rows);
     return post ?? null;
   }
 
@@ -101,6 +123,24 @@ class PostsService {
 
   async getImages(postId: string) {
     return db.select().from(postImages).where(eq(postImages.post_id, postId)).orderBy(postImages.position);
+  }
+
+  async getImagesForPosts(postIds: string[]) {
+    if (postIds.length === 0) return new Map<string, typeof postImages.$inferSelect[]>();
+
+    const rows = await db
+      .select()
+      .from(postImages)
+      .where(inArray(postImages.post_id, postIds))
+      .orderBy(postImages.position);
+
+    const map = new Map<string, typeof postImages.$inferSelect[]>();
+    for (const row of rows) {
+      const existing = map.get(row.post_id);
+      if (existing) existing.push(row);
+      else map.set(row.post_id, [row]);
+    }
+    return map;
   }
 }
 

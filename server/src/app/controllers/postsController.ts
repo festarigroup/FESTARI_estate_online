@@ -13,9 +13,12 @@ export const listPosts = asyncErrorHandler(async (req: Request, res: Response) =
   const { items, total } = await postsService.list(req.query.kind as string, limit, offset, req.user?.id);
   const { current_page: validatedPage } = validatePaginationParams(current_page, limit, total);
 
+  const imagesByPost = await postsService.getImagesForPosts(items.map((item) => item.id));
+  const itemsWithImages = items.map((item) => ({ ...item, images: imagesByPost.get(item.id) ?? [] }));
+
   return res.status(200).json({
     success: true,
-    data: { items, metadata: { total, pages: Math.ceil(total / limit), current_page: validatedPage, limit } },
+    data: { items: itemsWithImages, metadata: { total, pages: Math.ceil(total / limit), current_page: validatedPage, limit } },
   });
 });
 
