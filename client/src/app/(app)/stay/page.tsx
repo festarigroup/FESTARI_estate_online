@@ -41,7 +41,11 @@ export default function StayPage() {
   return (
     <div
       className={cn(
-        "mx-auto flex max-w-[1400px] flex-col gap-6 px-4 py-6 sm:px-6 lg:gap-6 lg:px-10",
+        // No top padding -- the last pass made TopNavBar's clearance flush
+        // for the sticky category tabs specifically, but the page's own
+        // py-6 was still stacking an extra 24px above the title too, which
+        // read as way more gap than intended. pb-6 keeps the bottom margin.
+        "mx-auto flex max-w-[1400px] flex-col gap-6 px-4 pb-6 sm:px-6 lg:gap-6 lg:px-10",
         !mapExpanded && "lg:flex-row lg:items-start",
       )}
     >

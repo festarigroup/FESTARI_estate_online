@@ -27,15 +27,16 @@ const PRICE_RANGES: { label: string; test: (n: number) => boolean }[] = [
 ];
 
 /** Owns the Stay page's title, category tabs, filter row, and venue feed —
- * Figma node 3393:16310's "Feed Column". Figma itself wraps the title/tabs/
- * filters in a card (node 3405:18724), but that treatment was explicitly
- * dropped here at request — this renders as a plain sticky block instead.
- * There's also no separate composer bar rendered on this screen anymore:
- * posting now goes through TopNavBar's global "+ Create Post" button
- * instead, see PostComposerContext. Venue posts have no backend
- * counterpart yet (see CreatePostModal), so `listings` starts from the
- * seeded STAY_LISTINGS mock and only grows locally as that global composer
- * creates new venue posts this session. */
+ * Figma node 3393:16310's "Feed Column". Figma wraps the title/tabs/filters
+ * in one card and makes all of it sticky together, but per explicit
+ * request only the category tabs stick here — the title and filter row
+ * scroll away normally along with the feed. There's also no separate
+ * composer bar rendered on this screen anymore: posting now goes through
+ * TopNavBar's global "+ Create Post" button instead, see
+ * PostComposerContext. Venue posts have no backend counterpart yet (see
+ * CreatePostModal), so `listings` starts from the seeded STAY_LISTINGS mock
+ * and only grows locally as that global composer creates new venue posts
+ * this session. */
 export function StayBrowser({ initialListings }: { initialListings: GeneralPost[] }) {
   const [listings, setListings] = useState(initialListings);
   const [category, setCategory] = useState<StayCategory>(STAY_CATEGORIES[0].id);
@@ -80,31 +81,32 @@ export function StayBrowser({ initialListings }: { initialListings: GeneralPost[
 
   return (
     <>
-      {/* Sticky only at `lg:`, flush against TopNavBar's own height (no
-          extra gap, same as PropertiesFilterRow) — below that it just
-          scrolls normally rather than permanently pinning this much taller
-          block (title included) over a small viewport. bg-background keeps
-          feed cards scrolling behind it from showing through while it's
-          pinned. */}
-      <div className="flex flex-col gap-6 bg-background pt-2 pb-3 lg:sticky lg:top-16 lg:z-10">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-[30px] font-bold tracking-[-0.9px] text-[#334154]">Stay (Hotels)</h1>
-          <p className="text-sm text-[#475568]">Discover hotels, resorts, and unique stays shared by the community.</p>
-        </div>
-        <StayCategoryNav active={category} onSelect={setCategory} />
-        <StayFilterRow
-          whereTo={whereTo}
-          onWhereToChange={setWhereTo}
-          dates={dates}
-          onDatesChange={setDates}
-          guests={guests}
-          guestOptions={GUEST_OPTIONS}
-          onGuestsChange={setGuests}
-          priceRange={priceRange}
-          priceRangeOptions={PRICE_RANGES.map((r) => r.label)}
-          onPriceRangeChange={setPriceRange}
-        />
+      <div className="flex flex-col gap-1">
+        <h1 className="text-[30px] font-bold tracking-[-0.9px] text-[#334154]">Stay (Hotels)</h1>
+        <p className="text-sm text-[#475568]">Discover hotels, resorts, and unique stays shared by the community.</p>
       </div>
+
+      {/* Only the category tabs stick (lg:), flush against TopNavBar's own
+          height (no extra gap, same as PropertiesFilterRow) — the title
+          above and the filter row below both scroll away normally.
+          bg-background keeps feed cards scrolling behind this from showing
+          through while it's pinned. */}
+      <div className="bg-background pt-2 pb-3 lg:sticky lg:top-16 lg:z-10">
+        <StayCategoryNav active={category} onSelect={setCategory} />
+      </div>
+
+      <StayFilterRow
+        whereTo={whereTo}
+        onWhereToChange={setWhereTo}
+        dates={dates}
+        onDatesChange={setDates}
+        guests={guests}
+        guestOptions={GUEST_OPTIONS}
+        onGuestsChange={setGuests}
+        priceRange={priceRange}
+        priceRangeOptions={PRICE_RANGES.map((r) => r.label)}
+        onPriceRangeChange={setPriceRange}
+      />
 
       <div className="flex w-full flex-col gap-6">
         {filtered.length > 0 ? (
