@@ -13,21 +13,13 @@ const FEATURES = [
 ];
 
 /** "Concierge Card" — the agency management pitch with a faded portrait
- * backdrop. Sticky on desktop (below the fixed TopNavBar, same top-[89px]
- * offset PropertyMapPanel uses): it stays pinned in place while the rest
- * of the sidebar rail scrolls up and out of view behind it — confirmed as
- * the intended behavior, not a bug to fix. Not a Figma spec, just this
- * app's own call.
- *
- * `z-10` matters once it's stuck: TrendingProperties/WhoToFollow further
- * down the rail wrap their own thumbnails in `position: relative` (for
- * next/image `fill`), which makes them positioned elements too — without
- * an explicit z-index, positioned siblings with `z-index: auto` stack in
- * DOM order, so those later widgets would otherwise paint over this
- * sticky card as they scroll past underneath it. */
+ * backdrop. Scrolls with the rest of the sidebar rail like every other
+ * widget — no longer sticky (was previously pinned in place on desktop
+ * while the rest of the rail scrolled up behind it; reverted at explicit
+ * request). Not a Figma spec either way, just this app's own call. */
 export function ConciergeCard() {
   return (
-    <div className="relative z-10 w-full shrink-0 overflow-hidden rounded-[39px] bg-brand-navy p-8 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)] lg:sticky lg:top-[89px]">
+    <div className="relative w-full shrink-0 overflow-hidden rounded-[39px] bg-brand-navy p-8 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
       <Image
         src="/images/concierge-portrait.png"
         alt=""
