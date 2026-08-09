@@ -1,0 +1,7 @@
+@host = http://localhost:3030
+@baseUrl = {{host}}/api/v1/example
+
+### Simple example endpoint
+GET {{baseUrl}}/
+
+Description: Public endpoint returning a basic example payload.

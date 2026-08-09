@@ -1,0 +1,1 @@
+ALTER TABLE "subscription_plans" ADD COLUMN "plan_code" uuid NOT NULL;

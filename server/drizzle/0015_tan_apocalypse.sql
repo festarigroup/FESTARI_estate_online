@@ -1,0 +1,1 @@
+ALTER TABLE "requests" ADD COLUMN "collection_code" integer DEFAULT 1234 NOT NULL;

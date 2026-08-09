@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "payment_provider_customer_id" text;

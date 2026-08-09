@@ -1,0 +1,1 @@
+ALTER TABLE "subscription_plans" ALTER COLUMN "plan_code" SET DATA TYPE text;
