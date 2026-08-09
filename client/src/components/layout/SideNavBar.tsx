@@ -63,13 +63,13 @@ export function SideNavBar({ open, onClose }: SideNavBarProps) {
           </button>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto pt-6" aria-label="Primary">
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-2 pt-6" aria-label="Primary">
           {NAV_ITEMS.map((item) => (
             <NavLink key={item.id} item={item} active={pathname === item.href} />
           ))}
         </nav>
 
-        <div className="flex flex-col gap-1 border-t border-brand-navy-light pt-2 pb-2">
+        <div className="flex flex-col gap-1 border-t border-brand-navy-light px-2 pt-2 pb-2">
           {NAV_SECONDARY_ITEMS.map((item) => (
             <NavLink key={item.id} item={item} active={pathname === item.href} />
           ))}
