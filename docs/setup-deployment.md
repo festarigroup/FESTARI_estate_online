@@ -65,17 +65,12 @@ cd client
 npm install
 ```
 
-Create `.env.local`:
-```env
-NEXT_PUBLIC_API_URL=http://localhost:3030/api/v1
-```
-
 ```bash
+cp .env.local.example .env.local
 npm run dev   # http://localhost:3000
 ```
 
-There's no `.env.local.example` file yet — the one variable above is currently everything the
-frontend reads from the environment.
+`NEXT_PUBLIC_API_URL` is currently the only variable the frontend reads from the environment.
 
 ## 4. Access the Application
 - **Frontend**: http://localhost:3000
