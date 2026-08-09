@@ -24,12 +24,12 @@ const MAP_LISTINGS = STAY_LISTINGS.filter((listing) => listing.venueDetails).map
   images: listing.images ?? [],
 }));
 
-/** "Stay" page — Figma node 3384:8225. Header, then a 2/3-1/3 split
- * matching the Home feed's own column proportions (Main Content Area's
- * 648/336 column widths resolve to that same ratio): StayBrowser owns the
- * category tabs, filter row, composer, and venue feed on the left; the
- * right sidebar carries a preview map plus the same WhoToFollow/
- * TrendingProperties/TopServiceProviders widgets Home uses.
+/** "Stay" page — Figma node 3393:16310. A 2/3-1/3 split matching the Home
+ * feed's own column proportions: StayBrowser owns the page title, category
+ * tabs, filter row (all now grouped in one card — see its own doc comment)
+ * and the venue feed on the left; the right sidebar carries a preview map
+ * plus the same WhoToFollow/TrendingProperties/TopServiceProviders widgets
+ * Home uses.
  *
  * The map's expand/collapse mechanic mirrors PropertiesBrowser's exactly
  * (same PropertyMapPanel, same `expanded` full-width takeover) — the
@@ -46,11 +46,6 @@ export default function StayPage() {
       )}
     >
       <section className={cn("flex w-full flex-col gap-6", mapExpanded ? "hidden" : "lg:w-2/3")}>
-        <div className="flex flex-col gap-1">
-          <h1 className="font-heading text-[28px] font-semibold text-ink">Stay</h1>
-          <p className="text-sm text-muted">Discover hotels, resorts, and unique stays shared by the community.</p>
-        </div>
-
         <StayBrowser initialListings={STAY_LISTINGS} />
 
         <StayCommunityBanner />
@@ -71,7 +66,7 @@ export default function StayPage() {
           expanded={mapExpanded}
           onExpand={() => setMapExpanded(true)}
           onCollapse={() => setMapExpanded(false)}
-          className="lg:top-[112px] lg:h-[calc(100vh-136px)]"
+          className="lg:top-[88px] lg:h-[calc(100vh-112px)]"
         />
 
         {!mapExpanded && (
