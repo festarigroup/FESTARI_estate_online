@@ -5,6 +5,9 @@ import exampleRouter from "./exampleRoute.js";
 import paymentRouter from "./paymentRoute.js";
 import notificationsRouter from "./notificationsRoute.js";
 import subscriptionsRouter from "./subscriptionsRoute.js";
+import propertiesRouter from "./propertiesRoute.js";
+import hotelsRouter from "./hotelsRoute.js";
+import artisansRouter from "./artisansRoute.js";
 
 const router = Router();
 
@@ -14,5 +17,8 @@ router.use("/users", usersRouter);
 router.use("/payments", paymentRouter);
 router.use("/notifications", notificationsRouter);
 router.use("/subscriptions", subscriptionsRouter);
+router.use("/properties", propertiesRouter);
+router.use("/hotels", hotelsRouter);
+router.use("/artisans", artisansRouter);
 
 export default router;
