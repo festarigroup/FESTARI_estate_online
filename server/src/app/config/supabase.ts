@@ -7,6 +7,9 @@ const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 export const supabaseAvatarBucket =
   process.env.SUPABASE_AVATAR_BUCKET ?? "avatars";
 
+export const supabaseMediaBucket =
+  process.env.SUPABASE_MEDIA_BUCKET ?? "media";
+
 export const supabaseAdmin =
   supabaseUrl && supabaseServiceRoleKey
     ? createClient(supabaseUrl, supabaseServiceRoleKey, {

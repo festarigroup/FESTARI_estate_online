@@ -1,17 +1,25 @@
 import { Router } from "express";
-import { protect } from "#app/middlewares/auth.js";
+import { protect, restrictTo } from "#app/middlewares/auth.js";
+import { validateSchema } from "#app/middlewares/validate.js";
+import { createPlanSchema, subscribeSchema } from "#app/validators/paymentValidators.js";
 import {
-  verifyGoogleSubscription,
+  createPlan,
+  getPlans,
+  subscribeToPlan,
   getMySubscription,
-  handleGoogleWebhook,
+  cancelSubscription,
+  getSubscriptionHistory,
 } from "#app/controllers/subscriptionsController.js";
 
 const router = Router();
 
-router.post("/google/webhook", handleGoogleWebhook);
+router.get("/plans", getPlans);
+router.post("/plans", protect, restrictTo("admin"), validateSchema(createPlanSchema), createPlan);
 
 router.use(protect);
-router.post("/google/verify", verifyGoogleSubscription);
-router.get("/me", getMySubscription);
+router.post("/subscribe", validateSchema(subscribeSchema), subscribeToPlan);
+router.get("/my-subscription", getMySubscription);
+router.put("/cancel", cancelSubscription);
+router.get("/history", getSubscriptionHistory);
 
 export default router;

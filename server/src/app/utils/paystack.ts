@@ -1,4 +1,3 @@
-import { PaymentRow } from "#app/types/PaymentTypes.js";
 import axios from "axios";
 import { randomUUID } from "crypto";
 import CustomError from "./CustomError";
@@ -22,7 +21,7 @@ export const paystack = axios.create({
   },
 });
 
-export const createPaystackPlan = async (row: PaymentRow) => {
+export const createPaystackPlan = async (row: { name: string; amount: string | number; interval: string }) => {
   try {
     const response = await paystack.post("/plan", {
       name: row.name,

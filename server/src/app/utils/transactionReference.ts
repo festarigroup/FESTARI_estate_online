@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import { db } from "#app/db/db.js";
-import { paymentTransactions } from "#app/db/schema.js";
+import { payments } from "#app/db/schema/index.js";
 import { eq } from "drizzle-orm";
 
 const REF_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -22,9 +22,9 @@ export async function generateUniqueTransactionReference(
   for (let attempt = 0; attempt < 8; attempt += 1) {
     const reference = generateTransactionReference(length);
     const existing = await db
-      .select({ id: paymentTransactions.id })
-      .from(paymentTransactions)
-      .where(eq(paymentTransactions.reference, reference))
+      .select({ id: payments.id })
+      .from(payments)
+      .where(eq(payments.reference, reference))
       .limit(1);
 
     if (existing.length === 0) {
