@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { PostComposer } from "@/components/home/PostComposer";
 import { StayCategoryNav } from "@/components/stay/StayCategoryNav";
 import { StayFilterRow } from "@/components/stay/StayFilterRow";
 import { StayListingCard } from "@/components/stay/StayListingCard";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { useRegisterPostComposerHandler } from "@/context/PostComposerContext";
 import { STAY_CATEGORIES } from "@/lib/mock-data";
 import type { ContentPost, GeneralPost, StayCategory } from "@/types/home";
 
@@ -39,7 +40,7 @@ export function StayBrowser({ initialListings }: { initialListings: GeneralPost[
   const [guests, setGuests] = useState(ANY_GUESTS);
   const [priceRange, setPriceRange] = useState(ANY_PRICE);
 
-  function addPost(post: ContentPost) {
+  const addPost = useCallback((post: ContentPost) => {
     // Every other page's composer only shows its own post kind (Properties
     // never renders a service post it can't fetch) -- a property/service/
     // poll post created from here still posts (CreatePostModal's own toast
@@ -47,7 +48,11 @@ export function StayBrowser({ initialListings }: { initialListings: GeneralPost[
     if (post.kind === "general" && post.tag === "venue") {
       setListings((prev) => [post, ...prev]);
     }
-  }
+  }, []);
+
+  // Lets TopNavBar's global "+ Create Post" button (Figma node 3393:18030)
+  // land venue posts here whenever the Stay page is the mounted page.
+  useRegisterPostComposerHandler(addPost);
 
   function handleClearFilters() {
     setWhereTo("");
