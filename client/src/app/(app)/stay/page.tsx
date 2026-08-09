@@ -1,11 +1,62 @@
-import { ComingSoonPage } from "@/components/ComingSoonPage";
+"use client";
 
+import toast from "react-hot-toast";
+import { StayBrowser } from "@/components/stay/StayBrowser";
+import { StayCommunityBanner } from "@/components/stay/StayCommunityBanner";
+import { PropertyMapPanel } from "@/components/properties/PropertyMapPanel";
+import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { WhoToFollow } from "@/components/home/WhoToFollow";
+import { TrendingProperties } from "@/components/home/TrendingProperties";
+import { TopServiceProviders } from "@/components/home/TopServiceProviders";
+import { STAY_LISTINGS } from "@/lib/mock-data";
+
+// The sidebar's map (Figma node 3384:8508) sits outside the feed column
+// entirely, unlike the Properties page's own map (which shares its
+// browser's filter state) -- so this always shows every seeded venue,
+// regardless of which category tab or filter is active in the feed beside
+// it, rather than lifting StayBrowser's filter state up just to keep them
+// in sync.
+const MAP_LISTINGS = STAY_LISTINGS.filter((listing) => listing.venueDetails).map((listing) => ({
+  id: listing.id,
+  price: `GHS ${listing.venueDetails!.pricePerNight.toLocaleString()} /night`,
+  propertyType: listing.venueDetails!.category,
+  images: listing.images ?? [],
+}));
+
+/** "Stay" page — Figma node 3384:8225. Header, then a 2/3-1/3 split
+ * matching the Home feed's own column proportions (Main Content Area's
+ * 648/336 column widths resolve to that same ratio): StayBrowser owns the
+ * category tabs, filter row, composer, and venue feed on the left; the
+ * right sidebar carries a static preview map plus the same
+ * WhoToFollow/TrendingProperties/TopServiceProviders widgets Home uses. */
 export default function StayPage() {
   return (
-    <ComingSoonPage
-      icon="BedDouble"
-      title="Stay (Hotels)"
-      description="Book short stays and hotel rooms across Ghana, with dates, guest counts, and real availability. We're building this page now."
-    />
+    <div className="mx-auto flex max-w-[1400px] flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:items-start lg:gap-6 lg:px-10">
+      <section className="flex w-full flex-col gap-6 lg:w-2/3">
+        <div className="flex flex-col gap-1">
+          <h1 className="font-heading text-[28px] font-semibold text-ink">Stay</h1>
+          <p className="text-sm text-muted">Discover hotels, resorts, and unique stays shared by the community.</p>
+        </div>
+
+        <StayBrowser initialListings={STAY_LISTINGS} />
+
+        <StayCommunityBanner />
+      </section>
+
+      <aside className="flex w-full flex-col gap-6 pb-12 lg:w-1/3">
+        <button
+          onClick={() => toast("Full map view is coming soon.")}
+          className="flex items-center gap-2 self-end rounded-full bg-brand-navy px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-navy-light"
+        >
+          <DynamicIcon name="Layers" className="size-3.5" />
+          Full Map View
+        </button>
+        <PropertyMapPanel listings={MAP_LISTINGS} />
+
+        <WhoToFollow />
+        <TrendingProperties />
+        <TopServiceProviders />
+      </aside>
+    </div>
   );
 }

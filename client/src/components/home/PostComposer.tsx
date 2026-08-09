@@ -22,7 +22,7 @@ export function PostComposer({ onCreatePost }: { onCreatePost: (post: ContentPos
   }
 
   return (
-    <div className="flex w-full shrink-0 flex-col gap-6 rounded-xl bg-white p-6 drop-shadow-[0px_4px_6px_rgba(0,31,63,0.08)]">
+    <div className="flex w-full shrink-0 flex-col gap-6 rounded-[39px] border border-border bg-white p-6 drop-shadow-[0px_4px_6px_rgba(0,31,63,0.08)]">
       <div className="flex w-full items-center gap-4">
         <Avatar src={user?.profile_picture ?? undefined} alt={firstName} size={48} />
         <button
