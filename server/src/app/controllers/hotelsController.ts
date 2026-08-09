@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import hotelsService from "#app/services/hotelsService.js";
 import subscriptionLimitService from "#app/services/subscriptionLimitService.js";
 import mediaStorageService from "#app/services/mediaStorageService.js";
+import notificationsService from "#app/services/notificationsService.js";
 import { asyncErrorHandler } from "#app/utils/asyncErrorHandler.js";
 import CustomError from "#app/utils/CustomError.js";
 import { requiredRouteParam } from "#app/utils/routeParams.js";
@@ -158,6 +159,18 @@ export const createHotelBooking = asyncErrorHandler(async (req: Request, res: Re
     guests: req.body.guests ?? 1,
     total_price: totalPrice,
   });
+
+  notificationsService
+    .notify({
+      recipientId: hotel.owner_id,
+      actorId: req.user.id,
+      verb: "booking",
+      targetType: "hotel_booking",
+      targetId: booking.id,
+      title: "New booking request",
+      body: `You have a new booking request for ${hotel.name}.`,
+    })
+    .catch(() => {});
 
   return res.status(201).json({ success: true, data: booking });
 });

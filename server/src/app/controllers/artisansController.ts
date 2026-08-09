@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import artisansService from "#app/services/artisansService.js";
+import notificationsService from "#app/services/notificationsService.js";
 import { asyncErrorHandler } from "#app/utils/asyncErrorHandler.js";
 import CustomError from "#app/utils/CustomError.js";
 import { requiredRouteParam } from "#app/utils/routeParams.js";
@@ -101,6 +102,18 @@ export const hireArtisan = asyncErrorHandler(async (req: Request, res: Response)
     requester_id: req.user.id,
     message: req.body.message,
   });
+
+  notificationsService
+    .notify({
+      recipientId: artisan.id,
+      actorId: req.user.id,
+      verb: "hire_request",
+      targetType: "artisan_hire_request",
+      targetId: hire.id,
+      title: "New hire request",
+      body: "You have a new hire request.",
+    })
+    .catch(() => {});
 
   return res.status(201).json({ success: true, data: hire });
 });
