@@ -15,7 +15,7 @@ function FilterPillButton({ label, bind }: FilterPillButtonProps) {
   return (
     <button
       {...bind}
-      className="flex h-9 items-center gap-2 rounded-full border border-[#e9ecef] bg-white px-4 text-xs font-semibold text-ink"
+      className="flex h-9 shrink-0 items-center gap-2 rounded-full border border-[#e9ecef] bg-white px-4 text-xs font-semibold text-ink"
     >
       {label}
       <DynamicIcon name="ChevronDown" className="size-3" />
@@ -36,23 +36,22 @@ interface StayFilterRowProps {
   onPriceRangeChange: (value: string) => void;
 }
 
-/** "Filter Row" (Figma node 3384:8235) — "Where to?" narrows by venue name/
- * location, "Guests"/"Price Range" narrow by preset bands (StayBrowser owns
- * the actual matching logic, same split PropertiesFilterRow/PropertiesBrowser
- * use). "Add dates" has no real availability data behind it yet — kept as a
- * plain input for visual fidelity with Figma, not wired to any filter.
+/** "Filter Row" (Figma node 3384:8235) — positioned exactly like
+ * PropertiesFilterRow: `sticky` unconditionally (not gated to `lg:`), with
+ * a mobile top offset matching TopNavBar's mobile height (73px) and a
+ * desktop one matching its desktop height (64px). This component's own
+ * root *is* the sticky element, one row, no nested wrapper — see
+ * StayBrowser's own doc comment for why that structural detail matters.
  *
- * This component's own root *is* the sticky element — positioned the same
- * way as PropertiesFilterRow, all four pills sticking together as one row.
- * (An earlier pass tried splitting Price Range out onto its own line so
- * only three of the four pills stuck; that's reverted here in favor of
- * matching Properties' layout exactly — one consolidated sticky bar.)
+ * "Where to?" narrows by venue name/location, "Guests"/"Price Range"
+ * narrow by preset bands (StayBrowser owns the actual matching logic, same
+ * split PropertiesFilterRow/PropertiesBrowser use). "Add dates" has no
+ * real availability data behind it yet — kept as a plain input for visual
+ * fidelity with Figma, not wired to any filter.
  *
- * flex-nowrap + overflow-x-auto, not flex-wrap: at narrower desktop widths
- * (confirmed via testing around 1024-1200px, where the feed column itself
- * is only a fraction of that) four pills don't fit on one line, and
- * flex-wrap was dropping Price Range onto its own row. Scrolling
- * horizontally keeps all four pills on the one row Figma shows instead. */
+ * flex-nowrap + overflow-x-auto rather than flex-wrap, so all four pills
+ * stay on the one row Figma shows: flex-wrap was dropping the last pill
+ * onto its own line once the feed column got narrower than ~1200px wide. */
 export function StayFilterRow({
   whereTo,
   onWhereToChange,
@@ -66,7 +65,7 @@ export function StayFilterRow({
   onPriceRangeChange,
 }: StayFilterRowProps) {
   return (
-    <div className="flex flex-nowrap items-center gap-3 overflow-x-auto bg-background lg:sticky lg:top-16 lg:z-10 lg:py-1">
+    <div className="sticky top-[73px] z-10 flex flex-nowrap items-center gap-3 overflow-x-auto bg-background py-3 lg:top-16">
       <label className={PILL_INPUT_CLASS}>
         <DynamicIcon name="MapPin" className="size-4 text-[#44474e]" />
         <input

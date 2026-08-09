@@ -24,17 +24,24 @@ const MAP_LISTINGS = STAY_LISTINGS.filter((listing) => listing.venueDetails).map
   images: listing.images ?? [],
 }));
 
-/** "Stay" page — Figma node 3393:16310. A 2/3-1/3 split matching the Home
- * feed's own column proportions: StayBrowser owns the page title, category
- * tabs, filter row (all now grouped in one card — see its own doc comment)
- * and the venue feed on the left; the right sidebar carries a preview map
- * plus the same WhoToFollow/TrendingProperties/TopServiceProviders widgets
- * Home uses.
+/** "Stay" page — Figma node 3393:16310. An 8/4-column grid, matching
+ * Figma's own "Feed Column (8 columns)" / "Right Sidebar (4 columns)"
+ * layer names, and mirroring PropertiesBrowser's own internal
+ * grid-cols-12 split between its cards and map columns.
  *
- * The map's expand/collapse mechanic mirrors PropertiesBrowser's exactly
- * (same PropertyMapPanel, same `expanded` full-width takeover) — the
- * `section` just gets `hidden` rather than being unmounted while expanded,
- * so StayBrowser's category/filter/listings state survives collapsing back. */
+ * CSS Grid's default `align-items: stretch` is what actually makes the
+ * sidebar's sticky map hold through the *whole* scroll range: it
+ * stretches <aside> to match <section>'s height automatically, so the
+ * map's own direct parent (its sticky containing block) has real room to
+ * clamp within. A plain flex row with `items-start` (this page's previous
+ * implementation) left <aside> only as tall as its own content, which
+ * silently starves any sticky element inside it of room to stick once
+ * that content runs out — this is the same mechanism that makes
+ * Properties' own map reliable; this page just wasn't using it.
+ *
+ * The title lives here rather than in StayBrowser, mirroring
+ * properties/page.tsx owning Properties' own title while PropertiesBrowser
+ * only owns the filter row + listing grid beneath it. */
 export default function StayPage() {
   const [mapExpanded, setMapExpanded] = useState(false);
 
@@ -56,23 +63,25 @@ export default function StayPage() {
         // `lg` there's no floating sidebar to clear, so px-4/sm:px-6 still
         // apply there as this page's only source of side margin.
         "mx-auto flex max-w-[1400px] flex-col gap-6 px-4 py-6 sm:px-6 lg:gap-6 lg:px-0",
-        !mapExpanded && "lg:flex-row lg:items-start",
+        !mapExpanded && "lg:grid lg:grid-cols-12",
       )}
     >
-      <section className={cn("flex w-full flex-col gap-6", mapExpanded ? "hidden" : "lg:w-2/3")}>
+      <section className={cn("flex w-full flex-col gap-6", mapExpanded ? "hidden" : "lg:col-span-8")}>
+        <div className="flex flex-col gap-1">
+          <h1 className="text-[30px] font-bold tracking-[-0.9px] text-[#334154]">Stay (Hotels)</h1>
+          <p className="text-sm text-[#475568]">Discover hotels, resorts, and unique stays shared by the community.</p>
+        </div>
+
         <StayBrowser initialListings={STAY_LISTINGS} />
 
         <StayCommunityBanner />
       </section>
 
-      <aside className={cn("flex w-full flex-col gap-6", mapExpanded ? "pb-12" : "pb-12 lg:w-1/3")}>
+      <aside className={cn("flex w-full flex-col gap-6", mapExpanded ? "pb-12" : "pb-12 lg:col-span-4")}>
         {!mapExpanded && (
           // Sticky at the same top-16 offset as StayFilterRow's own sticky
-          // trio, so this stays visible ("inline with the filters") while
-          // scrolling instead of scrolling away before the map does. Needs
-          // to be a *direct* flex-col child of <aside> for the sticky
-          // offset to actually clamp -- see StayFilterRow's doc comment
-          // for the Chromium quirk that requires this.
+          // row, so this stays visible ("inline with the filters") while
+          // scrolling instead of scrolling away before the map does.
           <div className="flex justify-end lg:sticky lg:top-16 lg:z-10">
             <button
               onClick={() => setMapExpanded(true)}

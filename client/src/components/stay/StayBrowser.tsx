@@ -26,16 +26,19 @@ const PRICE_RANGES: { label: string; test: (n: number) => boolean }[] = [
   { label: "Above GHS 3,000/night", test: (n) => n >= 3_000 },
 ];
 
-/** Owns the Stay page's title, category tabs, filter row, and venue feed —
- * Figma node 3393:16310's "Feed Column". The title and category tabs
- * scroll away normally with the feed; StayFilterRow's own root is the
- * sticky element, positioned the same way as PropertiesFilterRow (see its
- * doc comment). There's also no separate composer bar rendered on this
- * screen anymore: posting now goes through TopNavBar's global
- * "+ Create Post" button instead, see PostComposerContext. Venue posts
- * have no backend counterpart yet (see CreatePostModal), so `listings`
- * starts from the seeded STAY_LISTINGS mock and only grows locally as that
- * global composer creates new venue posts this session. */
+/** Owns the Stay page's category tabs, filter row, and venue feed — Figma
+ * node 3393:16310's "Feed Column (8 columns)". The page itself owns the
+ * title (mirrors properties/page.tsx owning Properties' title while
+ * PropertiesBrowser only owns the filter row + listing grid below it).
+ * Category tabs scroll away normally with the feed; StayFilterRow's own
+ * root is the sticky element, positioned the same way as
+ * PropertiesFilterRow (see its doc comment). There's also no separate
+ * composer bar rendered on this screen anymore: posting now goes through
+ * TopNavBar's global "+ Create Post" button instead, see
+ * PostComposerContext. Venue posts have no backend counterpart yet (see
+ * CreatePostModal), so `listings` starts from the seeded STAY_LISTINGS mock
+ * and only grows locally as that global composer creates new venue posts
+ * this session. */
 export function StayBrowser({ initialListings }: { initialListings: GeneralPost[] }) {
   const [listings, setListings] = useState(initialListings);
   const [category, setCategory] = useState<StayCategory>(STAY_CATEGORIES[0].id);
@@ -80,11 +83,6 @@ export function StayBrowser({ initialListings }: { initialListings: GeneralPost[
 
   return (
     <>
-      <div className="flex flex-col gap-1">
-        <h1 className="text-[30px] font-bold tracking-[-0.9px] text-[#334154]">Stay (Hotels)</h1>
-        <p className="text-sm text-[#475568]">Discover hotels, resorts, and unique stays shared by the community.</p>
-      </div>
-
       <StayCategoryNav active={category} onSelect={setCategory} />
 
       <StayFilterRow
