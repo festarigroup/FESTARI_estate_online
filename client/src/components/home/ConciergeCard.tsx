@@ -64,12 +64,11 @@ export function ConciergeCard() {
         </ul>
 
         <Button
-          variant="gold"
+          variant="outline-gold-white"
           className="w-full"
           onClick={() => toast.success("Thanks! Our team will reach out about hosting.")}
         >
           Become a Host
-          <DynamicIcon name="ArrowRight" className="size-4" />
         </Button>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "navy" | "gold" | "ghost" | "pill" | "outline-gold";
+  variant?: "navy" | "gold" | "ghost" | "pill" | "outline-gold" | "outline-gold-white";
 }
 
 const VARIANT_STYLES: Record<NonNullable<ButtonProps["variant"]>, string> = {
@@ -17,6 +17,12 @@ const VARIANT_STYLES: Record<NonNullable<ButtonProps["variant"]>, string> = {
   // actually specifies instead of an invented solid navy.
   "outline-gold":
     "border border-brand-gold-dark text-brand-gold-dark hover:bg-brand-gold-dark/5 rounded-full px-[21px] py-[9px] text-xs font-semibold tracking-[0.24px]",
+  // Same outline-pill idea as "outline-gold", but for the "BECOME A HOST"
+  // CTA on the navy Concierge Card (node 3379:4774) -- white/10 fill,
+  // white uppercase label, since the gold-dark text used on white cards
+  // would be unreadable against navy.
+  "outline-gold-white":
+    "bg-white/10 border border-brand-gold-dark text-white uppercase hover:bg-white/20 rounded-full px-6 py-2 font-heading text-base font-normal",
 };
 
 /** Base button — extend via `variant` and `className`, never fork a one-off style. */
