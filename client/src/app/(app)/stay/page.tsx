@@ -143,7 +143,21 @@ export default function StayPage() {
           // it) = 144 -- see doc comment above for why this specific
           // arithmetic is what keeps the map from drifting once the
           // button's already stuck.
-          className="lg:top-[144px] lg:h-[calc(100vh-168px)]"
+          //
+          // -260 rather than PropertyMapPanel's own default -146 (or the
+          // -168 this page used before): with the spacer/button/gap now
+          // eating into <aside>'s stretched height above the map (see doc
+          // comment above), the old, taller height left the map with more
+          // height than the room actually remaining beneath those, so the
+          // browser eased its `top` back down near the end of the scroll
+          // to avoid overflowing past <aside>'s own bottom padding --
+          // exactly the "map moves near the bottom" behaviour this was
+          // fixed to remove. -260 was found empirically (binary search
+          // against this page's actual current content -- 640px was the
+          // largest height that held at top-[144px] all the way to the end
+          // of scroll before it started easing) and has ~10-15px of margin
+          // below that threshold for cross-browser rounding.
+          className="lg:top-[144px] lg:h-[calc(100vh-260px)]"
         />
       </aside>
     </div>
