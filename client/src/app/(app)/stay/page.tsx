@@ -5,9 +5,6 @@ import { StayBrowser } from "@/components/stay/StayBrowser";
 import { StayCommunityBanner } from "@/components/stay/StayCommunityBanner";
 import { PropertyMapPanel } from "@/components/properties/PropertyMapPanel";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
-import { WhoToFollow } from "@/components/home/WhoToFollow";
-import { TrendingProperties } from "@/components/home/TrendingProperties";
-import { TopServiceProviders } from "@/components/home/TopServiceProviders";
 import { cn } from "@/lib/cn";
 import { STAY_LISTINGS } from "@/lib/mock-data";
 
@@ -102,14 +99,6 @@ export default function StayPage() {
           // gap-6 between them) = 120, instead of just top-16/64 alone.
           className="lg:top-[120px] lg:h-[calc(100vh-144px)]"
         />
-
-        {!mapExpanded && (
-          <>
-            <WhoToFollow />
-            <TrendingProperties />
-            <TopServiceProviders />
-          </>
-        )}
       </aside>
     </div>
   );
