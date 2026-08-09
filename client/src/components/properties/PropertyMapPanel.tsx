@@ -50,7 +50,7 @@ export function PropertyMapPanel({ listings, expanded, onExpand, onCollapse }: P
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-xl border border-border-subtle bg-[#e3e2e5] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]",
+        "overflow-hidden rounded-[39px] border border-border-subtle bg-[#e3e2e5] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]",
         expanded
           ? "block h-[75vh] w-full"
           : "hidden lg:sticky lg:top-[131px] lg:block lg:h-[calc(100vh-155px)]",

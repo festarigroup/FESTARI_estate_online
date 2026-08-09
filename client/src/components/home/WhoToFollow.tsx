@@ -47,7 +47,7 @@ export function WhoToFollow() {
   if (people.length === 0) return null;
 
   return (
-    <div className="flex w-full shrink-0 flex-col gap-6 rounded-xl border border-border bg-white p-6">
+    <div className="flex w-full shrink-0 flex-col gap-6 rounded-[39px] border border-border bg-white p-6">
       <SidebarWidgetHeader title="Who to follow" seeAllHref="/professionals" />
       <div className="flex w-full flex-col gap-4">
         {people.map((person) => {
