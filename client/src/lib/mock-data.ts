@@ -23,8 +23,6 @@ export const NAV_ITEMS: NavItem[] = [
   { id: "stay", label: "Stay (Hotels)", icon: "BedDouble", href: "/stay" },
   { id: "craftwork", label: "Craftwork", icon: "Hammer", href: "/craftwork" },
   { id: "professionals", label: "Professionals", icon: "Users", href: "/professionals" },
-  { id: "messages", label: "Messages", icon: "Mail", href: "/messages", badgeCount: 12 },
-  { id: "notifications", label: "Notifications", icon: "Bell", href: "/notifications", badgeCount: 23 },
   { id: "saved", label: "Saved", icon: "Bookmark", href: "/saved" },
 ];
 
