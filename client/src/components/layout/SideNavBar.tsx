@@ -29,13 +29,6 @@ interface SideNavBarProps {
  * its full height regardless of the padding, so staying above TopNavBar on
  * desktop too would paint over its logo with plain navy instead of leaving
  * it visible in the gap the padding creates.
- *
- * `lg:rounded-[45px]` (node 3379:5496) is desktop-only, matching this
- * app's standing scope decision to skip mobile refinements unless asked —
- * the mobile drawer stays sharp-cornered, which also fits an edge-to-edge
- * overlay better than a "floating panel" look. Needs `lg:overflow-hidden`
- * alongside it or the nav rows inside would keep their square corners and
- * just poke out past the rounded edge.
  */
 export function SideNavBar({ open, onClose }: SideNavBarProps) {
   const pathname = usePathname();
@@ -56,7 +49,7 @@ export function SideNavBar({ open, onClose }: SideNavBarProps) {
           // desktop, where this aside's *background* would otherwise paint
           // over TopNavBar's actual logo despite having no content of its
           // own in that corner (lg:pt-[73px] leaves it empty on purpose).
-          "fixed inset-y-0 left-0 z-[55] flex w-64 flex-col border-r border-brand-navy-light bg-brand-navy transition-transform lg:z-40 lg:translate-x-0 lg:overflow-hidden lg:rounded-[45px] lg:pt-[73px]",
+          "fixed inset-y-0 left-0 z-[55] flex w-64 flex-col border-r border-brand-navy-light bg-brand-navy transition-transform lg:z-40 lg:translate-x-0 lg:pt-[73px]",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
