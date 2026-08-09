@@ -42,10 +42,18 @@ export default function StayPage() {
     <div
       className={cn(
         // No top padding -- the last pass made TopNavBar's clearance flush
-        // for the sticky category tabs specifically, but the page's own
-        // py-6 was still stacking an extra 24px above the title too, which
-        // read as way more gap than intended. pb-6 keeps the bottom margin.
-        "mx-auto flex max-w-[1400px] flex-col gap-6 px-4 pb-6 sm:px-6 lg:gap-6 lg:px-10",
+        // for the sticky filters specifically, but the page's own py-6 was
+        // still stacking an extra 24px above the title too, which read as
+        // way more gap than intended. pb-6 keeps the bottom margin.
+        //
+        // No lg:px either, for the same reason on the *horizontal* axis:
+        // DashboardShell's <main> already clears SideNavBar with its own
+        // 24px gap built in (lg:pl-[sidebar-w+48px]) plus a 24px right
+        // margin (lg:pr-6) -- adding lg:px-10 on top of that doubled the
+        // margin on both sides to ~64px, well past Figma's ~24-36px. Below
+        // `lg` there's no floating sidebar to clear, so px-4/sm:px-6 still
+        // apply there as this page's only source of side margin.
+        "mx-auto flex max-w-[1400px] flex-col gap-6 px-4 pb-6 sm:px-6 lg:gap-6 lg:px-0",
         !mapExpanded && "lg:flex-row lg:items-start",
       )}
     >
