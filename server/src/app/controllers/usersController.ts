@@ -1,5 +1,4 @@
 import userService from "#app/services/usersService.js";
-import driverService from "#app/services/driversService.js";
 import avatarStorageService from "#app/services/avatarStorageService.js";
 import { asyncErrorHandler } from "#app/utils/asyncErrorHandler.js";
 import { requiredRouteParam } from "#app/utils/routeParams.js";
@@ -121,11 +120,6 @@ export const uploadProfileAvatar = asyncErrorHandler(
         profile_picture: uploadedUrl,
       });
 
-      const driver = await driverService.getDriverById(user.id);
-      if (driver) {
-        await driverService.updateDriver(user.id, { profile_picture: uploadedUrl });
-      }
-
       return res.status(200).json({
         success: true,
         data: {
@@ -162,13 +156,6 @@ export const updateUser = asyncErrorHandler(
       phone: sanitizePhone(phone) ?? user.phone,
       ...(profile_picture !== undefined ? { profile_picture } : {}),
     });
-
-    if (profile_picture !== undefined) {
-      const driver = await driverService.getDriverById(user.id);
-      if (driver) {
-        await driverService.updateDriver(user.id, { profile_picture });
-      }
-    }
 
     return res.status(200).json({
       success: true,

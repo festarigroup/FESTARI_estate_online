@@ -1,5 +1,5 @@
 import { db } from "#app/db/db.js";
-import { userRoles, users } from "#app/db/schema.js";
+import { userRoles, users } from "#app/db/schema/index.js";
 import { Transaction } from "#app/types/DbTransactionType.js";
 import { UserInsert, UserRow, UserWithRoles } from "#app/types/UserTypes.js";
 import { eq, getTableColumns, sql } from "drizzle-orm";

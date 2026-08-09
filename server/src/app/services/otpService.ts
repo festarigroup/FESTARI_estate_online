@@ -1,9 +1,10 @@
 import { db } from "#app/db/db.js";
-import { user_otps } from "#app/db/schema.js";
+import { userOtps as user_otps } from "#app/db/schema/index.js";
 import { Transaction } from "#app/types/DbTransactionType.js";
-import { and, desc, eq, isNull, lt, sql } from "drizzle-orm";
+import { and, desc, eq, lt, sql } from "drizzle-orm";
 
 type OtpInsert = typeof user_otps.$inferInsert;
+type OtpPurpose = "email_verification" | "password_reset";
 
 class OtpService {
   async createOtp(row: OtpInsert) {
@@ -62,21 +63,17 @@ class OtpService {
     return otp;
   }
 
-  async getLatestOtp(
-    userId: string,
-    purpose: "login" | "password_reset" | "email_verification" | "payment",
-  ) {
-    return db.query.user_otps.findFirst({
-      where: and(eq(user_otps.user_id, userId), eq(user_otps.purpose, purpose)),
-      orderBy: [desc(user_otps.created_at)],
-    });
+  async getLatestOtp(userId: string, purpose: OtpPurpose) {
+    const [otp] = await db
+      .select()
+      .from(user_otps)
+      .where(and(eq(user_otps.user_id, userId), eq(user_otps.purpose, purpose)))
+      .orderBy(desc(user_otps.created_at))
+      .limit(1);
+    return otp ?? null;
   }
 
-  async getLatestOtpTx(
-    tx: any,
-    userId: string,
-    purpose: "login" | "password_reset" | "email_verification" | "payment",
-  ) {
+  async getLatestOtpTx(tx: Transaction, userId: string, purpose: OtpPurpose) {
     const [otp] = await tx
       .select()
       .from(user_otps)
@@ -96,7 +93,7 @@ class OtpService {
       .where(eq(user_otps.id, id));
   }
 
-  async incrementAttemptsTx(tx: any, id: string) {
+  async incrementAttemptsTx(tx: Transaction, id: string) {
     await tx
       .update(user_otps)
       .set({
@@ -114,7 +111,7 @@ class OtpService {
       .where(eq(user_otps.id, id));
   }
 
-  async lockOtpTx(tx: any, id: string) {
+  async lockOtpTx(tx: Transaction, id: string) {
     await tx
       .update(user_otps)
       .set({
@@ -127,7 +124,7 @@ class OtpService {
     await db.delete(user_otps).where(eq(user_otps.id, id));
   }
 
-  async deleteOtpTx(tx: any, id: string) {
+  async deleteOtpTx(tx: Transaction, id: string) {
     await tx.delete(user_otps).where(eq(user_otps.id, id));
   }
 

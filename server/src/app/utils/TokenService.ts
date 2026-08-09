@@ -1,4 +1,3 @@
-import type { UserEntity } from "#app/types/UserTypes.js";
 import CustomError from "./CustomError";
 import jwt, { type JwtPayload } from "jsonwebtoken"
 

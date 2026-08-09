@@ -1,6 +1,8 @@
 import notificationService from "#app/services/notificationService.js";
 import otpService from "#app/services/otpService.js";
 import userService from "#app/services/usersService.js";
+import rolesService from "#app/services/rolesService.js";
+import sessionService from "#app/services/sessionService.js";
 import { asyncErrorHandler } from "#app/utils/asyncErrorHandler.js";
 import CustomError from "#app/utils/CustomError.js";
 import { toUserGetDto } from "#app/utils/mappers/UserMappers.js";
@@ -9,18 +11,11 @@ import tokenService from "#app/utils/TokenService.js";
 import type { Request, Response } from "express";
 import { db } from "#app/db/db.js";
 import { comparePassword, hashPassword } from "#app/utils/crypto.js";
-import customerService from "#app/services/customersService.js";
-import walletService from "#app/services/walletService.js";
 import { UserRow, UserWithRoles } from "#app/types/UserTypes.js";
-import driverService from "#app/services/driversService.js";
-import rolesService from "#app/services/rolesService.js";
-import bodyParser from "body-parser";
-import { sanitizePhone } from "#app/utils/sanitizePhone.js";
-import { verifyGoogleToken } from "#app/services/googleService.js";
-import sessionService from "#app/services/sessionService.js";
 import { OAuth2Client } from "google-auth-library";
 
 const MAX_OTP_ATTEMPTS = 5;
+const OTP_TTL_MS = 10 * 60 * 1000;
 
 function sendRefreshTokenCookie(res: Response, token: string) {
   res.cookie("refreshToken", token, {
@@ -31,423 +26,342 @@ function sendRefreshTokenCookie(res: Response, token: string) {
   });
 }
 
+async function issueSession(
+  user: { id: string; roles: string[] },
+  req: Request,
+  res: Response,
+) {
+  const { accessToken, refreshToken } = tokenService.generateTokens({
+    id: user.id,
+    roles: user.roles,
+  });
+
+  const session = await sessionService.createSession(user.id, refreshToken, {
+    deviceName: req.body.deviceName,
+    platform: req.body.platform,
+    ipAddress: req.ip,
+    userAgent: req.headers["user-agent"],
+  });
+
+  sendRefreshTokenCookie(res, refreshToken);
+
+  return { accessToken, refreshToken, sessionId: session?.id };
+}
+
+async function issueOtp(
+  tx: Parameters<Parameters<typeof db.transaction>[0]>[0],
+  userId: string,
+  purpose: "email_verification" | "password_reset",
+) {
+  const otpRaw = otpGenerator().toString();
+  const otpHashed = await hashPassword(otpRaw);
+
+  await otpService.createOtpTx(tx, {
+    user_id: userId,
+    otp_hash: otpHashed,
+    purpose,
+    expires_at: new Date(Date.now() + OTP_TTL_MS),
+  });
+
+  return otpRaw;
+}
+
 const googleClient = new OAuth2Client();
-const GOOGLE_AUDIENCES = [
-  process.env.GOOGLE_WEB_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_ID,
-].filter((id): id is string => Boolean(id));
-
-export const googleLogin = asyncErrorHandler(
-  async (req: Request, res: Response) => {
-    const { idToken, role } = req.body;
-
-    if (GOOGLE_AUDIENCES.length === 0) {
-      throw new CustomError("Google Sign-In is not configured on the server", 500);
-    }
-
-    const ticket = await googleClient.verifyIdToken({
-      idToken,
-      audience: GOOGLE_AUDIENCES,
-    });
-    const payload = ticket.getPayload();
-
-    if (!payload?.email) {
-      throw new CustomError("Invalid Google token", 401);
-    }
-    if (!payload.email_verified) {
-      throw new CustomError("Google account email is not verified", 400);
-    }
-
-    const email = payload.email.toLowerCase();
-    const googleId = payload.sub;
-
-    let user: UserRow | UserWithRoles | null = null;
-    let roles: string[] = [];
-    let isNewUser = false;
-
-    await db.transaction(async (tx) => {
-      const existingByGoogle = await userService.getUserByGoogleId(googleId);
-
-      if (existingByGoogle) {
-        user = existingByGoogle;
-        roles = existingByGoogle.roles;
-      } else {
-        const existingByEmail = await userService.getUserByEmail(email);
-
-        if (existingByEmail) {
-          await userService.updateUserTx(tx, existingByEmail.id, { googleId });
-          user = existingByEmail;
-          roles = existingByEmail.roles;
-        } else {
-          user = await userService.createUserTx(tx, {
-            email,
-            phone: null,
-            googleId,
-            firstname: payload.given_name ?? null,
-            lastname: payload.family_name ?? null,
-            verified: true,
-            is_active: true,
-          });
-          isNewUser = true;
-        }
-      }
-
-      const hasRole = roles.includes(role);
-
-      if (!hasRole) {
-        if (role === "customer") {
-          await customerService.createCustomerTx(tx, {
-            id: user.id,
-            points: 0,
-            bags_recycled: 0,
-          });
-          await walletService.getOrCreateWalletTx(tx, user.id);
-        } else if (role === "driver") {
-          await driverService.createDriverTx(tx, { id: user.id });
-        }
-        await rolesService.createRoleTx(tx, { user_id: user.id, role });
-        roles = [...roles, role];
-      }
-    });
-
-    const { accessToken, refreshToken } = tokenService.generateTokens({
-      id: user!.id,
-      roles,
-    });
-
-    const session = await sessionService.createSession(user!.id, refreshToken, {
-      deviceName: req.body.deviceName,
-      platform: req.body.platform,
-      ipAddress: req.ip,
-      userAgent: req.headers["user-agent"],
-      loginAuthKey: "email",
-      loginAuthValue: email,
-    });
-
-    sendRefreshTokenCookie(res, refreshToken);
-
-    return res.status(isNewUser ? 201 : 200).json({
-      success: true,
-      data: {
-        accessToken,
-        refreshToken,
-        sessionId: session?.id,
-        user: { ...toUserGetDto(user!), roles },
-      },
-    });
-  },
+const GOOGLE_AUDIENCES = [process.env.GOOGLE_WEB_CLIENT_ID, process.env.GOOGLE_CLIENT_ID].filter(
+  (id): id is string => Boolean(id),
 );
 
-export const registerUser = asyncErrorHandler(
-  async (req: Request, res: Response) => {
-    const { authKey, role, find } = req.body;
-    let { authValue } = req.body;
+export const googleLogin = asyncErrorHandler(async (req: Request, res: Response) => {
+  const { idToken, role } = req.body;
 
-    if (authKey === "email") {
-      authValue = authValue.toLowerCase().trim();
-    } else if (authKey === "phone") {
-      authValue = sanitizePhone(authValue.trim());
-      if (!authValue) {
-        throw new CustomError("Invalid phone number", 400);
-      }
-    }
+  if (GOOGLE_AUDIENCES.length === 0) {
+    throw new CustomError("Google Sign-In is not configured on the server", 500);
+  }
 
-    let user: UserRow | null = null;
-    let isNewUser = false;
-    let addedNewRole = false;
+  const ticket = await googleClient.verifyIdToken({ idToken, audience: GOOGLE_AUDIENCES });
+  const payload = ticket.getPayload();
 
-    await db.transaction(async (tx) => {
-      if (authKey === "email") {
-        user = await userService.getUserByEmail(authValue.toLowerCase());
-      } else if (authKey === "phone") {
-        user = await userService.getUserByPhone(authValue);
-      }
+  if (!payload?.email) {
+    throw new CustomError("Invalid Google token", 401);
+  }
+  if (!payload.email_verified) {
+    throw new CustomError("Google account email is not verified", 400);
+  }
 
-      if (!user) {
-        if (find) {
-          throw new CustomError(
-            "User not found, please ensure your details are correct.",
-            404,
-          );
-        }
+  const email = payload.email.toLowerCase();
+  const googleId = payload.sub;
+
+  let user: UserRow | UserWithRoles | null = null;
+  let roles: string[] = [];
+  let isNewUser = false;
+
+  await db.transaction(async (tx) => {
+    const existingByGoogle = await userService.getUserByGoogleId(googleId);
+
+    if (existingByGoogle) {
+      user = existingByGoogle;
+      roles = existingByGoogle.roles;
+    } else {
+      const existingByEmail = await userService.getUserByEmail(email);
+
+      if (existingByEmail) {
+        await userService.updateUserTx(tx, existingByEmail.id, { googleId });
+        user = existingByEmail;
+        roles = existingByEmail.roles;
+      } else {
         user = await userService.createUserTx(tx, {
-          email: authKey === "email" ? authValue.toLowerCase() : null,
-          phone: authKey === "phone" ? authValue : null,
+          email,
+          phone: null,
+          googleId,
+          firstname: payload.given_name ?? null,
+          lastname: payload.family_name ?? null,
+          verified: true,
+          is_active: true,
         });
-
-        if (!user) {
-          throw new CustomError(
-            "Failed to create user, please try again later",
-            500,
-          );
-        }
         isNewUser = true;
       }
-
-      const hasRole = await rolesService.hasRoleTx(tx, {
-        user_id: user.id,
-        role,
-      });
-
-      if (!hasRole) {
-        if (role === "customer") {
-          await customerService.createCustomerTx(tx, {
-            id: user.id,
-            points: 0,
-            bags_recycled: 0,
-          });
-          await walletService.getOrCreateWalletTx(tx, user.id);
-        } else if (role === "driver") {
-          await driverService.createDriverTx(tx, {
-            id: user.id,
-          });
-        }
-
-        await rolesService.createRoleTx(tx, {
-          user_id: user.id,
-          role,
-        });
-        addedNewRole = true;
-      }
-
-      const otpRaw = otpGenerator().toString();
-      console.log(otpRaw)
-      const otpHashed = await hashPassword(otpRaw);
-
-      await otpService.createOtpTx(tx, {
-        user_id: user.id,
-        otp_hash: otpHashed,
-        purpose: "login",
-        expires_at: new Date(Date.now() + 10 * 60 * 1000),
-      });
-
-      if (authKey === "phone" && user.phone) {
-        await notificationService.sendSms(`Hi, your otp is ${otpRaw}`, [
-          user.phone,
-        ]);
-      } else if (authKey === "email" && user.email) {
-        await notificationService.sendEmail(
-          [user.email],
-          otpRaw,
-          user.firstname ?? "",
-        );
-      }
-    });
-
-    return res.status(201).json({
-      success: true,
-      message: isNewUser
-        ? "Account created. OTP sent."
-        : addedNewRole
-          ? "Access added to your account. OTP sent."
-          : "Welcome back. OTP sent.",
-      data: {
-        user: toUserGetDto(user!),
-      },
-    });
-  },
-);
-
-export const verifyOtp = asyncErrorHandler(
-  async (req: Request, res: Response) => {
-    const { authKey, otp, purpose } = req.body;
-    let { authValue } = req.body;
-
-    if (authKey === "email") {
-      authValue = authValue.toLowerCase().trim();
-    } else if (authKey === "phone") {
-      authValue = sanitizePhone(authValue);
-      if (!authValue) {
-        throw new CustomError("Invalid phone number, plesase try again.", 400);
-      }
     }
 
-    let user = null;
-    if (authKey === "email") {
-      user = await userService.getUserByEmail(authValue.toLowerCase());
-    } else if (authKey === "phone") {
-      user = await userService.getUserByPhone(authValue);
-    } else {
+    if (!roles.includes(role)) {
+      await rolesService.createRoleTx(tx, { user_id: user!.id, role });
+      roles = [...roles, role];
+    }
+  });
+
+  const tokens = await issueSession({ id: user!.id, roles }, req, res);
+
+  return res.status(isNewUser ? 201 : 200).json({
+    success: true,
+    data: { ...tokens, user: { ...toUserGetDto(user!), roles } },
+  });
+});
+
+export const registerUser = asyncErrorHandler(async (req: Request, res: Response) => {
+  const { firstname, lastname, roles } = req.body;
+  const email = String(req.body.email).toLowerCase().trim();
+  const password = String(req.body.password);
+
+  const existing = await userService.getUserByEmail(email);
+  if (existing) {
+    throw new CustomError("An account with this email already exists", 409);
+  }
+
+  const passwordHash = await hashPassword(password);
+  let user: UserRow | null = null;
+  let otpRaw = "";
+
+  await db.transaction(async (tx) => {
+    user = await userService.createUserTx(tx, {
+      email,
+      firstname,
+      lastname,
+      password_hash: passwordHash,
+      is_active: true,
+      verified: false,
+    });
+
+    for (const role of roles as string[]) {
+      await rolesService.createRoleTx(tx, { user_id: user!.id, role });
+    }
+
+    otpRaw = await issueOtp(tx, user!.id, "email_verification");
+  });
+
+  if (user!.email) {
+    await notificationService.sendEmail([user!.email], otpRaw, user!.firstname ?? "");
+  }
+
+  return res.status(201).json({
+    success: true,
+    message: "Account created. Check your email for a verification code.",
+    data: { user: toUserGetDto(user!) },
+  });
+});
+
+export const loginUser = asyncErrorHandler(async (req: Request, res: Response) => {
+  const email = String(req.body.email).toLowerCase().trim();
+  const { password } = req.body;
+
+  const user = await userService.getUserByEmail(email);
+  if (!user || !user.password_hash) {
+    throw new CustomError("Invalid email or password", 401);
+  }
+
+  const isValid = await comparePassword(password, user.password_hash);
+  if (!isValid) {
+    throw new CustomError("Invalid email or password", 401);
+  }
+
+  if (!user.verified) {
+    throw new CustomError("Please verify your email before logging in", 403);
+  }
+
+  const tokens = await issueSession(user, req, res);
+
+  return res.status(200).json({
+    success: true,
+    data: { ...tokens, user: toUserGetDto(user) },
+  });
+});
+
+export const verifyOtp = asyncErrorHandler(async (req: Request, res: Response) => {
+  const email = String(req.body.email).toLowerCase().trim();
+  const { otp, purpose } = req.body;
+
+  const user = await userService.getUserByEmail(email);
+  if (!user) {
+    throw new CustomError("Invalid credentials", 400);
+  }
+
+  await db.transaction(async (tx) => {
+    const otpRecord = await otpService.getLatestOtpTx(tx, user.id, purpose);
+    if (!otpRecord) {
+      throw new CustomError("OTP not found. Please request a new OTP.", 400);
+    }
+    if (otpRecord.locked_at) {
+      throw new CustomError("Too many attempts. Please request a new OTP.", 400);
+    }
+    if (otpRecord.expires_at.getTime() < Date.now()) {
+      await otpService.deleteOtpTx(tx, otpRecord.id);
+      throw new CustomError("OTP has expired. Please request a new OTP.", 400);
+    }
+    if (otpRecord.attempt_count >= MAX_OTP_ATTEMPTS) {
+      await otpService.lockOtpTx(tx, otpRecord.id);
+      throw new CustomError("Too many failed attempts. Please request a new OTP.", 429);
+    }
+
+    const isValid = await comparePassword(otp, otpRecord.otp_hash);
+    if (!isValid) {
+      const nextAttempts = otpRecord.attempt_count + 1;
+      if (nextAttempts >= MAX_OTP_ATTEMPTS) {
+        await otpService.lockOtpTx(tx, otpRecord.id);
+        throw new CustomError("Too many failed attempts. Please request a new OTP.", 429);
+      }
+      await otpService.incrementAttemptsTx(tx, otpRecord.id);
       throw new CustomError(
-        "Please use email or phone to login to your account",
+        `Invalid OTP. ${MAX_OTP_ATTEMPTS - nextAttempts} attempt(s) remaining.`,
         400,
       );
     }
 
-    if (!user) {
-      throw new CustomError("Invalid credentials", 400);
+    await otpService.deleteOtpTx(tx, otpRecord.id);
+
+    if (purpose === "email_verification") {
+      await userService.updateUserTx(tx, user.id, { verified: true });
     }
+  });
 
-    await db.transaction(async (tx) => {
-      const otpRecord = await otpService.getLatestOtpTx(tx, user.id, purpose);
-      if (!otpRecord) {
-        throw new CustomError("OTP not found. Please request a new OTP.", 400);
-      }
+  const freshUser = await userService.getUserById(user.id);
 
-      // already used / invalidated / locked
-      if (otpRecord.locked_at) {
-        throw new CustomError(
-          "Too many attempts. Please request a new OTP.",
-          400,
-        );
-      }
+  return res.status(200).json({
+    success: true,
+    data: { user: toUserGetDto(freshUser ?? user) },
+  });
+});
 
-      // expired
-      if (otpRecord.expires_at.getTime() < Date.now()) {
-        await otpService.deleteOtpTx(tx, otpRecord.id);
-        throw new CustomError(
-          "OTP has expired. Please request a new OTP.",
-          400,
-        );
-      }
+export const resendOtp = asyncErrorHandler(async (req: Request, res: Response) => {
+  const email = String(req.body.email).toLowerCase().trim();
+  const { purpose } = req.body;
 
-      // lock the otp
-      if (otpRecord.attempt_count >= MAX_OTP_ATTEMPTS) {
-        await otpService.lockOtpTx(tx, otpRecord.id);
-        throw new CustomError(
-          "Too many failed attempts. Please request a new OTP.",
-          429,
-        );
-      }
+  const user = await userService.getUserByEmail(email);
+  if (!user) {
+    throw new CustomError("Invalid credentials", 400);
+  }
 
-      const isValid = await comparePassword(otp, otpRecord.otp_hash);
-      if (!isValid) {
-        const nextAttempts = otpRecord.attempt_count + 1;
-        if (nextAttempts >= MAX_OTP_ATTEMPTS) {
-          await otpService.lockOtpTx(tx, otpRecord.id);
-          throw new CustomError(
-            "Too many failed attempts. Please request a new OTP.",
-            429,
-          );
-        }
+  let otpRaw = "";
+  await db.transaction(async (tx) => {
+    otpRaw = await issueOtp(tx, user.id, purpose);
+  });
 
-        await otpService.incrementAttemptsTx(tx, otpRecord.id);
-        throw new CustomError(
-          `Invalid OTP. ${MAX_OTP_ATTEMPTS - nextAttempts} attempt(s) remaining.`,
-          400,
-        );
-      }
+  if (user.email) {
+    await notificationService.sendEmail([user.email], otpRaw, user.firstname ?? "");
+  }
 
-      // after success, delete otp
+  return res.status(200).json({ success: true, message: "OTP sent successfully" });
+});
+
+export const forgotPassword = asyncErrorHandler(async (req: Request, res: Response) => {
+  const email = String(req.body.email).toLowerCase().trim();
+
+  const user = await userService.getUserByEmail(email);
+  if (!user) {
+    throw new CustomError("Invalid credentials", 400);
+  }
+
+  let otpRaw = "";
+  await db.transaction(async (tx) => {
+    otpRaw = await issueOtp(tx, user.id, "password_reset");
+  });
+
+  if (user.email) {
+    await notificationService.sendEmail([user.email], otpRaw, user.firstname ?? "");
+  }
+
+  return res.status(200).json({ success: true, message: "Password reset code sent" });
+});
+
+export const resetPassword = asyncErrorHandler(async (req: Request, res: Response) => {
+  const email = String(req.body.email).toLowerCase().trim();
+  const { otp, newPassword } = req.body;
+
+  const user = await userService.getUserByEmail(email);
+  if (!user) {
+    throw new CustomError("Invalid credentials", 400);
+  }
+
+  await db.transaction(async (tx) => {
+    const otpRecord = await otpService.getLatestOtpTx(tx, user.id, "password_reset");
+    if (!otpRecord) {
+      throw new CustomError("OTP not found. Please request a new OTP.", 400);
+    }
+    if (otpRecord.locked_at) {
+      throw new CustomError("Too many attempts. Please request a new OTP.", 400);
+    }
+    if (otpRecord.expires_at.getTime() < Date.now()) {
       await otpService.deleteOtpTx(tx, otpRecord.id);
-      await userService.updateUserTx(tx, user.id, {
-        verified: true,
-      });
-    });
-
-    const { accessToken, refreshToken } = tokenService.generateTokens(user);
-
-    const session = await sessionService.createSession(user.id, refreshToken, {
-      deviceName: req.body.deviceName,
-      platform: req.body.platform,
-      ipAddress: req.ip,
-      userAgent: req.headers["user-agent"],
-      loginAuthKey: authKey,
-      loginAuthValue: authValue,
-    });
-
-    sendRefreshTokenCookie(res, refreshToken);
-
-    const freshUser = await userService.getUserById(user.id);
-
-    return res.status(200).json({
-      success: true,
-      data: {
-        accessToken,
-        refreshToken,
-        sessionId: session?.id,
-        user: toUserGetDto(freshUser ?? user),
-      },
-    });
-  },
-);
-
-export const getWelcomeContext = asyncErrorHandler(
-  async (req: Request, res: Response) => {
-    if (!req.user?.id) throw new CustomError("Unauthorized", 401);
-    const authKey = String(req.query.authKey ?? "");
-    const authValue = String(req.query.authValue ?? "");
-    const sessionId = req.query.sessionId ? String(req.query.sessionId) : "";
-
-    if (!authKey || !authValue) {
-      throw new CustomError("authKey and authValue are required", 400);
-    }
-    if (!sessionId) {
-      throw new CustomError("sessionId is required", 400);
+      throw new CustomError("OTP has expired. Please request a new OTP.", 400);
     }
 
-    const context = await sessionService.getWelcomeContext(
-      req.user.id,
-      sessionId,
-      authKey,
-      authValue,
-    );
-
-    return res.status(200).json({ success: true, data: context });
-  },
-);
-
-export const resendOtp = asyncErrorHandler(
-  async (req: Request, res: Response) => {
-    const { authKey, purpose } = req.body;
-    let { authValue } = req.body;
-
-    if (authKey === "email") {
-      authValue = authValue.toLowerCase().trim();
-    } else if (authKey === "phone") {
-      authValue = sanitizePhone(authValue);
-      if (!authValue) {
-        throw new CustomError("Invalid phone number", 400);
+    const isValid = await comparePassword(otp, otpRecord.otp_hash);
+    if (!isValid) {
+      const nextAttempts = otpRecord.attempt_count + 1;
+      if (nextAttempts >= MAX_OTP_ATTEMPTS) {
+        await otpService.lockOtpTx(tx, otpRecord.id);
+        throw new CustomError("Too many failed attempts. Please request a new OTP.", 429);
       }
-    }
-
-    let user = null;
-
-    if (authKey === "email") {
-      user = await userService.getUserByEmail(authValue.toLowerCase());
-    } else if (authKey === "phone") {
-      user = await userService.getUserByPhone(authValue);
-    } else {
-      throw new CustomError("Please use email or phone", 400);
-    }
-    if (!user) {
-      throw new CustomError("Invalid credentials", 400);
-    }
-
-    const otpRaw = otpGenerator().toString();
-    console.log(otpRaw)
-    const otpHash = await hashPassword(otpRaw);
-
-    await otpService.createOtp({
-      user_id: user.id,
-      otp_hash: otpHash,
-      purpose,
-      expires_at: new Date(Date.now() + 10 * 60 * 1000),
-    });
-
-    if (authKey == "phone" && user.phone) {
-      await notificationService.sendSms(`Hi, your otp is ${otpRaw}`, [
-        user.phone,
-      ]);
-    } else if (authKey == "email" && user.email) {
-      await notificationService.sendEmail(
-        [user.email],
-        otpRaw,
-        user.firstname ?? "",
+      await otpService.incrementAttemptsTx(tx, otpRecord.id);
+      throw new CustomError(
+        `Invalid OTP. ${MAX_OTP_ATTEMPTS - nextAttempts} attempt(s) remaining.`,
+        400,
       );
     }
 
-    return res.status(200).json({
-      success: true,
-      message: "OTP sent successfully",
-    });
-  },
-);
+    await otpService.deleteOtpTx(tx, otpRecord.id);
+    const passwordHash = await hashPassword(newPassword);
+    await userService.updateUserTx(tx, user.id, { password_hash: passwordHash });
+  });
 
-export const refreshToken = asyncErrorHandler(
-  async (req: Request, res: Response) => {
-    const { refreshToken } = req.body;
-    const accessToken = tokenService.refreshAccessToken(refreshToken);
-    return res.status(200).json({ success: true, data: { accessToken } });
-  },
-);
+  await sessionService.revokeAllSessions(user.id);
+
+  return res.status(200).json({ success: true, message: "Password reset successfully" });
+});
+
+export const logoutUser = asyncErrorHandler(async (req: Request, res: Response) => {
+  if (!req.user?.id) throw new CustomError("Unauthorized", 401);
+
+  const { sessionId } = req.body;
+  if (sessionId) {
+    await sessionService.revokeSession(req.user.id, sessionId);
+  } else {
+    await sessionService.revokeAllSessions(req.user.id);
+  }
+
+  res.clearCookie("refreshToken");
+  return res.status(200).json({ success: true, message: "Logged out" });
+});
+
+export const refreshToken = asyncErrorHandler(async (req: Request, res: Response) => {
+  const { refreshToken } = req.body;
+  const accessToken = tokenService.refreshAccessToken(refreshToken);
+  return res.status(200).json({ success: true, data: { accessToken } });
+});
