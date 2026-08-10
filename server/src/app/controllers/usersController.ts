@@ -1,4 +1,5 @@
 import userService from "#app/services/usersService.js";
+import rolesService from "#app/services/rolesService.js";
 import avatarStorageService from "#app/services/avatarStorageService.js";
 import { asyncErrorHandler } from "#app/utils/asyncErrorHandler.js";
 import { requiredRouteParam } from "#app/utils/routeParams.js";
@@ -136,6 +137,24 @@ export const uploadProfileAvatar = asyncErrorHandler(
     }
   },
 );
+
+export const setRole = asyncErrorHandler(async (req: Request, res: Response) => {
+  const user = req.user;
+  if (!user) {
+    throw new CustomError("Unauthorized", 401);
+  }
+
+  const { role } = req.body;
+  await rolesService.addRole(user.id, role);
+
+  const updated = await userService.getUserById(user.id);
+
+  return res.status(200).json({
+    success: true,
+    data: { user: toUserGetDto(updated ?? user) },
+    message: "Role saved",
+  });
+});
 
 export const updateUser = asyncErrorHandler(
   async (req: Request, res: Response) => {

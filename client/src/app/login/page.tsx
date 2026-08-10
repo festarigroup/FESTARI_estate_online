@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
 import { PasswordInput } from "@/components/ui/PasswordInput";
+import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
@@ -45,7 +46,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-sm rounded-xl bg-white p-8 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
         <div className="mb-6 flex flex-col items-center gap-2">
           <Image src="/images/logo-festari.png" alt="" width={37} height={54} className="h-10 w-auto" />
@@ -97,6 +98,21 @@ export default function LoginPage() {
             {submitting ? "Signing in..." : "Sign in"}
           </Button>
         </form>
+
+        <div className="my-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-border-subtle" />
+          <span className="text-xs text-muted">OR</span>
+          <div className="h-px flex-1 bg-border-subtle" />
+        </div>
+
+        <GoogleAuthButton
+          text="signin_with"
+          onSuccess={(user) => router.push(user.roles.length === 0 ? "/choose-role" : "/")}
+          onError={(message) => {
+            setError(message);
+            toast.error(message);
+          }}
+        />
 
         <p className="mt-6 text-center text-sm text-muted">
           Don&apos;t have an account?{" "}

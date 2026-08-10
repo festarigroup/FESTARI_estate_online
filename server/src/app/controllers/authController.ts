@@ -123,7 +123,7 @@ export const googleLogin = asyncErrorHandler(async (req: Request, res: Response)
       }
     }
 
-    if (!roles.includes(role)) {
+    if (role && !roles.includes(role)) {
       await rolesService.createRoleTx(tx, { user_id: user!.id, role });
       roles = [...roles, role];
     }

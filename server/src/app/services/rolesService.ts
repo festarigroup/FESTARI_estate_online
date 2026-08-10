@@ -1,3 +1,4 @@
+import { db } from "#app/db/db.js";
 import { userRoles } from "#app/db/schema/index.js";
 import { Transaction } from "#app/types/DbTransactionType.js";
 import { RoleRow } from "#app/types/RoleTypes.js";
@@ -8,6 +9,11 @@ class RolesService {
     const [created] = await tx.insert(userRoles).values(row).returning();
     if (!created) throw new Error("Failed to create role");
     return created;
+  }
+
+  /** Idempotent — relies on the (user_id, role) primary key to no-op if the user already has this role. */
+  async addRole(userId: string, role: RoleRow["role"]) {
+    await db.insert(userRoles).values({ user_id: userId, role }).onConflictDoNothing();
   }
 
   async hasRoleTx(

@@ -21,7 +21,11 @@ class UserService {
         role: userRoles.role,
       })
       .from(users)
-      .innerJoin(userRoles, eq(userRoles.user_id, users.id))
+      // left join: a Google-created account can exist with zero roles until
+      // the client forces a "choose your role" step, and an inner join here
+      // would make such a user invisible to lookups — including `protect`,
+      // which loads the user by id on every authenticated request.
+      .leftJoin(userRoles, eq(userRoles.user_id, users.id))
       .where(eq(users.id, id));
     return mapUserWithRoles(results) ?? null;
   }
@@ -33,7 +37,7 @@ class UserService {
         role: userRoles.role,
       })
       .from(users)
-      .innerJoin(userRoles, eq(userRoles.user_id, users.id))
+      .leftJoin(userRoles, eq(userRoles.user_id, users.id))
       .where(eq(users.email, email.toLowerCase()));
     return mapUserWithRoles(results) ?? null;
   }
@@ -45,7 +49,7 @@ class UserService {
         role: userRoles.role,
       })
       .from(users)
-      .innerJoin(userRoles, eq(userRoles.user_id, users.id))
+      .leftJoin(userRoles, eq(userRoles.user_id, users.id))
       .where(eq(users.googleId, googleId.toLowerCase()));
     return mapUserWithRoles(results) ?? null;
   }
@@ -57,7 +61,7 @@ class UserService {
         role: userRoles.role,
       })
       .from(users)
-      .innerJoin(userRoles, eq(userRoles.user_id, users.id))
+      .leftJoin(userRoles, eq(userRoles.user_id, users.id))
       .where(eq(users.phone, phone));
     return mapUserWithRoles(results) ?? null;
   }
@@ -103,14 +107,17 @@ class UserService {
 function mapUserWithRoles(
   rows: Array<
     typeof users.$inferSelect & {
-      role: typeof userRoles.$inferSelect.role;
+      role: typeof userRoles.$inferSelect.role | null;
     }
   >,
 ): UserWithRoles | null {
   if (rows.length === 0) return null;
   const first = rows[0]!;
   const { role, ...user } = first;
-  return {...user, roles: rows.map((r) => r.role)};
+  const roles = rows
+    .map((r) => r.role)
+    .filter((r): r is typeof userRoles.$inferSelect.role => r !== null);
+  return { ...user, roles };
 }
 
 const userService = new UserService();

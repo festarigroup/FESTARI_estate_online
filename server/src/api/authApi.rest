@@ -42,14 +42,22 @@ Content-Type: application/json
   "password": "correct-horse-battery-staple"
 }
 
-### Google sign-in
+### Google sign-in (role optional — omit to force role selection client-side afterward)
 POST {{baseUrl}}/google
 Content-Type: application/json
 
 {
-  "idToken": "REPLACE_WITH_GOOGLE_ID_TOKEN",
-  "role": "buyer"
+  "idToken": "REPLACE_WITH_GOOGLE_ID_TOKEN"
 }
+
+### Set role after Google sign-in (POST {{baseUrl}}/../users/me/role, requires the accessToken from above)
+# POST {{baseUrl}}/../users/me/role
+# Content-Type: application/json
+# Authorization: Bearer REPLACE_WITH_ACCESS_TOKEN
+#
+# {
+#   "role": "buyer"
+# }
 
 ### Forgot password
 POST {{baseUrl}}/forgot-password

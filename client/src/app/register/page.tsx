@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { useAuth } from "@/context/AuthContext";
 import { resendOtp } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
@@ -73,7 +74,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
       <div className="w-full max-w-sm rounded-xl bg-white p-8 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
         <div className="mb-6 flex flex-col items-center gap-2">
           <Image src="/images/logo-festari.png" alt="" width={37} height={54} className="h-10 w-auto" />
@@ -82,7 +83,7 @@ export default function RegisterPage() {
           </h1>
         </div>
 
-        {step === "form" ? (
+        {step === "form" && (
           <form onSubmit={handleRegister} className="flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-1.5">
@@ -158,7 +159,28 @@ export default function RegisterPage() {
               {submitting ? "Creating account..." : "Create account"}
             </Button>
           </form>
-        ) : (
+        )}
+
+        {step === "form" && (
+          <>
+            <div className="my-6 flex items-center gap-3">
+              <div className="h-px flex-1 bg-border-subtle" />
+              <span className="text-xs text-muted">OR</span>
+              <div className="h-px flex-1 bg-border-subtle" />
+            </div>
+
+            <GoogleAuthButton
+              text="signup_with"
+              onSuccess={(user) => {
+                toast.success("Welcome to Festari Estates!");
+                router.push(user.roles.length === 0 ? "/choose-role" : "/");
+              }}
+              onError={(message) => toast.error(message)}
+            />
+          </>
+        )}
+
+        {step === "otp" && (
           <form onSubmit={handleVerify} className="flex flex-col gap-4">
             <p className="text-sm text-muted">
               Enter the verification code we sent to <span className="font-semibold text-ink">{email}</span>.

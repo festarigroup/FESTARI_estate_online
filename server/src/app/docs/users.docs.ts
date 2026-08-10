@@ -179,6 +179,54 @@
 
 /**
  * @swagger
+ * /users/me/role:
+ *   post:
+ *     summary: Add a role to the current user
+ *     description: |
+ *       Adds a role to the authenticated user's account (idempotent — no-ops
+ *       if they already have it). Mainly used to force role selection after
+ *       a Google sign-in/sign-up that was created without one (see
+ *       POST /auth/google): the client checks `user.roles.length === 0` on
+ *       the auth response and, if empty, routes here before letting the
+ *       user into the app. `admin` cannot be self-assigned through this
+ *       endpoint.
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [role]
+ *             properties:
+ *               role:
+ *                 type: string
+ *                 enum: [buyer, estate_manager, hotel_manager, artisan]
+ *     responses:
+ *       200:
+ *         description: Role saved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Invalid role
+ *       401:
+ *         description: Unauthorized
+ */
+
+/**
+ * @swagger
  * /users/{id}:
  *   get:
  *     summary: Get a user by id

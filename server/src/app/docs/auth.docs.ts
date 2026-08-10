@@ -106,9 +106,14 @@
  *     summary: Sign in (or register) with Google
  *     description: |
  *       Verifies a Google ID token server-side. First-time sign-in creates a
- *       pre-verified account; `role` is added to the account if it doesn't
- *       already have it. Not Supabase-based — the token is verified directly
- *       against Google via `google-auth-library`.
+ *       pre-verified account with no role yet. `role` is optional; if
+ *       omitted, new accounts are created role-less and the returned
+ *       `user.roles` will be an empty array — the client should treat that
+ *       as "force the user through role selection" (POST /users/me/role)
+ *       before sending them anywhere but that screen. If `role` is passed
+ *       and the account doesn't already have it, it's added. Not
+ *       Supabase-based — the token is verified directly against Google via
+ *       `google-auth-library`.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -116,14 +121,15 @@
  *         application/json:
  *           schema:
  *             type: object
- *             required: [idToken, role]
+ *             required: [idToken]
  *             properties:
  *               idToken:
  *                 type: string
  *                 description: Google ID token from the client-side sign-in flow
  *               role:
  *                 type: string
- *                 enum: [buyer, estate_manager, hotel_manager, artisan, admin]
+ *                 enum: [buyer, estate_manager, hotel_manager, artisan]
+ *                 description: Optional. Omit to defer role selection to a later step.
  *     responses:
  *       200:
  *         description: Signed in (existing account)

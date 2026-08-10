@@ -17,6 +17,10 @@ export function login(email: string, password: string) {
   return apiPost<AuthTokens & { user: ApiUser }>("/auth/login", { email, password }, false);
 }
 
+export function googleLogin(idToken: string) {
+  return apiPost<AuthTokens & { user: ApiUser }>("/auth/google", { idToken }, false);
+}
+
 export function verifyOtp(email: string, otp: string, purpose: "email_verification" | "password_reset") {
   return apiPost<{ user: ApiUser }>("/auth/verify-otp", { email, otp, purpose }, false);
 }

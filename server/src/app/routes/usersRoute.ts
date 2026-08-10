@@ -1,6 +1,8 @@
-import { getCurrentUser, getUser, getUserByKey, getUsers, updateUser, acceptTerms, uploadProfileAvatar } from '#app/controllers/usersController.js';
+import { getCurrentUser, getUser, getUserByKey, getUsers, updateUser, acceptTerms, uploadProfileAvatar, setRole } from '#app/controllers/usersController.js';
 import { protect } from '#app/middlewares/auth.js';
 import { uploadAvatarMiddleware } from '#app/middlewares/uploadAvatar.js';
+import { validateSchema } from '#app/middlewares/validate.js';
+import { setRoleSchema } from '#app/validators/usersValidators.js';
 import { Router } from 'express'
 
 const router = Router()
@@ -9,6 +11,7 @@ router.get("/find", getUserByKey)
 router.get("/me", protect, getCurrentUser)
 router.post("/me/accept-terms", protect, acceptTerms)
 router.post("/me/avatar", protect, uploadAvatarMiddleware, uploadProfileAvatar)
+router.post("/me/role", protect, validateSchema(setRoleSchema), setRole)
 
 router.get("/:id", getUser)
 router.patch("/:id", protect, updateUser)

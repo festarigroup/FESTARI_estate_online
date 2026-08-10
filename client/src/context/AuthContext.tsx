@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import * as authApi from "@/lib/api/auth";
-import { getCurrentUser } from "@/lib/api/users";
+import { getCurrentUser, setUserRole } from "@/lib/api/users";
 import { clearTokens, getAccessToken, setTokens } from "@/lib/api/tokens";
 import type { ApiUser } from "@/lib/api/types";
 
@@ -10,8 +10,10 @@ interface AuthContextValue {
   user: ApiUser | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<ApiUser>;
   register: (payload: authApi.RegisterPayload) => Promise<void>;
   verifyOtp: (email: string, otp: string) => Promise<void>;
+  setRole: (role: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -47,8 +49,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(result.user);
   }
 
+  async function loginWithGoogle(idToken: string) {
+    const result = await authApi.googleLogin(idToken);
+    setTokens(result.accessToken, result.refreshToken);
+    setUser(result.user);
+    return result.user;
+  }
+
   async function register(payload: authApi.RegisterPayload) {
     await authApi.register(payload);
+  }
+
+  async function setRole(role: string) {
+    const { user: updated } = await setUserRole(role);
+    setUser(updated);
   }
 
   async function verifyOtp(email: string, otp: string) {
@@ -66,7 +80,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, verifyOtp, logout, refreshUser }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, loginWithGoogle, register, verifyOtp, setRole, logout, refreshUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
