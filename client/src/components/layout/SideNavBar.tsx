@@ -61,7 +61,7 @@ export function SideNavBar({ open, onClose, collapsed, onToggleCollapse }: SideN
       >
         <div className="flex items-center justify-between px-4 pt-4 pb-2 lg:hidden">
           <Link href="/" onClick={onClose} className="flex items-center gap-2">
-            <Image src="/images/logo-festari.png" alt="" width={31} height={40} className="h-9 w-auto" />
+            <Image src="/images/logo-festari.png" alt="" width={37} height={54} className="h-9 w-auto" />
             <span className="font-display text-base font-bold tracking-[-0.5px] text-ink">Festari Estates</span>
           </Link>
           <button onClick={onClose} aria-label="Close navigation" className="text-muted hover:text-ink">

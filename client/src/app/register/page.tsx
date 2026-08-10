@@ -74,7 +74,7 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-sm rounded-xl bg-white p-8 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
         <div className="mb-6 flex flex-col items-center gap-2">
-          <Image src="/images/logo-festari.png" alt="" width={31} height={40} className="h-10 w-auto" />
+          <Image src="/images/logo-festari.png" alt="" width={37} height={54} className="h-10 w-auto" />
           <h1 className="font-heading text-xl text-ink">
             {step === "form" ? "Create your account" : "Verify your email"}
           </h1>

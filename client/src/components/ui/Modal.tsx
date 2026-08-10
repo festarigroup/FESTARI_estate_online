@@ -67,7 +67,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
             <DynamicIcon name="X" className="size-5" />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto">{children}</div>
+        <div className="no-scrollbar flex-1 overflow-y-auto">{children}</div>
       </div>
     </div>,
     document.body,

@@ -70,7 +70,7 @@ export function TopNavBar({ onMenuClick }: TopNavBarProps) {
             own logo instead, since below `lg` this header has no spare
             width for it next to the search field. */}
         <Link href="/" className="hidden shrink-0 items-center gap-2 lg:flex">
-          <Image src="/images/logo-festari.png" alt="" width={31} height={40} className="h-10 w-auto" />
+          <Image src="/images/logo-festari.png" alt="" width={37} height={54} className="h-10 w-auto" />
           <span className="hidden font-display text-base font-bold tracking-[-0.5px] text-ink sm:inline">
             Festari Estates
           </span>

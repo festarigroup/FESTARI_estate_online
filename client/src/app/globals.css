@@ -52,3 +52,16 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
+
+/* Hides the scrollbar track/thumb on an otherwise-scrollable element
+   without disabling scrolling itself -- `scrollbar-width:none` alone (the
+   one-liner StoryBar used to reach for) only covers Firefox/IE; Chrome and
+   Safari still need the ::-webkit-scrollbar rule below to actually hide it. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

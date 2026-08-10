@@ -37,7 +37,7 @@ export function StoryBar() {
 
   return (
     <div className="relative w-full shrink-0 rounded-[39px] bg-white p-4 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
-      <div ref={scrollerRef} className="flex items-center gap-6 overflow-x-auto scroll-smooth pr-2 [scrollbar-width:none]">
+      <div ref={scrollerRef} className="no-scrollbar flex items-center gap-6 overflow-x-auto scroll-smooth pr-2">
         <div className="flex shrink-0 flex-col items-center gap-2">
           <button
             aria-label="Create a story"
