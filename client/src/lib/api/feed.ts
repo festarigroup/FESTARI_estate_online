@@ -15,11 +15,12 @@ export function getPost(id: string) {
 }
 
 export interface CreatePostPayload {
-  kind: "property" | "service" | "general";
+  kind: "property" | "service" | "general" | "venue";
   body: string;
   hashtags?: string;
   linked_property_id?: string;
   linked_artisan_id?: string;
+  linked_hotel_id?: string;
 }
 
 export function createPost(payload: CreatePostPayload) {

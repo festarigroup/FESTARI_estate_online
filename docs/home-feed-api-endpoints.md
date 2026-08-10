@@ -37,9 +37,10 @@ bubble per person; there is no separate "story group" resource server-side, just
 ## 2. Feed Posts
 Backs `PostComposer` and the `PropertyPostCard` / `ServicePostCard` / `GeneralPostCard` variants.
 
-- `GET /feed/posts/?kind=property|service|general&current_page=&limit=` — paginated, newest first.
+- `GET /feed/posts/?kind=property|service|general|venue&current_page=&limit=` — paginated, newest first.
   Each item includes `author`, `linked_property` (present + populated only for `kind=property`
-  posts with a real listing attached), `linked_artisan` (same, for `kind=service`), `images[]`,
+  posts with a real listing attached), `linked_artisan` (same, for `kind=service`),
+  `linked_hotel` (same, for `kind=venue` — includes `average_rating`/`review_count`), `images[]`,
   and computed `likes_count`/`comments_count`/`shares_count`/`is_liked`/`is_saved`.
 - `POST /feed/posts/` **Auth required**
   ```json
@@ -77,34 +78,45 @@ The `ServicePostCard`'s "Book Service" button calls:
 - `POST /artisans/{artisan_id}/hire/` **Auth required** — `{ "message": "..." }`. Free request,
   no payment collected at this step (see [api-reference.md](api-reference.md#artisans--artisans)).
 
-## 5. Social graph (follow)
+## 5. Reserve (from a venue post)
+Backs the Stay page (`StayListingCard`) and any venue post rendered elsewhere via
+`GeneralPostCard`. A venue post is a real `kind=venue` post with `linked_hotel` — likes,
+comments, shares, and saves on it go through the normal Post interaction endpoints above (§3),
+since it's a real post row like any other, not a separate hotel-specific interaction system.
+- `POST /hotels/{hotel_id}/bookings/` **Auth required** — `{ check_in, check_out, guests }`.
+  `VenueReservationButton`/`ReservationModal` call this with the post's `linked_hotel.id`.
+- Creating a venue post from the composer calls `POST /hotels/` first (same two-step pattern
+  the "Property" attach type uses against `POST /properties/`), then `POST /feed/posts/` with
+  `kind: "venue"` and the returned `linked_hotel_id`.
+
+## 6. Social graph (follow)
 Backs `WhoToFollow` and the follow/unfollow toggle. All **Auth required**.
 - `GET /social/suggestions/?limit=5`
 - `POST /social/follow/{user_id}/` / `DELETE /social/follow/{user_id}/`
 - `GET /social/following/`
 - `GET /social/followers/`
 
-## 6. Explore by Category
+## 7. Explore by Category
 Backs `CategoryGrid`. Thin filter over `properties`, not a feed endpoint.
 - `GET /properties/categories/` — count per `listing_type`.
 - `GET /properties/?listing_type=for_sale` / `?property_type=apartment` — the "See all"/category-click destination.
 
-## 7. Trending Properties
+## 8. Trending Properties
 Backs the `TrendingProperties` widget.
 - `GET /properties/trending/?limit=2` — ranked by `is_featured` then `views_count`.
 
-## 8. Top Service Providers
+## 9. Top Service Providers
 Backs the `TopServiceProviders` widget.
 - `GET /artisans/top/?limit=4` — ordered by `-average_rating` (computed via `AVG(artisan_reviews.rating)`, not stored on the profile).
 
-## 9. Notifications
+## 10. Notifications
 Backs the sidebar `Notifications` badge and `/notifications` page. All **Auth required**.
 - `GET /notifications/`
 - `GET /notifications/unread-count/` → `{ "count": 23 }`, polled for the badge.
 - `PUT /notifications/{id}/read/`
 - `PUT /notifications/read-all/`
 
-## 10. Messages
+## 11. Messages
 Backs the header/sidebar `Messages` badge and `/messages` page. All **Auth required**.
 - `GET /messages/conversations/`
 - `POST /messages/conversations/` — `{ "participant_id": "..." }`, finds-or-creates a 1:1 thread.
@@ -117,9 +129,6 @@ Backs the header/sidebar `Messages` badge and `/messages` page. All **Auth requi
 ## Out of scope
 - **Poll attachment** (Create Post modal's "Poll" type) — no `Poll` model exists; the composer
   still builds a local-only post for this case, same as before real wiring existed.
-- **Venue attachment** — there's no `venue` post kind or model either; `listing_type: short_stay`
-  on `Property` covers "short stay" style listings, but the composer's dedicated venue form
-  (name/price-per-night/bedrooms) has no backend endpoint and stays local-only.
 - **Real-time delivery** (messages/notifications pushing to the client without polling) — REST +
   client-side polling only, no WebSocket/SSE channel.
 - **`useFollowedAuthors`** (the per-post "Unfollow X" menu item, keyed by author name) is a

@@ -1,5 +1,5 @@
 import { db } from "#app/db/db.js";
-import { postComments, postLikes, posts, postShares, savedPosts, users } from "#app/db/schema/index.js";
+import { postComments, postLikes, postShares, savedPosts, users } from "#app/db/schema/index.js";
 import { PostCommentInsert } from "#app/types/FeedTypes.js";
 import { and, desc, eq, getTableColumns, sql } from "drizzle-orm";
 
@@ -66,11 +66,14 @@ class PostInteractionsService {
     await db.delete(savedPosts).where(and(eq(savedPosts.post_id, postId), eq(savedPosts.user_id, userId)));
   }
 
+  // Just the save records, oldest last -- postsController.listSavedPosts
+  // enriches these with the same author/images/linked_property/counts shape
+  // every other post listing carries (via postsService.listByIds), rather
+  // than duplicating that join here.
   async listSaved(userId: string) {
     return db
-      .select({ ...getTableColumns(posts), saved_at: savedPosts.created_at })
+      .select({ post_id: savedPosts.post_id, saved_at: savedPosts.created_at })
       .from(savedPosts)
-      .innerJoin(posts, eq(posts.id, savedPosts.post_id))
       .where(eq(savedPosts.user_id, userId))
       .orderBy(desc(savedPosts.created_at));
   }

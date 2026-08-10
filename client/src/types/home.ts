@@ -186,11 +186,14 @@ export interface GeneralPost {
   propertyId?: string;
   /** Only set when `tag === "venue"`. */
   venueDetails?: VenueDetails;
-  /** Seed-only starting counts for the Stay listing page's visible like/
-   * share numbers (Figma node 3384:8330), the same role PropertyPost's own
-   * `reactions` plays for PropertyListingCard. Omitted (and treated as 0)
-   * for anything posted through the composer — every other GeneralPost
-   * variant has never needed a visible count, just a toggle. */
+  /** The real backend hotels.id this venue post is linked to, used to send
+   * reservations against the actual hotel rather than the post. Only ever
+   * set when `tag === "venue"`. */
+  hotelId?: string;
+  /** The Stay listing page's visible like/share numbers (Figma node
+   * 3384:8330), the same role PropertyPost's own `reactions` plays for
+   * PropertyListingCard. Every other GeneralPost variant has never needed a
+   * visible count, just a toggle. */
   reactions?: { likes: number; shares: number };
   comments: Comment[];
 }

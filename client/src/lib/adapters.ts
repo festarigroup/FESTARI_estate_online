@@ -7,6 +7,7 @@ import type {
   ApiStory,
 } from "@/lib/api/types";
 import type {
+  Amenity,
   Comment,
   ContentPost,
   FollowSuggestion,
@@ -14,6 +15,7 @@ import type {
   PropertyPost,
   ServicePost,
   ServiceProvider,
+  StayCategory,
   Story,
   TrendingProperty,
 } from "@/types/home";
@@ -50,6 +52,24 @@ const PROPERTY_TYPE_LABEL: Record<string, string> = {
   home: "Home",
   apartment: "Apartment",
   office: "Office",
+};
+
+const HOTEL_CATEGORY_LABEL: Record<string, StayCategory> = {
+  hotel: "Hotel",
+  resort: "Resort",
+  apartment: "Apartment",
+  event_venue: "Event Venue",
+  short_stay: "Short Stay",
+};
+
+const BACKEND_AMENITY_LABEL: Record<string, Amenity> = {
+  wifi: "WiFi",
+  pool: "Pool",
+  parking: "Parking",
+  gym: "Gym",
+  breakfast: "Dining",
+  restaurant: "Dining",
+  ac: "AC",
 };
 
 export function mapComment(comment: ApiComment): Comment {
@@ -91,6 +111,36 @@ export function mapPost(post: ApiPost): ContentPost {
       beds: property.bedrooms ?? 0,
       baths: property.bathrooms ?? 0,
       areaSqm: property.area_sqm ?? 0,
+    };
+    return mapped;
+  }
+
+  if (post.kind === "venue" && post.linked_hotel) {
+    const hotel = post.linked_hotel;
+    const amenities = hotel.amenities
+      ? [...new Set(Object.entries(hotel.amenities).flatMap(([key, on]) => (on && BACKEND_AMENITY_LABEL[key] ? [BACKEND_AMENITY_LABEL[key]] : [])))]
+      : undefined;
+
+    const mapped: GeneralPost = {
+      id: post.id,
+      kind: "general",
+      isLiked: post.is_liked,
+      author,
+      body: post.body ? [post.body] : [],
+      images: images.length ? images : undefined,
+      tag: "venue",
+      hotelId: hotel.id,
+      venueDetails: {
+        name: hotel.name,
+        location: hotel.location,
+        pricePerNight: Number(hotel.price_per_night),
+        bedrooms: hotel.rooms ?? 0,
+        category: HOTEL_CATEGORY_LABEL[hotel.category] ?? "Hotel",
+        rating: hotel.average_rating ?? undefined,
+        amenities: amenities && amenities.length > 0 ? amenities : undefined,
+      },
+      reactions: { likes: post.likes_count, shares: post.shares_count },
+      comments: [],
     };
     return mapped;
   }

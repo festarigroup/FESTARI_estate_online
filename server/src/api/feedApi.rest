@@ -61,6 +61,18 @@ Content-Type: application/json
   "linked_property_id": "REPLACE_WITH_PROPERTY_ID"
 }
 
+### Create a venue post (link an existing hotel)
+POST {{baseUrl}}/posts
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "kind": "venue",
+  "body": "Book direct for the best rate — rooftop lounge, pool, and gym all included.",
+  "hashtags": "#EastLegon #Hotel #FestariStays",
+  "linked_hotel_id": "REPLACE_WITH_HOTEL_ID"
+}
+
 ### Update a post
 PUT {{baseUrl}}/posts/REPLACE_WITH_POST_ID
 Authorization: Bearer {{authToken}}
