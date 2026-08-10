@@ -102,7 +102,7 @@ export function StayBrowser({ initialListings }: { initialListings: GeneralPost[
         {filtered.length > 0 ? (
           filtered.map((listing) => <StayListingCard key={listing.id} post={listing} />)
         ) : (
-          <div className="flex flex-col items-center gap-3 rounded-[39px] border border-dashed border-border-subtle bg-white py-16 text-center">
+          <div className="flex flex-col items-center gap-3 rounded-[19px] border border-dashed border-border-subtle bg-white py-16 text-center lg:rounded-[24px]">
             <span className="flex size-12 items-center justify-center rounded-full bg-surface-muted">
               <DynamicIcon name="Search" className="size-5 text-muted" />
             </span>

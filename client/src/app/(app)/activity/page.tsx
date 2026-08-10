@@ -55,7 +55,7 @@ export default function ActivityPage() {
       {loading ? (
         <p className="py-8 text-center text-sm text-muted">Loading your posts...</p>
       ) : myPosts.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-[39px] border border-dashed border-border-subtle bg-white py-16 text-center">
+        <div className="flex flex-col items-center gap-3 rounded-[19px] border border-dashed border-border-subtle bg-white py-16 text-center lg:rounded-[24px]">
           <DynamicIcon name="History" className="size-8 text-muted" />
           <p className="text-sm text-muted">You haven&apos;t posted anything yet.</p>
         </div>

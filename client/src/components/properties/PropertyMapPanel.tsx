@@ -77,7 +77,7 @@ export function PropertyMapPanel({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-[39px] border border-border-subtle bg-[#e3e2e5] shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]",
+        "overflow-hidden rounded-[19px] border border-border-subtle bg-[#e3e2e5] lg:rounded-[24px]",
         expanded
           ? "block h-[75vh] w-full"
           // 122px clears TopNavBar (64px, flush) plus PropertiesFilterRow's

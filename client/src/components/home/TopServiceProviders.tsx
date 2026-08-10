@@ -21,7 +21,7 @@ export function TopServiceProviders() {
   if (providers.length === 0) return null;
 
   return (
-    <div className="flex w-full shrink-0 flex-col gap-6 rounded-[39px] border border-border bg-white p-6">
+    <div className="flex w-full shrink-0 flex-col gap-6 rounded-[19px] border border-border bg-white p-6 lg:rounded-[24px]">
       <SidebarWidgetHeader title="Top Service Providers" seeAllHref="/professionals" />
       <div className="flex w-full items-start justify-center gap-2">
         {providers.map((provider) => (

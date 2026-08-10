@@ -76,7 +76,7 @@ export function StayListingCard({ post }: { post: GeneralPost }) {
   );
 
   return (
-    <article className="flex w-full shrink-0 flex-col gap-4 overflow-hidden rounded-[39px] border border-border bg-white p-6">
+    <article className="flex w-full shrink-0 flex-col gap-4 overflow-hidden rounded-[19px] border border-border bg-white p-6 lg:rounded-[24px]">
       <PostHeader post={post} />
 
       {post.body.length > 0 && (

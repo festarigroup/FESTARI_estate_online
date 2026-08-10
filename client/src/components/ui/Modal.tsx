@@ -16,8 +16,9 @@ interface ModalProps {
 /**
  * Centered dialog shell — backdrop click and Escape both close it. Not part
  * of the Figma file (no modal frames were provided); styled to match the
- * feed's existing cards (white, rounded-[39px] to match every other card's
- * corner radius, navy/gold accents) since this is new surface built to make
+ * feed's existing cards (white, rounded-[19px]/lg:rounded-[24px] to match
+ * every other card's corner radius, navy/gold accents) since this is new
+ * surface built to make
  * the composer/story buttons actually do something.
  *
  * Portals to `document.body` rather than rendering in place: several cards
@@ -57,7 +58,7 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
         aria-modal="true"
         aria-label={title}
         className={cn(
-          "relative flex max-h-[85vh] w-full max-w-lg flex-col gap-4 rounded-[39px] bg-white p-6 shadow-xl",
+          "relative flex max-h-[85vh] w-full max-w-lg flex-col gap-4 rounded-[19px] bg-white p-6 shadow-xl lg:rounded-[24px]",
           className,
         )}
       >

@@ -26,7 +26,7 @@ const FEATURES = [
  * variant doc comment. */
 export function ConciergeCard() {
   return (
-    <div className="relative w-full shrink-0 overflow-hidden rounded-[39px] border border-border bg-brand-navy p-8">
+    <div className="relative w-full shrink-0 overflow-hidden rounded-[19px] border border-border bg-brand-navy p-8 lg:rounded-[24px]">
       <Image
         src="/images/concierge-portrait.png"
         alt=""

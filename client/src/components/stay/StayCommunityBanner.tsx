@@ -17,7 +17,7 @@ const MEMBER_AVATARS = [
  * that rather than linking somewhere real. */
 export function StayCommunityBanner() {
   return (
-    <div className="relative flex items-center justify-between overflow-hidden rounded-[39px] bg-brand-navy p-6">
+    <div className="relative flex items-center justify-between overflow-hidden rounded-[19px] bg-brand-navy p-6 lg:rounded-[24px]">
       <div
         className="pointer-events-none absolute -top-10 -right-10 size-40 rounded-full bg-brand-gold/10 blur-3xl"
         aria-hidden

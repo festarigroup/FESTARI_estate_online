@@ -23,7 +23,7 @@ export function TrendingProperties() {
   if (properties.length === 0) return null;
 
   return (
-    <div className="flex w-full shrink-0 flex-col gap-6 rounded-[39px] border border-border bg-white p-6">
+    <div className="flex w-full shrink-0 flex-col gap-6 rounded-[19px] border border-border bg-white p-6 lg:rounded-[24px]">
       <SidebarWidgetHeader title="Trending Properties" seeAllHref="/properties" />
       <div className="flex w-full flex-col gap-4">
         {properties.map((property) => (

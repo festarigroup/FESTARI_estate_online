@@ -6,7 +6,7 @@ import { CATEGORIES } from "@/lib/mock-data";
 /** "Explore by Category" widget: a 4-column grid of category shortcuts. */
 export function CategoryGrid() {
   return (
-    <div className="flex w-full shrink-0 flex-col gap-6 rounded-[39px] border border-border bg-white p-6">
+    <div className="flex w-full shrink-0 flex-col gap-6 rounded-[19px] border border-border bg-white p-6 lg:rounded-[24px]">
       <SidebarWidgetHeader title="Explore by Category" seeAllHref="/properties" />
       <div className="grid w-full grid-cols-4 gap-4">
         {CATEGORIES.map((category) => (
