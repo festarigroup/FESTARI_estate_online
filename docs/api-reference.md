@@ -91,8 +91,8 @@ List endpoints that accept `current_page`/`limit` return:
 `status` (moderation): `pending | approved | rejected` — public list/detail only return `approved`.
 
 ## Hotels — `/hotels`
-- `GET /hotels?location=`
-- `POST /hotels` **Auth required** — gated by `max_hotels`.
+- `GET /hotels?location=&category=` — `category`: `hotel | resort | apartment | event_venue | short_stay`. Includes `average_rating`/`review_count` (computed from `hotel_reviews`, not stored).
+- `POST /hotels` **Auth required** — gated by `max_hotels`. Accepts `category` (defaults `hotel`) and `rooms`.
 - `GET /hotels/:id`
 - `PUT /hotels/:id` / `DELETE /hotels/:id` **Auth required** — owner or admin.
 - `PUT /hotels/:id/approve` / `PUT /hotels/:id/reject` **Admin only**
@@ -104,6 +104,12 @@ List endpoints that accept `current_page`/`limit` return:
 - `GET /hotels/bookings/:id` **Auth required** — booker, hotel owner, or admin.
 - `PUT /hotels/bookings/:id` **Auth required** — hotel owner or admin, updates `status`.
 - `DELETE /hotels/bookings/:id` **Auth required** — booker or admin, cancels.
+- `POST /hotels/:id/reviews` **Auth required** — `{ rating: 1-5, comment? }`.
+
+A hotel can be linked into the home feed via `POST /feed/posts` with `kind: "venue"` and
+`linked_hotel_id` — see [home-feed-api-endpoints.md](home-feed-api-endpoints.md). Every
+like/comment/share/save on a venue post goes through the normal feed endpoints, since it's a
+real post row, not a hotel-specific interaction system.
 
 ## Artisans — `/artisans`
 - `GET /artisans?service_type=`

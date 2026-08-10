@@ -3,7 +3,7 @@
 @authToken = REPLACE_WITH_ACCESS_TOKEN
 
 ### List hotels
-GET {{baseUrl}}?location=Accra
+GET {{baseUrl}}?location=Accra&category=hotel
 
 ### Get a hotel
 GET {{baseUrl}}/REPLACE_WITH_HOTEL_ID
@@ -18,7 +18,9 @@ Content-Type: application/json
   "description": "Boutique hotel in East Legon.",
   "location": "East Legon, Accra",
   "amenities": { "wifi": true, "pool": true, "parking": true },
-  "price_per_night": 850
+  "price_per_night": 850,
+  "category": "hotel",
+  "rooms": 40
 }
 
 ### Update a hotel
@@ -93,3 +95,13 @@ Content-Type: application/json
 ### Cancel a booking
 DELETE {{baseUrl}}/bookings/REPLACE_WITH_BOOKING_ID
 Authorization: Bearer {{authToken}}
+
+### Leave a review
+POST {{baseUrl}}/REPLACE_WITH_HOTEL_ID/reviews
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "rating": 5,
+  "comment": "Spotless rooms and a great rooftop view."
+}

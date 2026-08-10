@@ -31,11 +31,12 @@ Unique on `(story_id, viewer_id)` — one view record per viewer.
 | Column | Type | Notes |
 |---|---|---|
 | `author_id` | uuid → `users.id`, cascade | |
-| `kind` | `post_kind` enum: `property \| service \| general` | |
+| `kind` | `post_kind` enum: `property \| service \| general \| venue` | |
 | `body` | text | |
 | `hashtags` | text, nullable | raw text, e.g. `"#A #B #C"` — not parsed into per-tag rows |
 | `linked_property_id` | uuid → `properties.id`, set null | set when `kind = property` |
 | `linked_artisan_id` | uuid → `artisan_profiles.id`, set null | set when `kind = service` |
+| `linked_hotel_id` | uuid → `hotels.id`, set null | set when `kind = venue` |
 
 `likes_count`/`comments_count`/`shares_count` are **not** columns — computed via correlated
 `count(*)` subqueries in `postsService`'s `withCounts()` helper at query time. `is_liked`/
@@ -128,10 +129,16 @@ a separate generated id. `average_rating` is not a column; `artisan_reviews` (`a
 `reviewer_id`, `rating: 1-5` with a Postgres `CHECK`, `comment`) backs a computed
 `AVG(rating)`/`COUNT(*)` in `artisansService.getTop()` / `getRatingSummary()`.
 
+### `schema/hotels.ts` — `hotels` + `hotel_reviews`
+`category` (`hotel_category` enum: `hotel | resort | apartment | event_venue | short_stay`) and
+`rooms` (nullable integer) back the Stay page's category tabs and bedroom-equivalent stat —
+same reasoning as the property/artisan additions above, added once the Stay page actually needed
+real data instead of the mock `STAY_LISTINGS`/`STAY_CATEGORIES` it started from. `hotel_reviews`
+mirrors `artisan_reviews` exactly (`hotel_id`, `reviewer_id`, `rating: 1-5` with a `CHECK`,
+`comment`), backing a computed `average_rating`/`review_count` the same way.
+
 ---
 
 ## Out of scope
 - **Poll model** — the Create Post modal's "Poll" attachment type has no backing table; posts of
   that shape stay local-only on the client.
-- **Venue post kind** — `posts.kind` is only `property | service | general`; there's no `venue`
-  value and no venue-specific fields anywhere in this schema.

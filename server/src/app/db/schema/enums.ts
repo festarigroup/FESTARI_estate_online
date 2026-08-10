@@ -48,7 +48,15 @@ export const hireStatusEnum = pgEnum("hire_status", [
   "completed",
 ]);
 
-export const postKindEnum = pgEnum("post_kind", ["property", "service", "general"]);
+export const postKindEnum = pgEnum("post_kind", ["property", "service", "general", "venue"]);
+
+export const hotelCategoryEnum = pgEnum("hotel_category", [
+  "hotel",
+  "resort",
+  "apartment",
+  "event_venue",
+  "short_stay",
+]);
 
 export const notificationVerbEnum = pgEnum("notification_verb", [
   "like",

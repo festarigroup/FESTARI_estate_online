@@ -10,6 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { postKindEnum } from "./enums.js";
 import { artisanProfiles } from "./artisans.js";
+import { hotels } from "./hotels.js";
 import { properties } from "./properties.js";
 import { users } from "./users.js";
 
@@ -60,6 +61,9 @@ export const posts = pgTable(
       onDelete: "set null",
     }),
     linked_artisan_id: uuid("linked_artisan_id").references(() => artisanProfiles.id, {
+      onDelete: "set null",
+    }),
+    linked_hotel_id: uuid("linked_hotel_id").references(() => hotels.id, {
       onDelete: "set null",
     }),
     created_at: timestamp("created_at").defaultNow().notNull(),

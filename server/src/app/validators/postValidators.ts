@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-const POST_KINDS = ["property", "service", "general"];
+const POST_KINDS = ["property", "service", "general", "venue"];
 
 export const createPostSchema = Joi.object({
   kind: Joi.string().valid(...POST_KINDS).default("general"),
@@ -8,6 +8,7 @@ export const createPostSchema = Joi.object({
   hashtags: Joi.string().allow("").optional(),
   linked_property_id: Joi.string().uuid().optional(),
   linked_artisan_id: Joi.string().uuid().optional(),
+  linked_hotel_id: Joi.string().uuid().optional(),
 });
 
 export const updatePostSchema = Joi.object({

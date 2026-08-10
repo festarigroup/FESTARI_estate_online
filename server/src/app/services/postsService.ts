@@ -1,6 +1,8 @@
 import { db } from "#app/db/db.js";
 import {
   artisanProfiles,
+  hotelReviews,
+  hotels,
   postComments,
   postImages,
   postLikes,
@@ -51,6 +53,17 @@ function baseSelection(currentUserId?: string) {
       id: artisanProfiles.id,
       service_type: artisanProfiles.service_type,
     },
+    linked_hotel: {
+      id: hotels.id,
+      name: hotels.name,
+      location: hotels.location,
+      price_per_night: hotels.price_per_night,
+      category: hotels.category,
+      rooms: hotels.rooms,
+      amenities: hotels.amenities,
+      average_rating: sql<number | null>`(select avg(${hotelReviews.rating})::float from ${hotelReviews} where ${hotelReviews.hotel_id} = ${posts.linked_hotel_id})`,
+      review_count: sql<number>`(select count(*)::int from ${hotelReviews} where ${hotelReviews.hotel_id} = ${posts.linked_hotel_id})`,
+    },
     ...withCounts(currentUserId),
   };
 }
@@ -60,7 +73,8 @@ function withJoins<T extends ReturnType<typeof db.select>>(query: T) {
     .from(posts)
     .innerJoin(users, eq(users.id, posts.author_id))
     .leftJoin(properties, eq(properties.id, posts.linked_property_id))
-    .leftJoin(artisanProfiles, eq(artisanProfiles.id, posts.linked_artisan_id));
+    .leftJoin(artisanProfiles, eq(artisanProfiles.id, posts.linked_artisan_id))
+    .leftJoin(hotels, eq(hotels.id, posts.linked_hotel_id));
 }
 
 function normalizeLinkedRows(rows: any[]) {
@@ -68,6 +82,7 @@ function normalizeLinkedRows(rows: any[]) {
     ...row,
     linked_property: row.linked_property?.id ? row.linked_property : null,
     linked_artisan: row.linked_artisan?.id ? row.linked_artisan : null,
+    linked_hotel: row.linked_hotel?.id ? row.linked_hotel : null,
   }));
 }
 
@@ -91,6 +106,16 @@ class PostsService {
     const rows = await withJoins(db.select(baseSelection(currentUserId))).where(eq(posts.id, id));
     const [post] = normalizeLinkedRows(rows);
     return post ?? null;
+  }
+
+  // Same enriched shape as list()/getById(), for a caller that already has
+  // its own ordered set of post ids (e.g. postInteractionsService.listSaved,
+  // ordered by save time rather than post time) -- doesn't preserve `ids`'
+  // order itself, callers that care (like listSavedPosts) reorder after.
+  async listByIds(ids: string[], currentUserId?: string) {
+    if (ids.length === 0) return [];
+    const rows = await withJoins(db.select(baseSelection(currentUserId))).where(inArray(posts.id, ids));
+    return normalizeLinkedRows(rows);
   }
 
   async getRawById(id: string) {

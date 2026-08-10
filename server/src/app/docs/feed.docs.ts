@@ -117,16 +117,17 @@
  *     summary: List feed posts
  *     description: |
  *       Public, but personalized (`is_liked`/`is_saved`) when a token is
- *       sent. `property`-kind posts include `linked_property`;
- *       `service`-kind posts include `linked_artisan` — both null when the
- *       post isn't backed by a real listing/profile.
+ *       sent. `property`-kind posts include `linked_property`,
+ *       `service`-kind posts include `linked_artisan`, `venue`-kind posts
+ *       include `linked_hotel` — all null when the post isn't backed by a
+ *       real listing/profile/hotel.
  *     tags: [Feed]
  *     parameters:
  *       - in: query
  *         name: kind
  *         schema:
  *           type: string
- *           enum: [property, service, general]
+ *           enum: [property, service, general, venue]
  *       - in: query
  *         name: current_page
  *         schema:
@@ -171,7 +172,7 @@
  *             properties:
  *               kind:
  *                 type: string
- *                 enum: [property, service, general]
+ *                 enum: [property, service, general, venue]
  *                 default: general
  *               body:
  *                 type: string
@@ -182,6 +183,9 @@
  *                 type: string
  *                 format: uuid
  *               linked_artisan_id:
+ *                 type: string
+ *                 format: uuid
+ *               linked_hotel_id:
  *                 type: string
  *                 format: uuid
  *     responses:
@@ -506,7 +510,7 @@
  *           format: uuid
  *         kind:
  *           type: string
- *           enum: [property, service, general]
+ *           enum: [property, service, general, venue]
  *         body:
  *           type: string
  *         hashtags:
@@ -517,6 +521,10 @@
  *           format: uuid
  *           nullable: true
  *         linked_artisan_id:
+ *           type: string
+ *           format: uuid
+ *           nullable: true
+ *         linked_hotel_id:
  *           type: string
  *           format: uuid
  *           nullable: true

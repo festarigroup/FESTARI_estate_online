@@ -16,6 +16,11 @@
  *         name: location
  *         schema:
  *           type: string
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *           enum: [hotel, resort, apartment, event_venue, short_stay]
  *     responses:
  *       200:
  *         description: Paginated hotel list
@@ -57,6 +62,12 @@
  *                 type: object
  *               price_per_night:
  *                 type: number
+ *               category:
+ *                 type: string
+ *                 enum: [hotel, resort, apartment, event_venue, short_stay]
+ *                 default: hotel
+ *               rooms:
+ *                 type: integer
  *     responses:
  *       201:
  *         description: Hotel created
@@ -367,6 +378,40 @@
 
 /**
  * @swagger
+ * /hotels/{id}/reviews:
+ *   post:
+ *     summary: Leave a review
+ *     tags: [Hotels]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [rating]
+ *             properties:
+ *               rating:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 5
+ *               comment:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Review created
+ */
+
+/**
+ * @swagger
  * components:
  *   schemas:
  *     Hotel:
@@ -391,6 +436,17 @@
  *         price_per_night:
  *           type: string
  *           description: decimal
+ *         category:
+ *           type: string
+ *           enum: [hotel, resort, apartment, event_venue, short_stay]
+ *         rooms:
+ *           type: integer
+ *           nullable: true
+ *         average_rating:
+ *           type: number
+ *           nullable: true
+ *         review_count:
+ *           type: integer
  *         status:
  *           type: string
  *           enum: [pending, approved, rejected]
