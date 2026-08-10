@@ -561,20 +561,29 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-semibold text-ink">Category</span>
-              <select
-                value={venueCategory}
-                onChange={(e) => setVenueCategory(e.target.value as StayCategory)}
-                className={FIELD_CLASS}
-              >
-                <option value="" disabled>
-                  Select a category
-                </option>
-                {STAY_CATEGORIES.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.label}
+              <div className="relative">
+                {/* Same treatment as the register screen's role select --
+                    appearance-none drops the browser's own flush-to-the-edge
+                    arrow in favor of this inset ChevronDown. */}
+                <select
+                  value={venueCategory}
+                  onChange={(e) => setVenueCategory(e.target.value as StayCategory)}
+                  className={cn(FIELD_CLASS, "appearance-none pr-9")}
+                >
+                  <option value="" disabled>
+                    Select a category
                   </option>
-                ))}
-              </select>
+                  {STAY_CATEGORIES.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.label}
+                    </option>
+                  ))}
+                </select>
+                <DynamicIcon
+                  name="ChevronDown"
+                  className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted"
+                />
+              </div>
             </label>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-1.5">

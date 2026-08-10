@@ -7,9 +7,11 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
 import { PasswordInput } from "@/components/ui/PasswordInput";
+import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { useAuth } from "@/context/AuthContext";
 import { resendOtp } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
+import { cn } from "@/lib/cn";
 
 const INPUT_CLASS =
   "w-full rounded-lg border border-border-subtle px-3 py-2 text-sm text-ink placeholder:text-muted focus:outline-2 focus:outline-brand-gold";
@@ -128,13 +130,28 @@ export default function RegisterPage() {
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-semibold text-ink">I am a...</span>
-              <select value={role} onChange={(e) => setRole(e.target.value)} className={INPUT_CLASS}>
-                {ROLES.map((r) => (
-                  <option key={r.value} value={r.value}>
-                    {r.label}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                {/* appearance-none drops the browser's own arrow (which sits
+                    flush against the edge with no breathing room) so this
+                    ChevronDown can take its place, inset the same way every
+                    other icon-affordance in this app is -- pr-9 on the
+                    select keeps its own text from running underneath it. */}
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className={cn(INPUT_CLASS, "appearance-none pr-9")}
+                >
+                  {ROLES.map((r) => (
+                    <option key={r.value} value={r.value}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
+                <DynamicIcon
+                  name="ChevronDown"
+                  className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted"
+                />
+              </div>
             </label>
 
             <Button type="submit" variant="gold" disabled={submitting} className="mt-2 w-full">
