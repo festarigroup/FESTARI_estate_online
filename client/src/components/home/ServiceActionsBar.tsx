@@ -6,6 +6,7 @@ import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { RepostButton } from "@/components/home/RepostButton";
 import { useSavedPosts } from "@/hooks/useSavedPosts";
 import { usePostShare } from "@/hooks/usePostShare";
+import { likePost, unlikePost } from "@/lib/api/feed";
 import { cn } from "@/lib/cn";
 import type { ContentPost } from "@/types/home";
 
@@ -15,9 +16,10 @@ interface ServiceActionsBarProps {
   onToggleComments: () => void;
   commentCount: number;
   /** The post's one direct-action CTA — BookServiceButton for a service
-   * post, VenueReservationButton for a venue post. Same slot PostEngagementBar's
-   * `cta` prop is, just always present here rather than optional, since
-   * every post that reaches this bar has one. */
+   * post, VenueReservationButton for a venue post (or a Message+Reserve
+   * pair wrapped together, for the Stay page's own listing card). Same
+   * slot PostEngagementBar's `cta` prop is, just always present here rather
+   * than optional, since every post that reaches this bar has one. */
   cta: React.ReactNode;
 }
 
@@ -27,15 +29,30 @@ interface ServiceActionsBarProps {
  * Like/Comment/Save affordances (toggle + label) rather than Figma's
  * static counts, since these buttons actually do something here. Shared by
  * every post whose primary action is booking something directly rather
- * than just sharing it — service posts and venue posts alike, the same
- * distinction the Figma file draws between "Property Listing" and
- * "Service/Promotion". Labels collapse to icon-only below sm: for the same
- * cramped-mobile-row reason PostEngagementBar's do. */
+ * than just sharing it — service posts, venue posts, and both listing
+ * pages' own venue/property cards, so all four render the exact same bar
+ * instead of each maintaining a near-but-not-quite-identical copy.
+ *
+ * Labels collapse to icon-only below sm: for the same cramped-mobile-row
+ * reason PostEngagementBar's do. The CTA drops to its own full-width row
+ * below the icon actions at mobile widths (sm:w-auto un-stacks it back
+ * onto the same row, right-aligned, once there's room) rather than
+ * crowding in next to five icons on a phone-width card -- the
+ * `[&>*]:w-full` on that wrapper stretches whatever's actually passed as
+ * `cta` (a single button, or a caller's own multi-button group) to fill
+ * that row without every CTA component needing its own width prop. */
 export function ServiceActionsBar({ post, commentsOpen, onToggleComments, commentCount, cta }: ServiceActionsBarProps) {
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(!!post.isLiked);
   const { isSaved, toggleSave } = useSavedPosts();
   const saved = isSaved(post.id);
   const { handleShare } = usePostShare(post);
+
+  function handleToggleLike() {
+    const next = !liked;
+    setLiked(next);
+    const request = next ? likePost(post.id) : unlikePost(post.id);
+    request.catch(() => setLiked(!next));
+  }
 
   function handleSave() {
     const wasSaved = saved;
@@ -44,10 +61,10 @@ export function ServiceActionsBar({ post, commentsOpen, onToggleComments, commen
   }
 
   return (
-    <div className="flex w-full items-center justify-between border-t border-border-subtle pt-[17px]">
+    <div className="flex w-full flex-wrap items-center gap-3 border-t border-border-subtle pt-[17px]">
       <div className="flex items-center gap-4">
         <button
-          onClick={() => setLiked((v) => !v)}
+          onClick={handleToggleLike}
           className={cn(
             "flex items-center gap-2 text-base font-medium",
             liked ? "text-brand-rust" : "text-muted hover:text-ink",
@@ -70,8 +87,6 @@ export function ServiceActionsBar({ post, commentsOpen, onToggleComments, commen
           </span>
         </button>
         <RepostButton postId={post.id} />
-      </div>
-      <div className="flex items-center gap-3">
         {/* Circular icon buttons, not text+icon rows — matches Figma's
             share/save buttons on this bar exactly (nodes 3340:1087/1090),
             distinct from PostEngagementBar's labeled style. */}
@@ -94,8 +109,8 @@ export function ServiceActionsBar({ post, commentsOpen, onToggleComments, commen
         >
           <DynamicIcon name="Bookmark" className="size-4" fill={saved ? "currentColor" : "none"} />
         </button>
-        {cta}
       </div>
+      <div className="w-full [&>*]:w-full sm:ml-auto sm:w-auto sm:[&>*]:w-auto">{cta}</div>
     </div>
   );
 }

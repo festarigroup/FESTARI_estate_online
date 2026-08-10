@@ -7,11 +7,8 @@ import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { PostHeader } from "@/components/home/PostHeader";
 import { PostImageLightbox } from "@/components/home/PostImageLightbox";
 import { CommentsSection } from "@/components/home/CommentsSection";
-import { useSavedPosts } from "@/hooks/useSavedPosts";
-import { usePostShare } from "@/hooks/usePostShare";
+import { PostEngagementBar } from "@/components/home/PostEngagementBar";
 import { usePostComments } from "@/hooks/usePostComments";
-import { likePost, unlikePost } from "@/lib/api/feed";
-import { cn } from "@/lib/cn";
 import type { PropertyPost } from "@/types/home";
 
 /** "Article - Property Card" from the Properties page (Figma node
@@ -20,29 +17,18 @@ import type { PropertyPost } from "@/types/home";
  * Details" CTA and the full beds/baths/sqm metadata strip. Same
  * `PropertyPost` data (Ama Serwaa's listing renders on both the Home feed
  * via PropertyPostCard and here via this component), just a different
- * presentation for a different context — PropertyPostCard's Home-feed CTA
- * was removed at explicit request earlier, so that decision is left alone
- * rather than reintroduced through a shared component. */
+ * presentation for a different context.
+ *
+ * The action bar itself is PostEngagementBar -- the exact same Like/
+ * Comment/Repost/Share/Save bar the Home feed's own PropertyPostCard would
+ * render (PropertyPostCard's own CTA was removed at explicit request
+ * earlier, so it renders that bar with no `cta` at all; this one passes
+ * "View Details" as PostEngagementBar's `cta`) -- rather than a bespoke
+ * bar that only approximated it. */
 export function PropertyListingCard({ listing }: { listing: PropertyPost }) {
-  const [liked, setLiked] = useState(!!listing.isLiked);
-  const [likeCount, setLikeCount] = useState(listing.reactions.likes);
-  const { isSaved, toggleSave } = useSavedPosts();
-  const saved = isSaved(listing.id);
-  const { handleShare } = usePostShare(listing);
   const { comments, commentsOpen, toggleComments, addComment } = usePostComments(listing.id, listing.comments);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const images = listing.images;
-
-  function handleLike() {
-    const next = !liked;
-    setLiked(next);
-    setLikeCount((c) => (next ? c + 1 : c - 1));
-    const request = next ? likePost(listing.id) : unlikePost(listing.id);
-    request.catch(() => {
-      setLiked(!next);
-      setLikeCount((c) => (next ? c - 1 : c + 1));
-    });
-  }
 
   const badge = (
     <span className="absolute top-3 left-3 rounded bg-brand-gold-dark px-2 py-1 text-[10px] font-semibold tracking-[0.5px] text-white uppercase shadow-sm">
@@ -152,61 +138,28 @@ export function PropertyListingCard({ listing }: { listing: PropertyPost }) {
         </div>
       </div>
 
-      {/* Social Interactions & Actions (node 3340:2465) */}
-      <div className="flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-6">
-          <button
-            onClick={handleLike}
-            className={cn(
-              "flex items-center gap-2 text-xs font-semibold",
-              liked ? "text-brand-rust" : "text-[#44474e] hover:text-ink",
-            )}
-          >
-            <DynamicIcon name="Heart" className="size-5" fill={liked ? "currentColor" : "none"} />
-            {likeCount}
-          </button>
-          <button
-            onClick={toggleComments}
-            aria-expanded={commentsOpen}
-            className={cn(
-              "flex items-center gap-2 text-xs font-semibold",
-              commentsOpen ? "text-brand-navy" : "text-[#44474e] hover:text-ink",
-            )}
-          >
-            <DynamicIcon name="MessageCircle" className="size-5" />
-            {comments.length}
-          </button>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            aria-label="Share"
-            onClick={handleShare}
-            className="flex size-9 items-center justify-center rounded-full border border-[#e9ecef] text-muted hover:bg-surface-muted"
-          >
-            <DynamicIcon name="Share2" className="size-4" />
-          </button>
-          <button
-            aria-label={saved ? "Remove from saved" : "Save"}
-            onClick={() => toggleSave(listing)}
-            className={cn(
-              "flex size-9 items-center justify-center rounded-full border",
-              saved
-                ? "border-[rgba(119,90,25,0.3)] bg-[rgba(254,212,136,0.2)] text-brand-gold-dark"
-                : "border-[#e9ecef] text-muted hover:bg-surface-muted",
-            )}
-          >
-            <DynamicIcon name="Bookmark" className="size-4" fill={saved ? "currentColor" : "none"} />
-          </button>
-          {/* Matches the Button component's outline-gold variant exactly —
-              inlined since Button renders a <button>, not a link, and this
-              CTA needs to navigate to the listing's detail page. */}
-          <Link
-            href={`/properties/${listing.id}`}
-            className="inline-flex items-center justify-center rounded-full border border-brand-gold-dark px-[21px] py-[9px] text-xs font-semibold tracking-[0.24px] text-brand-gold-dark hover:bg-brand-gold-dark/5"
-          >
-            View Details
-          </Link>
-        </div>
+      {/* Social Interactions & Actions (node 3340:2465) -- see this
+          component's own doc comment for why it's PostEngagementBar rather
+          than a bespoke row. No py- here: the bar's own border-t/pt-[17px]
+          already supplies the gap from the metadata strip above, matching
+          every other card that renders this same bar. */}
+      <div className="px-4 pb-4">
+        <PostEngagementBar
+          post={listing}
+          commentsOpen={commentsOpen}
+          onToggleComments={toggleComments}
+          cta={
+            // Matches the Button component's outline-gold variant exactly —
+            // inlined since Button renders a <button>, not a link, and this
+            // CTA needs to navigate to the listing's detail page.
+            <Link
+              href={`/properties/${listing.id}`}
+              className="inline-flex items-center justify-center rounded-full border border-brand-gold-dark px-[21px] py-[9px] text-xs font-semibold tracking-[0.24px] text-brand-gold-dark hover:bg-brand-gold-dark/5"
+            >
+              View Details
+            </Link>
+          }
+        />
       </div>
 
       {commentsOpen && (

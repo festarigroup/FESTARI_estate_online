@@ -96,11 +96,17 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
   // the full row exactly as before. With one, they cluster into a left
   // group so the CTA gets real room on the right — a different spacing
   // rule, which is why this branches instead of always wrapping in a group.
+  // The CTA itself drops to its own full-width row below that group at
+  // mobile widths (sm:w-auto un-stacks it back onto the same row, right-
+  // aligned, once there's room) rather than crowding in next to five
+  // icons on a phone-width card — see ServiceActionsBar's own doc comment
+  // for why `[&>*]:w-full` is what actually stretches it, not a width prop
+  // on whatever CTA component gets passed in.
   if (cta) {
     return (
-      <div className="flex w-full items-center justify-between border-t border-border-subtle pt-[17px]">
+      <div className="flex w-full flex-wrap items-center gap-3 border-t border-border-subtle pt-[17px]">
         <div className="flex items-center gap-4">{actions}</div>
-        {cta}
+        <div className="w-full [&>*]:w-full sm:ml-auto sm:w-auto sm:[&>*]:w-auto">{cta}</div>
       </div>
     );
   }

@@ -6,15 +6,12 @@ import { DynamicIcon, type IconName } from "@/components/ui/DynamicIcon";
 import { PostHeader } from "@/components/home/PostHeader";
 import { PostImageLightbox } from "@/components/home/PostImageLightbox";
 import { CommentsSection } from "@/components/home/CommentsSection";
+import { ServiceActionsBar } from "@/components/home/ServiceActionsBar";
 import { VenueMessageButton } from "@/components/home/VenueMessageButton";
 import { VenueReservationButton } from "@/components/home/VenueReservationButton";
-import { useSavedPosts } from "@/hooks/useSavedPosts";
-import { usePostShare } from "@/hooks/usePostShare";
 import { usePostComments } from "@/hooks/usePostComments";
-import { likePost, unlikePost } from "@/lib/api/feed";
 import { AMENITIES } from "@/lib/mock-data";
 import { isLocalPreviewUrl } from "@/lib/is-local-preview-url";
-import { cn } from "@/lib/cn";
 import type { GalleryImage, GeneralPost } from "@/types/home";
 
 const AMENITY_ICON: Record<string, IconName> = Object.fromEntries(AMENITIES.map((a) => [a.id, a.icon]));
@@ -27,18 +24,20 @@ const GRID_LIMIT = 3;
 /** "Article - Post: Property Listing" from the Stay page (Figma node
  * 3384:8282) — a close cousin of GeneralPostCard's own venue-tag rendering,
  * scoped to this listing page specifically: a category badge, star rating,
- * amenity chips, and a Message + Reserve pair instead of the single "Make a
- * Reservation" CTA the Home feed's card uses. Same `GeneralPost` data (a
- * venue posted from here also renders via GeneralPostCard wherever else it
- * might show up), just a different presentation for a different context —
- * mirrors exactly how PropertyListingCard relates to PropertyPostCard. */
+ * and amenity chips above the action bar. Same `GeneralPost` data (a venue
+ * posted from here also renders via GeneralPostCard wherever else it might
+ * show up), just a different presentation for a different context — mirrors
+ * exactly how PropertyListingCard relates to PropertyPostCard.
+ *
+ * The action bar itself is ServiceActionsBar -- the exact same Like/
+ * Comment/Repost/Share/Save bar every venue *post* on the Home feed
+ * already renders (GeneralPostCard routes `tag === "venue"` posts to this
+ * same component) -- rather than a bespoke one that only approximated it.
+ * Message + Reserve ride together in ServiceActionsBar's single `cta`
+ * slot as one wrapped pair, since this card needs two direct actions where
+ * a plain service post only ever has one. */
 export function StayListingCard({ post }: { post: GeneralPost }) {
   const venue = post.venueDetails;
-  const [liked, setLiked] = useState(!!post.isLiked);
-  const [likeCount, setLikeCount] = useState(post.reactions?.likes ?? 0);
-  const { isSaved, toggleSave } = useSavedPosts();
-  const saved = isSaved(post.id);
-  const { handleShare } = usePostShare(post);
   const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.id, post.comments);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const images = post.images ?? [];
@@ -47,17 +46,6 @@ export function StayListingCard({ post }: { post: GeneralPost }) {
   // than assumed, since `venueDetails` is still optional on the shared
   // GeneralPost type.
   if (!venue) return null;
-
-  function handleLike() {
-    const next = !liked;
-    setLiked(next);
-    setLikeCount((c) => (next ? c + 1 : c - 1));
-    const request = next ? likePost(post.id) : unlikePost(post.id);
-    request.catch(() => {
-      setLiked(!next);
-      setLikeCount((c) => (next ? c - 1 : c + 1));
-    });
-  }
 
   function renderImage(image: GalleryImage) {
     if (image.type === "video") {
@@ -189,72 +177,27 @@ export function StayListingCard({ post }: { post: GeneralPost }) {
         )}
       </div>
 
-      {/* Social Interactions & Actions (Figma node 3384:8328) -- Like/
-          Comment/Share/Save now match a normal post's own action bar
-          (ServiceActionsBar/PostEngagementBar: text-base font-medium,
-          labels collapsing to icon-only below sm: via sr-only rather than
-          always-visible counts) instead of this card's own smaller,
-          always-numbered style. The Message + Reserve CTAs get their own
-          full-width row below that group at mobile widths (sm:w-auto
-          un-stacks them back onto the same row once there's room) --
-          crowding two buttons onto the same line as four icons is what a
-          normal post's single-CTA bar never has to deal with. */}
-      <div className="flex w-full flex-wrap items-center gap-3 border-t border-border-subtle pt-[17px]">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={handleLike}
-            className={cn(
-              "flex items-center gap-2 text-base font-medium",
-              liked ? "text-brand-rust" : "text-muted hover:text-ink",
-            )}
-          >
-            <DynamicIcon name="Heart" className="size-5" fill={liked ? "currentColor" : "none"} />
-            <span className="sr-only sm:not-sr-only">{likeCount > 0 ? `Like (${likeCount})` : "Like"}</span>
-          </button>
-          <button
-            onClick={toggleComments}
-            aria-expanded={commentsOpen}
-            className={cn(
-              "flex items-center gap-2 text-base font-medium",
-              commentsOpen ? "text-brand-navy" : "text-muted hover:text-ink",
-            )}
-          >
-            <DynamicIcon name="MessageCircle" className="size-5" />
-            <span className="sr-only sm:not-sr-only">
-              {comments.length > 0 ? `Comment (${comments.length})` : "Comment"}
-            </span>
-          </button>
-          <button
-            aria-label="Share"
-            onClick={handleShare}
-            className="flex size-9 items-center justify-center rounded-full border border-[#e9ecef] text-muted hover:bg-surface-muted"
-          >
-            <DynamicIcon name="Share2" className="size-4" />
-          </button>
-          <button
-            aria-label={saved ? "Remove from saved" : "Save"}
-            onClick={() => toggleSave(post)}
-            className={cn(
-              "flex size-9 items-center justify-center rounded-full border",
-              saved
-                ? "border-[rgba(119,90,25,0.3)] bg-[rgba(254,212,136,0.2)] text-brand-gold-dark"
-                : "border-[#e9ecef] text-muted hover:bg-surface-muted",
-            )}
-          >
-            <DynamicIcon name="Bookmark" className="size-4" fill={saved ? "currentColor" : "none"} />
-          </button>
-        </div>
-        <div className="flex w-full items-center gap-3 sm:ml-auto sm:w-auto">
-          <VenueMessageButton venueName={venue.name} className="flex-1 sm:flex-none" />
-          <VenueReservationButton
-            venueName={venue.name}
-            hotelId={post.hotelId}
-            variant="gold-pill"
-            label="Reserve"
-            className="flex-1 sm:flex-none"
-          />
-        </div>
-      </div>
+      {/* Social Interactions & Actions (Figma node 3384:8328) -- see this
+          component's own doc comment for why it's ServiceActionsBar rather
+          than a bespoke row. */}
+      <ServiceActionsBar
+        post={post}
+        commentsOpen={commentsOpen}
+        onToggleComments={toggleComments}
+        commentCount={comments.length}
+        cta={
+          <div className="flex w-full gap-3">
+            <VenueMessageButton venueName={venue.name} className="flex-1" />
+            <VenueReservationButton
+              venueName={venue.name}
+              hotelId={post.hotelId}
+              variant="gold-pill"
+              label="Reserve"
+              className="flex-1"
+            />
+          </div>
+        }
+      />
 
       {commentsOpen && (
         <CommentsSection comments={comments} onAddComment={addComment} />
