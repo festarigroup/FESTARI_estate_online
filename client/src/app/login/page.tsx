@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api/client";
+import { cn } from "@/lib/cn";
 
 const INPUT_CLASS =
   "w-full rounded-lg border border-border-subtle px-3 py-2 text-sm text-ink placeholder:text-muted focus:outline-2 focus:outline-brand-gold";
@@ -19,15 +20,25 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  // Surfaced inline under the password field, not just as a toast that
+  // disappears after a few seconds — the backend intentionally returns the
+  // same "Invalid email or password" for both a wrong email and a wrong
+  // password (so a failed attempt never reveals whether that email even
+  // has an account), so this stays generic rather than pretending to know
+  // which field was actually wrong.
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
+    setError(null);
     try {
       await login(email, password);
       router.push("/");
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : "Couldn't sign you in.");
+      const message = err instanceof ApiError ? err.message : "Couldn't sign you in.";
+      setError(message);
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
@@ -49,8 +60,12 @@ export default function LoginPage() {
               required
               placeholder="admin@festari.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={INPUT_CLASS}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError(null);
+              }}
+              aria-invalid={!!error}
+              className={cn(INPUT_CLASS, error && "border-brand-rust focus:outline-brand-rust")}
             />
           </label>
           <label className="flex flex-col gap-1.5">
@@ -59,9 +74,18 @@ export default function LoginPage() {
               required
               placeholder="Enter your password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={INPUT_CLASS}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError(null);
+              }}
+              aria-invalid={!!error}
+              className={cn(INPUT_CLASS, error && "border-brand-rust focus:outline-brand-rust")}
             />
+            {error && (
+              <p role="alert" className="text-xs text-brand-rust">
+                {error}
+              </p>
+            )}
           </label>
 
           <Button type="submit" variant="gold" disabled={submitting} className="mt-2 w-full">
