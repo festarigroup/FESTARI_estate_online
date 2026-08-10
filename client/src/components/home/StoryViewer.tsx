@@ -2,8 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import toast from "react-hot-toast";
 import { Avatar } from "@/components/ui/Avatar";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { Dropdown, DropdownItem } from "@/components/ui/Dropdown";
+import { useAuth } from "@/context/AuthContext";
+import { useFollowedAuthors } from "@/hooks/useFollowedAuthors";
+import { useMutedAuthors } from "@/hooks/useMutedAuthors";
+import { ApiError } from "@/lib/api/client";
 import type { Story } from "@/types/home";
 
 const DURATION_MS = 5000;
@@ -13,6 +19,15 @@ interface StoryViewerProps {
   groups: Story[];
   initialGroupIndex: number;
   onClose: () => void;
+  /** Deletes the given story item on the backend and drops it from the
+   * parent's own list — StoryBar owns that, this view only asks for it.
+   * Rethrows on failure so handleDelete below can report it and skip
+   * closing the viewer. */
+  onDelete: (storyId: string) => Promise<void>;
+  /** Hides the given story item from StoryBar's own list (client-side only,
+   * with an Undo toast StoryBar owns) — used by "Report story" on someone
+   * else's story. */
+  onReport: (storyId: string) => void;
 }
 
 /** Full-screen story viewer — tap the right half to advance, the left half to
@@ -24,6 +39,14 @@ interface StoryViewerProps {
  * progress bar segments the *current* group's items; finishing the last item
  * advances to the next person's group, same as the platforms this is modeled
  * on — a person with 3 stories plays all 3 before moving on.
+ *
+ * The "⋮" menu in the header has two different item sets, same convention
+ * as PostOptionsMenu:
+ * - Your own story (group.id === the signed-in user's id, since groups are
+ *   keyed by author_id): Forward, Save for myself, Delete story.
+ * - Someone else's story: Follow/Unfollow, Mute/Unmute, Report story — the
+ *   same Mute/Follow stores PostOptionsMenu uses for posts, so muting or
+ *   unfollowing someone here also affects their posts, and vice versa.
  *
  * Position is tracked as a single flat index into every group's items,
  * flattened end to end — deliberately *not* as separate groupIndex/itemIndex
@@ -44,7 +67,10 @@ interface StoryViewerProps {
  * handler that called it — never from inside a state updater. `flatIndex`
  * state exists purely to make React re-render with the ref's latest value.
  */
-export function StoryViewer({ groups, initialGroupIndex, onClose }: StoryViewerProps) {
+export function StoryViewer({ groups, initialGroupIndex, onClose, onDelete, onReport }: StoryViewerProps) {
+  const { user } = useAuth();
+  const { isFollowing, toggleFollow } = useFollowedAuthors();
+  const { isMuted, toggleMute } = useMutedAuthors();
   const flat = useMemo(
     () => groups.flatMap((g, groupIndex) => g.items.map((_, itemIndex) => ({ groupIndex, itemIndex }))),
     [groups],
@@ -64,6 +90,17 @@ export function StoryViewer({ groups, initialGroupIndex, onClose }: StoryViewerP
   const { groupIndex, itemIndex } = flat[flatIndex];
   const group = groups[groupIndex];
   const item = group.items[itemIndex];
+  // Story groups are keyed by author_id (see mapStoriesToGroups), so this
+  // is a direct id comparison — no name-matching fallback needed the way
+  // PostOptionsMenu's mute/follow have to for a post's PostAuthor.
+  const isOwnStory = !!user && group.id === user.id;
+  // Only meaningful (and only rendered) when !isOwnStory, same Mute/Follow
+  // stores PostOptionsMenu uses for posts — muting or unfollowing someone
+  // from their story affects their posts too, and vice versa, since it's
+  // the same person either way. Named `authorMuted` (not `muted`) to stay
+  // distinct from the video-sound `muted` state above.
+  const following = isFollowing(group.name);
+  const authorMuted = isMuted(group.name);
 
   function goNext() {
     setProgress(0);
@@ -81,6 +118,97 @@ export function StoryViewer({ groups, initialGroupIndex, onClose }: StoryViewerP
     const prev = Math.max(positionRef.current - 1, 0);
     positionRef.current = prev;
     setFlatIndex(prev);
+  }
+
+  // Native share sheet with a copy-to-clipboard fallback, same pattern as
+  // usePostShare — there's no story-specific backend action to record here
+  // (stories don't track a share count the way posts do).
+  async function handleForward() {
+    const shareData: ShareData = {
+      title: `${group.name}'s story on Festari Estates`,
+      text: item.caption || `A story from ${group.name} on Festari Estates`,
+      url: item.image,
+    };
+
+    if (navigator.share && (navigator.canShare?.(shareData) ?? true)) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        if ((err as Error)?.name !== "AbortError") toast.error("Couldn't forward this story.");
+      }
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(item.image);
+      toast.success("Story link copied to clipboard.");
+    } catch {
+      toast.error("Couldn't copy the link.");
+    }
+  }
+
+  // "Save for myself" — stories expire after 24 hours and there's no saved-
+  // stories page to bookmark into (unlike posts' real Saved page), so the
+  // only thing "save" can mean here is downloading your own media to your
+  // device before it disappears.
+  async function handleSave() {
+    try {
+      const response = await fetch(item.image);
+      const blob = await response.blob();
+      const extension = /\.([a-z0-9]+)(?:\?.*)?$/i.exec(item.image)?.[1] ?? (item.type === "video" ? "mp4" : "jpg");
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = `festari-story-${item.id}.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(blobUrl);
+      toast.success("Saved to your device.");
+    } catch {
+      toast.error("Couldn't save this story.");
+    }
+  }
+
+  async function handleDelete() {
+    if (!window.confirm("Delete this story? This can't be undone.")) return;
+    try {
+      await onDelete(item.id);
+      toast.success("Story deleted.");
+      // Deleting mid-view leaves `flat`/`groupIndex`/`itemIndex` pointing at
+      // an item the parent's `groups` no longer has once it re-renders —
+      // closing outright sidesteps reconciling a live position against a
+      // list that just shrank out from under it.
+      onClose();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Couldn't delete this story.");
+    }
+  }
+
+  // Unlike Unfollow, muting leaves the follow relationship alone — see
+  // PostOptionsMenu's identical distinction for a post's author.
+  function handleToggleMuteAuthor() {
+    const wasMuted = authorMuted;
+    toggleMute(group.name);
+    toast.success(
+      wasMuted ? `You'll see posts from ${group.name} again.` : `You won't see posts or stories from ${group.name} anymore.`,
+    );
+  }
+
+  function handleToggleFollowAuthor() {
+    const wasFollowing = following;
+    toggleFollow(group.name);
+    toast.success(
+      wasFollowing ? `You won't see updates from ${group.name}.` : `You'll see updates from ${group.name} again.`,
+    );
+  }
+
+  // StoryBar owns the hide + Undo toast for this (same reasoning as
+  // handleDeleteStory owning the real delete) — closing here just gets the
+  // viewer out of the way of a story that no longer belongs in the rail.
+  function handleReport() {
+    onReport(item.id);
+    onClose();
   }
 
   useEffect(() => {
@@ -152,9 +280,41 @@ export function StoryViewer({ groups, initialGroupIndex, onClose }: StoryViewerP
               <p className="text-xs text-white/70">{item.postedAt ?? "Active now"}</p>
             </div>
           </div>
-          <button aria-label="Close" onClick={onClose} className="text-white/80 hover:text-white">
-            <DynamicIcon name="X" className="size-5" />
-          </button>
+          <div className="flex items-center gap-3">
+            <Dropdown
+              align="right"
+              trigger={(bind) => (
+                <button {...bind} aria-label="Story options" className="text-white/80 hover:text-white">
+                  <DynamicIcon name="MoreHorizontal" className="size-5" />
+                </button>
+              )}
+            >
+              {isOwnStory ? (
+                <>
+                  <DropdownItem icon="Forward" label="Forward" onClick={handleForward} />
+                  <DropdownItem icon="Download" label="Save for myself" onClick={handleSave} />
+                  <DropdownItem icon="Trash2" label="Delete story" onClick={handleDelete} className="text-brand-rust" />
+                </>
+              ) : (
+                <>
+                  <DropdownItem
+                    icon="CircleX"
+                    label={following ? `Unfollow ${group.name}` : `Follow ${group.name}`}
+                    onClick={handleToggleFollowAuthor}
+                  />
+                  <DropdownItem
+                    icon={authorMuted ? "Volume2" : "VolumeX"}
+                    label={authorMuted ? `Unmute ${group.name}` : `Mute ${group.name}`}
+                    onClick={handleToggleMuteAuthor}
+                  />
+                  <DropdownItem icon="Flag" label="Report story" onClick={handleReport} />
+                </>
+              )}
+            </Dropdown>
+            <button aria-label="Close" onClick={onClose} className="text-white/80 hover:text-white">
+              <DynamicIcon name="X" className="size-5" />
+            </button>
+          </div>
         </div>
 
         {item.type === "video" ? (

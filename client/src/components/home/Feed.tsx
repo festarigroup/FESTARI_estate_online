@@ -5,6 +5,7 @@ import { PostComposer } from "@/components/home/PostComposer";
 import { FeedPostCard } from "@/components/home/FeedPostCard";
 import { useReposts } from "@/hooks/useReposts";
 import { useHiddenPosts } from "@/hooks/useHiddenPosts";
+import { useMutedAuthors } from "@/hooks/useMutedAuthors";
 import { applyPostEdits, usePostEdits } from "@/hooks/usePostEdits";
 import { useAuth } from "@/context/AuthContext";
 import { useRegisterPostComposerHandler } from "@/context/PostComposerContext";
@@ -21,6 +22,7 @@ export function Feed() {
   const [loading, setLoading] = useState(true);
   const { reposts } = useReposts();
   const { isHidden } = useHiddenPosts();
+  const { isMuted } = useMutedAuthors();
   const { isDeleted, getEditedBody } = usePostEdits();
 
   useEffect(() => {
@@ -45,14 +47,18 @@ export function Feed() {
     subtitle: "Just now",
   };
 
-  // "Not interested" / "Report post" filter a post out of view entirely —
-  // including its repost wrapper, if it has one, since a lookup against
-  // this filtered list is what repostCards builds from below. A real
-  // "Delete post" (via PostOptionsMenu, own posts only) filters the same
-  // way; a real "Edit post" swaps in the saved body — both applied here
-  // via applyPostEdits so this list reflects either immediately, without
-  // re-fetching.
-  const visiblePosts = applyPostEdits(posts.filter((p) => !isHidden(p.id)), { isDeleted, getEditedBody });
+  // "Report post" filters a single post out of view; muting an author (see
+  // PostOptionsMenu's "Mute X") filters out everything from that author —
+  // both apply here, including to a post's repost wrapper if it has one,
+  // since a lookup against this filtered list is what repostCards builds
+  // from below. A real "Delete post" (via PostOptionsMenu, own posts only)
+  // filters the same way; a real "Edit post" swaps in the saved body —
+  // both applied here via applyPostEdits so this list reflects either
+  // immediately, without re-fetching.
+  const visiblePosts = applyPostEdits(
+    posts.filter((p) => !isHidden(p.id) && !isMuted(p.author.name)),
+    { isDeleted, getEditedBody },
+  );
 
   // Each active repost renders as its own wrapper card at the very top of
   // the feed, most-recently-reposted first — the original post stays right

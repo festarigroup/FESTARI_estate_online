@@ -11,6 +11,7 @@ import { usePostShare } from "@/hooks/usePostShare";
 import { usePostEdits } from "@/hooks/usePostEdits";
 import { useHiddenPosts } from "@/hooks/useHiddenPosts";
 import { useFollowedAuthors } from "@/hooks/useFollowedAuthors";
+import { useMutedAuthors } from "@/hooks/useMutedAuthors";
 import { deletePost } from "@/lib/api/feed";
 import { ApiError } from "@/lib/api/client";
 import type { ContentPost } from "@/types/home";
@@ -24,14 +25,14 @@ interface PostOptionsMenuProps {
 
 /** The post-card "⋮" overflow menu. Two different item sets:
  *
- * - Someone else's post: Share, Save, Copy link, Embed, Unfollow, Not
- *   interested, Report — the original set. Not a Figma frame (no menu
- *   frame was provided); the item set matches a common feed-post
- *   convention rather than one specific reference app.
+ * - Someone else's post: Share, Save, Copy link, Embed, Unfollow, Mute,
+ *   Report — the original set. Not a Figma frame (no menu frame was
+ *   provided); the item set matches a common feed-post convention rather
+ *   than one specific reference app.
  * - Your own post (post.author.id === the signed-in user's id): Share,
- *   Save, Copy link, Embed, Edit post, Delete post — Unfollow/Not
- *   interested/Report all drop out, since none of them make sense
- *   against something you posted yourself.
+ *   Save, Copy link, Embed, Edit post, Delete post — Unfollow/Mute/Report
+ *   all drop out, since none of them make sense against something you
+ *   posted yourself.
  *
  * Share and Save duplicate PostEngagementBar's own Share/Save buttons —
  * intentionally: PostEngagementBar hides both below `sm:` (five icons plus
@@ -46,9 +47,11 @@ export function PostOptionsMenu({ post, onShare }: PostOptionsMenuProps) {
   const { hidePost, unhidePost } = useHiddenPosts();
   const { markDeleted, markEdited } = usePostEdits();
   const { isFollowing, toggleFollow } = useFollowedAuthors();
+  const { isMuted, toggleMute } = useMutedAuthors();
   const [editOpen, setEditOpen] = useState(false);
   const saved = isSaved(post.id);
   const following = isFollowing(post.author.name);
+  const muted = isMuted(post.author.name);
   // post.author.id is unset for a synthetic/local-only author (a repost
   // wrapper's own attribution line, e.g.) — never "mine" in that case.
   const isOwnPost = !!user && !!post.author.id && user.id === post.author.id;
@@ -87,9 +90,20 @@ export function PostOptionsMenu({ post, onShare }: PostOptionsMenuProps) {
     );
   }
 
-  // Shared by "Not interested" and "Report post" — both remove the post
-  // from view, each with its own message, and both stay undoable in case
-  // of a misclick.
+  // Unlike Unfollow, muting leaves the follow relationship alone — it just
+  // drops every post from this author out of the feed (see Feed.tsx's own
+  // isMuted filter) until unmuted, the same "quietly stop seeing them
+  // without unfollowing" distinction Instagram/X draw.
+  function handleToggleMute() {
+    const wasMuted = muted;
+    toggleMute(post.author.name);
+    toast.success(
+      wasMuted ? `You'll see posts from ${post.author.name} again.` : `You won't see posts from ${post.author.name} anymore.`,
+    );
+  }
+
+  // Used by "Report post" — removes the post from view, stays undoable in
+  // case of a misclick.
   function hideWithUndo(message: string) {
     hidePost(post.id);
     toast((t) => (
@@ -148,9 +162,9 @@ export function PostOptionsMenu({ post, onShare }: PostOptionsMenuProps) {
               onClick={handleToggleFollow}
             />
             <DropdownItem
-              icon="ThumbsDown"
-              label="Not interested"
-              onClick={() => hideWithUndo("You'll see fewer posts like this.")}
+              icon={muted ? "Volume2" : "VolumeX"}
+              label={muted ? `Unmute ${post.author.name}` : `Mute ${post.author.name}`}
+              onClick={handleToggleMute}
             />
             <DropdownItem
               icon="Flag"
