@@ -17,6 +17,7 @@ interface VenueReservationButtonProps {
    * gold pill labeled "Reserve" — same modal, different button chrome. */
   variant?: "outline-gold" | "gold-pill";
   label?: string;
+  className?: string;
 }
 
 /** The "Make a Reservation" / "Reserve" CTA a venue post renders — self-
@@ -27,12 +28,13 @@ export function VenueReservationButton({
   hotelId,
   variant = "outline-gold",
   label = "Make a Reservation",
+  className,
 }: VenueReservationButtonProps) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <Button variant={variant} onClick={() => setOpen(true)}>
+      <Button variant={variant} onClick={() => setOpen(true)} className={className}>
         {label}
       </Button>
       <ReservationModal open={open} onClose={() => setOpen(false)} venueName={venueName} hotelId={hotelId} />

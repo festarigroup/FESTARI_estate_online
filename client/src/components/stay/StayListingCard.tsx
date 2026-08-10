@@ -189,32 +189,41 @@ export function StayListingCard({ post }: { post: GeneralPost }) {
         )}
       </div>
 
-      {/* Social Interactions & Actions (Figma node 3384:8328) */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-6">
+      {/* Social Interactions & Actions (Figma node 3384:8328) -- Like/
+          Comment/Share/Save now match a normal post's own action bar
+          (ServiceActionsBar/PostEngagementBar: text-base font-medium,
+          labels collapsing to icon-only below sm: via sr-only rather than
+          always-visible counts) instead of this card's own smaller,
+          always-numbered style. The Message + Reserve CTAs get their own
+          full-width row below that group at mobile widths (sm:w-auto
+          un-stacks them back onto the same row once there's room) --
+          crowding two buttons onto the same line as four icons is what a
+          normal post's single-CTA bar never has to deal with. */}
+      <div className="flex w-full flex-wrap items-center gap-3 border-t border-border-subtle pt-[17px]">
+        <div className="flex items-center gap-4">
           <button
             onClick={handleLike}
             className={cn(
-              "flex items-center gap-2 text-xs font-semibold",
-              liked ? "text-brand-rust" : "text-[#44474e] hover:text-ink",
+              "flex items-center gap-2 text-base font-medium",
+              liked ? "text-brand-rust" : "text-muted hover:text-ink",
             )}
           >
             <DynamicIcon name="Heart" className="size-5" fill={liked ? "currentColor" : "none"} />
-            {likeCount}
+            <span className="sr-only sm:not-sr-only">{likeCount > 0 ? `Like (${likeCount})` : "Like"}</span>
           </button>
           <button
             onClick={toggleComments}
             aria-expanded={commentsOpen}
             className={cn(
-              "flex items-center gap-2 text-xs font-semibold",
-              commentsOpen ? "text-brand-navy" : "text-[#44474e] hover:text-ink",
+              "flex items-center gap-2 text-base font-medium",
+              commentsOpen ? "text-brand-navy" : "text-muted hover:text-ink",
             )}
           >
             <DynamicIcon name="MessageCircle" className="size-5" />
-            {comments.length}
+            <span className="sr-only sm:not-sr-only">
+              {comments.length > 0 ? `Comment (${comments.length})` : "Comment"}
+            </span>
           </button>
-        </div>
-        <div className="flex items-center gap-3">
           <button
             aria-label="Share"
             onClick={handleShare}
@@ -234,8 +243,16 @@ export function StayListingCard({ post }: { post: GeneralPost }) {
           >
             <DynamicIcon name="Bookmark" className="size-4" fill={saved ? "currentColor" : "none"} />
           </button>
-          <VenueMessageButton venueName={venue.name} />
-          <VenueReservationButton venueName={venue.name} hotelId={post.hotelId} variant="gold-pill" label="Reserve" />
+        </div>
+        <div className="flex w-full items-center gap-3 sm:ml-auto sm:w-auto">
+          <VenueMessageButton venueName={venue.name} className="flex-1 sm:flex-none" />
+          <VenueReservationButton
+            venueName={venue.name}
+            hotelId={post.hotelId}
+            variant="gold-pill"
+            label="Reserve"
+            className="flex-1 sm:flex-none"
+          />
         </div>
       </div>
 

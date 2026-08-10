@@ -9,12 +9,12 @@ import { EnquiryModal } from "@/components/home/EnquiryModal";
  * forking a near-identical modal. EnquiryModal degrades to a local-only
  * toast without a `propertyId`, which is always the case here — there's no
  * hotel-inquiry endpoint on the backend, only property/artisan inquiries. */
-export function VenueMessageButton({ venueName }: { venueName: string }) {
+export function VenueMessageButton({ venueName, className }: { venueName: string; className?: string }) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <Button variant="outline-gold" onClick={() => setOpen(true)}>
+      <Button variant="outline-gold" onClick={() => setOpen(true)} className={className}>
         Message
       </Button>
       <EnquiryModal open={open} onClose={() => setOpen(false)} listerName={venueName} />
