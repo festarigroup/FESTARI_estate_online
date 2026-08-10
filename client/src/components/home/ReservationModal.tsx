@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { DateTimeInput } from "@/components/ui/DateTimeInput";
+import { createBooking } from "@/lib/api/hotels";
+import { ApiError } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 
 interface ReservationModalProps {
@@ -12,6 +14,13 @@ interface ReservationModalProps {
   onClose: () => void;
   /** Who the reservation request goes to — the venue, not the viewer. */
   venueName: string;
+  /** The real backend hotels.id to book against. Omitted for venue posts
+   * that predate real hotel linkage — the form still submits locally
+   * (toast only) in that case, same pattern as BookServiceModal/
+   * EnquiryModal. Also gates the "Check-out date" field: a real booking
+   * needs a check_in/check_out range (see POST /hotels/:hotelId/bookings),
+   * a local-only reservation never did. */
+  hotelId?: string;
 }
 
 const INPUT_CLASS =
@@ -22,33 +31,52 @@ const INPUT_CLASS =
  * shows the collapsed post card); mirrors BookServiceModal/EnquiryModal's
  * shape since all three are "reach the poster directly" forms, just for a
  * different post kind. */
-export function ReservationModal({ open, onClose, venueName }: ReservationModalProps) {
+export function ReservationModal({ open, onClose, venueName, hotelId }: ReservationModalProps) {
   const [name, setName] = useState("Kwame");
   const [phone, setPhone] = useState("");
   const [partySize, setPartySize] = useState("");
   const [date, setDate] = useState("");
+  const [checkOut, setCheckOut] = useState("");
   const [time, setTime] = useState("");
   const [notes, setNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const canSubmit = name.trim().length > 0 && phone.trim().length > 0 && date.length > 0;
+  const canSubmit =
+    name.trim().length > 0 && phone.trim().length > 0 && date.length > 0 && (!hotelId || checkOut.length > 0);
 
   function resetAndClose() {
     setPhone("");
     setPartySize("");
     setDate("");
+    setCheckOut("");
     setTime("");
     setNotes("");
     onClose();
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!canSubmit) return;
-    toast.success(
-      `Reservation request sent to ${venueName} for ${date}${time ? ` at ${time}` : ""}${
-        partySize ? ` (party of ${partySize})` : ""
-      }. They'll confirm availability.`,
-    );
-    resetAndClose();
+
+    const confirmation = `Reservation request sent to ${venueName} for ${date}${time ? ` at ${time}` : ""}${
+      partySize ? ` (party of ${partySize})` : ""
+    }. They'll confirm availability.`;
+
+    if (!hotelId) {
+      toast.success(confirmation);
+      resetAndClose();
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await createBooking(hotelId, { check_in: date, check_out: checkOut, guests: Number(partySize) || 1 });
+      toast.success(confirmation);
+      resetAndClose();
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Couldn't send your reservation.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -89,13 +117,20 @@ export function ReservationModal({ open, onClose, venueName }: ReservationModalP
 
         <div className="grid grid-cols-2 gap-3">
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold text-ink">Preferred date</span>
+            <span className="text-xs font-semibold text-ink">{hotelId ? "Check-in date" : "Preferred date"}</span>
             <DateTimeInput type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </label>
-          <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-semibold text-ink">Preferred time</span>
-            <DateTimeInput type="time" value={time} onChange={(e) => setTime(e.target.value)} />
-          </label>
+          {hotelId ? (
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-ink">Check-out date</span>
+              <DateTimeInput type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
+            </label>
+          ) : (
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-semibold text-ink">Preferred time</span>
+              <DateTimeInput type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+            </label>
+          )}
         </div>
 
         <label className="flex flex-col gap-1.5">
@@ -113,8 +148,8 @@ export function ReservationModal({ open, onClose, venueName }: ReservationModalP
           <Button variant="ghost" onClick={resetAndClose}>
             Cancel
           </Button>
-          <Button variant="gold" onClick={handleSubmit} disabled={!canSubmit} className="px-6 py-2">
-            Send Reservation
+          <Button variant="gold" onClick={handleSubmit} disabled={!canSubmit || submitting} className="px-6 py-2">
+            {submitting ? "Sending..." : "Send Reservation"}
           </Button>
         </div>
       </div>

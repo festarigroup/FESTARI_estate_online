@@ -6,6 +6,11 @@ import { ReservationModal } from "@/components/home/ReservationModal";
 
 interface VenueReservationButtonProps {
   venueName: string;
+  /** The real backend hotels.id to send the reservation against. Omitted
+   * for venue posts that predate real hotel linkage (composer-created
+   * venues) — the form still submits locally (toast only) in that case,
+   * same pattern as PropertyEnquiryButton/BookServiceButton. */
+  hotelId?: string;
   /** Defaults to the Figma "Book Service" outline-pill style (node
    * 3340:1102), matching every other post's "primary action" CTA. The
    * Stay listing page's own card (node 3387:8909) instead uses a filled
@@ -19,6 +24,7 @@ interface VenueReservationButtonProps {
  * themselves. Same shape as PropertyEnquiryButton, just for venues. */
 export function VenueReservationButton({
   venueName,
+  hotelId,
   variant = "outline-gold",
   label = "Make a Reservation",
 }: VenueReservationButtonProps) {
@@ -29,7 +35,7 @@ export function VenueReservationButton({
       <Button variant={variant} onClick={() => setOpen(true)}>
         {label}
       </Button>
-      <ReservationModal open={open} onClose={() => setOpen(false)} venueName={venueName} />
+      <ReservationModal open={open} onClose={() => setOpen(false)} venueName={venueName} hotelId={hotelId} />
     </>
   );
 }

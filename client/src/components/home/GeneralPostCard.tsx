@@ -225,7 +225,7 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
             post.tag === "service" ? (
               <BookServiceButton providerName={post.author.name} />
             ) : (
-              <VenueReservationButton venueName={post.author.name} />
+              <VenueReservationButton venueName={post.author.name} hotelId={post.hotelId} />
             )
           }
         />
