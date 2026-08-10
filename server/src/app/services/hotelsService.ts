@@ -1,24 +1,71 @@
 import { db } from "#app/db/db.js";
-import { hotelBookings, hotelImages, hotels } from "#app/db/schema/index.js";
-import { HotelBookingInsert, HotelImageInsert, HotelInsert } from "#app/types/HotelTypes.js";
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { hotelBookings, hotelImages, hotelReviews, hotels } from "#app/db/schema/index.js";
+import {
+  HotelBookingInsert,
+  HotelImageInsert,
+  HotelInsert,
+  HotelReviewInsert,
+} from "#app/types/HotelTypes.js";
+import { and, asc, avg, count, desc, eq, getTableColumns, sql } from "drizzle-orm";
 
 class HotelsService {
-  async list(location: string | undefined, limit: number, offset: number) {
-    const where = location
-      ? and(eq(hotels.status, "approved"), sql`${hotels.location} ILIKE ${"%" + location + "%"}`)
-      : eq(hotels.status, "approved");
+  async list(location: string | undefined, category: string | undefined, limit: number, offset: number) {
+    const conditions = [eq(hotels.status, "approved")];
+    if (location) conditions.push(sql`${hotels.location} ILIKE ${"%" + location + "%"}`);
+    if (category) conditions.push(eq(hotels.category, category as any));
+    const where = and(...conditions);
 
     const [items, countRows] = await Promise.all([
-      db.select().from(hotels).where(where).orderBy(desc(hotels.created_at)).limit(limit).offset(offset),
+      db
+        .select({
+          ...getTableColumns(hotels),
+          average_rating: avg(hotelReviews.rating).mapWith(Number),
+          review_count: count(hotelReviews.id),
+        })
+        .from(hotels)
+        .leftJoin(hotelReviews, eq(hotelReviews.hotel_id, hotels.id))
+        .where(where)
+        .groupBy(hotels.id)
+        .orderBy(desc(hotels.created_at))
+        .limit(limit)
+        .offset(offset),
       db.select({ count: sql<number>`count(*)::int` }).from(hotels).where(where),
     ]);
     return { items, total: countRows[0]?.count ?? 0 };
   }
 
   async getById(id: string) {
-    const [hotel] = await db.select().from(hotels).where(eq(hotels.id, id));
+    const [hotel] = await db
+      .select({
+        ...getTableColumns(hotels),
+        average_rating: avg(hotelReviews.rating).mapWith(Number),
+        review_count: count(hotelReviews.id),
+      })
+      .from(hotels)
+      .leftJoin(hotelReviews, eq(hotelReviews.hotel_id, hotels.id))
+      .where(eq(hotels.id, id))
+      .groupBy(hotels.id);
     return hotel ?? null;
+  }
+
+  async getRatingSummary(hotelId: string) {
+    const [summary] = await db
+      .select({
+        average_rating: avg(hotelReviews.rating).mapWith(Number),
+        review_count: count(hotelReviews.id),
+      })
+      .from(hotelReviews)
+      .where(eq(hotelReviews.hotel_id, hotelId));
+    return summary ?? { average_rating: null, review_count: 0 };
+  }
+
+  async createReview(row: HotelReviewInsert) {
+    const [review] = await db.insert(hotelReviews).values(row).returning();
+    return review;
+  }
+
+  async listReviews(hotelId: string) {
+    return db.select().from(hotelReviews).where(eq(hotelReviews.hotel_id, hotelId)).orderBy(desc(hotelReviews.created_at));
   }
 
   async getImages(hotelId: string) {

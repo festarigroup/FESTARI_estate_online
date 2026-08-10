@@ -9,10 +9,18 @@ const nextConfig: NextConfig = {
     root: path.join(__dirname),
   },
   images: {
-    // Supabase Storage serves every uploaded avatar/property/post/story
-    // image from a project-specific *.supabase.co host — wildcarded since
-    // the exact project subdomain differs per environment.
-    remotePatterns: [{ protocol: "https", hostname: "*.supabase.co" }],
+    remotePatterns: [
+      // Supabase Storage serves every uploaded avatar/property/post/story
+      // image from a project-specific *.supabase.co host — wildcarded since
+      // the exact project subdomain differs per environment.
+      { protocol: "https", hostname: "*.supabase.co" },
+      // db/seed.ts's own avatar()/img() helpers pull seed-only placeholder
+      // photos from these two hosts (randomuser.me for user avatars,
+      // picsum.photos for property/hotel/story imagery) — real uploads
+      // never use them, only `npm run db:seed`'s demo data does.
+      { protocol: "https", hostname: "randomuser.me" },
+      { protocol: "https", hostname: "picsum.photos" },
+    ],
   },
 };
 

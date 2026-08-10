@@ -235,7 +235,7 @@ export function StayListingCard({ post }: { post: GeneralPost }) {
             <DynamicIcon name="Bookmark" className="size-4" fill={saved ? "currentColor" : "none"} />
           </button>
           <VenueMessageButton venueName={venue.name} />
-          <VenueReservationButton venueName={venue.name} variant="gold-pill" label="Reserve" />
+          <VenueReservationButton venueName={venue.name} hotelId={post.hotelId} variant="gold-pill" label="Reserve" />
         </div>
       </div>
 

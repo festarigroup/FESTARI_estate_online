@@ -8,6 +8,13 @@
       "when": 1786254190566,
       "tag": "0000_bored_elektra",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786325641317,
+      "tag": "0001_bumpy_the_fallen",
+      "breakpoints": true
     }
   ]
 }

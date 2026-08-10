@@ -1,4 +1,5 @@
 import {
+  check,
   date,
   decimal,
   index,
@@ -10,7 +11,8 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
-import { bookingStatusEnum, moderationStatusEnum } from "./enums.js";
+import { sql } from "drizzle-orm";
+import { bookingStatusEnum, hotelCategoryEnum, moderationStatusEnum } from "./enums.js";
 import { users } from "./users.js";
 
 export const hotels = pgTable(
@@ -25,6 +27,8 @@ export const hotels = pgTable(
     location: text("location").notNull(),
     amenities: jsonb("amenities"),
     price_per_night: decimal("price_per_night", { precision: 12, scale: 2 }).notNull(),
+    category: hotelCategoryEnum("category").notNull().default("hotel"),
+    rooms: integer("rooms"),
     status: moderationStatusEnum("status").notNull().default("pending"),
     created_at: timestamp("created_at").defaultNow().notNull(),
     updated_at: timestamp("updated_at").defaultNow().notNull(),
@@ -32,6 +36,7 @@ export const hotels = pgTable(
   (table) => [
     index("hotels_owner_idx").on(table.owner_id),
     index("hotels_status_idx").on(table.status),
+    index("hotels_category_idx").on(table.category),
   ],
 );
 
@@ -70,5 +75,25 @@ export const hotelBookings = pgTable(
     index("hotel_bookings_hotel_idx").on(table.hotel_id),
     index("hotel_bookings_user_idx").on(table.user_id),
     index("hotel_bookings_status_idx").on(table.status),
+  ],
+);
+
+export const hotelReviews = pgTable(
+  "hotel_reviews",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    hotel_id: uuid("hotel_id")
+      .notNull()
+      .references(() => hotels.id, { onDelete: "cascade" }),
+    reviewer_id: uuid("reviewer_id")
+      .notNull()
+      .references(() => users.id),
+    rating: smallint("rating").notNull(),
+    comment: text("comment"),
+    created_at: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("hotel_reviews_hotel_idx").on(table.hotel_id),
+    check("hotel_reviews_rating_range", sql`${table.rating} >= 1 AND ${table.rating} <= 5`),
   ],
 );

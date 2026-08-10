@@ -23,6 +23,7 @@ const {
   hotels,
   hotelImages,
   hotelBookings,
+  hotelReviews,
   artisanProfiles,
   artisanHireRequests,
   artisanReviews,
@@ -78,6 +79,7 @@ async function clearExisting() {
   await db.delete(artisanReviews);
   await db.delete(artisanHireRequests);
   await db.delete(hotelBookings);
+  await db.delete(hotelReviews);
   await db.delete(hotelImages);
   await db.delete(hotels);
   await db.delete(wishlists);
@@ -531,6 +533,8 @@ async function seedHotels(userIds: Awaited<ReturnType<typeof seedUsers>>) {
         location: "East Legon, Accra",
         amenities: { wifi: true, pool: true, parking: true, gym: true },
         price_per_night: "850",
+        category: "hotel",
+        rooms: 40,
         status: "approved",
       },
       {
@@ -540,6 +544,8 @@ async function seedHotels(userIds: Awaited<ReturnType<typeof seedUsers>>) {
         location: "Labadi, Accra",
         amenities: { wifi: true, pool: true, beach_access: true, spa: true },
         price_per_night: "1200",
+        category: "resort",
+        rooms: 60,
         status: "approved",
       },
       {
@@ -549,15 +555,19 @@ async function seedHotels(userIds: Awaited<ReturnType<typeof seedUsers>>) {
         location: "Ridge, Kumasi",
         amenities: { wifi: true, breakfast: true, conference_room: true },
         price_per_night: "650",
+        category: "hotel",
+        rooms: 35,
         status: "approved",
       },
       {
         owner_id: userIds.kojo,
         name: "Savannah Comfort Inn",
-        description: "Budget-friendly stays with a courtyard restaurant.",
+        description: "Budget-friendly short stays with a courtyard restaurant.",
         location: "Tamale",
         amenities: { wifi: true, restaurant: true, parking: true },
         price_per_night: "400",
+        category: "short_stay",
+        rooms: 20,
         status: "approved",
       },
       {
@@ -567,7 +577,30 @@ async function seedHotels(userIds: Awaited<ReturnType<typeof seedUsers>>) {
         location: "Akosombo",
         amenities: { wifi: true, lake_view: true },
         price_per_night: "550",
+        category: "hotel",
+        rooms: 15,
         status: "pending",
+      },
+      {
+        owner_id: userIds.kojo,
+        name: "Airport City Executive Suites",
+        description: "Fully serviced executive apartments near the airport.",
+        location: "Airport Residential Area, Accra",
+        amenities: { wifi: true, parking: true, gym: true },
+        price_per_night: "700",
+        category: "apartment",
+        rooms: 12,
+        status: "approved",
+      },
+      {
+        owner_id: userIds.yaw,
+        name: "The Grand Terrace Events",
+        description: "Open-air event space for weddings, launches, and conferences.",
+        location: "East Legon, Accra",
+        amenities: { wifi: true, parking: true },
+        price_per_night: "5000",
+        category: "event_venue",
+        status: "approved",
       },
     ];
 
@@ -617,6 +650,17 @@ async function seedHotels(userIds: Awaited<ReturnType<typeof seedUsers>>) {
     },
   ];
   await db.insert(hotelBookings).values(bookingValues);
+
+  await db.insert(hotelReviews).values([
+    { hotel_id: rows[0]!.id, reviewer_id: userIds.ama, rating: 5, comment: "Spotless rooms and a great rooftop view." },
+    { hotel_id: rows[0]!.id, reviewer_id: userIds.akosua, rating: 4, comment: "Comfortable stay, breakfast could be better." },
+    { hotel_id: rows[1]!.id, reviewer_id: userIds.kwame, rating: 5, comment: "The beach access alone is worth it." },
+    { hotel_id: rows[1]!.id, reviewer_id: userIds.efua, rating: 5, comment: "Best resort weekend we've had in Accra." },
+    { hotel_id: rows[2]!.id, reviewer_id: userIds.kofi, rating: 4, comment: "Great views, solid conference setup." },
+    { hotel_id: rows[3]!.id, reviewer_id: userIds.abena, rating: 4, comment: "Good value for a short stay." },
+    { hotel_id: rows[5]!.id, reviewer_id: userIds.nana, rating: 5, comment: "Felt like a real home away from home." },
+    { hotel_id: rows[6]!.id, reviewer_id: userIds.kojo, rating: 5, comment: "Hosted our launch here, flawless space." },
+  ]);
 
   return rows;
 }
@@ -758,6 +802,7 @@ async function seedInquiries(
 async function seedFeed(
   userIds: Awaited<ReturnType<typeof seedUsers>>,
   propertyRows: Awaited<ReturnType<typeof seedProperties>>,
+  hotelRows: Awaited<ReturnType<typeof seedHotels>>,
 ) {
   console.log("Seeding stories, posts, and interactions...");
 
@@ -843,10 +888,52 @@ async function seedFeed(
         body: "Grateful for another 5-star review from a guest this week. Hospitality is a team effort!",
         hashtags: "#Hospitality #ThankYou",
       },
+      {
+        author_id: userIds.yaw,
+        kind: "venue",
+        body: "Book direct for the best rate — rooftop lounge, pool, and gym all included.",
+        hashtags: "#EastLegon #Hotel #FestariStays",
+        linked_hotel_id: hotelRows[0]!.id,
+      },
+      {
+        author_id: userIds.yaw,
+        kind: "venue",
+        body: "Beachfront suites are open for the season — private cabanas, ocean views, spa on site.",
+        hashtags: "#Labadi #Resort #FestariStays",
+        linked_hotel_id: hotelRows[1]!.id,
+      },
+      {
+        author_id: userIds.kojo,
+        kind: "venue",
+        body: "City-view rooms with full conference facilities — ideal for a business trip to Kumasi.",
+        hashtags: "#Kumasi #Hotel #FestariStays",
+        linked_hotel_id: hotelRows[2]!.id,
+      },
+      {
+        author_id: userIds.kojo,
+        kind: "venue",
+        body: "Budget-friendly short stays two minutes from the Tamale market.",
+        hashtags: "#Tamale #ShortStay #FestariStays",
+        linked_hotel_id: hotelRows[3]!.id,
+      },
+      {
+        author_id: userIds.kojo,
+        kind: "venue",
+        body: "Fully serviced executive apartments near the airport — great for a longer business stay.",
+        hashtags: "#AirportResidential #Apartment #FestariStays",
+        linked_hotel_id: hotelRows[5]!.id,
+      },
+      {
+        author_id: userIds.yaw,
+        kind: "venue",
+        body: "Open-air event space for up to 300 guests — weddings, launches, and everything in between.",
+        hashtags: "#EastLegon #EventVenue #FestariStays",
+        linked_hotel_id: hotelRows[6]!.id,
+      },
     ])
     .returning({ id: posts.id, kind: posts.kind, author_id: posts.author_id });
 
-  const imagePosts = [postRows[0]!, postRows[1]!, postRows[2]!, postRows[6]!];
+  const imagePosts = [postRows[0]!, postRows[1]!, postRows[2]!, postRows[6]!, postRows[9]!, postRows[10]!];
   const postImageValues = imagePosts.flatMap((post, i) => [
     { post_id: post.id, image_url: img(`festari-post-${i}-a`), position: 0 },
     { post_id: post.id, image_url: img(`festari-post-${i}-b`), position: 1 },
@@ -1004,10 +1091,10 @@ async function main() {
   const userIds = await seedUsers();
   await seedSubscriptions(userIds);
   const propertyRows = await seedProperties(userIds);
-  await seedHotels(userIds);
+  const hotelRows = await seedHotels(userIds);
   await seedArtisans(userIds);
   await seedInquiries(userIds, propertyRows);
-  const postRows = await seedFeed(userIds, propertyRows);
+  const postRows = await seedFeed(userIds, propertyRows, hotelRows);
   await seedSocial(userIds);
   await seedNotifications(userIds, postRows);
   await seedMessaging(userIds);

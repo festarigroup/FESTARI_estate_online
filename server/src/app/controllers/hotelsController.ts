@@ -16,7 +16,12 @@ function assertOwnerOrAdmin(userId: string, roles: string[], ownerId: string) {
 
 export const listHotels = asyncErrorHandler(async (req: Request, res: Response) => {
   const { limit, current_page, offset } = parsePaginationParams(req.query);
-  const { items, total } = await hotelsService.list(req.query.location as string, limit, offset);
+  const { items, total } = await hotelsService.list(
+    req.query.location as string,
+    req.query.category as string,
+    limit,
+    offset,
+  );
   const { current_page: validatedPage } = validatePaginationParams(current_page, limit, total);
 
   return res.status(200).json({
@@ -222,4 +227,21 @@ export const cancelBooking = asyncErrorHandler(async (req: Request, res: Respons
 
   const updated = await hotelsService.cancelBooking(id);
   return res.status(200).json({ success: true, data: updated });
+});
+
+export const createHotelReview = asyncErrorHandler(async (req: Request, res: Response) => {
+  if (!req.user?.id) throw new CustomError("Unauthorized", 401);
+  const id = requiredRouteParam(req.params.id, "id");
+
+  const hotel = await hotelsService.getById(id);
+  if (!hotel) throw new CustomError("Hotel not found", 404);
+
+  const review = await hotelsService.createReview({
+    hotel_id: id,
+    reviewer_id: req.user.id,
+    rating: req.body.rating,
+    comment: req.body.comment,
+  });
+
+  return res.status(201).json({ success: true, data: review });
 });

@@ -41,6 +41,18 @@ export interface ApiLinkedArtisan {
   service_type: string;
 }
 
+export interface ApiLinkedHotel {
+  id: string;
+  name: string;
+  location: string;
+  price_per_night: string;
+  category: "hotel" | "resort" | "apartment" | "event_venue" | "short_stay";
+  rooms: number | null;
+  amenities: Record<string, boolean> | null;
+  average_rating: number | null;
+  review_count: number;
+}
+
 export interface ApiPostImage {
   id: string;
   post_id: string;
@@ -51,16 +63,18 @@ export interface ApiPostImage {
 export interface ApiPost {
   id: string;
   author_id: string;
-  kind: "property" | "service" | "general";
+  kind: "property" | "service" | "general" | "venue";
   body: string;
   hashtags: string | null;
   linked_property_id: string | null;
   linked_artisan_id: string | null;
+  linked_hotel_id: string | null;
   created_at: string;
   updated_at: string;
   author: ApiPostAuthor;
   linked_property: ApiLinkedProperty | null;
   linked_artisan: ApiLinkedArtisan | null;
+  linked_hotel: ApiLinkedHotel | null;
   likes_count: number;
   comments_count: number;
   shares_count: number;
@@ -120,6 +134,44 @@ export interface ApiArtisan {
   status: "pending" | "approved" | "rejected";
   average_rating: number | null;
   review_count: number;
+}
+
+export interface ApiHotelImage {
+  id: string;
+  hotel_id: string;
+  image_url: string;
+  position: number;
+}
+
+export interface ApiHotel {
+  id: string;
+  owner_id: string;
+  name: string;
+  description: string | null;
+  location: string;
+  amenities: Record<string, boolean> | null;
+  price_per_night: string;
+  category: "hotel" | "resort" | "apartment" | "event_venue" | "short_stay";
+  rooms: number | null;
+  average_rating: number | null;
+  review_count: number;
+  status: "pending" | "approved" | "rejected";
+  created_at: string;
+  updated_at: string;
+  images?: ApiHotelImage[];
+}
+
+export interface ApiHotelBooking {
+  id: string;
+  hotel_id: string;
+  user_id: string;
+  check_in: string;
+  check_out: string;
+  guests: number;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
+  total_price: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Paginated<T> {

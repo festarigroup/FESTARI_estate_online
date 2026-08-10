@@ -192,6 +192,28 @@ export const unsavePost = asyncErrorHandler(async (req: Request, res: Response) 
 
 export const listSavedPosts = asyncErrorHandler(async (req: Request, res: Response) => {
   if (!req.user?.id) throw new CustomError("Unauthorized", 401);
-  const items = await postInteractionsService.listSaved(req.user.id);
+
+  // listSaved only carries {post_id, saved_at} (see its own doc comment) --
+  // enrich with the same author/images/linked_property/counts shape every
+  // other post listing carries, same as listPosts does above, so the
+  // client's shared mapPost() can render these too.
+  const saved = await postInteractionsService.listSaved(req.user.id);
+  const postIds = saved.map((row) => row.post_id);
+
+  const [posts, imagesByPost] = await Promise.all([
+    postsService.listByIds(postIds, req.user.id),
+    postsService.getImagesForPosts(postIds),
+  ]);
+  const postsById = new Map(posts.map((post) => [post.id, post]));
+
+  // listByIds doesn't preserve `postIds`' order -- restore the save-time
+  // order here, and drop any save whose post has since been deleted.
+  const items = saved
+    .map(({ post_id, saved_at }) => {
+      const post = postsById.get(post_id);
+      return post ? { ...post, images: imagesByPost.get(post_id) ?? [], saved_at } : null;
+    })
+    .filter((item) => item !== null);
+
   return res.status(200).json({ success: true, data: items });
 });

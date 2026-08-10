@@ -1,25 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StayBrowser } from "@/components/stay/StayBrowser";
 import { StayCommunityBanner } from "@/components/stay/StayCommunityBanner";
 import { PropertyMapPanel } from "@/components/properties/PropertyMapPanel";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { cn } from "@/lib/cn";
-import { STAY_LISTINGS } from "@/lib/mock-data";
-
-// The sidebar's map (Figma node 3384:8508) sits outside the feed column
-// entirely, unlike the Properties page's own map (which shares its
-// browser's filter state) -- so this always shows every seeded venue,
-// regardless of which category tab or filter is active in the feed beside
-// it, rather than lifting StayBrowser's filter state up just to keep them
-// in sync.
-const MAP_LISTINGS = STAY_LISTINGS.filter((listing) => listing.venueDetails).map((listing) => ({
-  id: listing.id,
-  price: `GHS ${listing.venueDetails!.pricePerNight.toLocaleString()} /night`,
-  propertyType: listing.venueDetails!.category,
-  images: listing.images ?? [],
-}));
+import { listPosts } from "@/lib/api/feed";
+import { mapPost } from "@/lib/adapters";
+import type { GeneralPost } from "@/types/home";
 
 // Measured: <section> stacks a title block + its gap-6 to StayCategoryNav +
 // StayCategoryNav's own height + its gap-6 to StayFilterRow above the
@@ -75,6 +64,24 @@ const SIDEBAR_TOP_SPACER = "lg:pt-[187px]";
  *    than continuing to slide up underneath it. */
 export default function StayPage() {
   const [mapExpanded, setMapExpanded] = useState(false);
+  const [listings, setListings] = useState<GeneralPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    listPosts({ kind: "venue", limit: 50 })
+      .then(({ items }) => setListings(items.map(mapPost).filter((p): p is GeneralPost => p.kind === "general")))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const mapListings = listings
+    .filter((listing) => listing.venueDetails)
+    .map((listing) => ({
+      id: listing.id,
+      price: `GHS ${listing.venueDetails!.pricePerNight.toLocaleString()} /night`,
+      propertyType: listing.venueDetails!.category,
+      images: listing.images ?? [],
+    }));
 
   return (
     <div
@@ -103,7 +110,11 @@ export default function StayPage() {
           <p className="text-sm text-[#475568]">Discover hotels, resorts, and unique stays shared by the community.</p>
         </div>
 
-        <StayBrowser initialListings={STAY_LISTINGS} />
+        {loading ? (
+          <p className="py-8 text-center text-sm text-muted">Loading stays...</p>
+        ) : (
+          <StayBrowser initialListings={listings} />
+        )}
 
         <StayCommunityBanner />
       </section>
@@ -132,7 +143,7 @@ export default function StayPage() {
           </div>
         )}
         <PropertyMapPanel
-          listings={MAP_LISTINGS}
+          listings={mapListings}
           expanded={mapExpanded}
           onExpand={() => setMapExpanded(true)}
           onCollapse={() => setMapExpanded(false)}

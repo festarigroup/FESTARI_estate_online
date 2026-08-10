@@ -35,10 +35,10 @@ const PRICE_RANGES: { label: string; test: (n: number) => boolean }[] = [
  * PropertiesFilterRow (see its doc comment). There's also no separate
  * composer bar rendered on this screen anymore: posting now goes through
  * TopNavBar's global "+ Create Post" button instead, see
- * PostComposerContext. Venue posts have no backend counterpart yet (see
- * CreatePostModal), so `listings` starts from the seeded STAY_LISTINGS mock
- * and only grows locally as that global composer creates new venue posts
- * this session. */
+ * PostComposerContext. `listings` starts from the real venue posts the page
+ * fetched (see stay/page.tsx, lib/api/feed.ts, mapPost in
+ * lib/adapters.ts) and only grows locally from there as that global
+ * composer creates new venue posts this session. */
 export function StayBrowser({ initialListings }: { initialListings: GeneralPost[] }) {
   const [listings, setListings] = useState(initialListings);
   const [category, setCategory] = useState<StayCategory>(STAY_CATEGORIES[0].id);
@@ -75,7 +75,7 @@ export function StayBrowser({ initialListings }: { initialListings: GeneralPost[
       const venue = listing.venueDetails;
       if (!venue || venue.category !== category) return false;
       if (!priceTest(venue.pricePerNight)) return false;
-      if (venue.bedrooms * 2 < minGuests) return false;
+      if (venue.bedrooms > 0 && venue.bedrooms * 2 < minGuests) return false;
       if (query && !`${venue.name} ${venue.location}`.toLowerCase().includes(query)) return false;
       return true;
     });

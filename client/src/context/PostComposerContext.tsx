@@ -21,8 +21,8 @@ const PostComposerContext = createContext<PostComposerContextValue | null>(null)
  * while it's on screen, and this provider just forwards to whatever's
  * currently registered. Visiting a page with no composer of its own (e.g.
  * Properties) means the post still gets created (or, for the local-only
- * venue/poll kinds, still shows the success toast) — it just has nowhere
- * to visually land until you navigate to a page that does.
+ * poll kind, still shows the success toast) — it just has nowhere to
+ * visually land until you navigate to a page that does.
  */
 export function PostComposerProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);

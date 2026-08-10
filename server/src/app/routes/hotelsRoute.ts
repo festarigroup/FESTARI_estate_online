@@ -2,7 +2,12 @@ import { Router } from "express";
 import { protect, restrictTo } from "#app/middlewares/auth.js";
 import { validateSchema } from "#app/middlewares/validate.js";
 import { createUploadMiddleware } from "#app/middlewares/uploadMedia.js";
-import { createBookingSchema, createHotelSchema, updateHotelSchema } from "#app/validators/hotelValidators.js";
+import {
+  createBookingSchema,
+  createHotelReviewSchema,
+  createHotelSchema,
+  updateHotelSchema,
+} from "#app/validators/hotelValidators.js";
 import {
   listHotels,
   getHotel,
@@ -19,6 +24,7 @@ import {
   getBooking,
   updateBooking,
   cancelBooking,
+  createHotelReview,
 } from "#app/controllers/hotelsController.js";
 
 const router = Router();
@@ -38,6 +44,7 @@ router.put("/:id/approve", restrictTo("admin"), approveHotel);
 router.put("/:id/reject", restrictTo("admin"), rejectHotel);
 router.post("/:id/images", uploadHotelImageMiddleware, uploadHotelImage);
 router.delete("/:id/images/:imageId", deleteHotelImage);
+router.post("/:id/reviews", validateSchema(createHotelReviewSchema), createHotelReview);
 
 router.get("/:hotelId/bookings", listHotelBookings);
 router.post("/:hotelId/bookings", validateSchema(createBookingSchema), createHotelBooking);

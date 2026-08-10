@@ -8,6 +8,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { DynamicIcon, type IconName } from "@/components/ui/DynamicIcon";
 import { useAuth } from "@/context/AuthContext";
 import * as feedApi from "@/lib/api/feed";
+import * as hotelsApi from "@/lib/api/hotels";
 import * as propertiesApi from "@/lib/api/properties";
 import { mapPost } from "@/lib/adapters";
 import { ApiError } from "@/lib/api/client";
@@ -35,6 +36,23 @@ const TAG_NOTE: Record<TagType, string> = {
   property: "This post will be tagged as a property listing.",
   service: "This post will be tagged as a service post.",
   venue: "This post will be tagged as a venue listing.",
+};
+
+const HOTEL_CATEGORY_BY_STAY: Record<StayCategory, "hotel" | "resort" | "apartment" | "event_venue" | "short_stay"> = {
+  Hotel: "hotel",
+  Resort: "resort",
+  Apartment: "apartment",
+  "Event Venue": "event_venue",
+  "Short Stay": "short_stay",
+};
+
+const AMENITY_TO_HOTEL_KEY: Record<Amenity, string> = {
+  WiFi: "wifi",
+  Pool: "pool",
+  Dining: "restaurant",
+  Parking: "parking",
+  Gym: "gym",
+  AC: "ac",
 };
 
 const FIELD_CLASS =
@@ -239,9 +257,6 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
 
   const authorName = [user?.firstname, user?.lastname].filter(Boolean).join(" ") || "You";
 
-  // Venue and poll attachments have no backend counterpart yet (no venue
-  // post kind, no poll model) — those two keep posting a local-only object,
-  // same as before. Photo/property/service posts go through the real API.
   function buildLocalPost(): ContentPost {
     return {
       id: `post-${Date.now()}`,
@@ -293,11 +308,9 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
   async function handleSubmit() {
     if (!canSubmit || submitting) return;
 
-    if (tag === "venue" || showPoll) {
+    if (showPoll) {
       onSubmit(buildLocalPost());
       toast.success("Posted to your feed.");
-      // Deliberately NOT revoking `images` here — the post we just created
-      // now owns these blob URLs for as long as it's shown in the feed.
       resetState();
       onClose();
       return;
@@ -321,10 +334,24 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
         linkedPropertyId = property.id;
       }
 
+      let linkedHotelId: string | undefined;
+      if (tag === "venue" && venueCategory !== "") {
+        const hotel = await hotelsApi.createHotel({
+          name: venueName.trim(),
+          location: venueLocation.trim(),
+          price_per_night: Number(venuePricePerNight) || 0,
+          category: HOTEL_CATEGORY_BY_STAY[venueCategory],
+          rooms: Number(venueBedrooms) || undefined,
+          amenities: venueAmenities.length > 0 ? Object.fromEntries(venueAmenities.map((a) => [AMENITY_TO_HOTEL_KEY[a], true])) : undefined,
+        });
+        linkedHotelId = hotel.id;
+      }
+
       const created = await feedApi.createPost({
-        kind: tag === "property" ? "property" : tag === "service" ? "service" : "general",
+        kind: tag === "property" ? "property" : tag === "service" ? "service" : tag === "venue" ? "venue" : "general",
         body: body.trim(),
         linked_property_id: linkedPropertyId,
+        linked_hotel_id: linkedHotelId,
       });
 
       const imageFiles = media.filter((m) => m.type === "image");
