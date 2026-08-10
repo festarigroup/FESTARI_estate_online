@@ -18,7 +18,7 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   return (
-    <article className="flex w-full shrink-0 flex-col overflow-hidden rounded-[19px] bg-white lg:rounded-[24px]">
+    <article className="flex w-full shrink-0 flex-col overflow-hidden rounded-[19px] border border-border bg-white lg:rounded-[24px]">
       <div className="flex flex-col gap-4 px-6 pt-6 pb-10">
         <PostHeader post={post} onShare={() => setShares((s) => s + 1)} />
         <div className="text-base leading-relaxed text-ink">

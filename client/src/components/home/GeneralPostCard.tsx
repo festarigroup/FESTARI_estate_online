@@ -73,7 +73,7 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
   }
 
   return (
-    <article className="flex w-full shrink-0 flex-col gap-4 rounded-[19px] bg-white p-6 lg:rounded-[24px]">
+    <article className="flex w-full shrink-0 flex-col gap-4 rounded-[19px] border border-border bg-white p-6 lg:rounded-[24px]">
       <PostHeader post={post} />
 
       {post.tag && (

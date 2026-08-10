@@ -36,7 +36,7 @@ export function StoryBar() {
   }
 
   return (
-    <div className="relative w-full shrink-0 rounded-[19px] bg-white p-4 lg:rounded-[24px]">
+    <div className="relative w-full shrink-0 rounded-[19px] border border-border bg-white p-4 lg:rounded-[24px]">
       <div ref={scrollerRef} className="no-scrollbar flex items-center gap-6 overflow-x-auto scroll-smooth pr-2">
         <div className="flex shrink-0 flex-col items-center gap-2">
           <button
