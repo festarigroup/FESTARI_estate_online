@@ -1,4 +1,4 @@
-import { apiDelete, apiGet, apiPost, apiUpload } from "@/lib/api/client";
+import { apiDelete, apiGet, apiPost, apiPut, apiUpload } from "@/lib/api/client";
 import type { ApiComment, ApiPost, ApiPostImage, ApiStory, Paginated } from "@/lib/api/types";
 
 export function listPosts(params: { kind?: string; page?: number; limit?: number } = {}) {
@@ -25,6 +25,17 @@ export interface CreatePostPayload {
 
 export function createPost(payload: CreatePostPayload) {
   return apiPost<ApiPost>("/feed/posts", payload);
+}
+
+/** PUT /feed/posts/:id only accepts body/hashtags server-side (no changing
+ * a post's images or linked property/artisan/hotel after the fact) — see
+ * server/src/app/validators/postValidators.ts's updatePostSchema. */
+export function updatePost(id: string, payload: { body?: string; hashtags?: string }) {
+  return apiPut<ApiPost>(`/feed/posts/${id}`, payload);
+}
+
+export function deletePost(id: string) {
+  return apiDelete<null>(`/feed/posts/${id}`);
 }
 
 export function uploadPostImage(postId: string, file: File, position: number) {

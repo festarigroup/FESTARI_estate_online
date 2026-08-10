@@ -1,12 +1,18 @@
 "use client";
 
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { Dropdown, DropdownItem } from "@/components/ui/Dropdown";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { EditPostModal } from "@/components/home/EditPostModal";
+import { useAuth } from "@/context/AuthContext";
 import { useSavedPosts } from "@/hooks/useSavedPosts";
 import { usePostShare } from "@/hooks/usePostShare";
+import { usePostEdits } from "@/hooks/usePostEdits";
 import { useHiddenPosts } from "@/hooks/useHiddenPosts";
 import { useFollowedAuthors } from "@/hooks/useFollowedAuthors";
+import { deletePost } from "@/lib/api/feed";
+import { ApiError } from "@/lib/api/client";
 import type { ContentPost } from "@/types/home";
 
 interface PostOptionsMenuProps {
@@ -16,10 +22,16 @@ interface PostOptionsMenuProps {
   onShare?: () => void;
 }
 
-/** The post-card "⋮" overflow menu — Share, Save, Copy link, Embed,
- * Unfollow, Not interested, Report. Not a Figma frame (no menu frame was
- * provided); the item set matches a common feed-post convention rather
- * than one specific reference app.
+/** The post-card "⋮" overflow menu. Two different item sets:
+ *
+ * - Someone else's post: Share, Save, Copy link, Embed, Unfollow, Not
+ *   interested, Report — the original set. Not a Figma frame (no menu
+ *   frame was provided); the item set matches a common feed-post
+ *   convention rather than one specific reference app.
+ * - Your own post (post.author.id === the signed-in user's id): Share,
+ *   Save, Copy link, Embed, Edit post, Delete post — Unfollow/Not
+ *   interested/Report all drop out, since none of them make sense
+ *   against something you posted yourself.
  *
  * Share and Save duplicate PostEngagementBar's own Share/Save buttons —
  * intentionally: PostEngagementBar hides both below `sm:` (five icons plus
@@ -28,12 +40,18 @@ interface PostOptionsMenuProps {
  * and up on the engagement bar itself, this menu is just always available
  * as a second path to the same actions, at every width. */
 export function PostOptionsMenu({ post, onShare }: PostOptionsMenuProps) {
+  const { user } = useAuth();
   const { isSaved, toggleSave } = useSavedPosts();
   const { handleShare } = usePostShare(post, onShare);
   const { hidePost, unhidePost } = useHiddenPosts();
+  const { markDeleted, markEdited } = usePostEdits();
   const { isFollowing, toggleFollow } = useFollowedAuthors();
+  const [editOpen, setEditOpen] = useState(false);
   const saved = isSaved(post.id);
   const following = isFollowing(post.author.name);
+  // post.author.id is unset for a synthetic/local-only author (a repost
+  // wrapper's own attribution line, e.g.) — never "mine" in that case.
+  const isOwnPost = !!user && !!post.author.id && user.id === post.author.id;
 
   function handleSave() {
     const wasSaved = saved;
@@ -90,33 +108,68 @@ export function PostOptionsMenu({ post, onShare }: PostOptionsMenuProps) {
     ));
   }
 
+  // Real backend call, not a hideWithUndo -- there's no restoring a
+  // deleted post the way "Not interested" can be undone, so this confirms
+  // first rather than offering an undo toast afterward.
+  async function handleDelete() {
+    if (!window.confirm("Delete this post? This can't be undone.")) return;
+    try {
+      await deletePost(post.id);
+      markDeleted(post.id);
+      toast.success("Post deleted.");
+    } catch (err) {
+      toast.error(err instanceof ApiError ? err.message : "Couldn't delete this post.");
+    }
+  }
+
   return (
-    <Dropdown
-      trigger={(bind) => (
-        <button {...bind} aria-label="More options" className="pb-1.5 text-muted hover:text-ink">
-          <DynamicIcon name="MoreHorizontal" className="size-4 rotate-90" />
-        </button>
+    <>
+      <Dropdown
+        trigger={(bind) => (
+          <button {...bind} aria-label="More options" className="pb-1.5 text-muted hover:text-ink">
+            <DynamicIcon name="MoreHorizontal" className="size-4 rotate-90" />
+          </button>
+        )}
+      >
+        <DropdownItem icon="Share2" label="Share" onClick={handleShare} />
+        <DropdownItem icon="Bookmark" label={saved ? "Remove from Save" : "Save"} onClick={handleSave} />
+        <DropdownItem icon="Link2" label="Copy link to post" onClick={handleCopyLink} />
+        <DropdownItem icon="Code2" label="Embed this post" onClick={handleEmbed} />
+        {isOwnPost ? (
+          <>
+            <DropdownItem icon="PencilLine" label="Edit post" onClick={() => setEditOpen(true)} />
+            <DropdownItem icon="Trash2" label="Delete post" onClick={handleDelete} className="text-brand-rust" />
+          </>
+        ) : (
+          <>
+            <DropdownItem
+              icon="CircleX"
+              label={following ? `Unfollow ${post.author.name}` : `Follow ${post.author.name}`}
+              onClick={handleToggleFollow}
+            />
+            <DropdownItem
+              icon="ThumbsDown"
+              label="Not interested"
+              onClick={() => hideWithUndo("You'll see fewer posts like this.")}
+            />
+            <DropdownItem
+              icon="Flag"
+              label="Report post"
+              onClick={() => hideWithUndo("Post reported. We'll take a look.")}
+            />
+          </>
+        )}
+      </Dropdown>
+
+      {isOwnPost && (
+        <EditPostModal
+          open={editOpen}
+          onClose={() => setEditOpen(false)}
+          postId={post.id}
+          initialBody={post.body.join("\n")}
+          onSaved={(body) => markEdited(post.id, body)}
+        />
       )}
-    >
-      <DropdownItem icon="Share2" label="Share" onClick={handleShare} />
-      <DropdownItem icon="Bookmark" label={saved ? "Remove from Save" : "Save"} onClick={handleSave} />
-      <DropdownItem icon="Link2" label="Copy link to post" onClick={handleCopyLink} />
-      <DropdownItem icon="Code2" label="Embed this post" onClick={handleEmbed} />
-      <DropdownItem
-        icon="CircleX"
-        label={following ? `Unfollow ${post.author.name}` : `Follow ${post.author.name}`}
-        onClick={handleToggleFollow}
-      />
-      <DropdownItem
-        icon="ThumbsDown"
-        label="Not interested"
-        onClick={() => hideWithUndo("You'll see fewer posts like this.")}
-      />
-      <DropdownItem
-        icon="Flag"
-        label="Report post"
-        onClick={() => hideWithUndo("Post reported. We'll take a look.")}
-      />
-    </Dropdown>
+    </>
   );
 }

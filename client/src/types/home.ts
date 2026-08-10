@@ -25,6 +25,12 @@ export interface Story {
 }
 
 export interface PostAuthor {
+  /** The real users.id this post's author maps back to — absent for
+   * synthetic/local-only authors (e.g. a repost wrapper's CURRENT_USER
+   * stand-in in Feed.tsx) that were never a real ApiPostAuthor to begin
+   * with. Lets PostOptionsMenu tell "my own post" apart from anyone
+   * else's by comparing against useAuth()'s own `user.id`. */
+  id?: string;
   name: string;
   /** Omit when the brand/profile has no resolvable photo — pair with `avatarIcon`. */
   avatar?: string;

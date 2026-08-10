@@ -83,6 +83,7 @@ export function mapComment(comment: ApiComment): Comment {
 
 export function mapPost(post: ApiPost): ContentPost {
   const author = {
+    id: post.author.id,
     name: authorName(post.author),
     avatar: post.author.profile_picture ?? undefined,
     subtitle: relativeTime(post.created_at),
