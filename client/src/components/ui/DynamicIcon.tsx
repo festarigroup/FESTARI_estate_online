@@ -1,5 +1,6 @@
 import {
   ArrowRight,
+  Award,
   BadgeCheck,
   BarChart3,
   Bath,
@@ -14,6 +15,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  CircleCheck,
   CircleX,
   Clock,
   Code2,
@@ -77,6 +79,7 @@ import {
  */
 const ICONS = {
   ArrowRight,
+  Award,
   BadgeCheck,
   BarChart3,
   Bath,
@@ -91,6 +94,7 @@ const ICONS = {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  CircleCheck,
   CircleX,
   Clock,
   Code2,
