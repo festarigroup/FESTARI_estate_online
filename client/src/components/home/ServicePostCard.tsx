@@ -16,7 +16,7 @@ export function ServicePostCard({ post }: { post: ServicePost }) {
   const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.id, post.comments);
 
   return (
-    <article className="flex w-full shrink-0 flex-col gap-4 rounded-xl bg-white p-6 drop-shadow-[0px_4px_6px_rgba(0,31,63,0.08)]">
+    <article className="flex w-full shrink-0 flex-col gap-4 rounded-[39px] bg-white p-6 drop-shadow-[0px_4px_6px_rgba(0,31,63,0.08)]">
       <PostHeader post={post} />
 
       <div className="text-base leading-relaxed text-ink">

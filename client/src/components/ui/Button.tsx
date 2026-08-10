@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "navy" | "gold" | "ghost" | "pill" | "outline-gold" | "gold-pill";
+  variant?: "navy" | "gold" | "ghost" | "pill" | "outline-gold" | "gold-pill" | "outline-gold-on-dark";
 }
 
 const VARIANT_STYLES: Record<NonNullable<ButtonProps["variant"]>, string> = {
@@ -21,6 +21,12 @@ const VARIANT_STYLES: Record<NonNullable<ButtonProps["variant"]>, string> = {
   // distinct from "outline-gold": solid brand-gold background, smaller
   // rounded-full padding than the "gold" variant's rounded-lg buttons use.
   "gold-pill": "bg-brand-gold text-brand-navy hover:brightness-95 rounded-full px-6 py-2",
+  // ConciergeCard's "Become a Host" (node 3379:4774) -- the same
+  // transparent-pill/gold-outline idea as "outline-gold", but for a card
+  // that's already navy: white label instead of gold, a translucent white
+  // wash instead of a transparent one, and a fixed 41px height to match
+  // the Figma spec exactly rather than deriving it from padding.
+  "outline-gold-on-dark": "h-[41px] rounded-full border border-brand-gold-dark bg-white/10 px-6 text-white hover:bg-white/15",
 };
 
 /** Base button — extend via `variant` and `className`, never fork a one-off style. */
