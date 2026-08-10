@@ -14,7 +14,11 @@ import type { ServicePost } from "@/types/home";
 /** "Article - Post: Service/Promotion" — lighter footer with a direct booking CTA. */
 export function ServicePostCard({ post }: { post: ServicePost }) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.id, post.comments);
+  const { comments, commentsOpen, toggleComments, addComment, commentsCount } = usePostComments(
+    post.id,
+    post.comments,
+    post.commentsCount,
+  );
 
   return (
     <article className="flex w-full shrink-0 flex-col gap-4 rounded-[19px] border border-border bg-white p-6 lg:rounded-[24px]">
@@ -60,6 +64,7 @@ export function ServicePostCard({ post }: { post: ServicePost }) {
         post={post}
         commentsOpen={commentsOpen}
         onToggleComments={toggleComments}
+        commentsCount={commentsCount}
         cta={<BookServiceButton providerName={post.author.name} artisanId={post.providerId} />}
       />
 

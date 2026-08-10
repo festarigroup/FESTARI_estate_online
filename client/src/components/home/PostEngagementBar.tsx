@@ -11,6 +11,10 @@ interface PostEngagementBarProps {
   post: ContentPost;
   commentsOpen: boolean;
   onToggleComments: () => void;
+  /** The caller's own usePostComments() count, not post.commentsCount
+   * directly — see that hook for why the two diverge once the comment
+   * panel has actually been opened. */
+  commentsCount: number;
   /** Extra CTA rendered on the right — BookServiceButton for a service
    * post, VenueReservationButton for a venue post, PropertyEnquiryButton
    * for a property post — kept optional here since a plain post doesn't
@@ -32,20 +36,29 @@ interface PostEngagementBarProps {
  * both at every width. Dropped from this row entirely now that the
  * dropdown is the one place for them -- one icon row, not two competing
  * paths to the same action. */
-export function PostEngagementBar({ post, commentsOpen, onToggleComments, cta }: PostEngagementBarProps) {
+export function PostEngagementBar({ post, commentsOpen, onToggleComments, commentsCount, cta }: PostEngagementBarProps) {
   const [liked, setLiked] = useState(!!post.isLiked);
+  // Tracks the real backend count optimistically alongside `liked`, same
+  // request/rollback pairing — a toggle with no visible number next to it
+  // read as broken once Comment/Repost both got one.
+  const [likeCount, setLikeCount] = useState(post.likesCount);
 
   function handleToggleLike() {
     const next = !liked;
     setLiked(next);
+    setLikeCount((c) => c + (next ? 1 : -1));
     const request = next ? likePost(post.id) : unlikePost(post.id);
-    request.catch(() => setLiked(!next));
+    request.catch(() => {
+      setLiked(!next);
+      setLikeCount((c) => c - (next ? 1 : -1));
+    });
   }
 
   // Labels collapse to icon-only below sm: (Like/Comment cramped up next to
   // a CTA at phone widths) — sr-only rather than a plain hidden, so the
   // label stays in the accessible name instead of leaving the button an
-  // unlabeled icon for screen readers.
+  // unlabeled icon for screen readers. The count itself always stays
+  // visible at every width, same as Repost's own.
   const actions = (
     <>
       <button
@@ -57,6 +70,7 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, cta }:
       >
         <DynamicIcon name="Heart" className="size-5" fill={liked ? "currentColor" : "none"} />
         <span className="sr-only sm:not-sr-only">Like</span>
+        <span>{likeCount}</span>
       </button>
       <button
         onClick={onToggleComments}
@@ -68,6 +82,7 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, cta }:
       >
         <DynamicIcon name="MessageCircle" className="size-5" />
         <span className="sr-only sm:not-sr-only">Comment</span>
+        <span>{commentsCount}</span>
       </button>
       <RepostButton postId={post.id} />
     </>

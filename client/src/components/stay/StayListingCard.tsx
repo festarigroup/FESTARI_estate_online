@@ -39,7 +39,11 @@ const GRID_LIMIT = 3;
  * card needs two direct actions where a plain post only ever has one. */
 export function StayListingCard({ post }: { post: GeneralPost }) {
   const venue = post.venueDetails;
-  const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.id, post.comments);
+  const { comments, commentsOpen, toggleComments, addComment, commentsCount } = usePostComments(
+    post.id,
+    post.comments,
+    post.commentsCount,
+  );
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const images = post.images ?? [];
 
@@ -189,6 +193,7 @@ export function StayListingCard({ post }: { post: GeneralPost }) {
         post={post}
         commentsOpen={commentsOpen}
         onToggleComments={toggleComments}
+        commentsCount={commentsCount}
         cta={
           <div className="flex gap-2">
             <VenueMessageButton venueName={venue.name} />

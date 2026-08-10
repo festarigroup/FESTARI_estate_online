@@ -26,7 +26,11 @@ import type { PropertyPost } from "@/types/home";
  * "View Details" as PostEngagementBar's `cta`) -- rather than a bespoke
  * bar that only approximated it. */
 export function PropertyListingCard({ listing }: { listing: PropertyPost }) {
-  const { comments, commentsOpen, toggleComments, addComment } = usePostComments(listing.id, listing.comments);
+  const { comments, commentsOpen, toggleComments, addComment, commentsCount } = usePostComments(
+    listing.id,
+    listing.comments,
+    listing.commentsCount,
+  );
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const images = listing.images;
 
@@ -152,6 +156,7 @@ export function PropertyListingCard({ listing }: { listing: PropertyPost }) {
           post={listing}
           commentsOpen={commentsOpen}
           onToggleComments={toggleComments}
+          commentsCount={commentsCount}
           cta={
             // Matches the Button component's outline-gold variant exactly —
             // inlined since Button renders a <button>, not a link, and this

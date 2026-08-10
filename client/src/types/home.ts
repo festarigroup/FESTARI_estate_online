@@ -86,7 +86,13 @@ export interface PropertyPost {
   hashtags: string;
   images: GalleryImage[];
   totalImages: number;
-  reactions: { likes: number; shares: number };
+  /** Real counts from the backend (likes_count/comments_count), shown next
+   * to PostEngagementBar's Like/Comment icons regardless of whether the
+   * comment panel has ever been opened — see usePostComments for how the
+   * displayed comment count reconciles with the lazily-loaded real list
+   * once it has. */
+  likesCount: number;
+  commentsCount: number;
   comments: Comment[];
   /** Full-listing facts shown on the Properties page's "Property Metadata
    * Strip" (Figma node 3340:936/2446) — PropertyPostCard's Home-feed
@@ -116,6 +122,10 @@ export interface ServicePost {
   author: PostAuthor;
   body: string[];
   image: GalleryImage;
+  /** Same real backend counts as PropertyPost's own — see there for why
+   * these are separate from `comments`/`isLiked`. */
+  likesCount: number;
+  commentsCount: number;
   comments: Comment[];
 }
 
@@ -196,11 +206,11 @@ export interface GeneralPost {
    * reservations against the actual hotel rather than the post. Only ever
    * set when `tag === "venue"`. */
   hotelId?: string;
-  /** The Stay listing page's visible like/share numbers (Figma node
-   * 3384:8330), the same role PropertyPost's own `reactions` plays for
-   * PropertyListingCard. Every other GeneralPost variant has never needed a
-   * visible count, just a toggle. */
-  reactions?: { likes: number; shares: number };
+  /** Same real backend counts as PropertyPost's own — every GeneralPost
+   * variant (plain, property/service/venue-tagged) gets these now, not
+   * just the Stay listing page's venue cards. */
+  likesCount: number;
+  commentsCount: number;
   comments: Comment[];
 }
 

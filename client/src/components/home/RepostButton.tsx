@@ -18,6 +18,12 @@ export function RepostButton({ postId }: { postId: string }) {
   const { isReposted, repost, toggleRepost } = useReposts();
   const [quoteOpen, setQuoteOpen] = useState(false);
   const reposted = isReposted(postId);
+  // Reposts are entirely local (see useReposts — there's no backend concept
+  // of one), so this can only ever reflect *this browser's* own repost, not
+  // a real cross-user total the way Like's count is. Showing it anyway,
+  // consistent with Like/Comment now both having one — 0 or 1 is still
+  // honest information, just narrower than a platform-wide count would be.
+  const repostCount = reposted ? 1 : 0;
 
   function handlePlainRepost() {
     repost(postId);
@@ -37,6 +43,7 @@ export function RepostButton({ postId }: { postId: string }) {
       >
         <DynamicIcon name="Repeat2" className="size-5" />
         <span className="sr-only sm:not-sr-only">Reposted</span>
+        <span>{repostCount}</span>
       </button>
     );
   }
@@ -52,6 +59,7 @@ export function RepostButton({ postId }: { postId: string }) {
           >
             <DynamicIcon name="Repeat2" className="size-5" />
             <span className="sr-only sm:not-sr-only">Repost</span>
+            <span>{repostCount}</span>
           </button>
         )}
       >

@@ -261,6 +261,10 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
     return {
       id: `post-${Date.now()}`,
       kind: "general",
+      // Brand new, local-only (this is the poll path -- never round-trips
+      // through the API, so there's no real backend count to seed from).
+      likesCount: 0,
+      commentsCount: 0,
       author: { name: authorName, avatar: user?.profile_picture ?? undefined, subtitle: "Just now" },
       body: body.trim() ? body.trim().split("\n") : [],
       images: media.length

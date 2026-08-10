@@ -13,8 +13,11 @@ import type { GalleryImage, PropertyPost } from "@/types/home";
 /** "Article - Post: Property Listing" — body copy, image gallery, reactions, actions. */
 export function PropertyPostCard({ post }: { post: PropertyPost }) {
   const images = post.images;
-  const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.id, post.comments);
-  const [shares, setShares] = useState(post.reactions.shares);
+  const { comments, commentsOpen, toggleComments, addComment, commentsCount } = usePostComments(
+    post.id,
+    post.comments,
+    post.commentsCount,
+  );
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   // Same reasoning as GeneralPostCard's renderImage: next/image can't
@@ -39,7 +42,7 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
   return (
     <article className="flex w-full shrink-0 flex-col overflow-hidden rounded-[19px] border border-border bg-white lg:rounded-[24px]">
       <div className="flex flex-col gap-4 px-6 pt-6 pb-10">
-        <PostHeader post={post} onShare={() => setShares((s) => s + 1)} />
+        <PostHeader post={post} />
         <div className="text-base leading-relaxed text-ink">
           {post.body.map((line) => (
             <p key={line}>{line}</p>
@@ -110,26 +113,18 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
         />
       )}
 
+      {/* The old separate "❤ N likes · N Comments · N Shares" summary row
+          that used to live here is gone — PostEngagementBar shows the same
+          Like/Comment counts inline on its own icons now, and Share no
+          longer has a visible count anywhere (see its own commit for why
+          Share dropped out of this bar entirely). */}
       <div className="flex w-full flex-col gap-6 p-6">
-        <div className="flex w-full items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center">
-              <span className="flex size-5 items-center justify-center rounded-full border-2 border-white bg-brand-blue">
-                <DynamicIcon name="ThumbsUp" className="size-2.5 text-white" fill="currentColor" />
-              </span>
-              <span className="-ml-1 flex size-5 items-center justify-center rounded-full border-2 border-white bg-brand-rust">
-                <DynamicIcon name="Heart" className="size-2.5 text-white" fill="currentColor" />
-              </span>
-            </div>
-            <span className="text-sm text-muted">{post.reactions.likes} likes</span>
-          </div>
-          <div className="flex gap-4 text-sm text-muted">
-            <span>{comments.length} Comments</span>
-            <span>{shares} Shares</span>
-          </div>
-        </div>
-
-        <PostEngagementBar post={post} commentsOpen={commentsOpen} onToggleComments={toggleComments} />
+        <PostEngagementBar
+          post={post}
+          commentsOpen={commentsOpen}
+          onToggleComments={toggleComments}
+          commentsCount={commentsCount}
+        />
         {commentsOpen && <CommentsSection comments={comments} onAddComment={addComment} />}
       </div>
     </article>

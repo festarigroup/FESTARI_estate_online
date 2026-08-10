@@ -33,7 +33,11 @@ const GRID_LIMIT = 3;
  * photos / a property-or-service tag / a poll) — not a Figma frame, built to
  * match the two feed-post variants that are. */
 export function GeneralPostCard({ post }: { post: GeneralPost }) {
-  const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.id, post.comments);
+  const { comments, commentsOpen, toggleComments, addComment, commentsCount } = usePostComments(
+    post.id,
+    post.comments,
+    post.commentsCount,
+  );
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const images = post.images ?? [];
 
@@ -226,6 +230,7 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
         post={post}
         commentsOpen={commentsOpen}
         onToggleComments={toggleComments}
+        commentsCount={commentsCount}
         cta={
           post.tag === "service" ? (
             <BookServiceButton providerName={post.author.name} />

@@ -120,7 +120,8 @@ export function mapPost(post: ApiPost): ContentPost {
       hashtags: post.hashtags ?? "",
       images,
       totalImages: images.length,
-      reactions: { likes: post.likes_count, shares: post.shares_count },
+      likesCount: post.likes_count,
+      commentsCount: post.comments_count,
       comments: [],
       price: formatPrice(property.price),
       propertyType: PROPERTY_TYPE_LABEL[property.property_type] ?? property.property_type,
@@ -157,7 +158,8 @@ export function mapPost(post: ApiPost): ContentPost {
         rating: hotel.average_rating ?? undefined,
         amenities: amenities && amenities.length > 0 ? amenities : undefined,
       },
-      reactions: { likes: post.likes_count, shares: post.shares_count },
+      likesCount: post.likes_count,
+      commentsCount: post.comments_count,
       comments: [],
     };
     return mapped;
@@ -172,6 +174,8 @@ export function mapPost(post: ApiPost): ContentPost {
       author,
       body: post.body ? [post.body] : [],
       image: images[0] ?? { src: "/images/avatar-kwame-composer.png", alt: author.name },
+      likesCount: post.likes_count,
+      commentsCount: post.comments_count,
       comments: [],
     };
     return mapped;
@@ -182,6 +186,8 @@ export function mapPost(post: ApiPost): ContentPost {
     kind: "general",
     isLiked: post.is_liked,
     author,
+    likesCount: post.likes_count,
+    commentsCount: post.comments_count,
     body: post.body ? post.body.split("\n").filter(Boolean) : [],
     images: images.length ? images : undefined,
     comments: [],
