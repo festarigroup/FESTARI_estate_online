@@ -18,7 +18,7 @@ const FEATURES = [
  * at explicit request back to plain scrolling. */
 export function ConciergeCard() {
   return (
-    <div className="relative w-full shrink-0 overflow-hidden rounded-xl bg-brand-navy p-8 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
+    <div className="relative w-full shrink-0 overflow-hidden rounded-[39px] bg-brand-navy p-8 shadow-[0px_4px_12px_0px_rgba(0,31,63,0.08)]">
       <Image
         src="/images/concierge-portrait.png"
         alt=""

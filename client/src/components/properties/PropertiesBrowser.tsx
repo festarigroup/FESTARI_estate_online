@@ -101,7 +101,7 @@ export function PropertiesBrowser({ listings }: { listings: PropertyPost[] }) {
             {filtered.length > 0 ? (
               filtered.map((listing) => <PropertyListingCard key={listing.id} listing={listing} />)
             ) : (
-              <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border-subtle bg-white py-16 text-center">
+              <div className="flex flex-col items-center gap-3 rounded-[39px] border border-dashed border-border-subtle bg-white py-16 text-center">
                 <span className="flex size-12 items-center justify-center rounded-full bg-surface-muted">
                   <DynamicIcon name="Search" className="size-5 text-muted" />
                 </span>

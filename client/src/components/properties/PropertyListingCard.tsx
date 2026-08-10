@@ -51,7 +51,7 @@ export function PropertyListingCard({ listing }: { listing: PropertyPost }) {
   );
 
   return (
-    <article className="flex w-full flex-col overflow-hidden rounded-xl border border-border-subtle bg-white shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]">
+    <article className="flex w-full flex-col overflow-hidden rounded-[39px] border border-border-subtle bg-white shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]">
       <div className="flex flex-col gap-3 p-4 pb-3">
         <PostHeader post={listing} />
         <div>
