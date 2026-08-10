@@ -103,7 +103,7 @@ export function PropertiesFilterRow({
         </Dropdown>
       </div>
       <div className="flex items-center gap-3">
-        <button
+        {/* <button
           onClick={onClearFilters}
           disabled={activeFilterCount === 0}
           className="flex items-center gap-2 rounded-full border border-border-subtle bg-white px-4 py-2 text-xs font-semibold text-ink hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-50"
@@ -115,7 +115,7 @@ export function PropertiesFilterRow({
               {activeFilterCount}
             </span>
           )}
-        </button>
+        </button> */}
         <button
           onClick={onToggleMapView}
           className="flex items-center gap-2 rounded-full bg-brand-navy px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-navy-light"
