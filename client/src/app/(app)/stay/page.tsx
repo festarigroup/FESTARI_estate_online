@@ -74,12 +74,6 @@ export default function StayPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // The sidebar's map (Figma node 3384:8508) sits outside the feed column
-  // entirely, unlike the Properties page's own map (which shares its
-  // browser's filter state) -- so this always shows every fetched venue,
-  // regardless of which category tab or filter is active in the feed beside
-  // it, rather than lifting StayBrowser's filter state up just to keep them
-  // in sync.
   const mapListings = listings
     .filter((listing) => listing.venueDetails)
     .map((listing) => ({
