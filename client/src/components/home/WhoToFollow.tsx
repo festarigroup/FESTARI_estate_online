@@ -7,23 +7,18 @@ import { SidebarWidgetHeader } from "@/components/home/SidebarWidgetHeader";
 import { cn } from "@/lib/cn";
 import { getSuggestions, followUser, unfollowUser } from "@/lib/api/social";
 import { mapFollowSuggestion } from "@/lib/adapters";
-import { FOLLOW_SUGGESTIONS } from "@/lib/mock-data";
 import type { FollowSuggestion } from "@/types/home";
 
 /** "Who to follow" widget — suggested people/businesses with a Follow toggle each. */
 export function WhoToFollow() {
   const [people, setPeople] = useState<FollowSuggestion[]>([]);
+
   const [followed, setFollowed] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    // Falls back to mock suggestions when the API is unreachable or empty
-    // (e.g. no backend hosted yet) so this widget isn't the only one that
-    // silently disappears from the sidebar rail.
     getSuggestions()
-      .then((suggestions) =>
-        setPeople(suggestions.length > 0 ? suggestions.map(mapFollowSuggestion) : FOLLOW_SUGGESTIONS),
-      )
-      .catch(() => setPeople(FOLLOW_SUGGESTIONS));
+      .then((suggestions) => setPeople(suggestions.map(mapFollowSuggestion)))
+      .catch(() => {});
   }, []);
 
   function toggleFollow(id: string, name: string) {

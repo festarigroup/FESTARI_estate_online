@@ -6,7 +6,6 @@ import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { SidebarWidgetHeader } from "@/components/home/SidebarWidgetHeader";
 import { getTop } from "@/lib/api/artisans";
 import { mapServiceProvider } from "@/lib/adapters";
-import { TOP_SERVICE_PROVIDERS } from "@/lib/mock-data";
 import type { ServiceProvider } from "@/types/home";
 
 /** "Top Service Providers" widget — avatar/icon, name, and star rating per provider. */
@@ -14,12 +13,9 @@ export function TopServiceProviders() {
   const [providers, setProviders] = useState<ServiceProvider[]>([]);
 
   useEffect(() => {
-    // Falls back to mock providers when the API is unreachable or empty
-    // (e.g. no backend hosted yet) so this widget isn't the only one that
-    // silently disappears from the sidebar rail.
     getTop()
-      .then((items) => setProviders(items.length > 0 ? items.map(mapServiceProvider) : TOP_SERVICE_PROVIDERS))
-      .catch(() => setProviders(TOP_SERVICE_PROVIDERS));
+      .then((items) => setProviders(items.map(mapServiceProvider)))
+      .catch(() => {});
   }, []);
 
   if (providers.length === 0) return null;
