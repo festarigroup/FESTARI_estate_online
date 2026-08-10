@@ -16,20 +16,26 @@ export function PostHeader({ post, onShare }: PostHeaderProps) {
   const { author } = post;
 
   return (
-    <div className="flex w-full items-start justify-between">
-      <div className="flex items-center gap-3">
+    <div className="flex w-full items-start justify-between gap-3">
+      {/* min-w-0 lets this side actually shrink below its content's natural
+          width -- without it a long name/subtitle (a real display name or
+          "2h ago • East Legon, Accra"-style subtitle) just pushes the "⋮"
+          menu off the card on a narrow screen instead of truncating. */}
+      <div className="flex min-w-0 items-center gap-3">
         <Avatar src={author.avatar} icon={author.avatarIcon} alt={author.name} size={48} />
-        <div>
+        <div className="min-w-0">
           <div className="flex items-center gap-1">
-            <h3 className="font-heading text-sm text-ink">{author.name}</h3>
+            <h3 className="truncate font-heading text-sm text-ink">{author.name}</h3>
             {author.verified && (
-              <DynamicIcon name="BadgeCheck" className="size-3 text-brand-blue" />
+              <DynamicIcon name="BadgeCheck" className="size-3 shrink-0 text-brand-blue" />
             )}
           </div>
-          <p className="text-xs text-muted">{author.subtitle}</p>
+          <p className="truncate text-xs text-muted">{author.subtitle}</p>
         </div>
       </div>
-      <PostOptionsMenu post={post} onShare={onShare} />
+      <div className="shrink-0">
+        <PostOptionsMenu post={post} onShare={onShare} />
+      </div>
     </div>
   );
 }

@@ -107,15 +107,21 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
   // One layout always, cta or not -- clustered left with a consistent
   // gap-5 rather than branching between that and a justify-between
   // full-width spread, so every post's icon-to-icon spacing is identical
-  // whether or not it has a CTA. The CTA (when there is one) now sits
-  // beside that group on the same row at every width, not just sm: and up
-  // -- with Share/Save hidden below sm: (see the doc comment above), the
-  // row only ever has three icons at mobile widths, which leaves enough
-  // room for the CTA right there instead of needing its own line below.
+  // whether or not it has a CTA. The CTA (when there is one) sits beside
+  // that group on the same row at every width, not just sm: and up -- with
+  // Share/Save hidden below sm: (see the doc comment above), the row only
+  // ever has three icons at mobile widths, which leaves enough room for a
+  // single-button CTA right there instead of needing its own line below.
+  // flex-wrap is a safety net, not the normal case: StayListingCard's own
+  // CTA is two buttons together (Message + Reserve, see its own doc
+  // comment), which no longer fits beside three icons at the very narrowest
+  // widths (~320px, e.g. iPhone SE) -- without it, Reserve clipped straight
+  // off the edge of the card instead of the row just breaking onto a
+  // second line the way any other wrapping content would.
   return (
-    <div className="flex w-full items-center gap-3 border-t border-border-subtle pt-[17px]">
+    <div className="flex w-full flex-wrap items-center gap-3 border-t border-border-subtle pt-[17px]">
       <div className="flex items-center gap-5">{actions}</div>
-      {cta && <div className="ml-auto flex items-center gap-2">{cta}</div>}
+      {cta && <div className="ml-auto flex flex-wrap items-center justify-end gap-2">{cta}</div>}
     </div>
   );
 }

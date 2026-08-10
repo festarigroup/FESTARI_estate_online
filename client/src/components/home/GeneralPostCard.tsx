@@ -162,12 +162,16 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
         // facts and same look as PropertyListingCard's on the Properties
         // page, so a property posted from here carries the same
         // information as one seeded there.
-        <div className="-mx-6 flex items-center justify-between border-y border-[#e9ecef] bg-[#f8f9fa] px-6 py-3">
-          <div>
-            <p className="font-heading text-2xl font-semibold text-ink">{post.propertyDetails.price}</p>
-            <p className="text-[13px] text-muted">{post.propertyDetails.propertyType}</p>
+        <div className="-mx-6 flex items-center justify-between gap-3 border-y border-[#e9ecef] bg-[#f8f9fa] px-6 py-3">
+          {/* min-w-0 so a long free-text propertyType (e.g. "4 Bedroom
+              Detached House With Pool And Garden") truncates instead of
+              wrapping onto the beds/baths/sqm stats' column and squeezing
+              them off a narrow screen. */}
+          <div className="min-w-0">
+            <p className="truncate font-heading text-2xl font-semibold text-ink">{post.propertyDetails.price}</p>
+            <p className="truncate text-[13px] text-muted">{post.propertyDetails.propertyType}</p>
           </div>
-          <div className="flex items-center gap-4 text-[13px] text-ink/80">
+          <div className="flex shrink-0 items-center gap-4 text-[13px] text-ink/80">
             <span className="flex items-center gap-1">
               <DynamicIcon name="BedDouble" className="size-3.5" />
               {post.propertyDetails.beds}
@@ -191,16 +195,18 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
         // price + context on the left, the one key stat on the right
         // (that post shows "4 Bedrooms"; a venue's equivalent stat is its
         // own bedroom count, not guest capacity).
-        <div className="-mx-6 flex items-center justify-between border-y border-[#e9ecef] bg-[#f8f9fa] px-6 py-3">
-          <div>
-            <p className="font-heading text-2xl font-semibold text-ink">
+        <div className="-mx-6 flex items-center justify-between gap-3 border-y border-[#e9ecef] bg-[#f8f9fa] px-6 py-3">
+          {/* min-w-0 + truncate: same reasoning as the property strip above
+              — a venue's free-text name/location can run long. */}
+          <div className="min-w-0">
+            <p className="truncate font-heading text-2xl font-semibold text-ink">
               GHS {post.venueDetails.pricePerNight.toLocaleString()} / night
             </p>
-            <p className="text-[13px] text-muted">
+            <p className="truncate text-[13px] text-muted">
               {post.venueDetails.name} • {post.venueDetails.location}
             </p>
           </div>
-          <div className="flex items-center gap-1.5 text-[13px] text-ink/70">
+          <div className="flex shrink-0 items-center gap-1.5 text-[13px] text-ink/70">
             <DynamicIcon name="BedDouble" className="size-4" />
             {post.venueDetails.bedrooms} Bedrooms
           </div>

@@ -149,14 +149,18 @@ export function StayListingCard({ post }: { post: GeneralPost }) {
       {/* Property Metadata Strip (Figma node 3387:8880) — price/night and
           the venue's name+rating on the left, amenity chips on the right. */}
       <div className="flex items-center justify-between gap-4 border-y border-[#e9ecef] py-3">
-        <div>
-          <p className="font-heading text-2xl font-semibold text-ink">
+        {/* min-w-0 + truncate on the venue name: it's free text a host
+            types themselves, so it can run long, and without this it would
+            wrap the rating pill onto its own line or push the amenity chips
+            off a narrow card instead of just truncating with an ellipsis. */}
+        <div className="min-w-0">
+          <p className="truncate font-heading text-2xl font-semibold text-ink">
             GHS {venue.pricePerNight.toLocaleString()} <span className="text-sm font-normal text-muted">/night</span>
           </p>
           <div className="flex items-center gap-1.5 text-[13px] text-ink/80">
-            <span>{venue.name}</span>
+            <span className="truncate">{venue.name}</span>
             {typeof venue.rating === "number" && (
-              <span className="flex items-center gap-1 font-semibold text-brand-gold-dark">
+              <span className="flex shrink-0 items-center gap-1 font-semibold text-brand-gold-dark">
                 <DynamicIcon name="Star" className="size-3.5 fill-current" />
                 {venue.rating.toFixed(1)}
               </span>
@@ -164,7 +168,7 @@ export function StayListingCard({ post }: { post: GeneralPost }) {
           </div>
         </div>
         {venue.amenities && venue.amenities.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             {venue.amenities.map((amenity) => (
               <span
                 key={amenity}

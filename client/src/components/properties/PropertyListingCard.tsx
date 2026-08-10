@@ -116,13 +116,17 @@ export function PropertyListingCard({ listing }: { listing: PropertyPost }) {
         </div>
       )}
 
-      {/* Property Metadata Strip (node 3340:2446) */}
-      <div className="flex items-center justify-between border-y border-[#e9ecef] bg-[#f8f9fa] px-4 py-3">
-        <div>
-          <p className="font-heading text-2xl font-semibold text-ink">{listing.price}</p>
-          <p className="text-[13px] text-muted">{listing.propertyType}</p>
+      {/* Property Metadata Strip (node 3340:2446). min-w-0 + truncate on the
+          left side: `price`/`propertyType` are free text (e.g. "GHS 8,000 /
+          month", "4 Bedroom Detached House") that can run long, and without
+          this they'd wrap and squeeze the beds/baths/sqm stats off a narrow
+          card instead of just truncating with an ellipsis. */}
+      <div className="flex items-center justify-between gap-3 border-y border-[#e9ecef] bg-[#f8f9fa] px-4 py-3">
+        <div className="min-w-0">
+          <p className="truncate font-heading text-2xl font-semibold text-ink">{listing.price}</p>
+          <p className="truncate text-[13px] text-muted">{listing.propertyType}</p>
         </div>
-        <div className="flex items-center gap-4 text-[13px] text-ink/80">
+        <div className="flex shrink-0 items-center gap-4 text-[13px] text-ink/80">
           <span className="flex items-center gap-1">
             <DynamicIcon name="BedDouble" className="size-3.5" />
             {listing.beds}
