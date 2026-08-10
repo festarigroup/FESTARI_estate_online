@@ -5,7 +5,6 @@ import Image from "next/image";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { PostHeader } from "@/components/home/PostHeader";
 import { PostEngagementBar } from "@/components/home/PostEngagementBar";
-import { ServiceActionsBar } from "@/components/home/ServiceActionsBar";
 import { BookServiceButton } from "@/components/home/BookServiceButton";
 import { PropertyEnquiryButton } from "@/components/home/PropertyEnquiryButton";
 import { VenueReservationButton } from "@/components/home/VenueReservationButton";
@@ -210,37 +209,27 @@ export function GeneralPostCard({ post }: { post: GeneralPost }) {
 
       {post.poll && <PollBlock poll={post.poll} />}
 
-      {post.tag === "service" || post.tag === "venue" ? (
-        // Service and venue posts both drive a direct booking action, not
-        // a share — same "Social Interactions & Actions" bar the Figma
-        // Service/Promotion post uses (node 3303:5412), so a venue post
-        // looks and behaves the same as a service post, not the heavier
-        // Property-style engagement row.
-        <ServiceActionsBar
-          post={post}
-          commentsOpen={commentsOpen}
-          onToggleComments={toggleComments}
-          commentCount={comments.length}
-          cta={
-            post.tag === "service" ? (
-              <BookServiceButton providerName={post.author.name} />
-            ) : (
-              <VenueReservationButton venueName={post.author.name} hotelId={post.hotelId} />
-            )
-          }
-        />
-      ) : (
-        <PostEngagementBar
-          post={post}
-          commentsOpen={commentsOpen}
-          onToggleComments={toggleComments}
-          cta={
-            post.tag === "property" ? (
-              <PropertyEnquiryButton listerName={post.author.name} propertyId={post.propertyId} />
-            ) : undefined
-          }
-        />
-      )}
+      {/* Every post tag renders the exact same PostEngagementBar now --
+          service/venue posts used to get a distinct "Social Interactions &
+          Actions" bar (ServiceActionsBar, circular icon-only Share/Save,
+          no RepostButton reuse) modeled on the Figma Service/Promotion
+          post (node 3303:5412), but that meant a venue or service post's
+          icons never quite matched a plain post's. Only the `cta` itself
+          still varies by tag. */}
+      <PostEngagementBar
+        post={post}
+        commentsOpen={commentsOpen}
+        onToggleComments={toggleComments}
+        cta={
+          post.tag === "service" ? (
+            <BookServiceButton providerName={post.author.name} />
+          ) : post.tag === "venue" ? (
+            <VenueReservationButton venueName={post.author.name} hotelId={post.hotelId} />
+          ) : post.tag === "property" ? (
+            <PropertyEnquiryButton listerName={post.author.name} propertyId={post.propertyId} />
+          ) : undefined
+        }
+      />
       {commentsOpen && <CommentsSection comments={comments} onAddComment={addComment} />}
 
       {lightboxIndex !== null && (

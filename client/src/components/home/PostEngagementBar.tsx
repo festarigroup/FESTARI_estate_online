@@ -17,14 +17,21 @@ interface PostEngagementBarProps {
   /** Called after a real share completes (native share sheet or copy-to-clipboard),
    * so a parent that displays a share count (PropertyPostCard) can bump it. */
   onShare?: () => void;
-  /** Extra CTA rendered on the right, e.g. PropertyEnquiryButton for a
-   * property-tagged post — same "primary action" slot ServiceActionsBar's
-   * Book Service button occupies, just kept optional here since most
-   * posts don't have one. */
+  /** Extra CTA rendered on the right — BookServiceButton for a service
+   * post, VenueReservationButton for a venue post, PropertyEnquiryButton
+   * for a property post — kept optional here since a plain post doesn't
+   * have one. */
   cta?: React.ReactNode;
 }
 
-/** Like / Comment / Repost / Share / Save action row, shared by every feed post variant. */
+/** Like / Comment / Repost / Share / Save action row, shared by every post
+ * everywhere in this app -- feed posts of every tag, and both the Stay and
+ * Properties listing pages' own cards -- so a venue or service post's
+ * icons are never a slightly-different lookalike of a plain post's. (Used
+ * to fork into a second bar, ServiceActionsBar, for service/venue posts
+ * specifically -- circular icon-only Share/Save instead of these labeled
+ * ones, a comment *count* instead of just "Comment" -- retired once that
+ * turned out to be exactly the mismatch users kept noticing.) */
 export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShare, cta }: PostEngagementBarProps) {
   const [liked, setLiked] = useState(!!post.isLiked);
   const { isSaved, toggleSave } = useSavedPosts();
@@ -92,28 +99,25 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
     </>
   );
 
-  // With no CTA (the common case), the five actions spread evenly across
-  // the full row exactly as before. With one, they cluster into a left
-  // group so the CTA gets real room on the right — a different spacing
-  // rule, which is why this branches instead of always wrapping in a group.
-  // The CTA itself drops to its own full-width row below that group at
-  // mobile widths (sm:w-auto un-stacks it back onto the same row, right-
-  // aligned, once there's room) rather than crowding in next to five
-  // icons on a phone-width card — see ServiceActionsBar's own doc comment
-  // for why `[&>*]:w-full` is what actually stretches it, not a width prop
-  // on whatever CTA component gets passed in.
-  if (cta) {
-    return (
-      <div className="flex w-full flex-wrap items-center gap-3 border-t border-border-subtle pt-[17px]">
-        <div className="flex items-center gap-4">{actions}</div>
-        <div className="w-full [&>*]:w-full sm:ml-auto sm:w-auto sm:[&>*]:w-auto">{cta}</div>
-      </div>
-    );
-  }
-
+  // One layout always, cta or not -- used to branch between a
+  // justify-between full-width spread (no CTA) and a clustered left group
+  // (with one), which meant a plain post's icon-to-icon spacing never
+  // actually matched a tagged post's: `justify-between` stretches its gaps
+  // to fill the whole row width, `gap-5` doesn't. Clustering left
+  // unconditionally is what makes every post's Like-to-Comment-to-Repost-
+  // to-Share-to-Save spacing identical, cta or no cta, at every width.
+  //
+  // The CTA (when there is one) drops to its own full-width row below that
+  // group at mobile widths (sm:w-auto un-stacks it back onto the same row,
+  // right-aligned, once there's room) rather than crowding in next to five
+  // icons on a phone-width card — `[&>*]:w-full` on that wrapper is what
+  // actually stretches whatever gets passed as `cta` (a single button/
+  // link, or a caller's own multi-button group), not a width prop on the
+  // CTA component itself.
   return (
-    <div className="flex w-full items-center justify-between border-t border-border-subtle pt-[17px]">
-      {actions}
+    <div className="flex w-full flex-wrap items-center gap-3 border-t border-border-subtle pt-[17px]">
+      <div className="flex items-center gap-5">{actions}</div>
+      {cta && <div className="w-full [&>*]:w-full sm:ml-auto sm:w-auto sm:[&>*]:w-auto">{cta}</div>}
     </div>
   );
 }

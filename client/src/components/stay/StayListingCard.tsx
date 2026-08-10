@@ -6,7 +6,7 @@ import { DynamicIcon, type IconName } from "@/components/ui/DynamicIcon";
 import { PostHeader } from "@/components/home/PostHeader";
 import { PostImageLightbox } from "@/components/home/PostImageLightbox";
 import { CommentsSection } from "@/components/home/CommentsSection";
-import { ServiceActionsBar } from "@/components/home/ServiceActionsBar";
+import { PostEngagementBar } from "@/components/home/PostEngagementBar";
 import { VenueMessageButton } from "@/components/home/VenueMessageButton";
 import { VenueReservationButton } from "@/components/home/VenueReservationButton";
 import { usePostComments } from "@/hooks/usePostComments";
@@ -29,13 +29,14 @@ const GRID_LIMIT = 3;
  * show up), just a different presentation for a different context — mirrors
  * exactly how PropertyListingCard relates to PropertyPostCard.
  *
- * The action bar itself is ServiceActionsBar -- the exact same Like/
- * Comment/Repost/Share/Save bar every venue *post* on the Home feed
- * already renders (GeneralPostCard routes `tag === "venue"` posts to this
- * same component) -- rather than a bespoke one that only approximated it.
- * Message + Reserve ride together in ServiceActionsBar's single `cta`
- * slot as one wrapped pair, since this card needs two direct actions where
- * a plain service post only ever has one. */
+ * The action bar itself is PostEngagementBar -- the exact same Like/
+ * Comment/Repost/Share/Save bar every post on the Home feed renders,
+ * venue-tagged or not (GeneralPostCard routes every tag through this one
+ * component now — see its own doc comment for why the venue/service-only
+ * ServiceActionsBar variant was retired) -- rather than a bespoke one that
+ * only approximated it. Message + Reserve ride together in
+ * PostEngagementBar's single `cta` slot as one wrapped pair, since this
+ * card needs two direct actions where a plain post only ever has one. */
 export function StayListingCard({ post }: { post: GeneralPost }) {
   const venue = post.venueDetails;
   const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.id, post.comments);
@@ -178,13 +179,12 @@ export function StayListingCard({ post }: { post: GeneralPost }) {
       </div>
 
       {/* Social Interactions & Actions (Figma node 3384:8328) -- see this
-          component's own doc comment for why it's ServiceActionsBar rather
+          component's own doc comment for why it's PostEngagementBar rather
           than a bespoke row. */}
-      <ServiceActionsBar
+      <PostEngagementBar
         post={post}
         commentsOpen={commentsOpen}
         onToggleComments={toggleComments}
-        commentCount={comments.length}
         cta={
           <div className="flex w-full gap-3">
             <VenueMessageButton venueName={venue.name} className="flex-1" />

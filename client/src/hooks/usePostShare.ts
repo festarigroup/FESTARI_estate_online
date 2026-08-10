@@ -5,11 +5,8 @@ import { sharePost } from "@/lib/api/feed";
 import type { ContentPost } from "@/types/home";
 
 /**
- * Native share sheet with a copy-to-clipboard fallback — pulled out once
- * PostEngagementBar and ServiceActionsBar both needed the identical
- * behavior (ServiceActionsBar didn't have a Share action at all until
- * venue posts needed the same "Social Interactions & Actions" bar Figma's
- * Service/Promotion post uses, which does have one). Also records the share
+ * Native share sheet with a copy-to-clipboard fallback — shared by
+ * PostEngagementBar and every card that renders it. Also records the share
  * against the post on the backend, best-effort — a failed record shouldn't
  * block the share the user just completed.
  */

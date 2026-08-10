@@ -8,9 +8,8 @@ import { QuoteRepostModal } from "@/components/home/QuoteRepostModal";
 import { useReposts } from "@/hooks/useReposts";
 import { cn } from "@/lib/cn";
 
-/** The Repost control shared by PostEngagementBar and ServiceActionsBar —
- * pulled out once both needed the exact same button/state/toast, and again
- * now that it needs more than a single click can express. Not reposted
+/** The Repost control shared by every card that renders PostEngagementBar —
+ * pulled out once it needed more than a single click can express. Not reposted
  * yet: clicking opens a small menu — plain Repost, or Repost with thoughts
  * (a quote repost, via QuoteRepostModal). Already reposted: clicking
  * undoes it directly, no menu, since there's nothing to choose between for
