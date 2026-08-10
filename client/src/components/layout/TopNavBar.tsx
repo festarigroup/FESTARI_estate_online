@@ -12,9 +12,15 @@ import { useAuth } from "@/context/AuthContext";
 import { usePostComposer } from "@/context/PostComposerContext";
 import { getUnreadCount as getUnreadMessages } from "@/lib/api/messaging";
 import { getUnreadCount as getUnreadNotifications } from "@/lib/api/notifications";
+import { cn } from "@/lib/cn";
 
 interface TopNavBarProps {
   onMenuClick: () => void;
+  /** SideNavBar's own collapsed/expanded state (DashboardShell owns it) —
+   * used to drop "Festari Estates" down to just the logo mark once the
+   * sidebar collapses to its icon-only width, so the wordmark doesn't sit
+   * oddly wide next to a much narrower sidebar underneath it. */
+  collapsed: boolean;
 }
 
 /**
@@ -28,7 +34,7 @@ interface TopNavBarProps {
  * logo/search-hides-earlier layout economy, and "+ Create Post" staying
  * desktop-only.
  */
-export function TopNavBar({ onMenuClick }: TopNavBarProps) {
+export function TopNavBar({ onMenuClick, collapsed }: TopNavBarProps) {
   const { user, logout } = useAuth();
   const { openCreatePost } = usePostComposer();
   const router = useRouter();
@@ -88,7 +94,16 @@ export function TopNavBar({ onMenuClick }: TopNavBarProps) {
             width for it next to the search field. */}
         <Link href="/" className="hidden shrink-0 items-center gap-2 lg:flex">
           <Image src="/images/logo-festari.png" alt="" width={37} height={54} className="h-10 w-auto" />
-          <span className="hidden font-display text-base font-bold tracking-[-0.5px] text-ink sm:inline">
+          {/* Vanishes once the sidebar collapses (icon-only), leaving just
+              the logo mark — same as SideNavBar's own nav labels dropping
+              out at that width, so the wordmark doesn't linger wider than
+              the collapsed sidebar sitting right underneath it. */}
+          <span
+            className={cn(
+              "hidden font-display text-base font-bold tracking-[-0.5px] text-ink sm:inline",
+              collapsed && "lg:hidden",
+            )}
+          >
             Festari Estates
           </span>
         </Link>

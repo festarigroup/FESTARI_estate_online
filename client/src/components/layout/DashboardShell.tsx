@@ -28,8 +28,11 @@ const SIDEBAR_WIDTH_COLLAPSED = "88px";
  * - the mobile drawer open/close state shared between the hamburger button
  *   (header) and the drawer (sidebar);
  * - the desktop sidebar's collapsed/expanded state (Figma node 3393:17213's
- *   "Collapse bar"), exposed to children as `--sidebar-w` so TopNavBar and
- *   this shell's own `<main>` padding can react to it too.
+ *   "Collapse bar"), exposed to children two ways: as the `--sidebar-w`
+ *   custom property so TopNavBar and this shell's own `<main>` padding can
+ *   size themselves against it, and as a plain `collapsed` prop to
+ *   TopNavBar directly for the one thing sizing alone can't do — hiding
+ *   its "Festari Estates" wordmark down to just the logo mark.
  */
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -57,7 +60,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         className="min-h-screen bg-background"
         style={{ "--sidebar-w": collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED } as CSSProperties}
       >
-        <TopNavBar onMenuClick={() => setSidebarOpen(true)} />
+        <TopNavBar onMenuClick={() => setSidebarOpen(true)} collapsed={collapsed} />
         <SideNavBar
           open={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
