@@ -16,9 +16,10 @@ interface NavLinkProps {
 }
 
 /** One sidebar nav row: icon, label, optional unread-count badge, active
- * tab styling (Figma node 3393:17267, "Link - Active Tab"). Colors are
- * tuned to read correctly against both the mobile drawer's navy background
- * and the desktop sidebar's white one (Figma only specifies the latter). */
+ * tab styling (Figma node 3393:17267, "Link - Active Tab"). The mobile
+ * drawer and the desktop sidebar share the same white background now, so
+ * this no longer needs one color set tuned to read on navy and another
+ * tuned for white (Figma only ever specified the white one). */
 export function NavLink({ item, active, collapsed }: NavLinkProps) {
   return (
     <Link
@@ -26,11 +27,11 @@ export function NavLink({ item, active, collapsed }: NavLinkProps) {
       aria-current={active ? "page" : undefined}
       title={collapsed ? item.label : undefined}
       className={cn(
-        "relative flex w-full items-center gap-4 rounded-lg border-l-4 px-4 py-3 transition-colors",
+        "relative flex w-full items-center gap-4 rounded-[11px] border-l-4 px-4 py-3 transition-colors",
         collapsed ? "justify-center" : "justify-between",
         active
-          ? "border-brand-gold bg-brand-navy-light text-white lg:rounded-[11px] lg:bg-brand-navy"
-          : "border-transparent text-[#6f85a8] hover:bg-white/10 hover:text-white lg:hover:bg-surface-muted lg:hover:text-ink",
+          ? "border-brand-gold bg-brand-navy text-white"
+          : "border-transparent text-muted hover:bg-surface-muted hover:text-ink",
       )}
     >
       <span className={cn("flex items-center gap-3", collapsed && "gap-0")}>

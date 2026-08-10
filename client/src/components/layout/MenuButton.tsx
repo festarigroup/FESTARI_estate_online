@@ -8,7 +8,7 @@ export function MenuButton({ onClick }: { onClick: () => void }) {
     <button
       onClick={onClick}
       aria-label="Toggle navigation menu"
-      className="text-white/80 hover:text-white lg:hidden"
+      className="text-muted hover:text-ink lg:hidden"
     >
       <DynamicIcon name="Menu" className="size-6" />
     </button>
