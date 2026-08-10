@@ -34,12 +34,10 @@ interface PostOptionsMenuProps {
  *   all drop out, since none of them make sense against something you
  *   posted yourself.
  *
- * Share and Save duplicate PostEngagementBar's own Share/Save buttons —
- * intentionally: PostEngagementBar hides both below `sm:` (five icons plus
- * a CTA left no room for two more on a phone-width card), so this menu is
- * where a mobile visitor actually reaches them; both still show at `sm:`
- * and up on the engagement bar itself, this menu is just always available
- * as a second path to the same actions, at every width. */
+ * Share and Save live here only — PostEngagementBar used to render its own
+ * copies of both (hidden below `sm:`), but that just meant the same two
+ * actions had two competing homes depending on screen width. This dropdown
+ * is now the one place for them, at every width. */
 export function PostOptionsMenu({ post, onShare }: PostOptionsMenuProps) {
   const { user } = useAuth();
   const { isSaved, toggleSave } = useSavedPosts();

@@ -129,12 +129,7 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
           </div>
         </div>
 
-        <PostEngagementBar
-          post={post}
-          commentsOpen={commentsOpen}
-          onToggleComments={toggleComments}
-          onShare={() => setShares((s) => s + 1)}
-        />
+        <PostEngagementBar post={post} commentsOpen={commentsOpen} onToggleComments={toggleComments} />
         {commentsOpen && <CommentsSection comments={comments} onAddComment={addComment} />}
       </div>
     </article>
