@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
+import { useRouter } from "next/navigation";
 import { SideNavBar } from "@/components/layout/SideNavBar";
 import { TopNavBar } from "@/components/layout/TopNavBar";
 import { useAuth } from "@/context/AuthContext";
@@ -15,29 +16,34 @@ const SIDEBAR_WIDTH_COLLAPSED = "88px";
 /**
  * Wraps every route under `(app)` with the persistent header + sidebar
  * chrome, and owns:
+ * - auth gating: redirects to /login once we know there's no signed-in
+ *   user, so /login (with its own link to /register) is effectively the
+ *   app's landing screen for anyone signed out now that a real backend is
+ *   wired up (see NEXT_PUBLIC_API_URL) — most of this app's real data
+ *   (feed personalization, follow suggestions, unread counts, likes/saves)
+ *   is only meaningful for an authenticated caller, and several endpoints
+ *   require a token outright. (This has flip-flopped a couple of times
+ *   this session depending on whether there was a real backend to sign in
+ *   against yet — it's back on again now that there is one.)
  * - the mobile drawer open/close state shared between the hamburger button
  *   (header) and the drawer (sidebar);
  * - the desktop sidebar's collapsed/expanded state (Figma node 3393:17213's
  *   "Collapse bar"), exposed to children as `--sidebar-w` so TopNavBar and
  *   this shell's own `<main>` padding can react to it too.
- *
- * TEMPORARY: a later pass re-added auth gating here (redirecting to /login
- * once `loading` resolved with no signed-in user, now that a real seeded
- * backend exists). Disabled again at explicit request — landing on "/"
- * should show the Home feed directly, not a sign-in wall. Every page here
- * already treats `user` as possibly null (falls back to "there"/"You"/guest
- * copy), so browsing signed-out just means write actions (posting,
- * following, reserving...) hit the API and fail gracefully rather than
- * being blocked up front. Restore the redirect by reintroducing
- * `useRouter`/`useEffect` on `loading && !user` once that tradeoff is
- * actually wanted again: see git history on this file for the removed block.
  */
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
-  const { loading } = useAuth();
+  const { user, loading } = useAuth();
+  const router = useRouter();
 
-  if (loading) {
+  useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/login");
+    }
+  }, [loading, user, router]);
+
+  if (loading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <p className="text-sm text-muted">Loading...</p>
