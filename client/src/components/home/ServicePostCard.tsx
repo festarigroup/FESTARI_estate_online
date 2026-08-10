@@ -7,6 +7,7 @@ import { CommentsSection } from "@/components/home/CommentsSection";
 import { PostImageLightbox } from "@/components/home/PostImageLightbox";
 import { PostEngagementBar } from "@/components/home/PostEngagementBar";
 import { BookServiceButton } from "@/components/home/BookServiceButton";
+import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { usePostComments } from "@/hooks/usePostComments";
 import type { ServicePost } from "@/types/home";
 
@@ -30,7 +31,21 @@ export function ServicePostCard({ post }: { post: ServicePost }) {
         onClick={() => setLightboxOpen(true)}
         className="relative h-64 w-full cursor-zoom-in overflow-hidden rounded-xl border border-border-subtle"
       >
-        <Image src={post.image.src} alt={post.image.alt} fill className="object-cover" />
+        {/* Same reasoning as GeneralPostCard's renderImage: next/image can't
+            decode a video src, so a video attachment needs its own muted
+            preview + play badge instead of rendering as a broken <Image>. */}
+        {post.image.type === "video" ? (
+          <>
+            <video src={post.image.src} muted playsInline className="size-full object-cover" />
+            <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <span className="flex size-10 items-center justify-center rounded-full bg-black/50">
+                <DynamicIcon name="Play" className="size-4 fill-white text-white" />
+              </span>
+            </span>
+          </>
+        ) : (
+          <Image src={post.image.src} alt={post.image.alt} fill className="object-cover" />
+        )}
       </button>
 
       {lightboxOpen && (

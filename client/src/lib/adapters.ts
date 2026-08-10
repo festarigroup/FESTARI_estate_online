@@ -35,6 +35,19 @@ function relativeTime(iso: string) {
   return `${days}d ago`;
 }
 
+// The backend doesn't persist an image/video flag on `post_images` or
+// `stories` rows — `mediaStorageService.uploadMedia` names the stored file
+// from the upload's content-type extension (video/mp4 -> ".mp4", etc.), so
+// the extension on the returned URL is the only signal we have left by the
+// time it comes back from the API. Without this, every video (post
+// attachment or story) renders through an <img>/<Image> tag instead of
+// <video> and just shows a broken-image icon after posting.
+const VIDEO_EXTENSIONS = /\.(mp4|webm|mov|quicktime|m4v|ogg)(\?.*)?$/i;
+
+function isVideoUrl(url: string) {
+  return VIDEO_EXTENSIONS.test(url);
+}
+
 function formatPrice(price: string) {
   const amount = Number(price);
   if (Number.isNaN(amount)) return price;
@@ -89,7 +102,11 @@ export function mapPost(post: ApiPost): ContentPost {
     subtitle: relativeTime(post.created_at),
   };
 
-  const images = post.images.map((image) => ({ src: image.image_url, alt: `Photo from ${author.name}` }));
+  const images = post.images.map((image) => ({
+    src: image.image_url,
+    alt: isVideoUrl(image.image_url) ? `Video from ${author.name}` : `Photo from ${author.name}`,
+    type: isVideoUrl(image.image_url) ? ("video" as const) : ("image" as const),
+  }));
 
   if (post.kind === "property" && post.linked_property) {
     const property = post.linked_property;
@@ -180,6 +197,7 @@ export function mapStoriesToGroups(stories: ApiStory[]): Story[] {
     const item = {
       id: story.id,
       image: story.media_url,
+      type: isVideoUrl(story.media_url) ? ("video" as const) : ("image" as const),
       postedAt: relativeTime(story.created_at),
       caption: story.caption ?? undefined,
     };

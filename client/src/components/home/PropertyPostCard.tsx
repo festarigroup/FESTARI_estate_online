@@ -8,7 +8,7 @@ import { PostEngagementBar } from "@/components/home/PostEngagementBar";
 import { CommentsSection } from "@/components/home/CommentsSection";
 import { PostImageLightbox } from "@/components/home/PostImageLightbox";
 import { usePostComments } from "@/hooks/usePostComments";
-import type { PropertyPost } from "@/types/home";
+import type { GalleryImage, PropertyPost } from "@/types/home";
 
 /** "Article - Post: Property Listing" — body copy, image gallery, reactions, actions. */
 export function PropertyPostCard({ post }: { post: PropertyPost }) {
@@ -16,6 +16,25 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
   const { comments, commentsOpen, toggleComments, addComment } = usePostComments(post.id, post.comments);
   const [shares, setShares] = useState(post.reactions.shares);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  // Same reasoning as GeneralPostCard's renderImage: next/image can't
+  // decode a video src, so a video attachment needs its own muted preview
+  // + play badge instead of silently rendering as a broken <Image>.
+  function renderThumb(image: GalleryImage) {
+    if (image.type === "video") {
+      return (
+        <>
+          <video src={image.src} muted playsInline className="size-full object-cover" />
+          <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <span className="flex size-10 items-center justify-center rounded-full bg-black/50">
+              <DynamicIcon name="Play" className="size-4 fill-white text-white" />
+            </span>
+          </span>
+        </>
+      );
+    }
+    return <Image src={image.src} alt={image.alt} fill className="object-cover" />;
+  }
 
   return (
     <article className="flex w-full shrink-0 flex-col overflow-hidden rounded-[19px] border border-border bg-white lg:rounded-[24px]">
@@ -35,7 +54,7 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
           onClick={() => setLightboxIndex(0)}
           className="relative h-[280px] w-full cursor-zoom-in sm:h-[400px]"
         >
-          <Image src={images[0].src} alt={images[0].alt} fill className="object-cover" />
+          {renderThumb(images[0])}
         </button>
       )}
 
@@ -48,7 +67,7 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
               onClick={() => setLightboxIndex(i)}
               className="relative h-[280px] cursor-zoom-in sm:h-[400px]"
             >
-              <Image src={image.src} alt={image.alt} fill className="object-cover" />
+              {renderThumb(image)}
             </button>
           ))}
         </div>
@@ -61,7 +80,7 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
             onClick={() => setLightboxIndex(0)}
             className="relative col-span-2 row-span-2 h-[280px] cursor-zoom-in sm:h-[400px]"
           >
-            <Image src={images[0].src} alt={images[0].alt} fill className="object-cover" />
+            {renderThumb(images[0])}
             <span className="absolute top-4 right-4 rounded bg-brand-navy/80 px-2 py-1 text-xs text-white">
               1/{images.length}
             </span>
@@ -71,14 +90,14 @@ export function PropertyPostCard({ post }: { post: PropertyPost }) {
             onClick={() => setLightboxIndex(1)}
             className="relative h-[137px] cursor-zoom-in sm:h-[199px]"
           >
-            <Image src={images[1].src} alt={images[1].alt} fill className="object-cover" />
+            {renderThumb(images[1])}
           </button>
           <button
             aria-label="View photo 3"
             onClick={() => setLightboxIndex(2)}
             className="relative h-[137px] cursor-zoom-in sm:h-[199px]"
           >
-            <Image src={images[2].src} alt={images[2].alt} fill className="object-cover" />
+            {renderThumb(images[2])}
           </button>
         </div>
       )}

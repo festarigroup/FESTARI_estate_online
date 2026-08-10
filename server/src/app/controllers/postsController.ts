@@ -72,13 +72,14 @@ export const uploadPostImage = asyncErrorHandler(async (req: Request, res: Respo
   if (!post) throw new CustomError("Post not found", 404);
   if (post.author_id !== req.user.id) throw new CustomError("Forbidden", 403);
 
-  if (!req.file) throw new CustomError("Image is required", 400);
+  if (!req.file) throw new CustomError("Image or video is required", 400);
 
   const existingImages = await postsService.getImages(id);
   const imageUrl = await mediaStorageService.uploadMedia({
     pathPrefix: `posts/${id}`,
     fileBuffer: req.file.buffer,
     contentType: req.file.mimetype,
+    allowVideo: true,
   });
 
   const image = await postsService.addImage({

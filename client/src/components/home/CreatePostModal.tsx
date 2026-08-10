@@ -354,12 +354,15 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
         linked_hotel_id: linkedHotelId,
       });
 
-      const imageFiles = media.filter((m) => m.type === "image");
-      for (const [index, attachment] of imageFiles.entries()) {
+      // Photos and videos share the same upload endpoint (it just stores
+      // whatever file it's given) -- filtering to images only here used to
+      // silently drop every video attachment before it ever reached the
+      // backend, so a "posted" video never actually existed server-side.
+      for (const [index, attachment] of media.entries()) {
         try {
           await feedApi.uploadPostImage(created.id, attachment.file, index);
         } catch {
-          // one failed image upload shouldn't block the rest of the post
+          // one failed upload shouldn't block the rest of the post
         }
       }
 

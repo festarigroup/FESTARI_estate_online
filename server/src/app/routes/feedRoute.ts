@@ -31,7 +31,7 @@ import {
 
 const router = Router();
 const uploadStoryMedia = createUploadMiddleware({ fieldName: "media", allowVideo: true, maxSizeMb: 20 });
-const uploadPostImageMiddleware = createUploadMiddleware({ fieldName: "image" });
+const uploadPostImageMiddleware = createUploadMiddleware({ fieldName: "image", allowVideo: true, maxSizeMb: 20 });
 
 router.get("/posts", listPosts);
 router.get("/posts/:id", getPost);
