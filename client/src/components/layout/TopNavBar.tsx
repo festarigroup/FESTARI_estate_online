@@ -62,9 +62,26 @@ export function TopNavBar({ onMenuClick }: TopNavBarProps) {
       // beside it, so this never needs to dodge --sidebar-w. Same
       // bg-white/border-[#e2e8f0] at every breakpoint too now; only the
       // height/padding still change at `lg`.
-      className="fixed left-0 right-0 top-0 z-50 flex h-[73px] items-center justify-between gap-4 border-b border-[#e2e8f0] bg-white px-4 sm:px-6 lg:h-16 lg:px-6"
+      // No justify-between: with the search field capped at max-w-[568px],
+      // space-between would dump whatever's left of the header's width
+      // into extra gaps instead of leaving it as slack, pushing search
+      // past where <main>'s content actually starts. The icons group
+      // below carries its own `ml-auto` for the same right-alignment
+      // instead.
+      className="fixed left-0 right-0 top-0 z-50 flex h-[73px] items-center gap-4 border-b border-[#e2e8f0] bg-white px-4 sm:px-6 lg:h-16 lg:gap-6 lg:pl-0 lg:pr-6"
     >
-      <div className="flex min-w-0 flex-1 items-center gap-4 lg:gap-6">
+      {/* Sized to `--sidebar-w` at `lg:` and up, flush at x=0 (the header's
+          own left padding is zeroed out there) so this box sits exactly
+          above SideNavBar's own `lg:left-0 lg:w-[var(--sidebar-w)]` box —
+          same width, same starting edge. The search field right after it
+          (across the header's own lg:gap-6) then starts at the same x as
+          `<main>`'s own content (DashboardShell's own
+          `lg:pl-[calc(var(--sidebar-w)+24px)]`), instead of sitting flush
+          against the logo regardless of how wide the sidebar is. Below
+          `lg` there's no sidebar offset to match (the logo itself is
+          hidden there too), so this stays natural width with the header's
+          own px-4/sm:px-6 providing its left inset same as always. */}
+      <div className="flex min-w-0 shrink-0 items-center gap-4 lg:w-[var(--sidebar-w)] lg:pl-6">
         <MenuButton onClick={onMenuClick} />
         {/* Hidden below `lg` — the mobile drawer (SideNavBar) carries its
             own logo instead, since below `lg` this header has no spare
@@ -75,21 +92,21 @@ export function TopNavBar({ onMenuClick }: TopNavBarProps) {
             Festari Estates
           </span>
         </Link>
-
-        <div className="relative hidden max-w-[568px] min-w-0 flex-1 md:block">
-          <DynamicIcon
-            name="Search"
-            className="absolute top-1/2 left-4 size-[18px] -translate-y-1/2 text-brand-gold-dark"
-          />
-          <input
-            type="search"
-            placeholder="Search properties, people, services..."
-            className="w-full rounded-full bg-surface-muted py-2.5 pr-4 pl-11 text-sm text-ink placeholder:text-muted focus:outline-2 focus:outline-brand-gold"
-          />
-        </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-3 sm:gap-6">
+      <div className="relative hidden max-w-[568px] min-w-0 flex-1 md:block">
+        <DynamicIcon
+          name="Search"
+          className="absolute top-1/2 left-4 size-[18px] -translate-y-1/2 text-brand-gold-dark"
+        />
+        <input
+          type="search"
+          placeholder="Search properties, people, services..."
+          className="w-full rounded-full bg-surface-muted py-2.5 pr-4 pl-11 text-sm text-ink placeholder:text-muted focus:outline-2 focus:outline-brand-gold"
+        />
+      </div>
+
+      <div className="ml-auto flex shrink-0 items-center gap-3 sm:gap-6">
         {/* "+ Create Post" (Figma node 3393:18030) — desktop-only global
             entry point to the same composer every page's own PostComposer
             already opens; see PostComposerContext for how a newly-created
