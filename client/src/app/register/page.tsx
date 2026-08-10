@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useAuth } from "@/context/AuthContext";
 import { resendOtp } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
@@ -84,23 +85,42 @@ export default function RegisterPage() {
             <div className="grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-1.5">
                 <span className="text-xs font-semibold text-ink">First name</span>
-                <input required value={firstname} onChange={(e) => setFirstname(e.target.value)} className={INPUT_CLASS} />
+                <input
+                  required
+                  placeholder="e.g. Kwame"
+                  value={firstname}
+                  onChange={(e) => setFirstname(e.target.value)}
+                  className={INPUT_CLASS}
+                />
               </label>
               <label className="flex flex-col gap-1.5">
                 <span className="text-xs font-semibold text-ink">Last name</span>
-                <input required value={lastname} onChange={(e) => setLastname(e.target.value)} className={INPUT_CLASS} />
+                <input
+                  required
+                  placeholder="e.g. Mensah"
+                  value={lastname}
+                  onChange={(e) => setLastname(e.target.value)}
+                  className={INPUT_CLASS}
+                />
               </label>
             </div>
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-semibold text-ink">Email</span>
-              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={INPUT_CLASS} />
+              <input
+                type="email"
+                required
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={INPUT_CLASS}
+              />
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-semibold text-ink">Password</span>
-              <input
-                type="password"
+              <PasswordInput
                 required
                 minLength={8}
+                placeholder="At least 8 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={INPUT_CLASS}
@@ -128,7 +148,13 @@ export default function RegisterPage() {
             </p>
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-semibold text-ink">Verification code</span>
-              <input required value={otp} onChange={(e) => setOtp(e.target.value)} className={INPUT_CLASS} />
+              <input
+                required
+                placeholder="6-digit code"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                className={INPUT_CLASS}
+              />
             </label>
             <Button type="submit" variant="gold" disabled={submitting} className="w-full">
               {submitting ? "Verifying..." : "Verify email"}

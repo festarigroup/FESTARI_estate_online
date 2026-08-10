@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api/client";
 
@@ -46,6 +47,7 @@ export default function LoginPage() {
             <input
               type="email"
               required
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className={INPUT_CLASS}
@@ -53,9 +55,9 @@ export default function LoginPage() {
           </label>
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold text-ink">Password</span>
-            <input
-              type="password"
+            <PasswordInput
               required
+              placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className={INPUT_CLASS}
