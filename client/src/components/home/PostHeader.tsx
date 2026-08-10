@@ -3,8 +3,16 @@ import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { PostOptionsMenu } from "@/components/home/PostOptionsMenu";
 import type { ContentPost } from "@/types/home";
 
+interface PostHeaderProps {
+  post: ContentPost;
+  /** Forwarded straight through to PostOptionsMenu's own Share item — see
+   * PostEngagementBar's prop of the same name for why (PropertyPostCard's
+   * own share counter). */
+  onShare?: () => void;
+}
+
 /** Shared post byline: avatar, name + verified badge, subtitle, and overflow menu. */
-export function PostHeader({ post }: { post: ContentPost }) {
+export function PostHeader({ post, onShare }: PostHeaderProps) {
   const { author } = post;
 
   return (
@@ -21,7 +29,7 @@ export function PostHeader({ post }: { post: ContentPost }) {
           <p className="text-xs text-muted">{author.subtitle}</p>
         </div>
       </div>
-      <PostOptionsMenu post={post} />
+      <PostOptionsMenu post={post} onShare={onShare} />
     </div>
   );
 }

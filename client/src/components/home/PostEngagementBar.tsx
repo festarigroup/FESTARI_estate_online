@@ -31,7 +31,12 @@ interface PostEngagementBarProps {
  * to fork into a second bar, ServiceActionsBar, for service/venue posts
  * specifically -- circular icon-only Share/Save instead of these labeled
  * ones, a comment *count* instead of just "Comment" -- retired once that
- * turned out to be exactly the mismatch users kept noticing.) */
+ * turned out to be exactly the mismatch users kept noticing.)
+ *
+ * Share and Save hide below `sm:` -- PostHeader's "⋮" overflow menu
+ * (PostOptionsMenu) carries both at every width, so a mobile visitor still
+ * reaches them from there instead of this row trying to fit five icons
+ * plus a CTA into a phone-width card. */
 export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShare, cta }: PostEngagementBarProps) {
   const [liked, setLiked] = useState(!!post.isLiked);
   const { isSaved, toggleSave } = useSavedPosts();
@@ -55,90 +60,62 @@ export function PostEngagementBar({ post, commentsOpen, onToggleComments, onShar
   // phone widths with five text+icon actions competing for space) — sr-only
   // rather than a plain hidden, so the label stays in the accessible name
   // instead of leaving the button an unlabeled icon for screen readers.
-  const likeButton = (
-    <button
-      onClick={handleToggleLike}
-      className={cn(
-        "flex items-center gap-2 text-base font-medium",
-        liked ? "text-brand-rust" : "text-muted hover:text-ink",
-      )}
-    >
-      <DynamicIcon name="Heart" className="size-5" fill={liked ? "currentColor" : "none"} />
-      <span className="sr-only sm:not-sr-only">Like</span>
-    </button>
-  );
-
-  const commentButton = (
-    <button
-      onClick={onToggleComments}
-      aria-expanded={commentsOpen}
-      className={cn(
-        "flex items-center gap-2 text-base font-medium",
-        commentsOpen ? "text-brand-navy" : "text-muted hover:text-ink",
-      )}
-    >
-      <DynamicIcon name="MessageCircle" className="size-5" />
-      <span className="sr-only sm:not-sr-only">Comment</span>
-    </button>
-  );
-
-  const shareButton = (
-    <button onClick={handleShare} className="flex items-center gap-2 text-base font-medium text-muted hover:text-ink">
-      <DynamicIcon name="Share2" className="size-5" />
-      <span className="sr-only sm:not-sr-only">Share</span>
-    </button>
-  );
-
-  const saveButton = (
-    <button
-      onClick={handleSave}
-      className={cn(
-        "flex items-center gap-2 text-base font-medium",
-        saved ? "text-brand-navy" : "text-muted hover:text-ink",
-      )}
-    >
-      <DynamicIcon name="Bookmark" className="size-5" fill={saved ? "currentColor" : "none"} />
-      <span className="sr-only sm:not-sr-only">Save</span>
-    </button>
-  );
-
-  // Share/Save move down next to the CTA at mobile widths only, when
-  // there is one -- rendered twice (once here, hidden below sm:; once in
-  // the CTA row, hidden from sm: up) rather than reflowed with CSS order,
-  // since the two copies live in genuinely different flex containers (this
-  // row vs. the CTA row) that plain `order` can't move an element between.
-  // Both copies close over the exact same `saved`/handleSave/handleShare
-  // above, so there's no separate state to keep in sync -- only whichever
-  // copy is actually visible at a given width can be interacted with.
-  // With no CTA at all (a plain post), there's nowhere to send them, so
-  // they just stay put at every width.
-  return (
-    <div className="flex w-full flex-wrap items-center gap-3 border-t border-border-subtle pt-[17px]">
-      <div className="flex items-center gap-5">
-        {likeButton}
-        {commentButton}
-        <RepostButton postId={post.id} />
-        {cta ? (
-          <span className="hidden items-center gap-5 sm:flex">
-            {shareButton}
-            {saveButton}
-          </span>
-        ) : (
-          <>
-            {shareButton}
-            {saveButton}
-          </>
+  const actions = (
+    <>
+      <button
+        onClick={handleToggleLike}
+        className={cn(
+          "flex items-center gap-2 text-base font-medium",
+          liked ? "text-brand-rust" : "text-muted hover:text-ink",
         )}
-      </div>
-      {cta && (
-        <div className="flex w-full items-center gap-4 sm:ml-auto sm:w-auto">
-          <span className="flex items-center gap-5 sm:hidden">
-            {shareButton}
-            {saveButton}
-          </span>
-          <div className="flex-1 [&>*]:w-full sm:w-auto sm:flex-none sm:[&>*]:w-auto">{cta}</div>
-        </div>
-      )}
+      >
+        <DynamicIcon name="Heart" className="size-5" fill={liked ? "currentColor" : "none"} />
+        <span className="sr-only sm:not-sr-only">Like</span>
+      </button>
+      <button
+        onClick={onToggleComments}
+        aria-expanded={commentsOpen}
+        className={cn(
+          "flex items-center gap-2 text-base font-medium",
+          commentsOpen ? "text-brand-navy" : "text-muted hover:text-ink",
+        )}
+      >
+        <DynamicIcon name="MessageCircle" className="size-5" />
+        <span className="sr-only sm:not-sr-only">Comment</span>
+      </button>
+      <RepostButton postId={post.id} />
+      <button
+        onClick={handleShare}
+        className="hidden items-center gap-2 text-base font-medium text-muted hover:text-ink sm:flex"
+      >
+        <DynamicIcon name="Share2" className="size-5" />
+        <span>Share</span>
+      </button>
+      <button
+        onClick={handleSave}
+        className={cn(
+          "hidden items-center gap-2 text-base font-medium sm:flex",
+          saved ? "text-brand-navy" : "text-muted hover:text-ink",
+        )}
+      >
+        <DynamicIcon name="Bookmark" className="size-5" fill={saved ? "currentColor" : "none"} />
+        <span>Save</span>
+      </button>
+    </>
+  );
+
+  // One layout always, cta or not -- clustered left with a consistent
+  // gap-5 rather than branching between that and a justify-between
+  // full-width spread, so every post's icon-to-icon spacing is identical
+  // whether or not it has a CTA. The CTA (when there is one) now sits
+  // beside that group on the same row at every width, not just sm: and up
+  // -- with Share/Save hidden below sm: (see the doc comment above), the
+  // row only ever has three icons at mobile widths, which leaves enough
+  // room for the CTA right there instead of needing its own line below.
+  return (
+    <div className="flex w-full items-center gap-3 border-t border-border-subtle pt-[17px]">
+      <div className="flex items-center gap-5">{actions}</div>
+      {cta && <div className="ml-auto flex items-center gap-2">{cta}</div>}
     </div>
   );
 }

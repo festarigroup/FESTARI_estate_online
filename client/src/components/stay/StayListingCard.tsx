@@ -186,15 +186,9 @@ export function StayListingCard({ post }: { post: GeneralPost }) {
         commentsOpen={commentsOpen}
         onToggleComments={toggleComments}
         cta={
-          <div className="flex w-full gap-3">
-            <VenueMessageButton venueName={venue.name} className="flex-1" />
-            <VenueReservationButton
-              venueName={venue.name}
-              hotelId={post.hotelId}
-              variant="gold-pill"
-              label="Reserve"
-              className="flex-1"
-            />
+          <div className="flex gap-2">
+            <VenueMessageButton venueName={venue.name} />
+            <VenueReservationButton venueName={venue.name} hotelId={post.hotelId} variant="gold-pill" label="Reserve" />
           </div>
         }
       />

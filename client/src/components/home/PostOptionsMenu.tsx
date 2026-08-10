@@ -4,16 +4,32 @@ import toast from "react-hot-toast";
 import { Dropdown, DropdownItem } from "@/components/ui/Dropdown";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { useSavedPosts } from "@/hooks/useSavedPosts";
+import { usePostShare } from "@/hooks/usePostShare";
 import { useHiddenPosts } from "@/hooks/useHiddenPosts";
 import { useFollowedAuthors } from "@/hooks/useFollowedAuthors";
 import type { ContentPost } from "@/types/home";
 
-/** The post-card "⋮" overflow menu — Save, Copy link, Embed, Unfollow,
- * Not interested, Report. Not a Figma frame (no menu frame was provided);
- * the item set matches a common feed-post convention rather than one
- * specific reference app. */
-export function PostOptionsMenu({ post }: { post: ContentPost }) {
+interface PostOptionsMenuProps {
+  post: ContentPost;
+  /** Forwarded straight to usePostShare — see PostEngagementBar's own prop
+   * of the same name for why (PropertyPostCard's own share counter). */
+  onShare?: () => void;
+}
+
+/** The post-card "⋮" overflow menu — Share, Save, Copy link, Embed,
+ * Unfollow, Not interested, Report. Not a Figma frame (no menu frame was
+ * provided); the item set matches a common feed-post convention rather
+ * than one specific reference app.
+ *
+ * Share and Save duplicate PostEngagementBar's own Share/Save buttons —
+ * intentionally: PostEngagementBar hides both below `sm:` (five icons plus
+ * a CTA left no room for two more on a phone-width card), so this menu is
+ * where a mobile visitor actually reaches them; both still show at `sm:`
+ * and up on the engagement bar itself, this menu is just always available
+ * as a second path to the same actions, at every width. */
+export function PostOptionsMenu({ post, onShare }: PostOptionsMenuProps) {
   const { isSaved, toggleSave } = useSavedPosts();
+  const { handleShare } = usePostShare(post, onShare);
   const { hidePost, unhidePost } = useHiddenPosts();
   const { isFollowing, toggleFollow } = useFollowedAuthors();
   const saved = isSaved(post.id);
@@ -82,6 +98,7 @@ export function PostOptionsMenu({ post }: { post: ContentPost }) {
         </button>
       )}
     >
+      <DropdownItem icon="Share2" label="Share" onClick={handleShare} />
       <DropdownItem icon="Bookmark" label={saved ? "Remove from Save" : "Save"} onClick={handleSave} />
       <DropdownItem icon="Link2" label="Copy link to post" onClick={handleCopyLink} />
       <DropdownItem icon="Code2" label="Embed this post" onClick={handleEmbed} />
