@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { Dropdown, DropdownItem } from "@/components/ui/Dropdown";
 import { useAuth } from "@/context/AuthContext";
 import { ApiError } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
@@ -75,23 +76,33 @@ export default function ChooseRolePage() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-semibold text-ink">I am a...</span>
-            <div className="relative">
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className={cn(INPUT_CLASS, "appearance-none pr-9")}
-              >
-                {ROLES.map((r) => (
-                  <option key={r.value} value={r.value}>
-                    {r.label}
-                  </option>
-                ))}
-              </select>
-              <DynamicIcon
-                name="ChevronDown"
-                className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted"
-              />
-            </div>
+            {/* Same reasoning as register's own role picker -- a native
+                <select>'s dropdown panel is OS/browser chrome no CSS
+                actually reaches, so this uses the app's own
+                Dropdown/DropdownItem instead. */}
+            <Dropdown
+              align="left"
+              matchTriggerWidth
+              trigger={(bind) => (
+                <button
+                  type="button"
+                  {...bind}
+                  className={cn(INPUT_CLASS, "flex items-center justify-between gap-2 text-left")}
+                >
+                  {ROLES.find((r) => r.value === role)?.label}
+                  <DynamicIcon name="ChevronDown" className="size-4 shrink-0 text-muted" />
+                </button>
+              )}
+            >
+              {ROLES.map((r) => (
+                <DropdownItem
+                  key={r.value}
+                  label={r.label}
+                  onClick={() => setRole(r.value)}
+                  className={r.value === role ? "bg-surface-muted font-semibold" : undefined}
+                />
+              ))}
+            </Dropdown>
           </label>
 
           <Button type="submit" variant="gold" disabled={submitting} className="mt-2 w-full">
