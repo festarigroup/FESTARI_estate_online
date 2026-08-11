@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { Dropdown, DropdownItem } from "@/components/ui/Dropdown";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { useAuth } from "@/context/AuthContext";
 import { resendOtp } from "@/lib/api/auth";
@@ -131,28 +132,40 @@ export default function RegisterPage() {
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-semibold text-ink">I am a...</span>
-              <div className="relative">
-                {/* appearance-none drops the browser's own arrow (which sits
-                    flush against the edge with no breathing room) so this
-                    ChevronDown can take its place, inset the same way every
-                    other icon-affordance in this app is -- pr-9 on the
-                    select keeps its own text from running underneath it. */}
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className={cn(INPUT_CLASS, "appearance-none pr-9")}
-                >
-                  {ROLES.map((r) => (
-                    <option key={r.value} value={r.value}>
-                      {r.label}
-                    </option>
-                  ))}
-                </select>
-                <DynamicIcon
-                  name="ChevronDown"
-                  className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted"
-                />
-              </div>
+              {/* A native <select>'s own dropdown panel is OS/browser chrome
+                  — no amount of CSS actually restyles it (the arrow was the
+                  only part that ever took a class). Swapped for this app's
+                  own Dropdown/DropdownItem so the open panel actually looks
+                  like the rest of the app instead of a bare system list. */}
+              <Dropdown
+                align="left"
+                matchTriggerWidth
+                trigger={(bind) => (
+                  <button
+                    type="button"
+                    {...bind}
+                    className={cn(INPUT_CLASS, "flex items-center justify-between gap-2 text-left")}
+                  >
+                    {ROLES.find((r) => r.value === role)?.label}
+                    <DynamicIcon name="ChevronDown" className="size-4 shrink-0 text-muted" />
+                  </button>
+                )}
+              >
+                {/* No per-item icon here (unlike a checkmark-on-selection
+                    pattern) -- DropdownItem only reserves icon space when
+                    one's actually passed, so mixing an icon on just the
+                    selected row would misalign every other row's label
+                    against it. The background + weight are enough to mark
+                    which one's active. */}
+                {ROLES.map((r) => (
+                  <DropdownItem
+                    key={r.value}
+                    label={r.label}
+                    onClick={() => setRole(r.value)}
+                    className={r.value === role ? "bg-surface-muted font-semibold" : undefined}
+                  />
+                ))}
+              </Dropdown>
             </label>
 
             <Button type="submit" variant="gold" disabled={submitting} className="mt-2 w-full">

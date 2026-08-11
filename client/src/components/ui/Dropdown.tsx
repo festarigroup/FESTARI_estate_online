@@ -19,6 +19,12 @@ interface DropdownProps {
   trigger: (bind: { onClick: () => void; "aria-expanded": boolean }) => React.ReactNode;
   children: React.ReactNode;
   align?: "left" | "right";
+  /** Size the panel to the trigger's own measured width instead of the
+   * fixed default — for a full-width form field styled as an input (e.g.
+   * register's role picker), a fixed 240px panel would look narrower than
+   * the field it drops from. Every other caller here is a narrow pill
+   * trigger, where the fixed width is the right call. */
+  matchTriggerWidth?: boolean;
 }
 
 /**
@@ -31,9 +37,9 @@ interface DropdownProps {
  * against, just via a different CSS mechanism (`overflow` here vs.
  * `filter`/`transform` there).
  */
-export function Dropdown({ trigger, children, align = "right" }: DropdownProps) {
+export function Dropdown({ trigger, children, align = "right", matchTriggerWidth = false }: DropdownProps) {
   const [open, setOpen] = useState(false);
-  const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: PANEL_WIDTH });
   const anchorRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -46,12 +52,14 @@ export function Dropdown({ trigger, children, align = "right" }: DropdownProps) 
     if (!open) return;
     const rect = anchorRef.current?.getBoundingClientRect();
     if (rect) {
+      const width = matchTriggerWidth ? rect.width : PANEL_WIDTH;
       setCoords({
         top: rect.bottom + 8,
-        left: align === "right" ? rect.right - PANEL_WIDTH : rect.left,
+        left: align === "right" ? rect.right - width : rect.left,
+        width,
       });
     }
-  }, [open, align]);
+  }, [open, align, matchTriggerWidth]);
 
   useEffect(() => {
     if (!open) return;
@@ -90,7 +98,7 @@ export function Dropdown({ trigger, children, align = "right" }: DropdownProps) 
           <div
             ref={panelRef}
             role="menu"
-            style={{ position: "fixed", top: coords.top, left: coords.left, width: PANEL_WIDTH }}
+            style={{ position: "fixed", top: coords.top, left: coords.left, width: coords.width }}
             className="z-[70] overflow-hidden rounded-xl border border-border-subtle bg-white py-2 shadow-xl"
           >
             <CloseContext.Provider value={() => setOpen(false)}>{children}</CloseContext.Provider>

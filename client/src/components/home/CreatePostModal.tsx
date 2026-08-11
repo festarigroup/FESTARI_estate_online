@@ -6,6 +6,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
 import { DynamicIcon, type IconName } from "@/components/ui/DynamicIcon";
+import { Dropdown, DropdownItem } from "@/components/ui/Dropdown";
 import { useAuth } from "@/context/AuthContext";
 import * as feedApi from "@/lib/api/feed";
 import * as hotelsApi from "@/lib/api/hotels";
@@ -565,29 +566,39 @@ export function CreatePostModal({ open, onClose, onSubmit, initialAttachment }: 
             </label>
             <label className="flex flex-col gap-1.5">
               <span className="text-xs font-semibold text-ink">Category</span>
-              <div className="relative">
-                {/* Same treatment as the register screen's role select --
-                    appearance-none drops the browser's own flush-to-the-edge
-                    arrow in favor of this inset ChevronDown. */}
-                <select
-                  value={venueCategory}
-                  onChange={(e) => setVenueCategory(e.target.value as StayCategory)}
-                  className={cn(FIELD_CLASS, "appearance-none pr-9")}
-                >
-                  <option value="" disabled>
-                    Select a category
-                  </option>
-                  {STAY_CATEGORIES.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.label}
-                    </option>
-                  ))}
-                </select>
-                <DynamicIcon
-                  name="ChevronDown"
-                  className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted"
-                />
-              </div>
+              {/* Same reasoning as the register screen's role picker -- a
+                  native <select>'s own dropdown panel is OS/browser chrome
+                  that no CSS actually reaches, so this uses the app's own
+                  Dropdown/DropdownItem instead. */}
+              <Dropdown
+                align="left"
+                matchTriggerWidth
+                trigger={(bind) => (
+                  <button
+                    type="button"
+                    {...bind}
+                    className={cn(
+                      FIELD_CLASS,
+                      "flex items-center justify-between gap-2 text-left",
+                      venueCategory === "" && "text-muted",
+                    )}
+                  >
+                    {venueCategory === ""
+                      ? "Select a category"
+                      : STAY_CATEGORIES.find((c) => c.id === venueCategory)?.label}
+                    <DynamicIcon name="ChevronDown" className="size-4 shrink-0 text-muted" />
+                  </button>
+                )}
+              >
+                {STAY_CATEGORIES.map((category) => (
+                  <DropdownItem
+                    key={category.id}
+                    label={category.label}
+                    onClick={() => setVenueCategory(category.id)}
+                    className={category.id === venueCategory ? "bg-surface-muted font-semibold" : undefined}
+                  />
+                ))}
+              </Dropdown>
             </label>
             <div className="grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-1.5">
