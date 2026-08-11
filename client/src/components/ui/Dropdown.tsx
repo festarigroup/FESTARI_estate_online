@@ -84,10 +84,18 @@ export function Dropdown({
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape") setOpen(false);
     }
-    // Scrolling anywhere invalidates the coordinates captured at open time
-    // (this is `position: fixed`, not re-measured on scroll) — closing
-    // rather than drifting is the simpler, still-correct choice here.
-    function handleScroll() {
+    // Scrolling the *page* invalidates the coordinates captured at open
+    // time (this is `position: fixed`, not re-measured on scroll) —
+    // closing rather than drifting is the simpler, still-correct choice
+    // there. But this listener is capture-phase on window specifically so
+    // it also catches scrolling *inside* the panel itself (a capturing
+    // ancestor listener fires for events targeting any descendant, scroll
+    // events or not) — a scrollable menu (e.g. DateTimeInput's time list)
+    // closed the instant you tried to scroll to an option below the fold,
+    // making anything past the first screenful unreachable. Only close for
+    // scrolls that didn't originate inside the panel.
+    function handleScroll(e: Event) {
+      if (panelRef.current?.contains(e.target as Node)) return;
       setOpen(false);
     }
 

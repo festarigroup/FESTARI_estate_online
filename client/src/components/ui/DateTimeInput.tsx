@@ -87,7 +87,10 @@ export function DateTimeInput({ type, value, onChange, className }: DateTimeInpu
         </button>
       )}
     >
-      <div className="max-h-60 overflow-y-auto">
+      {/* no-scrollbar (see globals.css, same pattern StoryBar's rail uses)
+          hides the visible scrollbar track/thumb -- still scrolls by
+          wheel/touch/drag, just without the bar itself. */}
+      <div className="no-scrollbar max-h-60 overflow-y-auto">
         {TIME_OPTIONS.map((t) => (
           <DropdownItem
             key={t}
