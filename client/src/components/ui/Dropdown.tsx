@@ -25,6 +25,12 @@ interface DropdownProps {
    * the field it drops from. Every other caller here is a narrow pill
    * trigger, where the fixed width is the right call. */
   matchTriggerWidth?: boolean;
+  /** Explicit panel width in px, overriding the 240px default — for
+   * content that needs more room than a menu list (Calendar's 7-column
+   * grid) but shouldn't stretch to match a much narrower trigger the way
+   * `matchTriggerWidth` would (a date field is nowhere near 288px wide in
+   * a two-column form row). Ignored if `matchTriggerWidth` is set. */
+  width?: number;
 }
 
 /**
@@ -37,9 +43,15 @@ interface DropdownProps {
  * against, just via a different CSS mechanism (`overflow` here vs.
  * `filter`/`transform` there).
  */
-export function Dropdown({ trigger, children, align = "right", matchTriggerWidth = false }: DropdownProps) {
+export function Dropdown({
+  trigger,
+  children,
+  align = "right",
+  matchTriggerWidth = false,
+  width,
+}: DropdownProps) {
   const [open, setOpen] = useState(false);
-  const [coords, setCoords] = useState({ top: 0, left: 0, width: PANEL_WIDTH });
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: width ?? PANEL_WIDTH });
   const anchorRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -52,14 +64,14 @@ export function Dropdown({ trigger, children, align = "right", matchTriggerWidth
     if (!open) return;
     const rect = anchorRef.current?.getBoundingClientRect();
     if (rect) {
-      const width = matchTriggerWidth ? rect.width : PANEL_WIDTH;
+      const panelWidth = matchTriggerWidth ? rect.width : (width ?? PANEL_WIDTH);
       setCoords({
         top: rect.bottom + 8,
-        left: align === "right" ? rect.right - width : rect.left,
-        width,
+        left: align === "right" ? rect.right - panelWidth : rect.left,
+        width: panelWidth,
       });
     }
-  }, [open, align, matchTriggerWidth]);
+  }, [open, align, matchTriggerWidth, width]);
 
   useEffect(() => {
     if (!open) return;

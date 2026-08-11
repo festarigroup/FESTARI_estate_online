@@ -1,51 +1,102 @@
+"use client";
+
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { Dropdown, DropdownItem } from "@/components/ui/Dropdown";
+import { Calendar } from "@/components/ui/Calendar";
 import { cn } from "@/lib/cn";
 
-interface DateTimeInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  /** Only these two make sense here — a native date/time input's own
-   * picker is what this wraps, not a general-purpose text field. */
+interface DateTimeInputProps {
+  /** Only these two make sense here — matches the two native input types
+   * this used to wrap. */
   type: "date" | "time";
+  /** Same string formats a native date/time input's value has:
+   * `YYYY-MM-DD` for `type="date"`, `HH:MM` (24-hour) for `type="time"` —
+   * every caller's existing `value`/`onChange` state round-trips unchanged. */
+  value: string;
+  onChange: (e: { target: { value: string } }) => void;
+  className?: string;
 }
 
+const TRIGGER_CLASS =
+  "relative flex w-full items-center rounded-lg border border-border-subtle bg-white py-2 pr-3 pl-9 text-left text-sm text-ink focus:outline-2 focus:outline-brand-gold";
+
+function formatDateDisplay(value: string) {
+  if (!value) return null;
+  const [y, m, d] = value.split("-").map(Number);
+  if (!y || !m || !d) return value;
+  return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+function formatTimeDisplay(value: string) {
+  const [h, m] = value.split(":").map(Number);
+  if (Number.isNaN(h) || Number.isNaN(m)) return value;
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
+}
+
+// Every half hour across the full day, the same range a native
+// `<input type="time">` allows -- 00:00 through 23:30.
+const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
+  const h = String(Math.floor(i / 2)).padStart(2, "0");
+  const m = i % 2 === 0 ? "00" : "30";
+  return `${h}:${m}`;
+});
+
 /**
- * A native date/time input dressed to match the rest of the app's form
- * fields — plain `<input type="date">`/`type="time"` render with the
- * browser's own generic chrome (no rounded border, no focus ring, a bare
- * calendar/clock glyph) that clashed with every styled field around it.
+ * A fully custom date/time field — this used to dress a native
+ * `<input type="date">`/`type="time">` (still-native picker popup, just a
+ * restyled field) rather than reimplement the picker itself, reasoning
+ * that a bespoke calendar/time widget was a worse trade for a form this
+ * size than a well-tested native one. Revisited at explicit request:
+ * every picker in this app is now custom-styled, dates and times
+ * included, so this trades that native-picker reliability for full visual
+ * consistency with the rest of the app instead.
  *
- * Still the real native input under the hood — its picker popup is
- * OS/browser-rendered and can't be restyled from CSS, and reimplementing a
- * calendar widget from scratch would trade a well-tested, keyboard- and
- * mobile-native picker for a bespoke one, a worse trade for a form this
- * size. What *is* stylable: the field itself (border, focus ring, height,
- * padding — matched to every other input here) and a leading icon that
- * signals what the field is for, same convention search bars use.
- *
- * `[color-scheme:light]` pins the native picker popup to a light theme
- * regardless of OS setting — this app has no dark mode, so a
- * system-dark-mode picker would be the one jarring dark surface in an
- * otherwise all-light UI. The `[&::-webkit-calendar-picker-indicator]`
- * rules just dim the browser's own icon at rest and bring it to full
- * opacity on hover, so it doesn't visually compete with the leading icon.
+ * `value`/`onChange` still speak the exact same string formats a native
+ * date/time input would have (`YYYY-MM-DD`, 24-hour `HH:MM`) — every
+ * existing caller's own state and submit-time formatting keeps working
+ * completely unchanged.
  */
-export function DateTimeInput({ type, className, ...props }: DateTimeInputProps) {
-  return (
-    <div className="relative">
-      <DynamicIcon
-        name={type === "date" ? "Calendar" : "Clock"}
-        className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted"
-      />
-      <input
-        type={type}
-        className={cn(
-          "w-full rounded-lg border border-border-subtle bg-white py-2 pr-3 pl-9 text-sm text-ink",
-          "placeholder:text-muted focus:outline-2 focus:outline-brand-gold",
-          "[color-scheme:light]",
-          "[&::-webkit-calendar-picker-indicator]:opacity-50 [&::-webkit-calendar-picker-indicator]:hover:opacity-100",
-          className,
+export function DateTimeInput({ type, value, onChange, className }: DateTimeInputProps) {
+  if (type === "date") {
+    return (
+      <Dropdown
+        align="left"
+        width={288}
+        trigger={(bind) => (
+          <button type="button" {...bind} className={cn(TRIGGER_CLASS, !value && "text-muted", className)}>
+            <DynamicIcon name="Calendar" className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" />
+            {formatDateDisplay(value) ?? "Select a date"}
+          </button>
         )}
-        {...props}
-      />
-    </div>
+      >
+        <Calendar value={value} onSelect={(v) => onChange({ target: { value: v } })} />
+      </Dropdown>
+    );
+  }
+
+  return (
+    <Dropdown
+      align="left"
+      matchTriggerWidth
+      trigger={(bind) => (
+        <button type="button" {...bind} className={cn(TRIGGER_CLASS, !value && "text-muted", className)}>
+          <DynamicIcon name="Clock" className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted" />
+          {value ? formatTimeDisplay(value) : "Select a time"}
+        </button>
+      )}
+    >
+      <div className="max-h-60 overflow-y-auto">
+        {TIME_OPTIONS.map((t) => (
+          <DropdownItem
+            key={t}
+            label={formatTimeDisplay(t)}
+            onClick={() => onChange({ target: { value: t } })}
+            className={t === value ? "bg-surface-muted font-semibold" : undefined}
+          />
+        ))}
+      </div>
+    </Dropdown>
   );
 }
