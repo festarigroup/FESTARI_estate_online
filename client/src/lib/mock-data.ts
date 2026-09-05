@@ -25,6 +25,7 @@ export const NAV_SECONDARY_ITEMS: NavItem[] = [
   // nav list has no per-user context to read from.
   { id: "leads", label: "Enquiries", icon: "Inbox", href: "/leads" },
   { id: "verification", label: "Verification Centre", icon: "ShieldCheck", href: "/verification" },
+  { id: "payments", label: "Payments", icon: "CreditCard", href: "/payments" },
   { id: "activity", label: "My Activity", icon: "History", href: "/activity" },
 ];
 

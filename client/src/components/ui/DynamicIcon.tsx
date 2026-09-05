@@ -25,6 +25,7 @@ import {
   Clock,
   Code2,
   Construction,
+  CreditCard,
   Download,
   Dumbbell,
   Eye,
@@ -68,6 +69,7 @@ import {
   Play,
   Plus,
   Quote,
+  RefreshCcw,
   Repeat2,
   Ruler,
   Search,
@@ -95,6 +97,7 @@ import {
   Wind,
   Wrench,
   X,
+  XCircle,
   type LucideProps,
 } from "lucide-react";
 
@@ -132,6 +135,7 @@ const ICONS = {
   Clock,
   Code2,
   Construction,
+  CreditCard,
   Download,
   Dumbbell,
   Eye,
@@ -175,6 +179,7 @@ const ICONS = {
   Play,
   Plus,
   Quote,
+  RefreshCcw,
   Repeat2,
   Ruler,
   Search,
@@ -202,6 +207,7 @@ const ICONS = {
   Wind,
   Wrench,
   X,
+  XCircle,
 } as const;
 
 export type IconName = keyof typeof ICONS;
