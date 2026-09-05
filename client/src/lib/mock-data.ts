@@ -9,6 +9,7 @@ import type { IconName } from "@/components/ui/DynamicIcon";
 
 export const NAV_ITEMS: NavItem[] = [
   { id: "home", label: "Home", icon: "Home", href: "/" },
+  { id: "marketplace", label: "Marketplace", icon: "Store", href: "/marketplace" },
   { id: "properties", label: "Property", icon: "Building2", href: "/properties" },
   { id: "stay", label: "Stay (Hotels)", icon: "BedDouble", href: "/stay" },
   { id: "craftwork", label: "Craftwork", icon: "Hammer", href: "/craftwork" },
