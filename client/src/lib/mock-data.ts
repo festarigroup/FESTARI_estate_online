@@ -24,6 +24,7 @@ export const NAV_SECONDARY_ITEMS: NavItem[] = [
   // "Leads Pipeline" and "My Enquiries" per leadTerms(), since this static
   // nav list has no per-user context to read from.
   { id: "leads", label: "Enquiries", icon: "Inbox", href: "/leads" },
+  { id: "verification", label: "Verification Centre", icon: "ShieldCheck", href: "/verification" },
   { id: "activity", label: "My Activity", icon: "History", href: "/activity" },
 ];
 
