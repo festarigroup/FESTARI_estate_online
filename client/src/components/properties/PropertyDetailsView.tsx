@@ -1,5 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
+import { LeadEnquiryModal } from "@/components/leads/LeadEnquiryModal";
 import { cn } from "@/lib/cn";
 import {
   FEATURES,
@@ -96,6 +100,7 @@ interface PropertyDetailsViewProps {
  * it.
  */
 export function PropertyDetailsView({ listing, previewMode = false }: PropertyDetailsViewProps) {
+  const [enquiryOpen, setEnquiryOpen] = useState(false);
   const categoryMeta = PROPERTY_CATEGORIES.find((c) => c.id === listing.category);
   const statusMeta = STATUS_META[listing.status];
   const live = isListingLive(listing.status);
@@ -182,26 +187,32 @@ export function PropertyDetailsView({ listing, previewMode = false }: PropertyDe
         </div>
       )}
 
-      {/* Viewing & Contact — gated by isListingLive, per spec */}
+      {/* Viewing & Contact — gated by isListingLive, per spec. The Enquire
+          button itself only needs the listing to be live; it never
+          depended on `viewingContact` being set (that's just the owner's
+          own stated preference, shown alongside the button when present) —
+          a real property fetched from the backend never has one (no such
+          field exists there yet, see mapApiPropertyToListing), and gating
+          the button on it meant the enquiry flow could never be reached
+          from the one path that matters most. */}
       <div className="border-t border-border-subtle pt-4">
         {live || previewMode ? (
-          listing.viewingContact ? (
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            {listing.viewingContact && (
               <p className="text-sm text-muted">
                 {VIEWING_MODES.find((m) => m.id === listing.viewingContact!.viewingMode)?.label ?? "By Appointment"} ·{" "}
                 Prefers contact by {listing.viewingContact.preferredContactMethod}
               </p>
-              <button
-                disabled={!live}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-navy px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-navy-light disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <DynamicIcon name="MessageCircle" className="size-4" />
-                {live ? "Enquire / Request Viewing" : "Enquire / Request Viewing (preview)"}
-              </button>
-            </div>
-          ) : (
-            <p className="text-sm text-muted">Viewing & contact details have not been set yet.</p>
-          )
+            )}
+            <button
+              disabled={!live}
+              onClick={() => setEnquiryOpen(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-navy px-6 py-2.5 text-sm font-semibold text-white hover:bg-brand-navy-light disabled:cursor-not-allowed disabled:opacity-50 sm:ml-auto"
+            >
+              <DynamicIcon name="MessageCircle" className="size-4" />
+              {live ? "Enquire / Request Viewing" : "Enquire / Request Viewing (preview)"}
+            </button>
+          </div>
         ) : (
           <p className="flex items-center gap-2 text-sm text-muted">
             <DynamicIcon name="Ban" className="size-4 shrink-0" />
@@ -209,6 +220,8 @@ export function PropertyDetailsView({ listing, previewMode = false }: PropertyDe
           </p>
         )}
       </div>
+
+      {live && <LeadEnquiryModal open={enquiryOpen} onClose={() => setEnquiryOpen(false)} listing={listing} />}
     </div>
   );
 }
