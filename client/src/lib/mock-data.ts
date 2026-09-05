@@ -19,6 +19,11 @@ export const NAV_ITEMS: NavItem[] = [
 
 export const NAV_SECONDARY_ITEMS: NavItem[] = [
   { id: "my-listings", label: "My Listings", icon: "ClipboardList", href: "/my-listings" },
+  // Label stays neutral here regardless of account type — the page itself
+  // (app/(app)/leads/page.tsx) adapts its own heading/terminology between
+  // "Leads Pipeline" and "My Enquiries" per leadTerms(), since this static
+  // nav list has no per-user context to read from.
+  { id: "leads", label: "Enquiries", icon: "Inbox", href: "/leads" },
   { id: "activity", label: "My Activity", icon: "History", href: "/activity" },
 ];
 
