@@ -161,8 +161,16 @@ export function PropertyListingCard({ listing }: { listing: PropertyPost }) {
             // Matches the Button component's outline-gold variant exactly —
             // inlined since Button renders a <button>, not a link, and this
             // CTA needs to navigate to the listing's detail page.
+            //
+            // `propertyId` (properties.id — the actual real-estate record)
+            // not `listing.id` (this post's own id): the detail page reads
+            // its route param straight through to GET /properties/:id, so
+            // linking to the post id 404s there even though the post
+            // itself renders fine. Falls back to `listing.id` only for
+            // type-safety against `propertyId`'s optional type — every
+            // PropertyPost mapPost actually produces sets it.
             <Link
-              href={`/properties/${listing.id}`}
+              href={`/properties/${listing.propertyId ?? listing.id}`}
               className="inline-flex items-center justify-center rounded-full border border-brand-gold-dark px-[21px] py-[9px] text-xs font-semibold tracking-[0.24px] text-brand-gold-dark hover:bg-brand-gold-dark/5"
             >
               View Details
