@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
@@ -8,7 +8,10 @@ import { PostHeader } from "@/components/home/PostHeader";
 import { PostImageLightbox } from "@/components/home/PostImageLightbox";
 import { CommentsSection } from "@/components/home/CommentsSection";
 import { PostEngagementBar } from "@/components/home/PostEngagementBar";
+import { VerificationBadge } from "@/components/verification/VerificationBadge";
 import { usePostComments } from "@/hooks/usePostComments";
+import { getDomainVerification } from "@/lib/mocks/verification";
+import { toBadgeStatus, type DomainVerification } from "@/types/verification";
 import type { PropertyPost } from "@/types/home";
 
 /** "Article - Property Card" from the Properties page (Figma node
@@ -33,6 +36,22 @@ export function PropertyListingCard({ listing }: { listing: PropertyPost }) {
   );
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const images = listing.images;
+
+  // Property Identity verification is an account-level fact (per the
+  // assumed API contract, GET /api/verification/status has no per-listing
+  // shape) — every one of this owner's listings shows the same status,
+  // fetched once per card from the same mock the Verification Centre page
+  // itself reads from, so the two can never drift apart.
+  const [propertyVerification, setPropertyVerification] = useState<DomainVerification | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    getDomainVerification("property_relationship").then((result) => {
+      if (!cancelled) setPropertyVerification(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const badge = (
     <span className="absolute top-3 left-3 rounded bg-brand-gold-dark px-2 py-1 text-[10px] font-semibold tracking-[0.5px] text-white uppercase shadow-sm">
@@ -145,6 +164,21 @@ export function PropertyListingCard({ listing }: { listing: PropertyPost }) {
           </span>
         </div>
       </div>
+
+      {/* Property Identity verification — not part of Figma's own metadata
+          strip; a new fact this app didn't show before Verification
+          Centre existed. Its own row rather than squeezed into the strip
+          above, which is already a tight space for price/propertyType vs.
+          beds/baths/sqm. */}
+      {propertyVerification && (
+        <div className="px-4 pt-3">
+          <VerificationBadge
+            domain="property_relationship"
+            status={toBadgeStatus(propertyVerification.status)}
+            expiresAt={propertyVerification.expiresAt}
+          />
+        </div>
+      )}
 
       {/* Social Interactions & Actions (node 3340:2465) -- see this
           component's own doc comment for why it's PostEngagementBar rather

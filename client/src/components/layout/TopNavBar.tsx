@@ -8,10 +8,13 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { DynamicIcon } from "@/components/ui/DynamicIcon";
 import { MenuButton } from "@/components/layout/MenuButton";
+import { VerificationBadge } from "@/components/verification/VerificationBadge";
 import { useAuth } from "@/context/AuthContext";
 import { usePostComposer } from "@/context/PostComposerContext";
 import { getUnreadCount as getUnreadMessages } from "@/lib/api/messaging";
 import { getUnreadCount as getUnreadNotifications } from "@/lib/api/notifications";
+import { getDomainVerification } from "@/lib/mocks/verification";
+import { toBadgeStatus, type DomainVerification } from "@/types/verification";
 import { cn } from "@/lib/cn";
 
 interface TopNavBarProps {
@@ -41,6 +44,7 @@ export function TopNavBar({ onMenuClick, collapsed }: TopNavBarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [identityVerification, setIdentityVerification] = useState<DomainVerification | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -49,6 +53,12 @@ export function TopNavBar({ onMenuClick, collapsed }: TopNavBarProps) {
       .catch(() => {});
     getUnreadNotifications()
       .then((res) => setUnreadNotifications(res.count))
+      .catch(() => {});
+    // Identity verification is its own independent domain (see
+    // Verification Centre) — shown here as a badge, never folded into or
+    // implied by anything plan/subscription-related on this same header.
+    getDomainVerification("identity")
+      .then(setIdentityVerification)
       .catch(() => {});
   }, [user]);
 
@@ -170,7 +180,20 @@ export function TopNavBar({ onMenuClick, collapsed }: TopNavBarProps) {
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-40 rounded-lg border border-border-subtle bg-white py-1 shadow-lg">
+            <div className="absolute right-0 top-full mt-2 w-56 rounded-lg border border-border-subtle bg-white py-1 shadow-lg">
+              {identityVerification && (
+                <div className="px-4 py-2">
+                  <VerificationBadge domain="identity" status={toBadgeStatus(identityVerification.status)} expiresAt={identityVerification.expiresAt} />
+                </div>
+              )}
+              <Link
+                href="/verification"
+                onClick={() => setMenuOpen(false)}
+                className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-ink hover:bg-surface-muted"
+              >
+                <DynamicIcon name="ShieldCheck" className="size-4" />
+                Verification Centre
+              </Link>
               <button
                 onClick={handleLogout}
                 className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-ink hover:bg-surface-muted"

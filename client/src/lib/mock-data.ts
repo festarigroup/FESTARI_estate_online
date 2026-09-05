@@ -17,6 +17,7 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 export const NAV_SECONDARY_ITEMS: NavItem[] = [
+  { id: "verification", label: "Verification Centre", icon: "ShieldCheck", href: "/verification" },
   { id: "activity", label: "My Activity", icon: "History", href: "/activity" },
 ];
 
