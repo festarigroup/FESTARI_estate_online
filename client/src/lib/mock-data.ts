@@ -17,6 +17,7 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 export const NAV_SECONDARY_ITEMS: NavItem[] = [
+  { id: "my-listings", label: "My Listings", icon: "ClipboardList", href: "/my-listings" },
   { id: "activity", label: "My Activity", icon: "History", href: "/activity" },
 ];
 

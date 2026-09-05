@@ -62,6 +62,15 @@ export function PropertiesBrowser({ listings }: { listings: PropertyPost[] }) {
     Boolean,
   ).length;
 
+  // PropertyMapPanel's own `id` is just an opaque key for pin-selection —
+  // fine to reuse PropertyPost.id for that. But its `detailHref(id)` needs
+  // the real properties.id, not this post's own id (PropertyListingCard's
+  // "View Details" link makes the same distinction, see its own comment) —
+  // swapped in here rather than changing `filtered` itself, which still
+  // needs each listing's real post id for PropertyListingCard's key/
+  // comments/likes below.
+  const mapListings = useMemo(() => filtered.map((listing) => ({ ...listing, id: listing.propertyId ?? listing.id })), [filtered]);
+
   function handleClearFilters() {
     setPropertyType(ALL_TYPES);
     setPriceRange(ANY_PRICE);
@@ -89,7 +98,7 @@ export function PropertiesBrowser({ listings }: { listings: PropertyPost[] }) {
       {mapExpanded ? (
         <div className="pt-2 pb-12">
           <PropertyMapPanel
-            listings={filtered}
+            listings={mapListings}
             expanded
             onCollapse={() => setMapExpanded(false)}
             detailHref={(id) => `/properties/${id}`}
@@ -114,7 +123,7 @@ export function PropertiesBrowser({ listings }: { listings: PropertyPost[] }) {
           </div>
           <div className="lg:col-span-5">
             <PropertyMapPanel
-              listings={filtered}
+              listings={mapListings}
               onExpand={() => setMapExpanded(true)}
               detailHref={(id) => `/properties/${id}`}
             />

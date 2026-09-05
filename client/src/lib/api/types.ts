@@ -108,6 +108,16 @@ export interface ApiFollowSuggestion {
   profile_picture: string | null;
 }
 
+/** Same shape as ApiPostImage, one row per `property_images` record — only
+ * ever present on the single-property response (`GET /properties/:id`
+ * joins these in); the list/trending endpoints don't return them. */
+export interface ApiPropertyImage {
+  id: string;
+  property_id: string;
+  image_url: string;
+  position: number;
+}
+
 export interface ApiProperty {
   id: string;
   owner_id: string;

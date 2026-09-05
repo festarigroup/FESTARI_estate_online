@@ -3,6 +3,7 @@ import type {
   ApiFollowSuggestion,
   ApiPost,
   ApiProperty,
+  ApiPropertyImage,
   ApiArtisan,
   ApiStory,
 } from "@/lib/api/types";
@@ -19,6 +20,7 @@ import type {
   Story,
   TrendingProperty,
 } from "@/types/home";
+import type { Listing, ListingPricing, ListingPurpose, PropertyCategory } from "@/types/listing";
 
 function authorName(author: { firstname: string | null; lastname: string | null }) {
   return [author.firstname, author.lastname].filter(Boolean).join(" ") || "Festari member";
@@ -244,6 +246,56 @@ export function mapTrendingProperty(property: ApiProperty): TrendingProperty {
     beds: property.bedrooms ?? 0,
     baths: property.bathrooms ?? 0,
     areaSqm: property.area_sqm ?? 0,
+  };
+}
+
+/** The real backend has no residential/land/commercial split (`ApiProperty`
+ * is one flat row for every kind of listing) — this is the one place that
+ * gap gets bridged so `PropertyDetailsView` (built for the My Listings
+ * wizard's own `Listing` shape) can also render a real property fetched by
+ * id, per its own doc comment on why it's the one component both use. */
+export function mapApiPropertyToListing(property: ApiProperty & { images?: ApiPropertyImage[] }): Listing {
+  const category: PropertyCategory =
+    property.property_type === "land" ? "land" : property.property_type === "office" ? "commercial" : "residential";
+  const purpose: ListingPurpose = property.listing_type === "for_sale" ? "sale" : "rent";
+  const unit: ListingPricing["unit"] = property.listing_type === "for_sale" ? "total" : "per_month";
+  // ApiProperty.status is a moderation state ("pending"/"approved"/
+  // "rejected"), not this app's own listing-lifecycle vocabulary — only an
+  // approved property is actually live/public, so that's the only case
+  // mapped to "published" (which is what gates the enquiry/viewing CTA).
+  const status: Listing["status"] = property.status === "approved" ? "published" : "pending_review";
+
+  return {
+    id: property.id,
+    ownerId: property.owner_id,
+    status,
+    purpose,
+    category,
+    title: property.title,
+    propertyType: PROPERTY_TYPE_LABEL[property.property_type] ?? property.property_type,
+    location: { address: property.location, area: "", city: "", region: "", precision: "exact" },
+    residential:
+      category === "residential"
+        ? {
+            bedrooms: property.bedrooms ?? undefined,
+            bathrooms: property.bathrooms ?? undefined,
+            areaSqm: property.area_sqm ?? undefined,
+          }
+        : {},
+    land: category === "land" ? { plotSize: property.area_sqm ?? undefined, plotUnit: "sqm" } : {},
+    commercial: category === "commercial" ? { floorAreaSqm: property.area_sqm ?? undefined } : {},
+    pricing: { amount: Number(property.price) || 0, currency: "GHS", unit, negotiable: false },
+    features: [],
+    description: property.description ?? "",
+    media: (property.images ?? []).map((image) => ({ url: image.image_url, type: "image" as const })),
+    // The real backend has no owner-facing viewing/contact-preference
+    // record yet (that's this branch's own new concept) — omitted rather
+    // than guessed; PropertyDetailsView already renders a sensible
+    // "haven't been set yet" message for a null viewingContact.
+    viewingContact: null,
+    authority: { status: "pending" },
+    createdAt: property.created_at,
+    updatedAt: property.created_at,
   };
 }
 
