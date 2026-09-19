@@ -24,9 +24,11 @@ export default function SignUpPage() {
     run(() => showSuccessToast("Sign up is coming soon"));
   }
 
+  const tagline = { highlight: "Join", rest: "the Built Environment" };
+
   if (pending) {
     return (
-      <AuthScreenLayout>
+      <AuthScreenLayout tagline={tagline}>
         <div className="flex justify-center">
           <HangTightCard
             heading="Creating your account!"
@@ -39,7 +41,7 @@ export default function SignUpPage() {
   }
 
   return (
-    <AuthScreenLayout>
+    <AuthScreenLayout tagline={tagline}>
       <div className="flex flex-col items-center gap-3 text-center">
         <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black">
           Create your account

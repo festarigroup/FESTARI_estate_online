@@ -18,7 +18,7 @@ export default function VerifyPage() {
   }
 
   return (
-    <AuthScreenLayout>
+    <AuthScreenLayout tagline={{ highlight: "Confirming", rest: "the Built Environment" }}>
       {pending ? (
         <div className="flex justify-center">
           <HangTightCard />

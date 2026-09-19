@@ -21,9 +21,11 @@ export default function SignInPage() {
     run(() => showSuccessToast("Sign in is coming soon"));
   }
 
+  const tagline = { highlight: "Welcome Back to", rest: "the Built Environment" };
+
   if (pending) {
     return (
-      <AuthScreenLayout>
+      <AuthScreenLayout tagline={tagline}>
         <div className="flex justify-center">
           <HangTightCard
             heading="Signing you in!"
@@ -36,7 +38,7 @@ export default function SignInPage() {
   }
 
   return (
-    <AuthScreenLayout>
+    <AuthScreenLayout tagline={tagline}>
       <div className="flex flex-col items-center gap-3 text-center">
         <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black">
           Let&rsquo;s Get In

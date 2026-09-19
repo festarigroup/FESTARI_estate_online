@@ -21,9 +21,11 @@ export default function ForgotPasswordPage() {
     });
   }
 
+  const tagline = { highlight: "Securing", rest: "the Built Environment" };
+
   if (pending) {
     return (
-      <AuthScreenLayout>
+      <AuthScreenLayout tagline={tagline}>
         <div className="flex justify-center">
           <HangTightCard
             heading="Sending reset link!"
@@ -36,7 +38,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <AuthScreenLayout>
+    <AuthScreenLayout tagline={tagline}>
       <div className="flex flex-col items-center gap-3 text-center">
         <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black">
           Reset your password

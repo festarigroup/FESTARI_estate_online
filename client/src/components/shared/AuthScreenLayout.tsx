@@ -1,12 +1,13 @@
 import type { ReactNode } from "react";
-import { AuthBrandPanel } from "@/components/shared/AuthBrandPanel";
+import { AuthBrandPanel, type AuthBrandTagline } from "@/components/shared/AuthBrandPanel";
 import { FadeIn } from "@/components/motion/FadeIn";
 
 interface AuthScreenLayoutProps {
   children: ReactNode;
+  tagline?: AuthBrandTagline;
 }
 
-export function AuthScreenLayout({ children }: AuthScreenLayoutProps) {
+export function AuthScreenLayout({ children, tagline }: AuthScreenLayoutProps) {
   return (
     <div className="flex h-screen items-center justify-center overflow-hidden bg-white">
       <div className="grid h-full w-full max-w-[1440px] lg:grid-cols-2">
@@ -15,7 +16,7 @@ export function AuthScreenLayout({ children }: AuthScreenLayoutProps) {
         </div>
 
         <div className="p-4">
-          <AuthBrandPanel />
+          <AuthBrandPanel tagline={tagline} />
         </div>
       </div>
     </div>

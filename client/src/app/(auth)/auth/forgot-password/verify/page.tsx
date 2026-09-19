@@ -76,7 +76,7 @@ function ForgotPasswordVerifyContent() {
 
 export default function ForgotPasswordVerifyPage() {
   return (
-    <AuthScreenLayout>
+    <AuthScreenLayout tagline={{ highlight: "Verifying", rest: "the Built Environment" }}>
       <Suspense fallback={null}>
         <ForgotPasswordVerifyContent />
       </Suspense>
