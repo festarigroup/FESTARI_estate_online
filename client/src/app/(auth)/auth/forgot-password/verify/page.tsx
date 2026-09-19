@@ -12,9 +12,6 @@ import { useHangTight } from "@/hooks/useHangTight";
 function ForgotPasswordVerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const requestedMethod = searchParams.get("method");
-  const lockedMethod = requestedMethod === "email" || requestedMethod === "phone" ? requestedMethod : null;
-  const method = lockedMethod ?? "email";
   const identifier = searchParams.get("identifier") || "Useraccount@gmail.com";
 
   const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
@@ -42,9 +39,9 @@ function ForgotPasswordVerifyContent() {
               Enter OTP
             </h1>
             <p className="text-lg leading-7 text-[#111826]">
-              We have shared a code to your registered {method}{" "}
-              <span className="font-semibold tracking-[-0.54px]">{identifier}.</span> Check your{" "}
-              {method === "email" ? "inbox" : "SMS"} to reset your password
+              We have shared a code to your registered email{" "}
+              <span className="font-semibold tracking-[-0.54px]">{identifier}.</span> Check your
+              inbox to reset your password
             </p>
           </div>
 
@@ -66,13 +63,7 @@ function ForgotPasswordVerifyContent() {
                   Resend OTP
                 </button>
               </p>
-              <Button
-                type="button"
-                variant="link"
-                onClick={() =>
-                  router.push(lockedMethod ? `/auth/sign-in?method=${lockedMethod}` : "/auth/sign-in")
-                }
-              >
+              <Button type="button" variant="link" onClick={() => router.push("/auth/sign-in")}>
                 Back to login page
               </Button>
             </div>
