@@ -5,10 +5,12 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import toast from "react-hot-toast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
+import { HangTightCard } from "@/components/shared/HangTightCard";
 import { IdentifierField, type IdentifierMethod } from "@/components/shared/IdentifierField";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { PasswordInput } from "@/components/ui/PasswordInput";
+import { useHangTight } from "@/hooks/useHangTight";
 
 function SignInContent() {
   const searchParams = useSearchParams();
@@ -18,10 +20,19 @@ function SignInContent() {
   const [method, setMethod] = useState<IdentifierMethod>(lockedMethod ?? "email");
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const { pending, run } = useHangTight();
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    toast("Sign in is coming soon", { icon: "🚧" });
+    run(() => toast("Sign in is coming soon", { icon: "🚧" }));
+  }
+
+  if (pending) {
+    return (
+      <div className="flex justify-center">
+        <HangTightCard />
+      </div>
+    );
   }
 
   return (

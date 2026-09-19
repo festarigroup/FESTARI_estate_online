@@ -7,6 +7,7 @@ import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { HangTightCard } from "@/components/shared/HangTightCard";
 import { OtpInput } from "@/components/shared/OtpInput";
 import { Button } from "@/components/ui/Button";
+import { useHangTight } from "@/hooks/useHangTight";
 
 function ForgotPasswordVerifyContent() {
   const router = useRouter();
@@ -15,20 +16,16 @@ function ForgotPasswordVerifyContent() {
   const identifier = searchParams.get("identifier") || "Useraccount@gmail.com";
 
   const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
-  const [verifying, setVerifying] = useState(false);
+  const { pending, run } = useHangTight();
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    setVerifying(true);
-    setTimeout(() => {
-      setVerifying(false);
-      toast("Password reset is coming soon", { icon: "🚧" });
-    }, 1500);
+    run(() => toast("Password reset is coming soon", { icon: "🚧" }));
   }
 
   return (
     <>
-      {verifying ? (
+      {pending ? (
         <div className="flex justify-center">
           <HangTightCard />
         </div>

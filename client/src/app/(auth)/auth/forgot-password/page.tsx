@@ -3,18 +3,33 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
+import { HangTightCard } from "@/components/shared/HangTightCard";
 import { IdentifierField, type IdentifierMethod } from "@/components/shared/IdentifierField";
 import { Button } from "@/components/ui/Button";
+import { useHangTight } from "@/hooks/useHangTight";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const [method, setMethod] = useState<IdentifierMethod>("email");
   const [identifier, setIdentifier] = useState("");
+  const { pending, run } = useHangTight();
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    const params = new URLSearchParams({ method, identifier });
-    router.push(`/auth/forgot-password/verify?${params.toString()}`);
+    run(() => {
+      const params = new URLSearchParams({ method, identifier });
+      router.push(`/auth/forgot-password/verify?${params.toString()}`);
+    });
+  }
+
+  if (pending) {
+    return (
+      <AuthScreenLayout>
+        <div className="flex justify-center">
+          <HangTightCard />
+        </div>
+      </AuthScreenLayout>
+    );
   }
 
   return (
