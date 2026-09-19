@@ -8,11 +8,10 @@ import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { HangTightCard } from "@/components/shared/HangTightCard";
 import { IdentifierField, type IdentifierMethod } from "@/components/shared/IdentifierField";
 import { Button } from "@/components/ui/Button";
-import { Checkbox } from "@/components/ui/Checkbox";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useHangTight } from "@/hooks/useHangTight";
 
-function SignInContent() {
+function SignUpContent() {
   const searchParams = useSearchParams();
   const requestedMethod = searchParams.get("method");
   const lockedMethod = requestedMethod === "email" || requestedMethod === "phone" ? requestedMethod : null;
@@ -24,16 +23,16 @@ function SignInContent() {
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    run(() => toast("Sign in is coming soon", { icon: "🚧" }));
+    run(() => toast("Sign up is coming soon", { icon: "🚧" }));
   }
 
   if (pending) {
     return (
       <div className="flex justify-center">
         <HangTightCard
-          heading="Signing you in!"
-          body="We are verifying your details for you!"
-          footer="You'll be allowed in soon..."
+          heading="Creating your account!"
+          body="We are setting things up for you!"
+          footer="This won't take long..."
         />
       </div>
     );
@@ -43,7 +42,7 @@ function SignInContent() {
     <>
       <div className="flex flex-col items-center gap-3 text-center">
         <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black">
-          Let&rsquo;s Get In
+          Create an account
         </h1>
         <p className="text-sm leading-5 text-black">
           Continue with your {method === "email" ? "email address" : "phone number"}
@@ -62,33 +61,23 @@ function SignInContent() {
           <PasswordInput
             id="password"
             label="Password"
-            placeholder="Enter your password"
+            placeholder="Create a password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-
-          <div className="flex items-center justify-between">
-            <Checkbox id="remember-me" label="Remember me" />
-            <Link
-              href={`/auth/forgot-password?method=${method}`}
-              className="text-xs text-ink hover:underline"
-            >
-              Forgot password?
-            </Link>
-          </div>
         </div>
 
         <Button type="submit" variant="primary">
-          Sign in
+          Sign up
         </Button>
 
         <p className="flex justify-center gap-2.5 text-sm">
-          <span className="text-ink">Don&rsquo;t have an account ?</span>
+          <span className="text-ink">Already have an account ?</span>
           <Link
-            href={lockedMethod ? `/auth/sign-up?method=${lockedMethod}` : "/auth/sign-up"}
+            href={lockedMethod ? `/auth/sign-in?method=${lockedMethod}` : "/auth/sign-in"}
             className="font-medium text-brand-900 underline underline-offset-2"
           >
-            Sign up
+            Sign in
           </Link>
         </p>
       </form>
@@ -96,11 +85,11 @@ function SignInContent() {
   );
 }
 
-export default function SignInPage() {
+export default function SignUpPage() {
   return (
     <AuthScreenLayout>
       <Suspense fallback={null}>
-        <SignInContent />
+        <SignUpContent />
       </Suspense>
     </AuthScreenLayout>
   );

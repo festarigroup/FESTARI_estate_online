@@ -1,10 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { SocialAuthButton } from "@/components/shared/SocialAuthButton";
-import { Button } from "@/components/ui/Button";
 import { Divider } from "@/components/ui/Divider";
 
 const PROVIDERS = [
@@ -60,9 +60,12 @@ export default function AuthPage() {
 
         <p className="flex justify-center gap-2.5 text-sm">
           <span className="text-ink">Don&rsquo;t have an account ?</span>
-          <Button type="button" variant="link" onClick={() => handleStubAuth("Sign up")}>
+          <Link
+            href="/auth/sign-up"
+            className="font-medium text-brand-900 underline underline-offset-2"
+          >
             Sign up
-          </Button>
+          </Link>
         </p>
       </div>
     </AuthScreenLayout>
