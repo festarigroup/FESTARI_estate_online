@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-plus-jakarta-sans);
+  --font-display: var(--font-poppins);
+
+  --color-brand-900: #1465e6;
+  --color-brand-gradient-from: #091e3a;
+  --color-brand-gradient-to: #2f80ed;
+  --color-ink: #16151a;
+  --color-surface-button: #f7f7f8;
+  --color-muted-300: #cbd5e0;
+  --color-muted-400: #94a3b7;
+  --color-gray-900: #181d27;
+  --color-gray-600: #535862;
+  --color-helper: #777797;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+@keyframes toast-progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes toast-leave {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.animate-enter {
+  animation: toast-enter 0.2s ease-out;
+}
+
+.animate-leave {
+  animation: toast-leave 0.15s ease-in forwards;
+}
