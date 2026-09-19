@@ -23,9 +23,9 @@ function handleStubAuth(provider: string) {
 
 export default function AuthPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white p-4 lg:p-6">
-      <div className="grid w-full max-w-[1440px] gap-4 lg:h-[900px] lg:grid-cols-2">
-        <div className="flex flex-col items-center justify-center px-6 py-8 sm:px-16 lg:px-[104px]">
+    <div className="flex h-screen items-center justify-center overflow-hidden bg-white p-4 lg:p-6">
+      <div className="grid h-full w-full max-w-[1440px] gap-4 lg:grid-cols-2">
+        <div className="flex min-h-0 flex-col items-center justify-center overflow-y-auto px-6 sm:px-16 lg:px-[104px]">
           <FadeIn className="flex w-full max-w-[512px] flex-col gap-8">
             <div className="flex flex-col items-center gap-3 text-center">
               <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black">
