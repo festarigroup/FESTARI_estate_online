@@ -64,7 +64,13 @@ function ForgotPasswordContent() {
         </Button>
 
         <div className="flex justify-center">
-          <Button type="button" variant="link" onClick={() => router.push("/auth/sign-in")}>
+          <Button
+            type="button"
+            variant="link"
+            onClick={() =>
+              router.push(lockedMethod ? `/auth/sign-in?method=${lockedMethod}` : "/auth/sign-in")
+            }
+          >
             Back to login page
           </Button>
         </div>
