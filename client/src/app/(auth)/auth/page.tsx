@@ -23,8 +23,8 @@ function handleStubAuth(provider: string) {
 
 export default function AuthPage() {
   return (
-    <div className="flex h-screen items-center justify-center overflow-hidden bg-white p-4 lg:p-6">
-      <div className="grid h-full w-full max-w-[1440px] gap-4 lg:grid-cols-2">
+    <div className="flex h-screen items-center justify-center overflow-hidden bg-white">
+      <div className="grid h-full w-full max-w-[1440px] lg:grid-cols-2">
         <div className="flex min-h-0 flex-col items-center justify-center overflow-y-auto px-6 sm:px-16 lg:px-[104px]">
           <FadeIn className="flex w-full max-w-[512px] flex-col gap-8">
             <div className="flex flex-col items-center gap-3 text-center">
@@ -73,7 +73,7 @@ export default function AuthPage() {
           </FadeIn>
         </div>
 
-        <div className="p-2">
+        <div className="p-4">
           <AuthBrandPanel />
         </div>
       </div>
