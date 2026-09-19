@@ -69,7 +69,10 @@ function SignInContent() {
 
           <div className="flex items-center justify-between">
             <Checkbox id="remember-me" label="Remember me" />
-            <Link href="/auth/forgot-password" className="text-xs text-ink hover:underline">
+            <Link
+              href={`/auth/forgot-password?method=${method}`}
+              className="text-xs text-ink hover:underline"
+            >
               Forgot password?
             </Link>
           </div>

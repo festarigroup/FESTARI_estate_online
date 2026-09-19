@@ -1,16 +1,20 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { HangTightCard } from "@/components/shared/HangTightCard";
 import { IdentifierField, type IdentifierMethod } from "@/components/shared/IdentifierField";
 import { Button } from "@/components/ui/Button";
 import { useHangTight } from "@/hooks/useHangTight";
 
-export default function ForgotPasswordPage() {
+function ForgotPasswordContent() {
   const router = useRouter();
-  const [method, setMethod] = useState<IdentifierMethod>("email");
+  const searchParams = useSearchParams();
+  const requestedMethod = searchParams.get("method");
+  const lockedMethod = requestedMethod === "email" || requestedMethod === "phone" ? requestedMethod : null;
+
+  const [method, setMethod] = useState<IdentifierMethod>(lockedMethod ?? "email");
   const [identifier, setIdentifier] = useState("");
   const { pending, run } = useHangTight();
 
@@ -24,20 +28,18 @@ export default function ForgotPasswordPage() {
 
   if (pending) {
     return (
-      <AuthScreenLayout>
-        <div className="flex justify-center">
-          <HangTightCard
-            heading="Sending reset link!"
-            body={`We are sending instructions to your ${method === "email" ? "email" : "phone"}!`}
-            footer="This won't take long..."
-          />
-        </div>
-      </AuthScreenLayout>
+      <div className="flex justify-center">
+        <HangTightCard
+          heading="Sending reset link!"
+          body={`We are sending instructions to your ${method === "email" ? "email" : "phone"}!`}
+          footer="This won't take long..."
+        />
+      </div>
     );
   }
 
   return (
-    <AuthScreenLayout>
+    <>
       <div className="flex flex-col items-center gap-3 text-center">
         <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black">
           Reset your password
@@ -54,6 +56,7 @@ export default function ForgotPasswordPage() {
           onMethodChange={setMethod}
           value={identifier}
           onChange={setIdentifier}
+          showSwitcher={!lockedMethod}
         />
 
         <Button type="submit" variant="primary">
@@ -66,6 +69,16 @@ export default function ForgotPasswordPage() {
           </Button>
         </div>
       </form>
+    </>
+  );
+}
+
+export default function ForgotPasswordPage() {
+  return (
+    <AuthScreenLayout>
+      <Suspense fallback={null}>
+        <ForgotPasswordContent />
+      </Suspense>
     </AuthScreenLayout>
   );
 }
