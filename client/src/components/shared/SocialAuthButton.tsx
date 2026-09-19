@@ -12,7 +12,7 @@ export function SocialAuthButton({ label, iconSrc, iconAlt, onClick }: SocialAut
   return (
     <Button type="button" variant="social" onClick={onClick}>
       <span>{label}</span>
-      <Image src={iconSrc} alt={iconAlt} width={24} height={24} />
+      <Image src={iconSrc} alt={iconAlt} width={24} height={24} className="h-6 w-6 shrink-0" />
     </Button>
   );
 }
