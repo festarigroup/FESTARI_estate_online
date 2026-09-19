@@ -13,8 +13,8 @@ const PROVIDERS = [
 ] as const;
 
 const CONTACT_PROVIDERS = [
-  { id: "email", label: "Continue with  Email", iconSrc: "/brand/mail-icon.svg" },
-  { id: "phone", label: "Continue with Phone", iconSrc: "/brand/phone-icon.svg" },
+  { id: "email", label: "Continue with  Email", iconSrc: "/brand/mail-icon.svg", method: "email" },
+  { id: "phone", label: "Continue with Phone", iconSrc: "/brand/phone-icon.svg", method: "phone" },
 ] as const;
 
 function handleStubAuth(provider: string) {
@@ -52,7 +52,7 @@ export default function AuthPage() {
             label={provider.label}
             iconSrc={provider.iconSrc}
             iconAlt={provider.id}
-            onClick={() => router.push("/auth/sign-in")}
+            onClick={() => router.push(`/auth/sign-in?method=${provider.method}`)}
           />
         ))}
 

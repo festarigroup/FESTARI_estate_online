@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { showSuccessToast } from "@/components/shared/AppToast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { HangTightCard } from "@/components/shared/HangTightCard";
@@ -11,8 +12,13 @@ import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useHangTight } from "@/hooks/useHangTight";
 
-export default function SignInPage() {
-  const [phoneNumber, setPhoneNumber] = useState("");
+const TAGLINE = { highlight: "Welcome Back to", rest: "the Built Environment" };
+
+function SignInContent() {
+  const searchParams = useSearchParams();
+  const method = searchParams.get("method") === "email" ? "email" : "phone";
+
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const { pending, run } = useHangTight();
 
@@ -21,41 +27,50 @@ export default function SignInPage() {
     run(() => showSuccessToast("Sign in is coming soon"));
   }
 
-  const tagline = { highlight: "Welcome Back to", rest: "the Built Environment" };
-
   if (pending) {
     return (
-      <AuthScreenLayout tagline={tagline}>
-        <div className="flex justify-center">
-          <HangTightCard
-            heading="Signing you in!"
-            body="We are verifying your details for you!"
-            footer="You'll be allowed in soon..."
-          />
-        </div>
-      </AuthScreenLayout>
+      <div className="flex justify-center">
+        <HangTightCard
+          heading="Signing you in!"
+          body="We are verifying your details for you!"
+          footer="You'll be allowed in soon..."
+        />
+      </div>
     );
   }
 
   return (
-    <AuthScreenLayout tagline={tagline}>
+    <>
       <div className="flex flex-col items-center gap-3 text-center">
         <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black">
           Let&rsquo;s Get In
         </h1>
-        <p className="text-sm leading-5 text-black">Continue with your phone number</p>
+        <p className="text-sm leading-5 text-black">
+          Continue with your {method === "email" ? "email address" : "phone number"}
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div className="flex flex-col gap-4">
-          <Input
-            id="phone-number"
-            label="Phone Number"
-            type="tel"
-            placeholder="0208 000 000"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
+          {method === "email" ? (
+            <Input
+              id="email"
+              label="Email Address"
+              type="email"
+              placeholder="Useraccount@gmail.com"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+            />
+          ) : (
+            <Input
+              id="phone-number"
+              label="Phone Number"
+              type="tel"
+              placeholder="0208 000 000"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+            />
+          )}
           <PasswordInput
             id="password"
             label="Password"
@@ -83,6 +98,16 @@ export default function SignInPage() {
           </Link>
         </p>
       </form>
+    </>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <AuthScreenLayout tagline={TAGLINE}>
+      <Suspense fallback={null}>
+        <SignInContent />
+      </Suspense>
     </AuthScreenLayout>
   );
 }
