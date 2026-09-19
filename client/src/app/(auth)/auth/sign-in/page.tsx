@@ -18,7 +18,7 @@ export default function SignInPage() {
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    run(() => toast("Sign in is coming soon", { icon: "🚧" }));
+    run(() => toast.success("Sign in is coming soon"));
   }
 
   if (pending) {

@@ -21,7 +21,7 @@ export default function SignUpPage() {
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    run(() => toast("Sign up is coming soon", { icon: "🚧" }));
+    run(() => toast.success("Sign up is coming soon"));
   }
 
   if (pending) {

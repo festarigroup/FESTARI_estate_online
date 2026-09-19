@@ -19,7 +19,7 @@ function ForgotPasswordVerifyContent() {
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    run(() => toast("Password reset is coming soon", { icon: "🚧" }));
+    run(() => toast.success("Password reset is coming soon"));
   }
 
   return (
@@ -58,7 +58,7 @@ function ForgotPasswordVerifyContent() {
                 <button
                   type="button"
                   className="font-semibold text-brand-900"
-                  onClick={() => toast("OTP resent", { icon: "📩" })}
+                  onClick={() => toast.success("OTP resent")}
                 >
                   Resend OTP
                 </button>

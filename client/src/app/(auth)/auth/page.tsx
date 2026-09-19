@@ -18,7 +18,7 @@ const CONTACT_PROVIDERS = [
 ] as const;
 
 function handleStubAuth(provider: string) {
-  toast(`${provider} sign-in is coming soon`, { icon: "🚧" });
+  toast.success(`${provider} sign-in is coming soon`);
 }
 
 export default function AuthPage() {

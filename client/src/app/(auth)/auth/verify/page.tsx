@@ -14,7 +14,7 @@ export default function VerifyPage() {
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    run(() => toast("You're verified! Full sign-in is coming soon", { icon: "🚧" }));
+    run(() => toast.success("You're verified! Full sign-in is coming soon"));
   }
 
   return (
@@ -46,7 +46,7 @@ export default function VerifyPage() {
               <button
                 type="button"
                 className="font-semibold text-brand-900"
-                onClick={() => toast("OTP resent", { icon: "📩" })}
+                onClick={() => toast.success("OTP resent")}
               >
                 Resend OTP
               </button>
