@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import toast from "react-hot-toast";
+import { showSuccessToast } from "@/components/shared/AppToast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { HangTightCard } from "@/components/shared/HangTightCard";
 import { OtpInput } from "@/components/shared/OtpInput";
@@ -14,7 +14,7 @@ export default function VerifyPage() {
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    run(() => toast.success("You're verified! Full sign-in is coming soon"));
+    run(() => showSuccessToast("You're verified! Full sign-in is coming soon"));
   }
 
   return (
@@ -46,7 +46,7 @@ export default function VerifyPage() {
               <button
                 type="button"
                 className="font-semibold text-brand-900"
-                onClick={() => toast.success("OTP resent")}
+                onClick={() => showSuccessToast("OTP resent")}
               >
                 Resend OTP
               </button>

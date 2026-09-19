@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import toast from "react-hot-toast";
+import { showSuccessToast } from "@/components/shared/AppToast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { HangTightCard } from "@/components/shared/HangTightCard";
 import { Button } from "@/components/ui/Button";
@@ -21,7 +21,7 @@ export default function SignUpPage() {
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    run(() => toast.success("Sign up is coming soon"));
+    run(() => showSuccessToast("Sign up is coming soon"));
   }
 
   if (pending) {

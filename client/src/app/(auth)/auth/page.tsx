@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { showSuccessToast } from "@/components/shared/AppToast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { SocialAuthButton } from "@/components/shared/SocialAuthButton";
 import { Divider } from "@/components/ui/Divider";
@@ -18,7 +18,7 @@ const CONTACT_PROVIDERS = [
 ] as const;
 
 function handleStubAuth(provider: string) {
-  toast.success(`${provider} sign-in is coming soon`);
+  showSuccessToast(`${provider} sign-in is coming soon`);
 }
 
 export default function AuthPage() {
