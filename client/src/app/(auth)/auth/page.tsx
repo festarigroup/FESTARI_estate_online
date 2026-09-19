@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { SocialAuthButton } from "@/components/shared/SocialAuthButton";
@@ -21,6 +22,8 @@ function handleStubAuth(provider: string) {
 }
 
 export default function AuthPage() {
+  const router = useRouter();
+
   return (
     <AuthScreenLayout>
       <div className="flex flex-col items-center gap-3 text-center">
@@ -49,7 +52,7 @@ export default function AuthPage() {
             label={provider.label}
             iconSrc={provider.iconSrc}
             iconAlt={provider.id}
-            onClick={() => handleStubAuth(provider.label)}
+            onClick={() => router.push("/auth/sign-in")}
           />
         ))}
 

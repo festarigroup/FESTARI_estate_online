@@ -1,15 +1,19 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import toast from "react-hot-toast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { HangTightCard } from "@/components/shared/HangTightCard";
 import { OtpInput } from "@/components/shared/OtpInput";
 import { Button } from "@/components/ui/Button";
 
-export default function ForgotPasswordVerifyPage() {
+function ForgotPasswordVerifyContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const method = searchParams.get("method") === "phone" ? "phone" : "email";
+  const identifier = searchParams.get("identifier") || "Useraccount@gmail.com";
+
   const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
   const [verifying, setVerifying] = useState(false);
 
@@ -23,7 +27,7 @@ export default function ForgotPasswordVerifyPage() {
   }
 
   return (
-    <AuthScreenLayout>
+    <>
       {verifying ? (
         <div className="flex justify-center">
           <HangTightCard />
@@ -35,9 +39,9 @@ export default function ForgotPasswordVerifyPage() {
               Enter OTP
             </h1>
             <p className="text-lg leading-7 text-[#111826]">
-              We have shared a code to your registered email{" "}
-              <span className="font-semibold tracking-[-0.54px]">Useraccount@gmail.com.</span>{" "}
-              Check your inbox to reset your password
+              We have shared a code to your registered {method}{" "}
+              <span className="font-semibold tracking-[-0.54px]">{identifier}.</span> Check your{" "}
+              {method === "email" ? "inbox" : "SMS"} to reset your password
             </p>
           </div>
 
@@ -59,17 +63,23 @@ export default function ForgotPasswordVerifyPage() {
                   Resend OTP
                 </button>
               </p>
-              <Button
-                type="button"
-                variant="link"
-                onClick={() => router.push("/auth/sign-in")}
-              >
+              <Button type="button" variant="link" onClick={() => router.push("/auth/sign-in")}>
                 Back to login page
               </Button>
             </div>
           </form>
         </>
       )}
+    </>
+  );
+}
+
+export default function ForgotPasswordVerifyPage() {
+  return (
+    <AuthScreenLayout>
+      <Suspense fallback={null}>
+        <ForgotPasswordVerifyContent />
+      </Suspense>
     </AuthScreenLayout>
   );
 }

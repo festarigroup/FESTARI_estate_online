@@ -4,12 +4,13 @@ import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
-import { IdentifierField } from "@/components/shared/IdentifierField";
+import { IdentifierField, type IdentifierMethod } from "@/components/shared/IdentifierField";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 
 export default function SignInPage() {
+  const [method, setMethod] = useState<IdentifierMethod>("email");
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
 
@@ -24,12 +25,19 @@ export default function SignInPage() {
         <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black">
           Let&rsquo;s Get In
         </h1>
-        <p className="text-sm leading-5 text-black">Continue with your phone number</p>
+        <p className="text-sm leading-5 text-black">
+          Continue with your {method === "email" ? "email address" : "phone number"}
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div className="flex flex-col gap-4">
-          <IdentifierField value={identifier} onChange={setIdentifier} />
+          <IdentifierField
+            method={method}
+            onMethodChange={setMethod}
+            value={identifier}
+            onChange={setIdentifier}
+          />
           <PasswordInput
             id="password"
             label="Password"

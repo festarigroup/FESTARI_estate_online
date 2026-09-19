@@ -1,39 +1,42 @@
 "use client";
 
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/Input";
 
-type Method = "email" | "phone";
+export type IdentifierMethod = "email" | "phone";
 
-const METHOD_CONFIG: Record<Method, { tab: string; label: string; placeholder: string; type: string }> = {
+export const IDENTIFIER_METHOD_CONFIG: Record<
+  IdentifierMethod,
+  { tab: string; label: string; placeholder: string; type: string }
+> = {
   email: { tab: "Email", label: "Email Address", placeholder: "Useraccount@gmail.com", type: "email" },
   phone: { tab: "Phone", label: "Phone Number", placeholder: "0208 000 000", type: "tel" },
 };
 
 interface IdentifierFieldProps {
+  method: IdentifierMethod;
+  onMethodChange: (method: IdentifierMethod) => void;
   value: string;
   onChange: (value: string) => void;
 }
 
-export function IdentifierField({ value, onChange }: IdentifierFieldProps) {
-  const [method, setMethod] = useState<Method>("email");
-  const config = METHOD_CONFIG[method];
+export function IdentifierField({ method, onMethodChange, value, onChange }: IdentifierFieldProps) {
+  const config = IDENTIFIER_METHOD_CONFIG[method];
 
   return (
     <div className="flex w-full flex-col gap-3">
       <div className="flex gap-2">
-        {(Object.keys(METHOD_CONFIG) as Method[]).map((key) => (
+        {(Object.keys(IDENTIFIER_METHOD_CONFIG) as IdentifierMethod[]).map((key) => (
           <button
             key={key}
             type="button"
-            onClick={() => setMethod(key)}
+            onClick={() => onMethodChange(key)}
             className={cn(
               "rounded-full px-3 py-1 text-xs font-medium transition-colors",
               method === key ? "bg-brand-900 text-white" : "bg-surface-button text-ink",
             )}
           >
-            {METHOD_CONFIG[key].tab}
+            {IDENTIFIER_METHOD_CONFIG[key].tab}
           </button>
         ))}
       </div>
