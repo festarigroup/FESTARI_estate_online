@@ -30,7 +30,11 @@ function SignInContent() {
   if (pending) {
     return (
       <div className="flex justify-center">
-        <HangTightCard />
+        <HangTightCard
+          heading="Signing you in!"
+          body="We are verifying your details for you!"
+          footer="You'll be allowed in soon..."
+        />
       </div>
     );
   }

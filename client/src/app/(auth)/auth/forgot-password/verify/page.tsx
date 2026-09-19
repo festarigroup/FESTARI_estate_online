@@ -27,7 +27,11 @@ function ForgotPasswordVerifyContent() {
     <>
       {pending ? (
         <div className="flex justify-center">
-          <HangTightCard />
+          <HangTightCard
+            heading="Verifying!"
+            body="We are confirming your code for you!"
+            footer="This won't take long..."
+          />
         </div>
       ) : (
         <>

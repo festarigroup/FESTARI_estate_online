@@ -26,7 +26,11 @@ export default function ForgotPasswordPage() {
     return (
       <AuthScreenLayout>
         <div className="flex justify-center">
-          <HangTightCard />
+          <HangTightCard
+            heading="Sending reset link!"
+            body={`We are sending instructions to your ${method === "email" ? "email" : "phone"}!`}
+            footer="This won't take long..."
+          />
         </div>
       </AuthScreenLayout>
     );
