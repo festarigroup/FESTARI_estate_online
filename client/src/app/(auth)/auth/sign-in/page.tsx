@@ -84,10 +84,7 @@ function SignInContent() {
 
         <p className="flex justify-center gap-2.5 text-sm">
           <span className="text-ink">Don&rsquo;t have an account ?</span>
-          <Link
-            href={lockedMethod ? `/auth/sign-up?method=${lockedMethod}` : "/auth/sign-up"}
-            className="font-medium text-brand-900 underline underline-offset-2"
-          >
+          <Link href="/auth/sign-up" className="font-medium text-brand-900 underline underline-offset-2">
             Sign up
           </Link>
         </p>
