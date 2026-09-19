@@ -18,6 +18,9 @@
   --color-surface-button: #f7f7f8;
   --color-muted-300: #cbd5e0;
   --color-muted-400: #94a3b7;
+  --color-gray-900: #181d27;
+  --color-gray-600: #535862;
+  --color-helper: #777797;
 }
 
 body {
