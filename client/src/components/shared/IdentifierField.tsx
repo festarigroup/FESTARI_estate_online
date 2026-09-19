@@ -18,28 +18,37 @@ interface IdentifierFieldProps {
   onMethodChange: (method: IdentifierMethod) => void;
   value: string;
   onChange: (value: string) => void;
+  showSwitcher?: boolean;
 }
 
-export function IdentifierField({ method, onMethodChange, value, onChange }: IdentifierFieldProps) {
+export function IdentifierField({
+  method,
+  onMethodChange,
+  value,
+  onChange,
+  showSwitcher = true,
+}: IdentifierFieldProps) {
   const config = IDENTIFIER_METHOD_CONFIG[method];
 
   return (
     <div className="flex w-full flex-col gap-3">
-      <div className="flex gap-2">
-        {(Object.keys(IDENTIFIER_METHOD_CONFIG) as IdentifierMethod[]).map((key) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => onMethodChange(key)}
-            className={cn(
-              "rounded-full px-3 py-1 text-xs font-medium transition-colors",
-              method === key ? "bg-brand-900 text-white" : "bg-surface-button text-ink",
-            )}
-          >
-            {IDENTIFIER_METHOD_CONFIG[key].tab}
-          </button>
-        ))}
-      </div>
+      {showSwitcher && (
+        <div className="flex gap-2">
+          {(Object.keys(IDENTIFIER_METHOD_CONFIG) as IdentifierMethod[]).map((key) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onMethodChange(key)}
+              className={cn(
+                "rounded-full px-3 py-1 text-xs font-medium transition-colors",
+                method === key ? "bg-brand-900 text-white" : "bg-surface-button text-ink",
+              )}
+            >
+              {IDENTIFIER_METHOD_CONFIG[key].tab}
+            </button>
+          ))}
+        </div>
+      )}
       <Input
         id="identifier"
         label={config.label}

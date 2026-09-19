@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import toast from "react-hot-toast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { IdentifierField, type IdentifierMethod } from "@/components/shared/IdentifierField";
@@ -9,8 +10,12 @@ import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 
-export default function SignInPage() {
-  const [method, setMethod] = useState<IdentifierMethod>("email");
+function SignInContent() {
+  const searchParams = useSearchParams();
+  const requestedMethod = searchParams.get("method");
+  const lockedMethod = requestedMethod === "email" || requestedMethod === "phone" ? requestedMethod : null;
+
+  const [method, setMethod] = useState<IdentifierMethod>(lockedMethod ?? "email");
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
 
@@ -20,7 +25,7 @@ export default function SignInPage() {
   }
 
   return (
-    <AuthScreenLayout>
+    <>
       <div className="flex flex-col items-center gap-3 text-center">
         <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black">
           Let&rsquo;s Get In
@@ -37,6 +42,7 @@ export default function SignInPage() {
             onMethodChange={setMethod}
             value={identifier}
             onChange={setIdentifier}
+            showSwitcher={!lockedMethod}
           />
           <PasswordInput
             id="password"
@@ -69,6 +75,16 @@ export default function SignInPage() {
           </Button>
         </p>
       </form>
+    </>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <AuthScreenLayout>
+      <Suspense fallback={null}>
+        <SignInContent />
+      </Suspense>
     </AuthScreenLayout>
   );
 }
