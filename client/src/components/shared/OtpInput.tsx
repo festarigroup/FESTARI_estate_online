@@ -29,6 +29,12 @@ export function OtpInput({ value, onChange }: OtpInputProps) {
     }
   }
 
+  function handleSelectExisting(event: { currentTarget: HTMLInputElement }) {
+    // Select any existing digit so typing (or tapping on mobile) immediately
+    // replaces it instead of being blocked by maxLength once the box is full.
+    event.currentTarget.select();
+  }
+
   return (
     <div className="flex w-full items-center gap-3" role="group" aria-label="One-time passcode">
       {Array.from({ length: LENGTH }).map((_, index) => (
@@ -40,6 +46,8 @@ export function OtpInput({ value, onChange }: OtpInputProps) {
             value={value[index] ?? ""}
             onChange={(e) => handleChange(index, e.target.value)}
             onKeyDown={(e) => handleKeyDown(index, e)}
+            onFocus={handleSelectExisting}
+            onClick={handleSelectExisting}
             inputMode="numeric"
             maxLength={1}
             aria-label={`Digit ${index + 1}`}
