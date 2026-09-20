@@ -6,9 +6,10 @@ import { FadeIn } from "@/components/motion/FadeIn";
 interface AuthScreenLayoutProps {
   children: ReactNode;
   tagline?: AuthBrandTagline;
+  footerText?: string;
 }
 
-export function AuthScreenLayout({ children, tagline }: AuthScreenLayoutProps) {
+export function AuthScreenLayout({ children, tagline, footerText }: AuthScreenLayoutProps) {
   return (
     <div className="relative flex h-screen items-center justify-center overflow-hidden bg-white dark:bg-night-900">
       <div className="pointer-events-none absolute inset-2 rounded-[38px] border-2 border-[#e2e8f0] dark:border-night-700 lg:hidden" />
@@ -23,7 +24,7 @@ export function AuthScreenLayout({ children, tagline }: AuthScreenLayoutProps) {
         </div>
 
         <div className="hidden p-4 lg:block">
-          <AuthBrandPanel tagline={tagline} />
+          <AuthBrandPanel tagline={tagline} footerText={footerText} />
         </div>
       </div>
     </div>
