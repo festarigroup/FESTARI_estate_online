@@ -9,6 +9,7 @@ import { OtpInput } from "@/components/shared/OtpInput";
 import { Button } from "@/components/ui/Button";
 import { useHangTight } from "@/hooks/useHangTight";
 import { useResendCountdown } from "@/hooks/useResendCountdown";
+import { isCompleteOtp } from "@/lib/validation";
 import { cn } from "@/lib/utils";
 
 function VerifyContent() {
@@ -18,6 +19,7 @@ function VerifyContent() {
   const isSignup = searchParams.get("context") === "signup";
 
   const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
+  const [otpError, setOtpError] = useState(false);
   const { pending, run } = useHangTight();
   const { secondsLeft, canResend, restart } = useResendCountdown();
 
@@ -29,6 +31,11 @@ function VerifyContent() {
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+
+    const incomplete = !isCompleteOtp(otp);
+    setOtpError(incomplete);
+    if (incomplete) return;
+
     run(() =>
       showSuccessToast(
         isSignup ? "Account created! Welcome to Biltlinx" : "You're verified! Full sign-in is coming soon",
@@ -59,7 +66,17 @@ function VerifyContent() {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-        <OtpInput value={otp} onChange={setOtp} />
+        <div className="flex flex-col gap-2">
+          <OtpInput
+            value={otp}
+            onChange={(next) => {
+              setOtp(next);
+              if (otpError) setOtpError(false);
+            }}
+            error={otpError}
+          />
+          {otpError && <p className="text-xs text-[#e73d1c]">Enter the full 4-digit code</p>}
+        </div>
 
         <Button type="submit" variant="primary">
           Verify

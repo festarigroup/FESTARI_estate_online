@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface PasswordInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
   label: string;
+  error?: string;
 }
 
 function EyeIcon({ open }: { open: boolean }) {
@@ -34,7 +35,7 @@ function EyeIcon({ open }: { open: boolean }) {
   );
 }
 
-export function PasswordInput({ label, id, className, ...props }: PasswordInputProps) {
+export function PasswordInput({ label, id, className, error, ...props }: PasswordInputProps) {
   const [visible, setVisible] = useState(false);
 
   return (
@@ -46,9 +47,12 @@ export function PasswordInput({ label, id, className, ...props }: PasswordInputP
         <input
           id={id}
           type={visible ? "text" : "password"}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${id}-error` : undefined}
           className={cn(
             "h-12 w-full rounded-lg border border-muted-300 px-3 pr-11 text-sm text-ink placeholder:text-muted-400 focus:outline-none focus:ring-2 focus:ring-brand-900",
             "dark:border-night-700 dark:bg-night-800 dark:text-white dark:placeholder:text-muted-400",
+            error && "border-[#e73d1c] focus:ring-[#e73d1c]",
             className,
           )}
           {...props}
@@ -62,6 +66,11 @@ export function PasswordInput({ label, id, className, ...props }: PasswordInputP
           <EyeIcon open={visible} />
         </button>
       </div>
+      {error && (
+        <p id={`${id}-error`} className="text-xs text-[#e73d1c]">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

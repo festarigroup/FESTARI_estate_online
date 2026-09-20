@@ -13,6 +13,9 @@ import { Divider } from "@/components/ui/Divider";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useHangTight } from "@/hooks/useHangTight";
+import { validateFullName, validateIdentifier, validatePassword } from "@/lib/validation";
+
+const TERMS_ERROR = "You must confirm your age and agree to the terms to continue";
 
 const PROVIDERS = [
   { id: "google", label: "Sign Up with Google", iconSrc: "/brand/google-icon.svg", invertOnDark: false },
@@ -71,10 +74,25 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [isAdult, setIsAdult] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [errors, setErrors] = useState<{
+    fullName?: string;
+    email?: string;
+    phone?: string;
+    password?: string;
+    terms?: string;
+  }>({});
   const { pending, run } = useHangTight();
 
   function handleContinue(event: React.FormEvent) {
     event.preventDefault();
+
+    const nextErrors = {
+      fullName: validateFullName(fullName),
+      email: validateIdentifier(email, "email"),
+    };
+    setErrors((prev) => ({ ...prev, ...nextErrors }));
+    if (nextErrors.fullName || nextErrors.email) return;
+
     setStep("security");
   }
 
@@ -90,6 +108,15 @@ export default function SignUpPage() {
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+
+    const nextErrors = {
+      phone: validateIdentifier(phone, "phone"),
+      password: validatePassword(password),
+      terms: isAdult && agreedToTerms ? undefined : TERMS_ERROR,
+    };
+    setErrors((prev) => ({ ...prev, ...nextErrors }));
+    if (nextErrors.phone || nextErrors.password || nextErrors.terms) return;
+
     run(goToOtpVerification);
   }
 
@@ -106,6 +133,19 @@ export default function SignUpPage() {
 
   function handleMobileContinue(event: React.FormEvent) {
     event.preventDefault();
+
+    let fieldError: string | undefined;
+    if (mobileField === "fullName") fieldError = validateFullName(fullName);
+    else if (mobileField === "email") fieldError = validateIdentifier(email, "email");
+    else if (mobileField === "phone") fieldError = validateIdentifier(phone, "phone");
+    else fieldError = validatePassword(password);
+
+    const termsError =
+      mobileField === "password" && !(isAdult && agreedToTerms) ? TERMS_ERROR : undefined;
+
+    setErrors((prev) => ({ ...prev, [mobileField]: fieldError, terms: termsError }));
+    if (fieldError || termsError) return;
+
     if (isMobileLastField) {
       run(goToOtpVerification);
       return;
@@ -152,6 +192,7 @@ export default function SignUpPage() {
                 placeholder="Username"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
+                error={errors.fullName}
               />
             )}
             {mobileField === "email" && (
@@ -162,6 +203,7 @@ export default function SignUpPage() {
                 placeholder="Useraccount@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                error={errors.email}
               />
             )}
             {mobileField === "phone" && (
@@ -172,6 +214,7 @@ export default function SignUpPage() {
                 placeholder="0208 000 000"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                error={errors.phone}
               />
             )}
             {mobileField === "password" && (
@@ -183,10 +226,13 @@ export default function SignUpPage() {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    error={errors.password}
                   />
-                  <p className="text-xs text-muted-400 dark:text-muted-300">
-                    Use 8 or more characters with a mix of letters and numbers
-                  </p>
+                  {!errors.password && (
+                    <p className="text-xs text-muted-400 dark:text-muted-300">
+                      Use 8 or more characters with a mix of letters and numbers
+                    </p>
+                  )}
                 </div>
                 <div className="flex flex-col gap-2">
                   <Checkbox
@@ -206,6 +252,7 @@ export default function SignUpPage() {
                     checked={agreedToTerms}
                     onChange={(e) => setAgreedToTerms(e.target.checked)}
                   />
+                  {errors.terms && <p className="text-xs text-[#e73d1c]">{errors.terms}</p>}
                 </div>
               </>
             )}
@@ -259,6 +306,7 @@ export default function SignUpPage() {
                 placeholder="Username"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
+                error={errors.fullName}
               />
               <Input
                 id="email"
@@ -267,6 +315,7 @@ export default function SignUpPage() {
                 placeholder="Useraccount@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                error={errors.email}
               />
             </div>
 
@@ -311,6 +360,7 @@ export default function SignUpPage() {
                 placeholder="0208 000 000"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                error={errors.phone}
               />
               <div className="flex flex-col gap-1">
                 <PasswordInput
@@ -319,10 +369,13 @@ export default function SignUpPage() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  error={errors.password}
                 />
-                <p className="text-xs text-muted-400 dark:text-muted-300">
-                  Use 8 or more characters with a mix of letters and numbers
-                </p>
+                {!errors.password && (
+                  <p className="text-xs text-muted-400 dark:text-muted-300">
+                    Use 8 or more characters with a mix of letters and numbers
+                  </p>
+                )}
               </div>
             </div>
 
@@ -344,6 +397,7 @@ export default function SignUpPage() {
                 checked={agreedToTerms}
                 onChange={(e) => setAgreedToTerms(e.target.checked)}
               />
+              {errors.terms && <p className="text-xs text-[#e73d1c]">{errors.terms}</p>}
             </div>
 
             <div className="flex gap-2.5">

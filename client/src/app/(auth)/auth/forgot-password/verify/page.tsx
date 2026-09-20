@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useHangTight } from "@/hooks/useHangTight";
 import { useResendCountdown } from "@/hooks/useResendCountdown";
+import { isCompleteOtp, validatePassword } from "@/lib/validation";
 import { cn } from "@/lib/utils";
 
 function BackToLoginLink({ router }: { router: ReturnType<typeof useRouter> }) {
@@ -28,13 +29,23 @@ function ForgotPasswordVerifyContent() {
 
   const [step, setStep] = useState<"otp" | "newPassword">("otp");
   const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
+  const [otpError, setOtpError] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState<{
+    newPassword?: string;
+    confirmPassword?: string;
+  }>({});
   const { pending, run } = useHangTight();
   const { secondsLeft, canResend, restart } = useResendCountdown();
 
   function handleVerify(event: React.FormEvent) {
     event.preventDefault();
+
+    const incomplete = !isCompleteOtp(otp);
+    setOtpError(incomplete);
+    if (incomplete) return;
+
     run(() => setStep("newPassword"));
   }
 
@@ -46,6 +57,15 @@ function ForgotPasswordVerifyContent() {
 
   function handleResetPassword(event: React.FormEvent) {
     event.preventDefault();
+
+    const nextErrors = {
+      newPassword: validatePassword(newPassword),
+      confirmPassword:
+        confirmPassword !== newPassword ? "Passwords do not match" : undefined,
+    };
+    setPasswordErrors(nextErrors);
+    if (nextErrors.newPassword || nextErrors.confirmPassword) return;
+
     run(() => {
       showSuccessToast("Password reset successful");
       router.push("/auth");
@@ -89,10 +109,13 @@ function ForgotPasswordVerifyContent() {
                 placeholder="Enter your new password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
+                error={passwordErrors.newPassword}
               />
-              <p className="text-xs text-muted-400 dark:text-muted-300">
-                Use 8 or more characters with a mix of letters and numbers
-              </p>
+              {!passwordErrors.newPassword && (
+                <p className="text-xs text-muted-400 dark:text-muted-300">
+                  Use 8 or more characters with a mix of letters and numbers
+                </p>
+              )}
             </div>
             <PasswordInput
               id="confirm-password"
@@ -100,6 +123,7 @@ function ForgotPasswordVerifyContent() {
               placeholder="Re-enter your new password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              error={passwordErrors.confirmPassword}
             />
           </div>
 
@@ -130,7 +154,17 @@ function ForgotPasswordVerifyContent() {
       </div>
 
       <form onSubmit={handleVerify} className="flex flex-col gap-6">
-        <OtpInput value={otp} onChange={setOtp} />
+        <div className="flex flex-col gap-2">
+          <OtpInput
+            value={otp}
+            onChange={(next) => {
+              setOtp(next);
+              if (otpError) setOtpError(false);
+            }}
+            error={otpError}
+          />
+          {otpError && <p className="text-xs text-[#e73d1c]">Enter the full 4-digit code</p>}
+        </div>
 
         <Button type="submit" variant="primary">
           Verify

@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useHangTight } from "@/hooks/useHangTight";
+import { isNonEmpty, validateIdentifier } from "@/lib/validation";
 
 const TAGLINE = { highlight: "Welcome Back to", rest: "the Built Environment" };
 
@@ -20,10 +21,19 @@ function SignInContent() {
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<{ identifier?: string; password?: string }>({});
   const { pending, run } = useHangTight();
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+
+    const nextErrors = {
+      identifier: validateIdentifier(identifier, method),
+      password: isNonEmpty(password) ? undefined : "Enter your password",
+    };
+    setErrors(nextErrors);
+    if (nextErrors.identifier || nextErrors.password) return;
+
     run(() => showSuccessToast("Sign in is coming soon"));
   }
 
@@ -60,6 +70,7 @@ function SignInContent() {
               placeholder="Useraccount@gmail.com"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
+              error={errors.identifier}
             />
           ) : (
             <Input
@@ -69,6 +80,7 @@ function SignInContent() {
               placeholder="0208 000 000"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
+              error={errors.identifier}
             />
           )}
           <PasswordInput
@@ -77,6 +89,7 @@ function SignInContent() {
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            error={errors.password}
           />
 
           <div className="flex items-center justify-between">

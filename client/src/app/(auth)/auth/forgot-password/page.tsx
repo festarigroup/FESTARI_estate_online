@@ -7,6 +7,7 @@ import { HangTightCard } from "@/components/shared/HangTightCard";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useHangTight } from "@/hooks/useHangTight";
+import { validateIdentifier } from "@/lib/validation";
 
 function ForgotPasswordContent() {
   const router = useRouter();
@@ -14,10 +15,16 @@ function ForgotPasswordContent() {
   const method = searchParams.get("method") === "phone" ? "phone" : "email";
 
   const [identifier, setIdentifier] = useState("");
+  const [error, setError] = useState<string>();
   const { pending, run } = useHangTight();
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
+
+    const identifierError = validateIdentifier(identifier, method);
+    setError(identifierError);
+    if (identifierError) return;
+
     run(() => {
       const params = new URLSearchParams({ identifier, method });
       router.push(`/auth/forgot-password/verify?${params.toString()}`);
@@ -57,6 +64,7 @@ function ForgotPasswordContent() {
             placeholder="0208 000 000"
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
+            error={error}
           />
         ) : (
           <Input
@@ -66,6 +74,7 @@ function ForgotPasswordContent() {
             placeholder="Useraccount@gmail.com"
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
+            error={error}
           />
         )}
 
