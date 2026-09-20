@@ -1,9 +1,5 @@
 import Image from "next/image";
-
-const NAV_ROWS = [
-  ["Properties", "People", "Projects", "Services"],
-  ["Community", "And more"],
-];
+import { SiteNav } from "@/components/shared/SiteNav";
 
 export interface AuthBrandTagline {
   highlight: string;
@@ -27,20 +23,7 @@ export function AuthBrandPanel({ tagline = DEFAULT_TAGLINE }: AuthBrandPanelProp
 
       <div className="flex-1" />
 
-      <nav aria-label="Site sections" className="flex flex-col items-center gap-2">
-        {NAV_ROWS.map((row) => (
-          <div key={row.join("-")} className="flex flex-wrap items-center justify-center gap-5">
-            {row.map((link, index) => (
-              <div key={link} className="flex items-center gap-5">
-                {index > 0 && <span className="h-2 w-px rounded-full bg-[#cdced2]" />}
-                <span className="whitespace-nowrap font-display text-base font-semibold tracking-[-1.28px] text-white">
-                  {link}
-                </span>
-              </div>
-            ))}
-          </div>
-        ))}
-      </nav>
+      <SiteNav size="base" />
     </div>
   );
 }
