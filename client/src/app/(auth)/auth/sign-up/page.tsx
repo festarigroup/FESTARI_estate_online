@@ -207,7 +207,7 @@ export default function SignUpPage() {
         <div className="flex gap-2.5">
           <Button
             type="button"
-            variant="secondary"
+            variant="primary"
             className="flex-1"
             onClick={() => setStep("profile")}
           >
