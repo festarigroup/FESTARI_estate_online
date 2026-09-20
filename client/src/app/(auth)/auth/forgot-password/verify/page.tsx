@@ -35,10 +35,10 @@ function ForgotPasswordVerifyContent() {
       ) : (
         <>
           <div className="flex flex-col items-center gap-3 text-center">
-            <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black">
+            <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black dark:text-white">
               Enter OTP
             </h1>
-            <p className="text-lg leading-7 text-[#111826]">
+            <p className="text-lg leading-7 text-[#111826] dark:text-white">
               We have shared a code to your registered email{" "}
               <span className="font-semibold tracking-[-0.54px]">{identifier}.</span> Check your
               inbox to reset your password

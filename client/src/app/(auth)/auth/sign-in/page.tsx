@@ -42,10 +42,10 @@ function SignInContent() {
   return (
     <>
       <div className="flex flex-col items-center gap-3 text-center">
-        <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black">
+        <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black dark:text-white">
           Let&rsquo;s Get In
         </h1>
-        <p className="text-sm leading-5 text-black">
+        <p className="text-sm leading-5 text-black dark:text-white">
           Continue with your {method === "email" ? "email address" : "phone number"}
         </p>
       </div>
@@ -81,7 +81,10 @@ function SignInContent() {
 
           <div className="flex items-center justify-between">
             <Checkbox id="remember-me" label="Remember me" />
-            <Link href="/auth/forgot-password" className="text-xs text-ink hover:underline">
+            <Link
+              href="/auth/forgot-password"
+              className="text-xs text-ink hover:underline dark:text-white"
+            >
               Forgot password?
             </Link>
           </div>
@@ -92,7 +95,7 @@ function SignInContent() {
         </Button>
 
         <p className="flex justify-center gap-2.5 text-sm">
-          <span className="text-ink">Don&rsquo;t have an account ?</span>
+          <span className="text-ink dark:text-white">Don&rsquo;t have an account ?</span>
           <Link href="/auth/sign-up" className="font-medium text-brand-900 underline underline-offset-2">
             Sign up
           </Link>

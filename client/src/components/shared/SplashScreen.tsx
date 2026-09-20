@@ -30,7 +30,7 @@ function ChevronsRightIcon() {
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M2.00012 6L8.00037 12.0002L1.99658 18.004M8.99963 6L14.9999 12.0002L8.99609 18.004M15.9996 6L21.9999 12.0002L15.9961 18.004"
-        stroke="#CBD5E0"
+        className="stroke-[#CBD5E0] dark:stroke-night-700"
         strokeWidth="1.6"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -96,10 +96,10 @@ function SlideToStart({ onConfirm }: SlideToStartProps) {
   return (
     <div
       ref={trackRef}
-      className="relative flex h-16 shrink-0 items-center rounded-full border border-muted-300 bg-[#f1f5f9] p-2"
+      className="relative flex h-16 shrink-0 items-center rounded-full border border-muted-300 bg-[#f1f5f9] p-2 dark:border-night-700 dark:bg-night-800"
     >
       <div className="flex w-full items-center justify-between pl-14 pr-2">
-        <span className="font-display text-lg font-medium tracking-[-0.44px] text-muted-300">
+        <span className="font-display text-lg font-medium tracking-[-0.44px] text-muted-300 dark:text-night-700">
           Get Started
         </span>
         <ChevronsRightIcon />
@@ -131,7 +131,7 @@ interface SplashScreenProps {
 
 export function SplashScreen({ onGetStarted }: SplashScreenProps) {
   return (
-    <div className="flex h-screen w-full flex-col gap-3 bg-white p-4">
+    <div className="flex h-screen w-full flex-col gap-3 bg-white p-4 dark:bg-night-900">
       <div className="relative flex flex-1 flex-col overflow-hidden rounded-[38px] bg-gradient-to-r from-brand-gradient-from to-brand-gradient-to px-6 pb-8 pt-8">
         <Image src="/brand/hero-illustration.png" alt="Biltlinx" width={80} height={40} priority />
 

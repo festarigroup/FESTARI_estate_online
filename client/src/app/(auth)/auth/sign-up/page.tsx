@@ -43,10 +43,10 @@ export default function SignUpPage() {
   return (
     <AuthScreenLayout tagline={tagline}>
       <div className="flex flex-col items-center gap-3 text-center">
-        <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black">
+        <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black dark:text-white">
           Create your account
         </h1>
-        <p className="text-sm leading-5 text-black">
+        <p className="text-sm leading-5 text-black dark:text-white">
           Takes under a minute. No role commitment requirement.
         </p>
       </div>
@@ -76,7 +76,7 @@ export default function SignUpPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <p className="text-xs text-muted-400">
+            <p className="text-xs text-muted-400 dark:text-muted-300">
               Use 8 or more characters with a mix of letters and numbers
             </p>
           </div>
@@ -107,7 +107,7 @@ export default function SignUpPage() {
         </Button>
 
         <p className="flex justify-center gap-2.5 text-sm">
-          <span className="text-ink">Already have an account ?</span>
+          <span className="text-ink dark:text-white">Already have an account ?</span>
           <Link href="/auth" className="font-medium text-brand-900 underline underline-offset-2">
             Sign In
           </Link>

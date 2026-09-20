@@ -21,12 +21,22 @@
   --color-gray-900: #181d27;
   --color-gray-600: #535862;
   --color-helper: #777797;
+  --color-night-900: #0f1621;
+  --color-night-800: #121c2d;
+  --color-night-700: #334154;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: var(--color-night-900);
+    color: #ffffff;
+  }
 }
 
 @keyframes toast-progress {

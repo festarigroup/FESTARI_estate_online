@@ -39,7 +39,7 @@ export function PasswordInput({ label, id, className, ...props }: PasswordInputP
 
   return (
     <div className="flex w-full flex-col gap-2">
-      <label htmlFor={id} className="text-sm text-ink">
+      <label htmlFor={id} className="text-sm text-ink dark:text-white">
         {label}
       </label>
       <div className="relative">
@@ -48,6 +48,7 @@ export function PasswordInput({ label, id, className, ...props }: PasswordInputP
           type={visible ? "text" : "password"}
           className={cn(
             "h-12 w-full rounded-lg border border-muted-300 px-3 pr-11 text-sm text-ink placeholder:text-muted-400 focus:outline-none focus:ring-2 focus:ring-brand-900",
+            "dark:border-night-700 dark:bg-night-800 dark:text-white dark:placeholder:text-muted-400",
             className,
           )}
           {...props}
@@ -55,7 +56,7 @@ export function PasswordInput({ label, id, className, ...props }: PasswordInputP
         <button
           type="button"
           onClick={() => setVisible((v) => !v)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-ink"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-ink dark:text-white"
           aria-label={visible ? "Hide password" : "Show password"}
         >
           <EyeIcon open={visible} />

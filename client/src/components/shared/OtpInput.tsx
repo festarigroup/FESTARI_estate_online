@@ -43,9 +43,11 @@ export function OtpInput({ value, onChange }: OtpInputProps) {
             inputMode="numeric"
             maxLength={1}
             aria-label={`Digit ${index + 1}`}
-            className="h-12 w-full flex-1 rounded-xl bg-surface-button text-center text-base text-ink focus:outline-none focus:ring-2 focus:ring-brand-900"
+            className="h-12 w-full flex-1 rounded-xl bg-surface-button text-center text-base text-ink focus:outline-none focus:ring-2 focus:ring-brand-900 dark:bg-night-800 dark:text-white"
           />
-          {index < LENGTH - 1 && <span className="text-3xl text-muted-400">-</span>}
+          {index < LENGTH - 1 && (
+            <span className="text-3xl text-muted-400 dark:text-night-700">-</span>
+          )}
         </div>
       ))}
     </div>

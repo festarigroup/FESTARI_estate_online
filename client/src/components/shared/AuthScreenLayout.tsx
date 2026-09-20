@@ -9,7 +9,7 @@ interface AuthScreenLayoutProps {
 
 export function AuthScreenLayout({ children, tagline }: AuthScreenLayoutProps) {
   return (
-    <div className="flex h-screen items-center justify-center overflow-hidden bg-white">
+    <div className="flex h-screen items-center justify-center overflow-hidden bg-white dark:bg-night-900">
       <div className="grid h-full w-full max-w-[1440px] lg:grid-cols-2">
         <div className="flex min-h-0 flex-col items-center justify-center overflow-y-auto px-6 sm:px-16 lg:px-[104px]">
           <FadeIn className="flex w-full max-w-[512px] flex-col gap-8">{children}</FadeIn>

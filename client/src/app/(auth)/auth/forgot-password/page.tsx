@@ -40,10 +40,10 @@ export default function ForgotPasswordPage() {
   return (
     <AuthScreenLayout tagline={tagline}>
       <div className="flex flex-col items-center gap-3 text-center">
-        <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black">
+        <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black dark:text-white">
           Reset your password
         </h1>
-        <p className="text-sm leading-5 text-black">
+        <p className="text-sm leading-5 text-black dark:text-white">
           Enter your email address and we will send you password reset instructions
         </p>
       </div>
