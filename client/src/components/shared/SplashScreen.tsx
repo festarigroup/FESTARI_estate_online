@@ -1,9 +1,15 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 
 const NAV_ROWS = [
   ["Properties", "People", "Projects", "Services"],
   ["Community", "And more"],
 ];
+
+const THUMB_INSET = 8;
+const CONFIRM_THRESHOLD = 0.85;
 
 function ArrowRightIcon() {
   return (
@@ -30,6 +36,92 @@ function ChevronsRightIcon() {
         strokeLinejoin="round"
       />
     </svg>
+  );
+}
+
+interface SlideToStartProps {
+  onConfirm: () => void;
+}
+
+function SlideToStart({ onConfirm }: SlideToStartProps) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const thumbRef = useRef<HTMLDivElement>(null);
+  const dragStartRef = useRef(0);
+
+  const [dragX, setDragX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [maxDrag, setMaxDrag] = useState(0);
+
+  useEffect(() => {
+    function updateMaxDrag() {
+      if (!trackRef.current || !thumbRef.current) return;
+      setMaxDrag(trackRef.current.offsetWidth - thumbRef.current.offsetWidth - THUMB_INSET * 2);
+    }
+    updateMaxDrag();
+    window.addEventListener("resize", updateMaxDrag);
+    return () => window.removeEventListener("resize", updateMaxDrag);
+  }, []);
+
+  function handlePointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setIsDragging(true);
+    dragStartRef.current = event.clientX - dragX;
+  }
+
+  function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (!isDragging) return;
+    const next = event.clientX - dragStartRef.current;
+    setDragX(Math.min(Math.max(next, 0), maxDrag));
+  }
+
+  function handlePointerUp() {
+    if (!isDragging) return;
+    setIsDragging(false);
+    if (maxDrag > 0 && dragX >= maxDrag * CONFIRM_THRESHOLD) {
+      setDragX(maxDrag);
+      window.setTimeout(onConfirm, 150);
+    } else {
+      setDragX(0);
+    }
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setDragX(maxDrag);
+      window.setTimeout(onConfirm, 150);
+    }
+  }
+
+  return (
+    <div
+      ref={trackRef}
+      className="relative flex h-16 shrink-0 items-center rounded-full border border-muted-300 bg-[#f1f5f9] p-2"
+    >
+      <div className="flex w-full items-center justify-between pl-14 pr-2">
+        <span className="font-display text-lg font-medium tracking-[-0.44px] text-muted-300">
+          Get Started
+        </span>
+        <ChevronsRightIcon />
+      </div>
+      <div
+        ref={thumbRef}
+        role="button"
+        tabIndex={0}
+        aria-label="Slide to get started"
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onKeyDown={handleKeyDown}
+        style={{ transform: `translateX(${dragX}px)` }}
+        className={`absolute left-2 flex size-12 cursor-grab touch-none items-center justify-center rounded-full bg-brand-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-900 focus-visible:ring-offset-2 active:cursor-grabbing ${
+          isDragging ? "" : "transition-transform duration-200 ease-out"
+        }`}
+      >
+        <ArrowRightIcon />
+      </div>
+    </div>
   );
 }
 
@@ -68,19 +160,7 @@ export function SplashScreen({ onGetStarted }: SplashScreenProps) {
         </nav>
       </div>
 
-      <button
-        type="button"
-        onClick={onGetStarted}
-        className="flex shrink-0 items-center justify-between rounded-full border border-muted-300 bg-[#f1f5f9] p-2.5"
-      >
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-900">
-          <ArrowRightIcon />
-        </span>
-        <span className="font-display text-lg font-medium tracking-[-0.44px] text-muted-300">
-          Get Started
-        </span>
-        <ChevronsRightIcon />
-      </button>
+      <SlideToStart onConfirm={onGetStarted} />
     </div>
   );
 }
