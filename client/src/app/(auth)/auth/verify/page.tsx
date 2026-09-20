@@ -39,11 +39,13 @@ function VerifyContent() {
     <>
       <div className="flex flex-col items-center gap-3 text-center">
         <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black dark:text-white">
-          Almost there!
+          Enter OTP
         </h1>
-        <p className="text-sm leading-5 text-black dark:text-white">
-          we sent a temporary code to your {channel === "phone" ? "phone number" : "email"}{" "}
-          {identifier}
+        <p className="text-lg leading-7 text-[#111826] dark:text-white">
+          We have shared a code to your registered {channel === "phone" ? "phone number" : "email"}
+          {" "}
+          <span className="font-semibold tracking-[-0.54px]">{identifier}.</span>{" "}
+          {channel === "phone" ? "Check your messages" : "Check your inbox"} to verify your account
         </p>
       </div>
 
