@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils";
 
 type ToastVariant = "success" | "error";
 
-const VARIANT_STYLES: Record<ToastVariant, { bg: string; bar: string }> = {
-  success: { bg: "bg-[#1d5f39]", bar: "bg-[#22c55e]" },
-  error: { bg: "bg-[#ef4444]", bar: "bg-white" },
+const VARIANT_STYLES: Record<ToastVariant, { bg: string; bar: string; text: string }> = {
+  success: { bg: "bg-[#1d5f39]", bar: "bg-[#22c55e]", text: "text-xs" },
+  error: { bg: "bg-[#ef4444]", bar: "bg-white", text: "text-sm" },
 };
 
 function CheckmarkIcon() {
@@ -45,18 +45,18 @@ interface AppToastProps {
 }
 
 function AppToast({ toastInstance, variant, message }: AppToastProps) {
-  const { bg, bar } = VARIANT_STYLES[variant];
+  const { bg, bar, text } = VARIANT_STYLES[variant];
 
   return (
     <div
       className={cn(
-        "relative flex w-[343px] items-center gap-2 overflow-hidden rounded-lg px-4 pb-6 pt-4 shadow-[0px_0px_40px_0px_rgba(69,71,69,0.2)]",
+        "relative flex w-[343px] items-center gap-2 overflow-hidden rounded-2xl px-4 pb-6 pt-4 shadow-[0px_0px_40px_0px_rgba(69,71,69,0.2)]",
         bg,
         toastInstance.visible ? "animate-enter" : "animate-leave",
       )}
     >
       {variant === "success" ? <CheckmarkIcon /> : <InformationIcon />}
-      <p className="flex-1 text-sm text-white">{message}</p>
+      <p className={cn("flex-1 leading-5 text-white", text)}>{message}</p>
       <button
         type="button"
         onClick={() => toast.dismiss(toastInstance.id)}
