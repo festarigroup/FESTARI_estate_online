@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Dark mode only applies when a `.dark` class is present (not automatically
+   from the OS/browser color-scheme) — light is always the default. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -32,11 +36,9 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    background: var(--color-night-900);
-    color: #ffffff;
-  }
+.dark body {
+  background: var(--color-night-900);
+  color: #ffffff;
 }
 
 @keyframes toast-progress {
