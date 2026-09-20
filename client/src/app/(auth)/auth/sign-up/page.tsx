@@ -108,7 +108,7 @@ export default function SignUpPage() {
 
         <p className="flex justify-center gap-2.5 text-sm">
           <span className="text-ink">Already have an account ?</span>
-          <Link href="/auth/sign-in" className="font-medium text-brand-900 underline underline-offset-2">
+          <Link href="/auth" className="font-medium text-brand-900 underline underline-offset-2">
             Sign In
           </Link>
         </p>

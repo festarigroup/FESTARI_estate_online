@@ -63,7 +63,7 @@ function ForgotPasswordVerifyContent() {
                   Resend OTP
                 </button>
               </p>
-              <Button type="button" variant="link" onClick={() => router.push("/auth/sign-in")}>
+              <Button type="button" variant="link" onClick={() => router.push("/auth")}>
                 Back to login page
               </Button>
             </div>

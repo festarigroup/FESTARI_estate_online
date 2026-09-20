@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
         </Button>
 
         <div className="flex justify-center">
-          <Button type="button" variant="link" onClick={() => router.push("/auth/sign-in")}>
+          <Button type="button" variant="link" onClick={() => router.push("/auth")}>
             Back to login page
           </Button>
         </div>
