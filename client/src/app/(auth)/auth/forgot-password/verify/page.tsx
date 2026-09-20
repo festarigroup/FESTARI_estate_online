@@ -13,6 +13,7 @@ function ForgotPasswordVerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const identifier = searchParams.get("identifier") || "Useraccount@gmail.com";
+  const method = searchParams.get("method") === "phone" ? "phone" : "email";
 
   const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
   const { pending, run } = useHangTight();
@@ -39,9 +40,11 @@ function ForgotPasswordVerifyContent() {
               Enter OTP
             </h1>
             <p className="text-lg leading-7 text-[#111826] dark:text-white">
-              We have shared a code to your registered email{" "}
-              <span className="font-semibold tracking-[-0.54px]">{identifier}.</span> Check your
-              inbox to reset your password
+              We have shared a code to your registered {method === "phone" ? "phone number" : "email"}
+              {" "}
+              <span className="font-semibold tracking-[-0.54px]">{identifier}.</span>{" "}
+              {method === "phone" ? "Check your messages" : "Check your inbox"} to reset your
+              password
             </p>
           </div>
 

@@ -78,9 +78,19 @@ export default function SignUpPage() {
     setStep("security");
   }
 
+  function goToOtpVerification() {
+    const channel = email ? "email" : "phone";
+    const params = new URLSearchParams({
+      identifier: email || phone,
+      channel,
+      context: "signup",
+    });
+    router.push(`/auth/verify?${params.toString()}`);
+  }
+
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    run(() => showSuccessToast("Sign up is coming soon"));
+    run(goToOtpVerification);
   }
 
   const mobileField: MobileField = MOBILE_FIELDS[mobileFieldIndex];
@@ -97,7 +107,7 @@ export default function SignUpPage() {
   function handleMobileContinue(event: React.FormEvent) {
     event.preventDefault();
     if (isMobileLastField) {
-      run(() => showSuccessToast("Sign up is coming soon"));
+      run(goToOtpVerification);
       return;
     }
     setMobileFieldIndex((index) => index + 1);
