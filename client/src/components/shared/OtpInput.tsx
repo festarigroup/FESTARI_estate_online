@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 
 const LENGTH = 4;
 
@@ -32,7 +32,7 @@ export function OtpInput({ value, onChange }: OtpInputProps) {
   return (
     <div className="flex w-full items-center gap-3" role="group" aria-label="One-time passcode">
       {Array.from({ length: LENGTH }).map((_, index) => (
-        <div key={index} className="flex flex-1 items-center gap-3">
+        <Fragment key={index}>
           <input
             ref={(el) => {
               inputRefs.current[index] = el;
@@ -43,12 +43,12 @@ export function OtpInput({ value, onChange }: OtpInputProps) {
             inputMode="numeric"
             maxLength={1}
             aria-label={`Digit ${index + 1}`}
-            className="h-12 w-full flex-1 rounded-xl bg-surface-button text-center text-base text-ink focus:outline-none focus:ring-2 focus:ring-brand-900 dark:bg-night-800 dark:text-white"
+            className="h-12 min-w-0 flex-1 rounded-xl bg-surface-button text-center text-base text-ink focus:outline-none focus:ring-2 focus:ring-brand-900 dark:bg-night-800 dark:text-white"
           />
           {index < LENGTH - 1 && (
-            <span className="text-3xl text-muted-400 dark:text-night-700">-</span>
+            <span className="shrink-0 text-3xl text-muted-400 dark:text-night-700">-</span>
           )}
-        </div>
+        </Fragment>
       ))}
     </div>
   );
