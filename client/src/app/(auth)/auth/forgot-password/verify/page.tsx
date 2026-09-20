@@ -9,6 +9,8 @@ import { OtpInput } from "@/components/shared/OtpInput";
 import { Button } from "@/components/ui/Button";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useHangTight } from "@/hooks/useHangTight";
+import { useResendCountdown } from "@/hooks/useResendCountdown";
+import { cn } from "@/lib/utils";
 
 function BackToLoginLink({ router }: { router: ReturnType<typeof useRouter> }) {
   return (
@@ -29,10 +31,17 @@ function ForgotPasswordVerifyContent() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const { pending, run } = useHangTight();
+  const { secondsLeft, canResend, restart } = useResendCountdown();
 
   function handleVerify(event: React.FormEvent) {
     event.preventDefault();
     run(() => setStep("newPassword"));
+  }
+
+  function handleResend() {
+    if (!canResend) return;
+    showSuccessToast("OTP resent");
+    restart();
   }
 
   function handleResetPassword(event: React.FormEvent) {
@@ -132,10 +141,14 @@ function ForgotPasswordVerifyContent() {
             Didn&rsquo;t receive code?{" "}
             <button
               type="button"
-              className="font-semibold text-brand-900"
-              onClick={() => showSuccessToast("OTP resent")}
+              disabled={!canResend}
+              className={cn(
+                "font-semibold",
+                canResend ? "text-brand-900" : "cursor-not-allowed text-muted-400",
+              )}
+              onClick={handleResend}
             >
-              Resend OTP
+              {canResend ? "Resend OTP" : `Resend OTP in ${secondsLeft}s`}
             </button>
           </p>
           <BackToLoginLink router={router} />

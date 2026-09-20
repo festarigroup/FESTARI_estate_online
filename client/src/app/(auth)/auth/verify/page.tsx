@@ -8,6 +8,8 @@ import { HangTightCard } from "@/components/shared/HangTightCard";
 import { OtpInput } from "@/components/shared/OtpInput";
 import { Button } from "@/components/ui/Button";
 import { useHangTight } from "@/hooks/useHangTight";
+import { useResendCountdown } from "@/hooks/useResendCountdown";
+import { cn } from "@/lib/utils";
 
 function VerifyContent() {
   const searchParams = useSearchParams();
@@ -17,6 +19,13 @@ function VerifyContent() {
 
   const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
   const { pending, run } = useHangTight();
+  const { secondsLeft, canResend, restart } = useResendCountdown();
+
+  function handleResend() {
+    if (!canResend) return;
+    showSuccessToast("OTP resent");
+    restart();
+  }
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -60,10 +69,14 @@ function VerifyContent() {
           Didn&rsquo;t receive code?{" "}
           <button
             type="button"
-            className="font-semibold text-brand-900"
-            onClick={() => showSuccessToast("OTP resent")}
+            disabled={!canResend}
+            className={cn(
+              "font-semibold",
+              canResend ? "text-brand-900" : "cursor-not-allowed text-muted-400",
+            )}
+            onClick={handleResend}
           >
-            Resend OTP
+            {canResend ? "Resend OTP" : `Resend OTP in ${secondsLeft}s`}
           </button>
         </p>
       </form>
