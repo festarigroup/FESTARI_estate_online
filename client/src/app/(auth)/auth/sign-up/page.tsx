@@ -14,6 +14,7 @@ import { useHangTight } from "@/hooks/useHangTight";
 export default function SignUpPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [isAdult, setIsAdult] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -67,6 +68,14 @@ export default function SignUpPage() {
             placeholder="Useraccount@gmail.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input
+            id="phone-number"
+            label="Phone Number"
+            type="tel"
+            placeholder="0208 000 000"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
           />
           <div className="flex flex-col gap-1">
             <PasswordInput
