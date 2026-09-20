@@ -147,6 +147,21 @@ export default function SignUpPage() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
+          {PROVIDERS.map((provider) => (
+            <SocialAuthButton
+              key={provider.id}
+              label={provider.label}
+              iconSrc={provider.iconSrc}
+              iconAlt={provider.id}
+              invertOnDark={provider.invertOnDark}
+              onClick={() => handleStubAuth(provider.label)}
+            />
+          ))}
+        </div>
+
+        <Divider label="or" />
+
+        <div className="flex flex-col gap-3">
           <Input
             id="phone-number"
             label="Phone Number"
