@@ -229,6 +229,8 @@ export default function SignUpPage() {
 
           <SocialButtons />
 
+          <Divider />
+
           <SignInFooter />
         </form>
       </div>
