@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { NavIcon } from "@/components/shared/NavIcon";
-import { NAV_ITEMS } from "@/components/shared/nav-items";
+import { NAV_ITEMS, type NavChildItem } from "@/components/shared/nav-items";
 
 interface MobileBottomNavProps {
   activeKey?: string;
+  activeChildKey?: string;
 }
 
 // Shorter labels than the sidebar's full names (e.g. "Stay and Events"), to
@@ -21,13 +23,22 @@ const SHORT_LABEL: Record<string, string> = {
   you: "You",
 };
 
-export function MobileBottomNav({ activeKey = "feed" }: MobileBottomNavProps) {
+export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }: MobileBottomNavProps) {
   const [visible, setVisible] = useState(true);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [openKey, setOpenKey] = useState<string | null>(null);
+  const itemRefs = useRef(new Map<string, HTMLAnchorElement>());
+  const flyoutRef = useRef<HTMLDivElement | null>(null);
+  const [flyoutPos, setFlyoutPos] = useState<{ bottom: number; left: number } | null>(null);
+
+  const openItem = openKey ? NAV_ITEMS.find((item) => item.key === openKey) : undefined;
+  const showFlyout = !!openItem?.children?.length;
 
   useEffect(() => {
     const handleScroll = () => {
       setVisible(false);
+      setOpenKey(null);
       if (hideTimeout.current) clearTimeout(hideTimeout.current);
       hideTimeout.current = setTimeout(() => setVisible(true), 600);
     };
@@ -42,6 +53,35 @@ export function MobileBottomNav({ activeKey = "feed" }: MobileBottomNavProps) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!showFlyout || !openKey) return;
+    const updatePosition = () => {
+      const rect = itemRefs.current.get(openKey)?.getBoundingClientRect();
+      if (!rect) return;
+      setFlyoutPos({
+        bottom: window.innerHeight - rect.top + 8,
+        left: Math.min(Math.max(rect.left + rect.width / 2 - 96, 8), window.innerWidth - 192 - 8),
+      });
+    };
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      setFlyoutPos(null);
+    };
+  }, [showFlyout, openKey]);
+
+  useEffect(() => {
+    if (!showFlyout || !openKey) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (itemRefs.current.get(openKey)?.contains(target) || flyoutRef.current?.contains(target)) return;
+      setOpenKey(null);
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [showFlyout, openKey]);
+
   return (
     <nav
       aria-label="Primary navigation"
@@ -53,14 +93,25 @@ export function MobileBottomNav({ activeKey = "feed" }: MobileBottomNavProps) {
     >
       {NAV_ITEMS.map((item) => {
         const isActive = item.key === activeKey;
+        const hasChildren = !!item.children?.length;
+        const isOpen = hasChildren && openKey === item.key;
+
         return (
           <Link
             key={item.key}
             href={item.href}
+            ref={(node) => {
+              if (node) itemRefs.current.set(item.key, node);
+              else itemRefs.current.delete(item.key);
+            }}
             onClick={(event) => {
               if (item.href === "#") event.preventDefault();
+              if (hasChildren) {
+                setOpenKey((current) => (current === item.key ? null : item.key));
+              }
             }}
             aria-label={item.label}
+            aria-expanded={hasChildren ? isOpen : undefined}
             className="flex shrink-0 flex-col items-center gap-0.5"
           >
             <NavIcon
@@ -80,6 +131,39 @@ export function MobileBottomNav({ activeKey = "feed" }: MobileBottomNavProps) {
           </Link>
         );
       })}
+
+      {showFlyout &&
+        flyoutPos &&
+        openItem?.children &&
+        createPortal(
+          <div
+            ref={flyoutRef}
+            style={{ bottom: flyoutPos.bottom, left: flyoutPos.left }}
+            className="fixed z-50 flex w-48 flex-col gap-1 rounded-[11px] border border-gray-200 bg-white p-2 shadow-lg"
+          >
+            {openItem.children.map((child) => (
+              <ChildLink key={child.key} child={child} isActive={child.key === activeChildKey} />
+            ))}
+          </div>,
+          document.body,
+        )}
     </nav>
+  );
+}
+
+function ChildLink({ child, isActive }: { child: NavChildItem; isActive: boolean }) {
+  return (
+    <Link
+      href={child.href}
+      onClick={(event) => {
+        if (child.href === "#") event.preventDefault();
+      }}
+      className="flex h-10 w-full items-center gap-3 rounded-[10px] px-3 text-[13px] hover:bg-gray-50"
+    >
+      <NavIcon icon={child.icon} color={isActive ? "brand" : "night"} size={16} />
+      <span className={cn("whitespace-nowrap", isActive ? "font-medium text-brand-600" : "text-night-700")}>
+        {child.label}
+      </span>
+    </Link>
   );
 }
