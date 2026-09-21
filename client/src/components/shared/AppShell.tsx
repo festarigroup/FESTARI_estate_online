@@ -22,9 +22,9 @@ export function AppShell({ activeKey, children, rightRail }: AppShellProps) {
           onToggleCollapse={() => setCollapsed((value) => !value)}
           activeKey={activeKey}
         />
-        <main className="min-w-0 flex-1 overflow-y-auto px-6 py-6">{children}</main>
+        <main className="no-scrollbar min-w-0 flex-1 overflow-y-auto px-6 py-6">{children}</main>
         {rightRail && (
-          <div className="w-[350px] shrink-0 overflow-y-auto px-6 py-6">{rightRail}</div>
+          <div className="no-scrollbar w-[350px] shrink-0 overflow-y-auto px-6 py-6">{rightRail}</div>
         )}
       </div>
     </div>

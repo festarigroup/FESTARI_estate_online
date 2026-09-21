@@ -87,3 +87,14 @@ body {
 .animate-leave {
   animation: toast-leave 0.15s ease-in forwards;
 }
+
+/* Keeps scrolling functional while hiding the browser scrollbar chrome,
+   matching Figma's frame rendering (no visible scrollbar). */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
