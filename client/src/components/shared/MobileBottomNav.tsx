@@ -75,10 +75,11 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
       ref={navRef}
       aria-label="Primary navigation"
       className={cn(
-        "fixed bottom-4 z-40 flex items-center overflow-x-auto rounded-full bg-gray-50 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] lg:hidden",
-        expanded
-          ? "left-1/2 w-[calc(100%-120px)] -translate-x-1/2 justify-between"
-          : "left-[30px] w-fit gap-5",
+        // Centering an element with width calc(100% - 120px) always computes
+        // to a constant 60px left offset, so the collapsed trigger sits at
+        // that same left-[60px] — no jump when it expands/collapses.
+        "fixed bottom-4 left-[60px] z-40 flex items-center overflow-x-auto rounded-full bg-gray-50 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] lg:hidden",
+        expanded ? "w-[calc(100%-120px)] justify-between" : "w-fit gap-5",
       )}
     >
       <button
