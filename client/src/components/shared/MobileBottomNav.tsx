@@ -13,7 +13,9 @@ interface MobileBottomNavProps {
 }
 
 export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }: MobileBottomNavProps) {
+  const [expanded, setExpanded] = useState(false);
   const [openKey, setOpenKey] = useState<string | null>(null);
+  const navRef = useRef<HTMLElement | null>(null);
   const triggerRef = useRef<HTMLAnchorElement | null>(null);
   const flyoutRef = useRef<HTMLDivElement | null>(null);
   const [flyoutPos, setFlyoutPos] = useState<{ bottom: number; left: number } | null>(null);
@@ -54,39 +56,67 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [showFlyout]);
 
+  // Collapse the whole pill back to just the trigger when tapping outside it.
+  useEffect(() => {
+    if (!expanded) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (navRef.current?.contains(target) || flyoutRef.current?.contains(target)) return;
+      setExpanded(false);
+      setOpenKey(null);
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [expanded]);
+
   return (
     <nav
+      ref={navRef}
       aria-label="Primary navigation"
-      className="fixed inset-x-0 bottom-4 z-40 mx-auto flex w-fit max-w-[calc(100%-32px)] items-center gap-1 overflow-x-auto rounded-full bg-gray-50 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] lg:hidden"
+      className="fixed bottom-4 left-4 z-40 flex w-fit max-w-[calc(100%-32px)] items-center gap-1 overflow-x-auto rounded-full bg-gray-50 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] lg:hidden"
     >
-      {NAV_ITEMS.map((item) => {
-        const hasChildren = !!item.children?.length;
-        const isOpen = hasChildren && openKey === item.key;
-        const isActive = item.key === activeKey;
+      <button
+        type="button"
+        aria-label={expanded ? "Close navigation" : "Open navigation"}
+        aria-expanded={expanded}
+        onClick={() => {
+          setExpanded((v) => !v);
+          setOpenKey(null);
+        }}
+        className="flex shrink-0 items-center justify-center rounded-full bg-white p-[10px] shadow-[0px_4px_2px_rgba(0,0,0,0.25)]"
+      >
+        <NavIcon icon="/icons/menu-square.svg" color="night" size={22} />
+      </button>
 
-        return (
-          <Link
-            key={item.key}
-            href={item.href}
-            ref={isOpen ? triggerRef : undefined}
-            onClick={(event) => {
-              if (item.href === "#") event.preventDefault();
-              if (hasChildren) {
-                setOpenKey((current) => (current === item.key ? null : item.key));
-              }
-            }}
-            aria-label={item.label}
-            aria-expanded={hasChildren ? isOpen : undefined}
-            title={item.label}
-            className={cn(
-              "flex shrink-0 items-center justify-center rounded-full",
-              isActive ? "bg-white p-[10px] shadow-[0px_4px_2px_rgba(0,0,0,0.25)]" : "p-2",
-            )}
-          >
-            <NavIcon icon={item.icon} color={isActive ? "brand" : "night"} size={isActive ? 22 : 18} />
-          </Link>
-        );
-      })}
+      {expanded &&
+        NAV_ITEMS.map((item) => {
+          const hasChildren = !!item.children?.length;
+          const isOpen = hasChildren && openKey === item.key;
+          const isActive = item.key === activeKey;
+
+          return (
+            <Link
+              key={item.key}
+              href={item.href}
+              ref={isOpen ? triggerRef : undefined}
+              onClick={(event) => {
+                if (item.href === "#") event.preventDefault();
+                if (hasChildren) {
+                  setOpenKey((current) => (current === item.key ? null : item.key));
+                }
+              }}
+              aria-label={item.label}
+              aria-expanded={hasChildren ? isOpen : undefined}
+              title={item.label}
+              className={cn(
+                "flex shrink-0 items-center justify-center rounded-full",
+                isActive ? "bg-white p-[10px] shadow-[0px_4px_2px_rgba(0,0,0,0.25)]" : "p-2",
+              )}
+            >
+              <NavIcon icon={item.icon} color={isActive ? "brand" : "night"} size={isActive ? 22 : 18} />
+            </Link>
+          );
+        })}
 
       {showFlyout &&
         flyoutPos &&
