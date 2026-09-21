@@ -77,8 +77,10 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
       ref={navRef}
       aria-label="Primary navigation"
       className={cn(
-        "fixed bottom-4 left-4 z-40 flex items-center overflow-x-auto rounded-full bg-gray-50/40 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-sm lg:hidden",
-        expanded ? "right-4 justify-between" : "w-fit gap-5",
+        // Insets match where the post image sits (main's px-[15px] plus the
+        // post card's own p-[15px]), not the raw screen edge or card edge.
+        "fixed bottom-4 left-[30px] z-40 flex items-center overflow-x-auto rounded-full bg-gray-50/40 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-sm lg:hidden",
+        expanded ? "right-[30px] justify-between" : "w-fit gap-5",
       )}
     >
       <button
@@ -89,9 +91,12 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
           setExpanded((v) => !v);
           setOpenKey(null);
         }}
-        className="flex shrink-0 items-center justify-center rounded-full bg-white p-[10px] shadow-[0px_4px_2px_rgba(0,0,0,0.25)]"
+        className={cn(
+          "flex shrink-0 items-center justify-center rounded-full p-[10px] shadow-[0px_4px_2px_rgba(0,0,0,0.25)]",
+          expanded ? "bg-white" : "bg-[#5d9afb]",
+        )}
       >
-        <NavIcon icon={activeItem.icon} color="night" size={22} />
+        <NavIcon icon={activeItem.icon} color={expanded ? "night" : "white"} size={22} />
       </button>
 
       {expanded &&
