@@ -1,8 +1,23 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import { NavIcon } from "@/components/shared/NavIcon";
 
 export function TopNav() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      if (menuRef.current?.contains(event.target as Node)) return;
+      setMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [menuOpen]);
+
   return (
     <header className="flex h-[67px] shrink-0 items-center justify-between gap-2 border-b border-gray-200 bg-white px-[15px] py-2 sm:px-[23px]">
       <div className="flex min-w-0 flex-1 items-center gap-[15px] md:gap-[38px] lg:gap-[57px] 3xl:gap-[109px] 3xl:flex-initial">
@@ -31,18 +46,17 @@ export function TopNav() {
 
         <button
           type="button"
-          className="flex h-[38px] items-center justify-center gap-2 rounded-lg bg-brand-600 px-[11px] text-[13px] text-white hover:bg-brand-600/90 sm:w-[93px] sm:p-[15px]"
+          aria-label="Create"
+          className="flex h-[38px] items-center justify-center gap-2 rounded-full px-2 hover:bg-gray-50 sm:rounded-lg sm:bg-brand-600 sm:px-[11px] sm:hover:bg-brand-600/90 sm:w-[93px] sm:p-[15px]"
         >
-          <span className="relative block size-[19px] shrink-0">
-            <Image src="/icons/add-alt.svg" alt="" fill sizes="19px" />
-          </span>
-          <span className="hidden sm:inline">Create</span>
+          <NavIcon icon="/icons/add-alt.svg" color="night" size={19} className="sm:bg-white" />
+          <span className="hidden text-[13px] text-white sm:inline">Create</span>
         </button>
 
         <button
           type="button"
           aria-label="Messages"
-          className="relative flex size-[38px] shrink-0 items-center justify-center rounded-full hover:bg-gray-50"
+          className="relative hidden size-[38px] shrink-0 items-center justify-center rounded-full hover:bg-gray-50 sm:flex"
         >
           <span className="relative block size-[19px] shrink-0">
             <Image src="/icons/message-programming.svg" alt="" fill sizes="19px" />
@@ -53,7 +67,7 @@ export function TopNav() {
         <button
           type="button"
           aria-label="Notifications"
-          className="relative flex size-[38px] shrink-0 items-center justify-center rounded-full hover:bg-gray-50"
+          className="relative hidden size-[38px] shrink-0 items-center justify-center rounded-full hover:bg-gray-50 sm:flex"
         >
           <span className="relative block size-[19px] shrink-0">
             <Image src="/icons/notification.svg" alt="" fill sizes="19px" />
@@ -61,14 +75,48 @@ export function TopNav() {
           <span className="absolute right-[7px] top-[8px] size-1.5 rounded-full border border-[#f5f0f9] bg-red-500" />
         </button>
 
-        <div className="flex items-center gap-2">
-          <span className="relative block size-[30px] shrink-0 overflow-hidden rounded-full">
-            <Image src="/icons/avatar-sample.jpg" alt="Madeline Price" fill className="object-cover" sizes="30px" />
-          </span>
-          <div className="hidden flex-col items-start md:flex">
-            <p className="text-[11px] font-semibold text-night-900">Madeline Price</p>
-            <span className="rounded-full bg-gray-200 px-2 py-0.5 text-[9.5px] text-brand-900">Researcher</span>
-          </div>
+        <div ref={menuRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-expanded={menuOpen}
+            aria-label="Account menu"
+            className="flex items-center gap-2 rounded-full hover:bg-gray-50"
+          >
+            <span className="relative block size-[30px] shrink-0 overflow-hidden rounded-full">
+              <Image src="/icons/avatar-sample.jpg" alt="Madeline Price" fill className="object-cover" sizes="30px" />
+            </span>
+            <div className="hidden flex-col items-start md:flex">
+              <p className="text-[11px] font-semibold text-night-900">Madeline Price</p>
+              <span className="rounded-full bg-gray-200 px-2 py-0.5 text-[9.5px] text-brand-900">Researcher</span>
+            </div>
+          </button>
+
+          {menuOpen && (
+            <div className="absolute right-0 top-[calc(100%+8px)] z-50 flex w-48 flex-col gap-1 rounded-[11px] border border-gray-200 bg-white p-2 shadow-lg">
+              <button
+                type="button"
+                className="flex h-10 w-full items-center gap-3 rounded-[10px] px-3 text-[13px] text-night-700 hover:bg-gray-50 sm:hidden"
+              >
+                <NavIcon icon="/icons/message-programming.svg" color="night" size={18} />
+                Messages
+              </button>
+              <button
+                type="button"
+                className="flex h-10 w-full items-center gap-3 rounded-[10px] px-3 text-[13px] text-night-700 hover:bg-gray-50 sm:hidden"
+              >
+                <NavIcon icon="/icons/notification.svg" color="night" size={18} />
+                Notifications
+              </button>
+              <button
+                type="button"
+                className="flex h-10 w-full items-center gap-3 rounded-[10px] px-3 text-[13px] text-night-700 hover:bg-gray-50"
+              >
+                <NavIcon icon="/icons/logout-01.svg" color="night" size={18} />
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

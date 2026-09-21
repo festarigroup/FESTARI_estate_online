@@ -47,7 +47,7 @@ export function MobileBottomNav({ activeKey = "feed" }: MobileBottomNavProps) {
       aria-label="Primary navigation"
       aria-hidden={!visible}
       className={cn(
-        "fixed bottom-4 left-1/2 z-40 flex w-[calc(100%-32px)] -translate-x-1/2 items-center justify-between rounded-full border border-gray-200 bg-white px-5 py-3 shadow-[0px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300 ease-out lg:hidden",
+        "fixed bottom-4 left-1/2 z-40 flex w-[calc(100%-32px)] -translate-x-1/2 items-center justify-between rounded-full border border-gray-200 bg-white/70 p-5 shadow-[0px_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-md transition-all duration-300 ease-out lg:hidden",
         visible ? "translate-y-0 opacity-100" : "translate-y-24 opacity-0",
       )}
     >
