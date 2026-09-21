@@ -76,7 +76,7 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
     <nav
       ref={navRef}
       aria-label="Primary navigation"
-      className="fixed bottom-4 left-4 z-40 flex w-fit max-w-[calc(100%-32px)] items-center gap-1 overflow-x-auto rounded-full bg-gray-50 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] lg:hidden"
+      className="fixed bottom-4 left-4 z-40 flex w-fit max-w-[calc(100%-32px)] items-center gap-5 overflow-x-auto rounded-full bg-gray-50/40 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-sm lg:hidden"
     >
       <button
         type="button"
@@ -112,7 +112,7 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
               title={item.label}
               className="flex shrink-0 items-center justify-center rounded-full p-2"
             >
-              <NavIcon icon={item.icon} color="night" size={18} />
+              <NavIcon icon={item.icon} color="night" size={20} />
             </Link>
           );
         })}
