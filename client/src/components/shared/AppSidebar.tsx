@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS, type NavChildItem } from "@/components/shared/nav-items";
 
@@ -20,6 +21,44 @@ export function AppSidebar({
   activeChildKey = "home",
 }: AppSidebarProps) {
   const [openKey, setOpenKey] = useState<string | null>(activeKey);
+  const triggerRef = useRef<HTMLDivElement | null>(null);
+  const flyoutRef = useRef<HTMLDivElement | null>(null);
+  const [flyoutPos, setFlyoutPos] = useState<{ top: number; left: number } | null>(null);
+
+  const openItem = openKey ? NAV_ITEMS.find((item) => item.key === openKey) : undefined;
+  const showFlyout = collapsed && !!openItem?.children?.length;
+
+  // The collapsed rail sits inside overflow-hidden/overflow-auto ancestors, so
+  // the flyout is portalled to <body> and positioned from the trigger's rect
+  // instead of relying on CSS `absolute` (which those ancestors would clip).
+  useEffect(() => {
+    if (!showFlyout) {
+      setFlyoutPos(null);
+      return;
+    }
+    const updatePosition = () => {
+      const rect = triggerRef.current?.getBoundingClientRect();
+      if (rect) setFlyoutPos({ top: rect.top, left: rect.right + 8 });
+    };
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [showFlyout, openKey]);
+
+  useEffect(() => {
+    if (!showFlyout) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (triggerRef.current?.contains(target) || flyoutRef.current?.contains(target)) return;
+      setOpenKey(null);
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [showFlyout]);
 
   return (
     <aside
@@ -36,7 +75,7 @@ export function AppSidebar({
           const isActive = item.key === activeKey;
 
           return (
-            <div key={item.key} className="relative w-full">
+            <div key={item.key} className="relative w-full" ref={isOpen ? triggerRef : undefined}>
               <Link
                 href={item.href}
                 aria-expanded={hasChildren ? isOpen : undefined}
@@ -83,20 +122,12 @@ export function AppSidebar({
                 )}
               </Link>
 
-              {isOpen && item.children && (
-                collapsed ? (
-                  <div className="absolute left-full top-0 z-50 ml-2 flex w-44 flex-col gap-1 rounded-[11px] border border-gray-200 bg-white p-2 shadow-lg">
-                    {item.children.map((child) => (
-                      <ChildLink key={child.key} child={child} isActive={child.key === activeChildKey} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex w-full flex-col items-start pb-1">
-                    {item.children.map((child) => (
-                      <ChildLink key={child.key} child={child} isActive={child.key === activeChildKey} />
-                    ))}
-                  </div>
-                )
+              {isOpen && item.children && !collapsed && (
+                <div className="flex w-full flex-col items-start pb-1">
+                  {item.children.map((child) => (
+                    <ChildLink key={child.key} child={child} isActive={child.key === activeChildKey} />
+                  ))}
+                </div>
               )}
             </div>
           );
@@ -117,6 +148,22 @@ export function AppSidebar({
         </span>
         {!collapsed && <span className="whitespace-nowrap">Collapse bar</span>}
       </button>
+
+      {showFlyout &&
+        flyoutPos &&
+        openItem?.children &&
+        createPortal(
+          <div
+            ref={flyoutRef}
+            style={{ top: flyoutPos.top, left: flyoutPos.left }}
+            className="fixed z-50 flex w-44 flex-col gap-1 rounded-[11px] border border-gray-200 bg-white p-2 shadow-lg"
+          >
+            {openItem.children.map((child) => (
+              <ChildLink key={child.key} child={child} isActive={child.key === activeChildKey} />
+            ))}
+          </div>,
+          document.body,
+        )}
     </aside>
   );
 }
