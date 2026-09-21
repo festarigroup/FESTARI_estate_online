@@ -89,7 +89,7 @@ export function AppSidebar({
                 className={cn(
                   "group relative flex h-[53px] w-full items-center gap-1 rounded-[11px] py-[11px] text-[13px] font-medium",
                   collapsed ? "justify-center px-1" : "justify-between px-[15px]",
-                  isActive && !isOpen ? "bg-brand-600 text-white" : "text-night-700 hover:bg-gray-50",
+                  isActive ? "bg-brand-600 text-white" : "text-night-700 hover:bg-gray-50",
                 )}
               >
                 <span className="flex items-center gap-2">
@@ -107,7 +107,7 @@ export function AppSidebar({
                     )}
                   >
                     <Image
-                      src={isActive && !isOpen ? "/icons/chevron-right.svg" : "/icons/chevron-right-gray.svg"}
+                      src={isActive ? "/icons/chevron-right.svg" : "/icons/chevron-right-gray.svg"}
                       alt=""
                       width={collapsed ? 5 : 7}
                       height={collapsed ? 10 : 13}
