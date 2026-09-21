@@ -29,7 +29,13 @@ export function AppShell({ activeKey, children, rightRail }: AppShellProps) {
           onToggleCollapse={() => setCollapsedOverride(!collapsed)}
           activeKey={activeKey}
         />
-        <main className="no-scrollbar min-w-0 flex-1 overflow-y-auto px-[15px] py-[15px] sm:px-[23px] sm:py-[23px]">
+        {/* No top padding here: a sticky child's `top: 0` sticks relative to
+            this element's padding edge, which left a gap for scrolled
+            content to flash through above it. Top spacing instead lives on
+            the non-scrolling wrapper inside `children`, so it scrolls away
+            normally and the sticky child ends up flush with this element's
+            actual top edge. */}
+        <main className="no-scrollbar min-w-0 flex-1 overflow-y-auto px-[15px] pb-[15px] sm:px-[23px] sm:pb-[23px]">
           {children}
         </main>
         {rightRail && (

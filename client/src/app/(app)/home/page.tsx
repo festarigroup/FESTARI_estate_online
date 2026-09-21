@@ -192,7 +192,7 @@ export default function HomeFeedPage() {
 
   return (
     <AppShell activeKey="feed" rightRail={<RightRail />}>
-      <div className="mx-auto flex w-full max-w-[762px] flex-col gap-[15px]">
+      <div className="mx-auto flex w-full max-w-[762px] flex-col gap-[15px] pt-[15px] sm:pt-[23px]">
         <div className="sticky top-0 z-10 flex flex-col gap-[15px] bg-gray-50">
           <ComposerCard />
           <FeedTabs activeTab={activeTab} onSelect={setActiveTab} />
