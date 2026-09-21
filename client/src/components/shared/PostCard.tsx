@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { NavIcon } from "@/components/shared/NavIcon";
 import { cn } from "@/lib/utils";
 
 export type PostActionVariant = "primary" | "outline" | "outline-brand";
@@ -18,6 +19,27 @@ export interface PollOption {
   votes: string;
   leading?: boolean;
 }
+
+export interface CommentItem {
+  id: string;
+  authorName: string;
+  avatar?: string;
+  postedAt: string;
+  text: string;
+  likes?: number;
+}
+
+const DEFAULT_COMMENTS: CommentItem[] = [
+  {
+    id: "c1",
+    authorName: "Jane Doe",
+    postedAt: "17s ago",
+    text: "We are very good. Your story is very inspiring!\nDon't stop keep going.",
+    likes: 20,
+  },
+  { id: "c2", authorName: "John Doe", postedAt: "1m ago", text: "Cool Champ.", likes: 20 },
+  { id: "c3", authorName: "Jane Doe", postedAt: "20m ago", text: "Cool Champ." },
+];
 
 export interface PostCardData {
   id: string;
@@ -50,6 +72,7 @@ export interface PostCardData {
   rating?: string;
   actions?: PostAction[];
   messageHostLabel?: string;
+  commentsList?: CommentItem[];
 }
 
 interface PostCardProps {
@@ -58,6 +81,8 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardProps) {
+  const [showComments, setShowComments] = useState(false);
+
   return (
     <article className="flex w-full flex-col gap-[15px] rounded-[15px] border border-gray-200 bg-white p-[15px]">
       <PostHeader post={post} />
@@ -91,7 +116,7 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
 
       <div className="h-px w-full bg-gray-200" />
 
-      <PostStatsBar post={post} />
+      <PostStatsBar post={post} showComments={showComments} onToggleComments={() => setShowComments((v) => !v)} />
 
       {post.showComposer && (
         <div className="flex w-full items-center gap-2 rounded-3xl bg-gray-100 p-2">
@@ -108,6 +133,8 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
           </button>
         </div>
       )}
+
+      {showComments && <CommentsSection comments={post.commentsList ?? DEFAULT_COMMENTS} />}
     </article>
   );
 }
@@ -316,7 +343,15 @@ function ActionsRow({ post }: { post: PostCardData }) {
   );
 }
 
-function PostStatsBar({ post }: { post: PostCardData }) {
+function PostStatsBar({
+  post,
+  showComments,
+  onToggleComments,
+}: {
+  post: PostCardData;
+  showComments: boolean;
+  onToggleComments: () => void;
+}) {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -330,12 +365,17 @@ function PostStatsBar({ post }: { post: PostCardData }) {
           {post.likes + (liked ? 1 : 0)} Likes
         </span>
       </button>
-      <div className="flex items-center gap-2">
+      <button
+        type="button"
+        className="flex items-center gap-2"
+        aria-expanded={showComments}
+        onClick={onToggleComments}
+      >
         <span className="relative block size-[23px] shrink-0">
           <Image src="/icons/message-03.svg" alt="" fill sizes="23px" />
         </span>
         <span className="text-[11px] font-bold text-brand-900">{post.comments} Comments</span>
-      </div>
+      </button>
       <div className="flex items-center gap-2">
         <span className="relative block size-[23px] shrink-0">
           <Image src="/icons/share-05.svg" alt="" fill sizes="23px" />
@@ -348,6 +388,51 @@ function PostStatsBar({ post }: { post: PostCardData }) {
         </span>
         <span className="text-[11px] font-bold text-brand-900">{saved ? "Saved" : "Save"}</span>
       </button>
+    </div>
+  );
+}
+
+function CommentsSection({ comments }: { comments: CommentItem[] }) {
+  return (
+    <div className="flex w-full flex-col gap-2.5">
+      <p className="text-[11px] font-bold text-brand-900">Comments</p>
+      <div className="flex w-full flex-col items-center gap-[14px]">
+        {comments.map((comment) => (
+          <CommentRow key={comment.id} comment={comment} />
+        ))}
+      </div>
+      <button type="button" className="text-left text-[11px] font-bold text-brand-900">
+        Load More Comments
+      </button>
+    </div>
+  );
+}
+
+function CommentRow({ comment }: { comment: CommentItem }) {
+  return (
+    <div className="flex w-full items-start gap-[14px]">
+      <span className="relative block size-[47px] shrink-0 overflow-hidden rounded-full bg-[#eef2ff]">
+        {comment.avatar ? (
+          <Image src={comment.avatar} alt={comment.authorName} fill className="object-cover" sizes="47px" />
+        ) : (
+          <span className="absolute left-1/2 top-1/2 block size-6 -translate-x-1/2 -translate-y-1/2">
+            <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="24px" />
+          </span>
+        )}
+      </span>
+      <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5">
+        <div className="flex w-full items-start justify-between gap-2">
+          <p className="text-[13px] font-bold text-brand-900">{comment.authorName}</p>
+          <p className="shrink-0 text-[9.5px] text-gray-500">{comment.postedAt}</p>
+        </div>
+        <p className="whitespace-pre-line text-[13px] leading-[1.5] text-gray-600">{comment.text}</p>
+        {!!comment.likes && (
+          <div className="flex items-center gap-1">
+            <NavIcon icon="/icons/heart-like.svg" color="brand" size={11} className="bg-[#ea5e9c]" />
+            <span className="text-[9.5px] font-bold text-brand-900">{comment.likes}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
