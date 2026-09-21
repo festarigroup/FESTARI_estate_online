@@ -21,8 +21,8 @@ export function TopNav() {
   return (
     <header className="flex h-[67px] shrink-0 items-center justify-between gap-2 border-b border-gray-200 bg-white px-[15px] py-2 sm:px-[23px]">
       <div className="flex min-w-0 flex-1 items-center gap-[15px] md:gap-[38px] lg:gap-[57px] 3xl:gap-[109px] 3xl:flex-initial">
-        <div className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-brand-600 sm:hidden">
-          <span className="font-display text-base font-bold text-white">B</span>
+        <div className="relative size-[34px] shrink-0 sm:hidden">
+          <Image src="/icons/logo-biltlinx-mobile.png" alt="Biltlinx" fill className="object-contain" sizes="34px" priority />
         </div>
         <div className="relative hidden h-[36px] w-[72px] shrink-0 sm:block">
           <Image src="/icons/logo-biltlinx.png" alt="Biltlinx" fill className="object-contain" sizes="72px" priority />

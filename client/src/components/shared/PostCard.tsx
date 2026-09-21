@@ -310,13 +310,19 @@ function PriceRow({ post }: { post: PostCardData }) {
             <span className="relative block h-[15px] w-[17px]">
               <Image src="/icons/bed-single-01.svg" alt="" fill sizes="17px" />
             </span>
-            <span className="text-[9.5px] font-light text-gray-700">{post.beds} bedroom</span>
+            <span className="text-[9.5px] font-light text-gray-700">
+              {post.beds}
+              <span className="hidden sm:inline"> bedroom</span>
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <span className="relative block h-[15px] w-[17px]">
               <Image src="/icons/bathtub-02.svg" alt="" fill sizes="17px" />
             </span>
-            <span className="text-[9.5px] font-light text-gray-700">{post.baths} bedroom</span>
+            <span className="text-[9.5px] font-light text-gray-700">
+              {post.baths}
+              <span className="hidden sm:inline"> bathroom</span>
+            </span>
           </div>
         </div>
       ) : post.rating ? (
