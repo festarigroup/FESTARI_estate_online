@@ -1,0 +1,68 @@
+import Image from "next/image";
+
+interface TrendingProperty {
+  title: string;
+  location: string;
+  price: string;
+  likes: number;
+  image: string;
+}
+
+const PROPERTIES: TrendingProperty[] = [
+  {
+    title: "5 Bedroom House",
+    location: "East Legon, Accra",
+    price: "GHS 6,500,000",
+    likes: 200,
+    image: "/images/trending-property-1.jpg",
+  },
+  {
+    title: "3 Bedroom Apartment",
+    location: "Airport Residential Area",
+    price: "GHS 3,500 / month",
+    likes: 190,
+    image: "/images/trending-property-2.jpg",
+  },
+  {
+    title: "Land for sale",
+    location: "Trassaco Valley, Accra",
+    price: "GHS 500,000",
+    likes: 214,
+    image: "/images/trending-property-3.jpg",
+  },
+];
+
+export function TrendingPropertiesCard() {
+  return (
+    <div className="flex w-full flex-col gap-4 rounded-2xl border border-[#e6d7ef] bg-white p-3">
+      <div className="flex items-center justify-between">
+        <p className="text-base font-bold text-gray-700">Trending Properties</p>
+        <button type="button" className="text-[13px] font-medium text-brand-600">
+          View all
+        </button>
+      </div>
+      <ul className="flex flex-col gap-4">
+        {PROPERTIES.map((property) => (
+          <li key={property.title} className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="relative block h-16 w-[106px] shrink-0 overflow-hidden rounded-2xl">
+                <Image src={property.image} alt={property.title} fill className="object-cover" sizes="106px" />
+              </span>
+              <div className="flex flex-col gap-0.5">
+                <p className="text-xs font-bold text-gray-700">{property.title}</p>
+                <p className="text-[9px] text-gray-500">{property.location}</p>
+                <p className="text-[10px] font-bold text-gray-700">{property.price}</p>
+              </div>
+            </div>
+            <div className="flex shrink-0 items-center gap-1">
+              <span className="relative block size-3.5">
+                <Image src="/icons/heart-like.svg" alt="" fill sizes="14px" />
+              </span>
+              <span className="text-[10px] font-bold text-brand-900">{property.likes}</span>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
