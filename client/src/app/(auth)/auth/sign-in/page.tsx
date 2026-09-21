@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { showSuccessToast } from "@/components/shared/AppToast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
@@ -16,6 +16,7 @@ import { isNonEmpty, validateIdentifier } from "@/lib/validation";
 const TAGLINE = { highlight: "Welcome Back to", rest: "the Built Environment" };
 
 function SignInContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const method = searchParams.get("method") === "email" ? "email" : "phone";
 
@@ -34,7 +35,10 @@ function SignInContent() {
     setErrors(nextErrors);
     if (nextErrors.identifier || nextErrors.password) return;
 
-    run(() => showSuccessToast("Sign in is coming soon"));
+    run(() => {
+      showSuccessToast("Signed in! Welcome back to Biltlinx");
+      router.push("/home");
+    });
   }
 
   if (pending) {
