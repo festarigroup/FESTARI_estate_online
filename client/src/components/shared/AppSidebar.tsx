@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
+import { NavIcon } from "@/components/shared/NavIcon";
 import { NAV_ITEMS, type NavChildItem } from "@/components/shared/nav-items";
 
 interface AppSidebarProps {
@@ -93,9 +94,7 @@ export function AppSidebar({
                 )}
               >
                 <span className="flex items-center gap-2">
-                  <span className="relative block size-[19px] shrink-0">
-                    <Image src={item.icon} alt="" fill sizes="19px" />
-                  </span>
+                  <NavIcon icon={item.icon} color={isActive ? "white" : "night"} size={19} />
                   {!collapsed && <span className="whitespace-nowrap">{item.label}</span>}
                 </span>
                 {hasChildren && (
@@ -177,9 +176,7 @@ function ChildLink({ child, isActive }: { child: NavChildItem; isActive: boolean
       }}
       className="flex h-[34px] w-full items-center gap-[15px] rounded-[11px] px-[23px] py-2 text-[13px] hover:bg-gray-50"
     >
-      <span className="relative block size-[15px] shrink-0">
-        <Image src={child.icon} alt="" fill sizes="15px" />
-      </span>
+      <NavIcon icon={child.icon} color={isActive ? "brand" : "night"} size={15} />
       <span className={cn("whitespace-nowrap", isActive ? "font-medium text-brand-600" : "text-night-700")}>
         {child.label}
       </span>
