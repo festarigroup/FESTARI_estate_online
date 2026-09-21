@@ -188,8 +188,11 @@ function PostHeader({ post }: { post: PostCardData }) {
             <span className="hidden text-[13px] text-brand-900 sm:inline">Follow</span>
           </button>
         )}
-        <span className="relative block size-[23px] shrink-0">
+        <span className="relative block size-[23px] shrink-0 sm:hidden">
           <Image src="/icons/more-horizontal.svg" alt="Post options" fill sizes="23px" />
+        </span>
+        <span className="relative hidden size-[23px] shrink-0 sm:block">
+          <Image src="/icons/menu-03.svg" alt="Post options" fill sizes="23px" />
         </span>
       </div>
     </div>
@@ -417,26 +420,31 @@ function PostStatsBar({
       </div>
 
       {likeCount > 0 && (
-        <div className="flex items-center gap-2 sm:hidden">
-          <span className="flex items-center -space-x-1.5">
-            {[0, 1, 2].map((avatar) => (
-              <span
-                key={avatar}
-                className="relative block size-[18px] shrink-0 overflow-hidden rounded-full bg-[#eef2ff] ring-2 ring-white"
-              >
-                <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="18px" className="p-0.5" />
-              </span>
-            ))}
-          </span>
-          <p className="text-[11px] text-gray-600">
-            Liked by <span className="font-bold text-brand-900">people you follow</span>
-            {likeCount > 3 && (
+        <div className="flex items-center justify-between gap-2 sm:hidden">
+          <p className="min-w-0 flex-1 truncate text-[11px] text-gray-600">
+            Liked by <span className="font-bold text-brand-900">Kwame</span>
+            {likeCount > 1 && (
               <>
                 {" "}
-                and <span className="font-bold text-brand-900">{likeCount - 3} others</span>
+                and <span className="font-bold text-brand-900">{likeCount - 1} others</span>
               </>
             )}
           </p>
+          <span className="flex shrink-0 items-center -space-x-2">
+            {[0, 1, 2].map((avatar) => (
+              <span
+                key={avatar}
+                className="relative block size-[22px] shrink-0 overflow-hidden rounded-full bg-[#eef2ff] ring-2 ring-white"
+              >
+                <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="22px" className="p-0.5" />
+              </span>
+            ))}
+            {likeCount > 3 && (
+              <span className="relative flex size-[22px] shrink-0 items-center justify-center rounded-full bg-night-900 text-[8px] font-bold text-white ring-2 ring-white">
+                +{likeCount - 3}
+              </span>
+            )}
+          </span>
         </div>
       )}
     </div>
