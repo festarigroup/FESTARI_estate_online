@@ -1,6 +1,10 @@
 import Image from "next/image";
 import { AppShell } from "@/components/shared/AppShell";
 import { PostCard, type PostCardData } from "@/components/shared/PostCard";
+import { WhoToFollowCard } from "@/components/shared/WhoToFollowCard";
+import { TrendingPropertiesCard } from "@/components/shared/TrendingPropertiesCard";
+import { UpcomingOpenHousesCard } from "@/components/shared/UpcomingOpenHousesCard";
+import { TrendingHashtagsCard } from "@/components/shared/TrendingHashtagsCard";
 
 const FEED_TABS = ["All Posts", "Following", "Nearby", "Properties", "Stay", "Professionals", "Projects"];
 
@@ -16,45 +20,130 @@ const COMPOSER_ACTIONS = [
   { key: "article", label: "Article", icon: "/icons/book-bookmark-01.svg" },
 ];
 
+const POST_TEXT =
+  "Land prices in East Legon Hills are up nearly 12% this quarter. If you're thinking of buying in the next 6 months, now's worth a serious look.";
+
+const CONSULT_TEXT =
+  "New build wrapped this week — a 3-unit courtyard house in Trasacco. Full portfolio on my profile.";
+
 const POSTS: PostCardData[] = [
   {
     id: "1",
+    variant: "text",
     authorName: "Andy Ansong",
-    authorRole: "Real Estate Consultant",
+    roleLine: "Real Estate Consultant |",
     postedAt: "27m ago",
-    text: "Land prices in East Legon Hills are up nearly 12% this quarter. If you're thinking of buying in the next 6 months, now's worth a serious look.",
-    image: "/icons/post-image-sample.jpg",
+    avatar: "/icons/avatar-andy.png",
+    verified: true,
+    text: POST_TEXT,
+    image: "/images/post-building-01.jpg",
     likes: 42,
     comments: 42,
-    avatar: "/icons/avatar-andy.png",
+    showComposer: true,
   },
   {
     id: "2",
-    authorName: "Jane Doe",
-    authorRole: "Sales Agent",
-    postedAt: "1h ago",
-    text: "Just closed on a beautiful 3-bedroom apartment in Cantonments. Grateful for another happy client!",
-    likes: 28,
-    comments: 12,
-    avatar: "/icons/avatar-sample.jpg",
+    variant: "poll",
+    authorName: "Edwin adu Boateng",
+    roleLine: "Sales Agent |",
+    postedAt: "2hrs ago",
+    avatar: "",
+    avatarPlaceholder: true,
+    participantAvatars: ["/images/poll-avatar-1.png", "/images/poll-avatar-2.png", "/images/poll-avatar-3.png"],
+    question: "What matters most when choosing a stay?",
+    hashtags: "#quickquestion #plsanswer",
+    pollOptions: [
+      { label: "Amenities", percent: 55, votes: "1,418", leading: true },
+      { label: "Price", percent: 25, votes: "4,587" },
+      { label: "Location", percent: 12, votes: "1,418" },
+      { label: "Reviews", percent: 8, votes: "487" },
+    ],
+    pollFooter: "Jun 25, 2026 — 12,157 votes total",
+    likes: 12,
+    comments: 25,
+    shareLabel: "187 Share",
+    showComposer: true,
   },
   {
     id: "3",
-    authorName: "John Doe",
-    authorRole: "Property Manager",
-    postedAt: "3h ago",
-    text: "Reminder: our open house for the Airport Residential listing runs this Saturday from 10am to 2pm. Come through!",
-    image: "/icons/post-image-sample.jpg",
-    likes: 15,
-    comments: 6,
-    avatar: "/icons/avatar-sample.jpg",
+    variant: "property",
+    authorName: "Kasapa Properties Ltd",
+    roleLine: "Sponsored by agent |",
+    postedAt: "40m ago",
+    avatar: "/images/avatar-kasapa.png",
+    verified: true,
+    text: POST_TEXT,
+    image: "/images/post-building-01.jpg",
+    priceLine: "GHS 1,850.00",
+    subLine: "4 bedroom Detached House",
+    beds: 4,
+    baths: 2,
+    actions: [
+      { label: "Request viewing", variant: "primary" },
+      { label: "View Property", variant: "outline" },
+    ],
+    messageHostLabel: "Message Host",
+    likes: 42,
+    comments: 42,
   },
-];
-
-const PEOPLE_YOU_MAY_KNOW = [
-  { name: "Andy Ansong", role: "Real Estate Consultant", avatar: "/icons/avatar-andy.png" },
-  { name: "Edwin Adu", role: "Sales Agent", avatar: "/icons/avatar-sample.jpg" },
-  { name: "Carlos Ramirez", role: "Software Engineer", avatar: "/icons/avatar-sample.jpg" },
+  {
+    id: "4",
+    variant: "stay",
+    authorName: "Golden Palm Hotel",
+    roleLine: "Labadi |",
+    postedAt: "1d",
+    avatar: "/images/avatar-golden-palm.png",
+    verified: true,
+    image: "/images/post-hotel-pool.jpg",
+    priceLine: "GHS 550.00",
+    priceSuffix: "/night",
+    subLine: "Deluxe room",
+    rating: "4.7 ratings (312)",
+    actions: [
+      { label: "Book Now", variant: "primary" },
+      { label: "Check Availability", variant: "outline" },
+    ],
+    likes: 42,
+    comments: 42,
+  },
+  {
+    id: "5",
+    variant: "project",
+    authorName: "Ama Boatengmaa",
+    roleLine: "Architect - Studio Meridian |",
+    postedAt: "27m ago",
+    avatar: "/images/avatar-generic.png",
+    verified: true,
+    text: CONSULT_TEXT,
+    image: "/images/post-building-01.jpg",
+    actions: [
+      { label: "Request Consultation", variant: "primary" },
+      { label: "Message", variant: "outline" },
+    ],
+    messageHostLabel: "Message Host",
+    likes: 42,
+    comments: 42,
+    showComposer: true,
+  },
+  {
+    id: "6",
+    variant: "artisan",
+    authorName: "Yaw Osei",
+    roleLine: "Electrician - Serves Accra |",
+    postedAt: "27m ago",
+    avatar: "/images/avatar-generic.png",
+    verified: true,
+    text: CONSULT_TEXT,
+    image: "/images/post-building-01.jpg",
+    actions: [
+      { label: "Request Quote", variant: "primary" },
+      { label: "Bookmark Artisan", variant: "outline" },
+    ],
+    messageHostLabel: "Message Host",
+    likes: 42,
+    comments: 42,
+    showComposer: true,
+  },
 ];
 
 export default function HomeFeedPage() {
@@ -79,7 +168,7 @@ function ComposerCard() {
           SL
         </span>
         <div className="flex w-full items-center justify-between rounded-3xl bg-gray-100 p-2">
-          <p className="text-xs font-medium text-black/35">What&apos;s on your mind?</p>
+          <p className="text-xs font-medium text-black/35">Add your comment</p>
           <button type="button" aria-label="Post" className="relative block size-6 shrink-0">
             <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="24px" />
           </button>
@@ -135,42 +224,20 @@ function RightRail() {
           <p className="text-sm text-gray-500">Grow your visibility and connect with serious buyers.</p>
         </div>
         <div className="relative h-[120px] w-full overflow-hidden rounded-xl">
-          <Image src="/icons/post-image-sample.jpg" alt="" fill className="object-cover" sizes="318px" />
+          <Image src="/images/post-building-01.jpg" alt="" fill className="object-cover" sizes="318px" />
         </div>
         <button
           type="button"
           className="h-10 w-full rounded-lg bg-brand-900 text-sm font-medium text-white hover:bg-brand-900/90"
         >
-          Get Started
+          List Property
         </button>
       </div>
 
-      <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-3">
-        <div className="flex items-center justify-between px-0 py-1">
-          <p className="text-base font-semibold text-night-900">People you may know</p>
-        </div>
-        <ul className="flex flex-col gap-4">
-          {PEOPLE_YOU_MAY_KNOW.map((person) => (
-            <li key={person.name} className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-3">
-                <span className="relative block size-11 shrink-0 overflow-hidden rounded-full">
-                  <Image src={person.avatar} alt={person.name} fill className="object-cover" sizes="44px" />
-                </span>
-                <div className="flex flex-col">
-                  <p className="text-sm font-medium text-night-900">{person.name}</p>
-                  <p className="text-xs text-gray-500">{person.role}</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                className="h-6 shrink-0 rounded-full border border-brand-900 px-3 text-xs font-medium text-brand-900"
-              >
-                Connect
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <WhoToFollowCard />
+      <TrendingPropertiesCard />
+      <UpcomingOpenHousesCard />
+      <TrendingHashtagsCard />
     </div>
   );
 }
