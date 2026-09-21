@@ -41,7 +41,9 @@ export function AppShell({ activeKey, header, children, rightRail }: AppShellPro
               <div className="mx-auto w-full max-w-[762px]">{header}</div>
             </div>
           )}
-          <div className="no-scrollbar flex-1 overflow-y-auto px-[15px] pb-[15px] sm:px-[23px] sm:pb-[23px]">
+          {/* Extra bottom clearance below lg so the floating mobile nav pill
+              never overlaps the last post. */}
+          <div className="no-scrollbar flex-1 overflow-y-auto px-[15px] pb-24 sm:px-[23px] lg:pb-[23px]">
             <div className="mx-auto w-full max-w-[762px]">{children}</div>
           </div>
         </main>

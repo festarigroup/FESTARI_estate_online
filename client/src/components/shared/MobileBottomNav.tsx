@@ -57,7 +57,7 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
   return (
     <nav
       aria-label="Primary navigation"
-      className="no-scrollbar flex h-[61px] w-full shrink-0 items-center justify-between gap-1 overflow-x-auto border-t border-gray-200 bg-white px-2 lg:hidden"
+      className="fixed inset-x-0 bottom-4 z-40 mx-auto flex w-fit max-w-[calc(100%-32px)] items-center gap-1 overflow-x-auto rounded-full bg-gray-50 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] lg:hidden"
     >
       {NAV_ITEMS.map((item) => {
         const hasChildren = !!item.children?.length;
@@ -78,9 +78,12 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
             aria-label={item.label}
             aria-expanded={hasChildren ? isOpen : undefined}
             title={item.label}
-            className="flex min-w-14 flex-1 items-center justify-center rounded-lg py-2.5"
+            className={cn(
+              "flex shrink-0 items-center justify-center rounded-full",
+              isActive ? "bg-white p-[10px] shadow-[0px_4px_2px_rgba(0,0,0,0.25)]" : "p-2",
+            )}
           >
-            <NavIcon icon={item.icon} color={isActive ? "brand" : "night"} size={22} />
+            <NavIcon icon={item.icon} color={isActive ? "brand" : "night"} size={isActive ? 22 : 18} />
           </Link>
         );
       })}
