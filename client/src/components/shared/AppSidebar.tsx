@@ -24,8 +24,8 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        "hidden h-full shrink-0 flex-col gap-[11px] border border-gray-200 bg-white px-[17px] py-4 transition-[width] duration-200 ease-in-out lg:flex",
-        collapsed ? "w-[61px]" : "w-[228px]",
+        "hidden h-full shrink-0 flex-col gap-[11px] border border-gray-200 bg-white py-4 transition-[width,padding] duration-200 ease-in-out lg:flex",
+        collapsed ? "w-[61px] px-2" : "w-[228px] px-[17px]",
       )}
       aria-label="Primary navigation"
     >
@@ -48,8 +48,8 @@ export function AppSidebar({
                   }
                 }}
                 className={cn(
-                  "group relative flex h-[53px] w-full items-center rounded-[11px] px-[15px] py-[11px] text-[13px] font-medium",
-                  !collapsed && "justify-between",
+                  "group relative flex h-[53px] w-full items-center rounded-[11px] py-[11px] text-[13px] font-medium",
+                  collapsed ? "justify-center px-1" : "justify-between px-[15px]",
                   isActive && !isOpen ? "bg-brand-600 text-white" : "text-night-700 hover:bg-gray-50",
                 )}
               >
@@ -119,7 +119,10 @@ export function AppSidebar({
         type="button"
         onClick={onToggleCollapse}
         title={collapsed ? "Expand sidebar" : "Collapse bar"}
-        className="flex w-full items-center gap-[10px] rounded-[11px] px-[15px] py-[11px] text-[13px] text-text-secondary-dark hover:bg-gray-50"
+        className={cn(
+          "flex w-full items-center gap-[10px] rounded-[11px] py-[11px] text-[13px] text-text-secondary-dark hover:bg-gray-50",
+          collapsed ? "justify-center px-1" : "px-[15px]",
+        )}
       >
         <span className="relative block size-[23px] shrink-0">
           <Image src="/icons/collapse-bar.svg" alt="" fill sizes="23px" />
