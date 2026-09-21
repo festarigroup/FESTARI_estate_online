@@ -50,7 +50,7 @@ export function TopNav() {
         <button
           type="button"
           aria-label="Create"
-          className="flex size-[38px] items-center justify-center gap-2 rounded-full bg-brand-600 hover:bg-brand-600/90 sm:h-[38px] sm:w-[93px] sm:rounded-lg sm:px-[15px]"
+          className="flex size-[38px] items-center justify-center gap-2 rounded-full bg-brand-900 hover:bg-brand-900/90 sm:h-[38px] sm:w-[93px] sm:rounded-lg sm:px-[15px]"
         >
           <NavIcon icon="/icons/add-circle-01.svg" color="white" size={19} />
           <span className="hidden text-[13px] text-white sm:inline">Create</span>
