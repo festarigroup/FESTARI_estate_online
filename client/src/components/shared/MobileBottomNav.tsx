@@ -76,7 +76,10 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
     <nav
       ref={navRef}
       aria-label="Primary navigation"
-      className="fixed bottom-4 left-4 z-40 flex w-fit max-w-[calc(100%-32px)] items-center gap-5 overflow-x-auto rounded-full bg-gray-50/40 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-sm lg:hidden"
+      className={cn(
+        "fixed bottom-4 left-4 z-40 flex items-center overflow-x-auto rounded-full bg-gray-50/40 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-sm lg:hidden",
+        expanded ? "right-4 justify-between" : "w-fit gap-5",
+      )}
     >
       <button
         type="button"
