@@ -62,7 +62,7 @@ export function AppSidebar({
                 <span
                   className={cn(
                     "relative flex shrink-0 items-center justify-center transition-transform duration-150",
-                    collapsed ? "size-3" : "size-[23px]",
+                    collapsed ? "size-[13px]" : "size-[23px]",
                     isOpen && "rotate-90",
                   )}
                 >
@@ -71,7 +71,7 @@ export function AppSidebar({
                     alt=""
                     width={collapsed ? 4 : 7}
                     height={collapsed ? 8 : 13}
-                    className={cn("w-auto object-contain", collapsed ? "h-[7px]" : "h-[13px]")}
+                    className={cn("w-auto object-contain", collapsed ? "h-2" : "h-[13px]")}
                   />
                 </span>
                 {collapsed && (
