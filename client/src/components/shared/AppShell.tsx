@@ -14,16 +14,18 @@ export function AppShell({ activeKey, children, rightRail }: AppShellProps) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="flex min-h-screen w-full min-w-[1440px] flex-col bg-gray-50">
+    <div className="flex h-screen w-full flex-col overflow-hidden bg-gray-50">
       <TopNav />
-      <div className="flex flex-1 items-start">
+      <div className="flex flex-1 overflow-hidden">
         <AppSidebar
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsed((value) => !value)}
           activeKey={activeKey}
         />
-        <main className="flex-1 px-6 py-6">{children}</main>
-        {rightRail && <div className="w-[350px] shrink-0 px-6 py-6">{rightRail}</div>}
+        <main className="min-w-0 flex-1 overflow-y-auto px-6 py-6">{children}</main>
+        {rightRail && (
+          <div className="w-[350px] shrink-0 overflow-y-auto px-6 py-6">{rightRail}</div>
+        )}
       </div>
     </div>
   );

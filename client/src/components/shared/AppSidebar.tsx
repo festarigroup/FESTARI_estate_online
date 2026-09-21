@@ -29,7 +29,7 @@ export function AppSidebar({ collapsed, onToggleCollapse, activeKey = "feed" }: 
   return (
     <aside
       className={cn(
-        "flex h-full shrink-0 flex-col gap-3 overflow-hidden border border-gray-200 bg-white px-[18px] py-[17px] transition-[width] duration-200 ease-in-out",
+        "flex h-full shrink-0 flex-col gap-3 border border-gray-200 bg-white px-[18px] py-[17px] transition-[width] duration-200 ease-in-out",
         collapsed ? "w-16" : "w-60",
       )}
       aria-label="Primary navigation"
@@ -41,9 +41,9 @@ export function AppSidebar({ collapsed, onToggleCollapse, activeKey = "feed" }: 
             <a
               key={item.key}
               href={item.href}
-              title={collapsed ? item.label : undefined}
+              aria-label={collapsed ? item.label : undefined}
               className={cn(
-                "flex h-14 w-full items-center rounded-xl px-4 py-3 text-sm font-medium",
+                "group relative flex h-14 w-full items-center rounded-xl px-4 py-3 text-sm font-medium",
                 collapsed ? "justify-center" : "justify-between",
                 isActive ? "bg-brand-600 text-white" : "text-night-700 hover:bg-gray-50",
               )}
@@ -55,13 +55,19 @@ export function AppSidebar({ collapsed, onToggleCollapse, activeKey = "feed" }: 
                 {!collapsed && <span className="whitespace-nowrap">{item.label}</span>}
               </span>
               {!collapsed && (
-                <span className="relative block size-6 shrink-0">
+                <span className="relative flex size-6 shrink-0 items-center justify-center">
                   <Image
                     src={isActive ? "/icons/chevron-right.svg" : "/icons/chevron-right-gray.svg"}
                     alt=""
-                    fill
-                    sizes="24px"
+                    width={7}
+                    height={14}
+                    className="h-3.5 w-auto object-contain"
                   />
+                </span>
+              )}
+              {collapsed && (
+                <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded-lg bg-night-900 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
+                  {item.label}
                 </span>
               )}
             </a>
