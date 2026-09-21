@@ -357,11 +357,16 @@ function PostStatsBar({
 
   return (
     <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-6">
-      <button type="button" className="flex items-center gap-2" onClick={() => setLiked((v) => !v)}>
+      <button
+        type="button"
+        className="flex items-center gap-2"
+        aria-label={`${post.likes + (liked ? 1 : 0)} Likes`}
+        onClick={() => setLiked((v) => !v)}
+      >
         <span className="relative block size-[23px] shrink-0">
           <Image src="/icons/heart-like.svg" alt="" fill sizes="23px" />
         </span>
-        <span className="text-[11px] font-bold text-brand-900">
+        <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">
           {post.likes + (liked ? 1 : 0)} Likes
         </span>
       </button>
@@ -369,24 +374,30 @@ function PostStatsBar({
         type="button"
         className="flex items-center gap-2"
         aria-expanded={showComments}
+        aria-label={`${post.comments} Comments`}
         onClick={onToggleComments}
       >
         <span className="relative block size-[23px] shrink-0">
           <Image src="/icons/message-03.svg" alt="" fill sizes="23px" />
         </span>
-        <span className="text-[11px] font-bold text-brand-900">{post.comments} Comments</span>
+        <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">{post.comments} Comments</span>
       </button>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2" aria-label={post.shareLabel ?? "Share"}>
         <span className="relative block size-[23px] shrink-0">
           <Image src="/icons/share-05.svg" alt="" fill sizes="23px" />
         </span>
-        <span className="text-[11px] font-bold text-brand-900">{post.shareLabel ?? "Share"}</span>
+        <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">{post.shareLabel ?? "Share"}</span>
       </div>
-      <button type="button" className="flex items-center gap-2" onClick={() => setSaved((v) => !v)}>
+      <button
+        type="button"
+        className="flex items-center gap-2"
+        aria-label={saved ? "Saved" : "Save"}
+        onClick={() => setSaved((v) => !v)}
+      >
         <span className="relative block size-[23px] shrink-0">
           <Image src="/icons/archive-save.svg" alt="" fill sizes="23px" />
         </span>
-        <span className="text-[11px] font-bold text-brand-900">{saved ? "Saved" : "Save"}</span>
+        <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">{saved ? "Saved" : "Save"}</span>
       </button>
     </div>
   );

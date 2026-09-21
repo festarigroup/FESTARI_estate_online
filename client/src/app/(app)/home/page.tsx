@@ -224,17 +224,18 @@ function ComposerCard() {
 
       <div className="h-px w-full bg-gray-200" />
 
-      <div className="flex w-full flex-wrap items-center gap-[17px]">
+      <div className="flex w-full flex-wrap items-center gap-3 sm:gap-[17px]">
         {COMPOSER_ACTIONS.map((action) => (
           <button
             key={action.key}
             type="button"
+            aria-label={action.label}
             className="flex items-center gap-2 text-[11px] font-bold text-gray-500 hover:text-brand-900"
           >
-            <span className="relative block size-[13px] shrink-0">
-              <Image src={action.icon} alt="" fill sizes="13px" />
+            <span className="relative block size-4 shrink-0 sm:size-[13px]">
+              <Image src={action.icon} alt="" fill sizes="16px" />
             </span>
-            {action.label}
+            <span className="hidden sm:inline">{action.label}</span>
           </button>
         ))}
       </div>
