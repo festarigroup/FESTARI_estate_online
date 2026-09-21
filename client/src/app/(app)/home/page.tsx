@@ -231,7 +231,7 @@ function ComposerCard() {
 
       <div className="h-px w-full bg-gray-200" />
 
-      <div className="flex w-full flex-wrap items-center gap-3 sm:gap-[17px]">
+      <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:gap-[17px]">
         {COMPOSER_ACTIONS.map((action) => (
           <button
             key={action.key}
