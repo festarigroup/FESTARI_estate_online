@@ -75,8 +75,10 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
       ref={navRef}
       aria-label="Primary navigation"
       className={cn(
-        "fixed bottom-4 left-1/2 z-40 flex -translate-x-1/2 items-center overflow-x-auto rounded-full bg-gray-50 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] lg:hidden",
-        expanded ? "w-[calc(100%-120px)] justify-between" : "w-fit gap-5",
+        "fixed bottom-4 z-40 flex items-center overflow-x-auto rounded-full bg-gray-50 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] lg:hidden",
+        expanded
+          ? "left-1/2 w-[calc(100%-120px)] -translate-x-1/2 justify-between"
+          : "left-[30px] w-fit gap-5",
       )}
     >
       <button
@@ -87,12 +89,9 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
           setExpanded((v) => !v);
           setOpenKey(null);
         }}
-        className={cn(
-          "flex shrink-0 items-center justify-center rounded-full p-[10px] shadow-[0px_4px_2px_rgba(0,0,0,0.25)]",
-          expanded ? "bg-white" : "bg-[#5d9afb]",
-        )}
+        className="flex shrink-0 items-center justify-center rounded-full bg-[#5d9afb] p-[10px] shadow-[0px_4px_2px_rgba(0,0,0,0.25)]"
       >
-        <NavIcon icon={activeItem.icon} color={expanded ? "night" : "white"} size={22} />
+        <NavIcon icon={activeItem.icon} color="white" size={22} />
       </button>
 
       {expanded &&
