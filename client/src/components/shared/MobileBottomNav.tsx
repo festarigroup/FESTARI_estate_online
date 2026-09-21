@@ -24,15 +24,16 @@ export function MobileBottomNav({ activeKey = "feed" }: MobileBottomNavProps) {
             onClick={(event) => {
               if (item.href === "#") event.preventDefault();
             }}
+            aria-label={item.label}
+            title={item.label}
             className={cn(
-              "flex min-w-14 flex-1 flex-col items-center justify-center gap-1 rounded-lg py-1.5 text-[9.5px] font-medium",
+              "flex min-w-14 flex-1 items-center justify-center rounded-lg py-2.5",
               isActive ? "text-brand-600" : "text-night-700",
             )}
           >
-            <span className="relative block size-[19px] shrink-0">
-              <Image src={item.icon} alt="" fill sizes="19px" />
+            <span className="relative block size-[22px] shrink-0">
+              <Image src={item.icon} alt="" fill sizes="22px" />
             </span>
-            <span className="whitespace-nowrap">{item.label}</span>
           </Link>
         );
       })}
