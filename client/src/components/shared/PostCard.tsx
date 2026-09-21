@@ -337,18 +337,18 @@ function ActionsRow({ post }: { post: PostCardData }) {
     <div className="flex w-full flex-wrap items-center justify-between gap-2">
       <div className="flex flex-wrap items-center gap-2 sm:gap-4">
         {primary && (
-          <Button variant="primary" className="h-[38px] w-auto px-[15px] text-[13px]">
+          <Button variant="primary" className="h-auto w-auto rounded-xl px-3 py-1.5 text-[10px]">
             {primary.label}
           </Button>
         )}
         {secondary && (
-          <Button variant={secondary.variant} className="h-[38px] w-auto px-[15px] text-[13px]">
+          <Button variant={secondary.variant} className="h-auto w-auto rounded-xl px-3 py-1.5 text-[10px]">
             {secondary.label}
           </Button>
         )}
       </div>
       {post.messageHostLabel && (
-        <Button variant="outline-brand" className="h-[38px] w-auto px-[15px] text-[13px]">
+        <Button variant="outline-brand" className="h-auto w-auto rounded-xl px-3 py-1.5 text-[10px]">
           {post.messageHostLabel}
         </Button>
       )}
