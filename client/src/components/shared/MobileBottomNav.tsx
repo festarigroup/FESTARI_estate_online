@@ -88,7 +88,7 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
         }}
         className="flex shrink-0 items-center justify-center rounded-full bg-white p-[10px] shadow-[0px_4px_2px_rgba(0,0,0,0.25)]"
       >
-        <NavIcon icon={activeItem.icon} color="brand" size={22} />
+        <NavIcon icon={activeItem.icon} color="night" size={22} />
       </button>
 
       {expanded &&
