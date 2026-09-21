@@ -2,22 +2,7 @@
 
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-
-interface NavItem {
-  key: string;
-  label: string;
-  icon: string;
-  href: string;
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { key: "feed", label: "Feed", icon: "/icons/grid-view.svg", href: "/home" },
-  { key: "people", label: "People", icon: "/icons/user-star-01.svg", href: "#" },
-  { key: "services", label: "Services", icon: "/icons/timer-clock-watch.svg", href: "#" },
-  { key: "community", label: "Community", icon: "/icons/user-group.svg", href: "#" },
-  { key: "stay", label: "Stay and Events", icon: "/icons/guest-house.svg", href: "#" },
-  { key: "you", label: "You", icon: "/icons/archive-add.svg", href: "#" },
-];
+import { NAV_ITEMS } from "@/components/shared/nav-items";
 
 interface AppSidebarProps {
   collapsed: boolean;
@@ -29,7 +14,7 @@ export function AppSidebar({ collapsed, onToggleCollapse, activeKey = "feed" }: 
   return (
     <aside
       className={cn(
-        "flex h-full shrink-0 flex-col gap-3 border border-gray-200 bg-white px-[18px] py-[17px] transition-[width] duration-200 ease-in-out",
+        "hidden h-full shrink-0 flex-col gap-3 border border-gray-200 bg-white px-[18px] py-[17px] transition-[width] duration-200 ease-in-out lg:flex",
         collapsed ? "w-16" : "w-60",
       )}
       aria-label="Primary navigation"

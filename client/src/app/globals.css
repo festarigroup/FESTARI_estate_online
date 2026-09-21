@@ -15,6 +15,10 @@
   --font-sans: var(--font-plus-jakarta-sans);
   --font-display: var(--font-poppins);
 
+  /* Matches the Figma desktop frame width (1440px) where the full
+     3-column feed layout (sidebar + content + right rail) fits. */
+  --breakpoint-3xl: 1440px;
+
   --color-brand-900: #1465e6;
   --color-brand-300: #86b3fb;
   --color-brand-gradient-from: #091e3a;

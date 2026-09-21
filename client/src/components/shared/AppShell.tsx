@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { AppSidebar } from "@/components/shared/AppSidebar";
+import { MobileBottomNav } from "@/components/shared/MobileBottomNav";
 import { TopNav } from "@/components/shared/TopNav";
 
 interface AppShellProps {
@@ -22,11 +23,16 @@ export function AppShell({ activeKey, children, rightRail }: AppShellProps) {
           onToggleCollapse={() => setCollapsed((value) => !value)}
           activeKey={activeKey}
         />
-        <main className="no-scrollbar min-w-0 flex-1 overflow-y-auto px-6 py-6">{children}</main>
+        <main className="no-scrollbar min-w-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
+          {children}
+        </main>
         {rightRail && (
-          <div className="no-scrollbar w-[350px] shrink-0 overflow-y-auto px-6 py-6">{rightRail}</div>
+          <div className="no-scrollbar hidden w-[350px] shrink-0 overflow-y-auto px-6 py-6 3xl:block">
+            {rightRail}
+          </div>
         )}
       </div>
+      <MobileBottomNav activeKey={activeKey} />
     </div>
   );
 }

@@ -294,8 +294,8 @@ function PriceRow({ post }: { post: PostCardData }) {
 function ActionsRow({ post }: { post: PostCardData }) {
   const [primary, secondary] = post.actions ?? [];
   return (
-    <div className="flex w-full items-center justify-between">
-      <div className="flex items-center gap-4">
+    <div className="flex w-full flex-wrap items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-4">
         {primary && (
           <Button variant="primary" className="h-10 w-auto px-4">
             {primary.label}
@@ -321,7 +321,7 @@ function PostStatsBar({ post }: { post: PostCardData }) {
   const [saved, setSaved] = useState(false);
 
   return (
-    <div className="flex w-full items-center gap-6">
+    <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-6">
       <button type="button" className="flex items-center gap-2" onClick={() => setLiked((v) => !v)}>
         <span className="relative block size-6 shrink-0">
           <Image src="/icons/heart-like.svg" alt="" fill sizes="24px" />

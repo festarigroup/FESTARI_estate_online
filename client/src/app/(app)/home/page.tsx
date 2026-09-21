@@ -149,7 +149,7 @@ const POSTS: PostCardData[] = [
 export default function HomeFeedPage() {
   return (
     <AppShell activeKey="feed" rightRail={<RightRail />}>
-      <div className="mx-auto flex w-[802px] max-w-full flex-col gap-4">
+      <div className="mx-auto flex w-full max-w-[802px] flex-col gap-4">
         <ComposerCard />
         <FeedTabs />
         {POSTS.map((post) => (
@@ -197,15 +197,15 @@ function ComposerCard() {
 
 function FeedTabs() {
   return (
-    <div className="flex h-11 w-full items-center rounded-2xl border border-[#e6e7ec] bg-white pl-4 pr-2.5">
+    <div className="no-scrollbar flex h-11 w-full items-center overflow-x-auto rounded-2xl border border-[#e6e7ec] bg-white pl-4 pr-2.5">
       {FEED_TABS.map((tab, index) => (
         <button
           key={tab}
           type="button"
           className={
             index === 0
-              ? "flex h-full items-center justify-center border-b-2 border-brand-600 p-4 text-[13px] font-medium text-brand-600"
-              : "flex h-full items-center justify-center border-b border-[#e6e7ec] p-4 text-[13px] text-[#111826]"
+              ? "flex h-full shrink-0 items-center justify-center whitespace-nowrap border-b-2 border-brand-600 p-4 text-[13px] font-medium text-brand-600"
+              : "flex h-full shrink-0 items-center justify-center whitespace-nowrap border-b border-[#e6e7ec] p-4 text-[13px] text-[#111826]"
           }
         >
           {tab}
