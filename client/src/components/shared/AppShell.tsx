@@ -27,7 +27,7 @@ export function AppShell({ activeKey, children, rightRail }: AppShellProps) {
           {children}
         </main>
         {rightRail && (
-          <div className="no-scrollbar hidden w-[350px] shrink-0 overflow-y-auto px-6 py-6 3xl:block">
+          <div className="no-scrollbar hidden w-[350px] shrink-0 overflow-y-auto px-6 py-6 xl:block">
             {rightRail}
           </div>
         )}
