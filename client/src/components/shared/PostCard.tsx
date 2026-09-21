@@ -93,18 +93,24 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
         <PollBody post={post} />
       ) : (
         <>
-          {post.text && (
-            <div className="flex w-full items-center gap-0.5 text-sm leading-5">
-              <p className="min-w-0 flex-1 truncate text-[#1e293b]">{post.text}</p>
-              {post.truncated !== false && (
-                <button type="button" className="shrink-0 font-bold text-gray-400">
-                  more
-                </button>
+          {(post.text || post.image) && (
+            // Mobile shows the image first with the caption below it;
+            // desktop keeps the caption above the image.
+            <div className="flex w-full flex-col-reverse gap-[15px] sm:flex-col">
+              {post.text && (
+                <div className="flex w-full items-center gap-0.5 text-sm leading-5">
+                  <p className="min-w-0 flex-1 truncate text-[#1e293b]">{post.text}</p>
+                  {post.truncated !== false && (
+                    <button type="button" className="shrink-0 font-bold text-gray-400">
+                      more
+                    </button>
+                  )}
+                </div>
               )}
+
+              {post.image && <ImageCarousel image={post.image} />}
             </div>
           )}
-
-          {post.image && <ImageCarousel image={post.image} />}
 
           {(post.priceLine || post.actions) && <div className="h-px w-full bg-gray-200" />}
 
@@ -173,13 +179,17 @@ function PostHeader({ post }: { post: PostCardData }) {
         {post.variant !== "poll" && (
           <button
             type="button"
-            className="flex h-[38px] w-[81px] items-center justify-center rounded-lg border border-brand-900 px-[15px] py-2 text-[13px] text-brand-900"
+            aria-label="Follow"
+            className="flex h-[38px] w-[38px] items-center justify-center rounded-lg border border-brand-900 sm:w-[81px] sm:px-[15px] sm:py-2"
           >
-            Follow
+            <span className="relative block size-5 shrink-0 sm:hidden">
+              <Image src="/icons/user-add-01.svg" alt="" fill sizes="20px" />
+            </span>
+            <span className="hidden text-[13px] text-brand-900 sm:inline">Follow</span>
           </button>
         )}
         <span className="relative block size-[23px] shrink-0">
-          <Image src="/icons/menu-03.svg" alt="Post options" fill sizes="23px" />
+          <Image src="/icons/more-horizontal.svg" alt="Post options" fill sizes="23px" />
         </span>
       </div>
     </div>
@@ -355,50 +365,80 @@ function PostStatsBar({
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  const likeCount = post.likes + (liked ? 1 : 0);
+
   return (
-    <div className="flex w-full flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-6">
-      <button
-        type="button"
-        className="flex items-center gap-2"
-        aria-label={`${post.likes + (liked ? 1 : 0)} Likes`}
-        onClick={() => setLiked((v) => !v)}
-      >
-        <span className="relative block size-[23px] shrink-0">
-          <Image src="/icons/heart-like.svg" alt="" fill sizes="23px" />
-        </span>
-        <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">
-          {post.likes + (liked ? 1 : 0)} Likes
-        </span>
-      </button>
-      <button
-        type="button"
-        className="flex items-center gap-2"
-        aria-expanded={showComments}
-        aria-label={`${post.comments} Comments`}
-        onClick={onToggleComments}
-      >
-        <span className="relative block size-[23px] shrink-0">
-          <Image src="/icons/message-03.svg" alt="" fill sizes="23px" />
-        </span>
-        <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">{post.comments} Comments</span>
-      </button>
-      <div className="flex items-center gap-2" aria-label={post.shareLabel ?? "Share"}>
-        <span className="relative block size-[23px] shrink-0">
-          <Image src="/icons/share-05.svg" alt="" fill sizes="23px" />
-        </span>
-        <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">{post.shareLabel ?? "Share"}</span>
+    <div className="flex w-full flex-col gap-2">
+      <div className="flex w-full items-center justify-between sm:justify-start sm:gap-6">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-6">
+          <button
+            type="button"
+            className="flex items-center gap-2"
+            aria-label={`${likeCount} Likes`}
+            onClick={() => setLiked((v) => !v)}
+          >
+            <span className="relative block size-[23px] shrink-0">
+              <Image src="/icons/heart-like.svg" alt="" fill sizes="23px" />
+            </span>
+            <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">{likeCount} Likes</span>
+          </button>
+          <button
+            type="button"
+            className="flex items-center gap-2"
+            aria-expanded={showComments}
+            aria-label={`${post.comments} Comments`}
+            onClick={onToggleComments}
+          >
+            <span className="relative block size-[23px] shrink-0">
+              <Image src="/icons/message-03.svg" alt="" fill sizes="23px" />
+            </span>
+            <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">{post.comments} Comments</span>
+          </button>
+          <div className="flex items-center gap-2" aria-label={post.shareLabel ?? "Share"}>
+            <span className="relative block size-[23px] shrink-0">
+              <Image src="/icons/share-05.svg" alt="" fill sizes="23px" />
+            </span>
+            <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">
+              {post.shareLabel ?? "Share"}
+            </span>
+          </div>
+        </div>
+        <button
+          type="button"
+          className="flex items-center gap-2"
+          aria-label={saved ? "Saved" : "Save"}
+          onClick={() => setSaved((v) => !v)}
+        >
+          <span className="relative block size-[23px] shrink-0">
+            <Image src="/icons/archive-save.svg" alt="" fill sizes="23px" />
+          </span>
+          <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">{saved ? "Saved" : "Save"}</span>
+        </button>
       </div>
-      <button
-        type="button"
-        className="flex items-center gap-2"
-        aria-label={saved ? "Saved" : "Save"}
-        onClick={() => setSaved((v) => !v)}
-      >
-        <span className="relative block size-[23px] shrink-0">
-          <Image src="/icons/archive-save.svg" alt="" fill sizes="23px" />
-        </span>
-        <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">{saved ? "Saved" : "Save"}</span>
-      </button>
+
+      {likeCount > 0 && (
+        <div className="flex items-center gap-2 sm:hidden">
+          <span className="flex items-center -space-x-1.5">
+            {[0, 1, 2].map((avatar) => (
+              <span
+                key={avatar}
+                className="relative block size-[18px] shrink-0 overflow-hidden rounded-full bg-[#eef2ff] ring-2 ring-white"
+              >
+                <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="18px" className="p-0.5" />
+              </span>
+            ))}
+          </span>
+          <p className="text-[11px] text-gray-600">
+            Liked by <span className="font-bold text-brand-900">people you follow</span>
+            {likeCount > 3 && (
+              <>
+                {" "}
+                and <span className="font-bold text-brand-900">{likeCount - 3} others</span>
+              </>
+            )}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
