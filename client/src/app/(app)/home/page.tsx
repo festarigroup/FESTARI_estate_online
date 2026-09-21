@@ -195,13 +195,13 @@ export default function HomeFeedPage() {
       activeKey="feed"
       rightRail={<RightRail />}
       header={
-        <div className="flex flex-col gap-[15px] pb-[15px]">
-          <ComposerCard />
+        <div className="pb-[15px]">
           <FeedTabs activeTab={activeTab} onSelect={setActiveTab} />
         </div>
       }
     >
       <div className="flex w-full flex-col gap-[15px]">
+        <ComposerCard />
         {filteredPosts.length > 0 ? (
           filteredPosts.map((post) => <PostCard key={post.id} post={post} />)
         ) : (
