@@ -8,11 +8,14 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface AppShellProps {
   activeKey?: string;
+  /** Rendered above the scrollable body, outside the scroll container —
+   * genuinely fixed in place rather than relying on `position: sticky`. */
+  header?: ReactNode;
   children: ReactNode;
   rightRail?: ReactNode;
 }
 
-export function AppShell({ activeKey, children, rightRail }: AppShellProps) {
+export function AppShell({ activeKey, header, children, rightRail }: AppShellProps) {
   // Below xl (1280px) the sidebar defaults to icon-only so the feed column
   // keeps enough room; it expands automatically once there's space again,
   // unless the user has manually toggled it (that choice then sticks).
@@ -29,14 +32,18 @@ export function AppShell({ activeKey, children, rightRail }: AppShellProps) {
           onToggleCollapse={() => setCollapsedOverride(!collapsed)}
           activeKey={activeKey}
         />
-        {/* No top padding here: a sticky child's `top: 0` sticks relative to
-            this element's padding edge, which left a gap for scrolled
-            content to flash through above it. Top spacing instead lives on
-            the non-scrolling wrapper inside `children`, so it scrolls away
-            normally and the sticky child ends up flush with this element's
-            actual top edge. */}
-        <main className="no-scrollbar min-w-0 flex-1 overflow-y-auto px-[15px] pb-[15px] sm:px-[23px] sm:pb-[23px]">
-          {children}
+        {/* `header` lives outside the scroll container entirely (a real,
+            non-scrolling region) rather than being pinned there with
+            `position: sticky`, so it can't ever scroll away or flicker. */}
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
+          {header && (
+            <div className="shrink-0 px-[15px] pt-[15px] sm:px-[23px] sm:pt-[23px]">
+              <div className="mx-auto w-full max-w-[762px]">{header}</div>
+            </div>
+          )}
+          <div className="no-scrollbar flex-1 overflow-y-auto px-[15px] pb-[15px] sm:px-[23px] sm:pb-[23px]">
+            <div className="mx-auto w-full max-w-[762px]">{children}</div>
+          </div>
         </main>
         {rightRail && (
           <div className="no-scrollbar hidden w-[333px] shrink-0 overflow-y-auto px-[23px] py-[23px] xl:block">

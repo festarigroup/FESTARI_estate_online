@@ -191,12 +191,17 @@ export default function HomeFeedPage() {
   );
 
   return (
-    <AppShell activeKey="feed" rightRail={<RightRail />}>
-      <div className="mx-auto flex w-full max-w-[762px] flex-col gap-[15px] pt-[15px] sm:pt-[23px]">
-        <div className="sticky top-0 z-10 flex flex-col gap-[15px] bg-gray-50">
+    <AppShell
+      activeKey="feed"
+      rightRail={<RightRail />}
+      header={
+        <div className="flex flex-col gap-[15px] pb-[15px]">
           <ComposerCard />
           <FeedTabs activeTab={activeTab} onSelect={setActiveTab} />
         </div>
+      }
+    >
+      <div className="flex w-full flex-col gap-[15px]">
         {filteredPosts.length > 0 ? (
           filteredPosts.map((post) => <PostCard key={post.id} post={post} />)
         ) : (
