@@ -27,10 +27,7 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
   const showFlyout = !!openItem?.children?.length;
 
   useEffect(() => {
-    if (!showFlyout) {
-      setFlyoutPos(null);
-      return;
-    }
+    if (!showFlyout) return;
     const updatePosition = () => {
       const rect = triggerRef.current?.getBoundingClientRect();
       if (!rect) return;
@@ -45,6 +42,7 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
     return () => {
       window.removeEventListener("resize", updatePosition);
       window.removeEventListener("scroll", updatePosition, true);
+      setFlyoutPos(null);
     };
   }, [showFlyout, openKey]);
 
@@ -77,10 +75,8 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
       ref={navRef}
       aria-label="Primary navigation"
       className={cn(
-        // Insets match where the post image sits (main's px-[15px] plus the
-        // post card's own p-[15px]), not the raw screen edge or card edge.
-        "fixed bottom-4 left-[30px] z-40 flex items-center overflow-x-auto rounded-full bg-gray-50/40 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-sm lg:hidden",
-        expanded ? "right-[30px] justify-between" : "w-fit gap-5",
+        "fixed bottom-4 left-1/2 z-40 flex -translate-x-1/2 items-center overflow-x-auto rounded-full bg-gray-50 p-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.15)] lg:hidden",
+        expanded ? "w-[calc(100%-120px)] justify-between" : "w-fit gap-5",
       )}
     >
       <button

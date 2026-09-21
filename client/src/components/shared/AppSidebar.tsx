@@ -33,10 +33,7 @@ export function AppSidebar({
   // the flyout is portalled to <body> and positioned from the trigger's rect
   // instead of relying on CSS `absolute` (which those ancestors would clip).
   useEffect(() => {
-    if (!showFlyout) {
-      setFlyoutPos(null);
-      return;
-    }
+    if (!showFlyout) return;
     const updatePosition = () => {
       const rect = triggerRef.current?.getBoundingClientRect();
       if (rect) setFlyoutPos({ top: rect.top, left: rect.right + 8 });
@@ -47,6 +44,7 @@ export function AppSidebar({
     return () => {
       window.removeEventListener("resize", updatePosition);
       window.removeEventListener("scroll", updatePosition, true);
+      setFlyoutPos(null);
     };
   }, [showFlyout, openKey]);
 
