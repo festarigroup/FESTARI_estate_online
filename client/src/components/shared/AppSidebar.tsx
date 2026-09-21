@@ -25,7 +25,7 @@ export function AppSidebar({
     <aside
       className={cn(
         "hidden h-full shrink-0 flex-col gap-[11px] border border-gray-200 bg-white py-4 transition-[width,padding] duration-200 ease-in-out lg:flex",
-        collapsed ? "w-[61px] px-2" : "w-[228px] px-[17px]",
+        collapsed ? "w-[68px] px-3" : "w-[228px] px-[17px]",
       )}
       aria-label="Primary navigation"
     >
@@ -49,7 +49,7 @@ export function AppSidebar({
                 }}
                 className={cn(
                   "group relative flex h-[53px] w-full items-center rounded-[11px] py-[11px] text-[13px] font-medium",
-                  collapsed ? "justify-center px-1" : "justify-between px-[15px]",
+                  collapsed ? "justify-center px-2" : "justify-between px-[15px]",
                   isActive && !isOpen ? "bg-brand-600 text-white" : "text-night-700 hover:bg-gray-50",
                 )}
               >
@@ -59,21 +59,22 @@ export function AppSidebar({
                   </span>
                   {!collapsed && <span className="whitespace-nowrap">{item.label}</span>}
                 </span>
-                <span
-                  className={cn(
-                    "relative flex shrink-0 items-center justify-center transition-transform duration-150",
-                    collapsed ? "size-[13px]" : "size-[23px]",
-                    isOpen && "rotate-90",
-                  )}
-                >
-                  <Image
-                    src={isActive && !isOpen ? "/icons/chevron-right.svg" : "/icons/chevron-right-gray.svg"}
-                    alt=""
-                    width={collapsed ? 4 : 7}
-                    height={collapsed ? 8 : 13}
-                    className={cn("w-auto object-contain", collapsed ? "h-2" : "h-[13px]")}
-                  />
-                </span>
+                {!collapsed && (
+                  <span
+                    className={cn(
+                      "relative flex size-[23px] shrink-0 items-center justify-center transition-transform duration-150",
+                      isOpen && "rotate-90",
+                    )}
+                  >
+                    <Image
+                      src={isActive && !isOpen ? "/icons/chevron-right.svg" : "/icons/chevron-right-gray.svg"}
+                      alt=""
+                      width={7}
+                      height={13}
+                      className="h-[13px] w-auto object-contain"
+                    />
+                  </span>
+                )}
                 {collapsed && (
                   <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded-lg bg-night-900 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
                     {item.label}
