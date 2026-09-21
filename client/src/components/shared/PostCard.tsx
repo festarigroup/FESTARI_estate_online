@@ -84,7 +84,7 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
   const [showComments, setShowComments] = useState(false);
 
   return (
-    <article className="flex w-full flex-col gap-[15px] rounded-[15px] border border-gray-200 bg-white p-[15px]">
+    <article className="flex w-full flex-col gap-[15px] rounded-[29px] border border-gray-200 bg-white p-[15px] sm:rounded-[15px]">
       <PostHeader post={post} />
 
       <div className="h-px w-full bg-gray-200" />
@@ -201,7 +201,7 @@ function PostHeader({ post }: { post: PostCardData }) {
 
 function ImageCarousel({ image }: { image: string }) {
   return (
-    <div className="relative h-[285px] w-full overflow-hidden rounded-[15px]">
+    <div className="relative h-[285px] w-full overflow-hidden rounded-[29px] sm:rounded-[15px]">
       <Image src={image} alt="" fill className="object-cover" sizes="770px" />
 
       <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-between px-4">
