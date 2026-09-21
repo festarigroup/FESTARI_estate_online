@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { NAV_ITEMS } from "@/components/shared/nav-items";
+import { NAV_ITEMS, type NavChildItem } from "@/components/shared/nav-items";
 
 interface AppSidebarProps {
   collapsed: boolean;
@@ -25,31 +25,31 @@ export function AppSidebar({
     <aside
       className={cn(
         "hidden h-full shrink-0 flex-col gap-[11px] border border-gray-200 bg-white py-4 transition-[width,padding] duration-200 ease-in-out lg:flex",
-        collapsed ? "w-[68px] px-3" : "w-[228px] px-[17px]",
+        collapsed ? "w-20 px-3" : "w-[228px] px-[17px]",
       )}
       aria-label="Primary navigation"
     >
       <nav className="no-scrollbar flex flex-1 flex-col items-start gap-0 overflow-y-auto">
         {NAV_ITEMS.map((item) => {
           const hasChildren = !!item.children?.length;
-          const isOpen = !collapsed && hasChildren && openKey === item.key;
+          const isOpen = hasChildren && openKey === item.key;
           const isActive = item.key === activeKey;
 
           return (
-            <div key={item.key} className="w-full">
+            <div key={item.key} className="relative w-full">
               <Link
                 href={item.href}
-                aria-expanded={hasChildren && !collapsed ? isOpen : undefined}
+                aria-expanded={hasChildren ? isOpen : undefined}
                 aria-label={collapsed ? item.label : undefined}
                 onClick={(event) => {
                   if (item.href === "#") event.preventDefault();
-                  if (!collapsed && hasChildren) {
+                  if (hasChildren) {
                     setOpenKey((current) => (current === item.key ? null : item.key));
                   }
                 }}
                 className={cn(
-                  "group relative flex h-[53px] w-full items-center rounded-[11px] py-[11px] text-[13px] font-medium",
-                  collapsed ? "justify-center px-2" : "justify-between px-[15px]",
+                  "group relative flex h-[53px] w-full items-center gap-1 rounded-[11px] py-[11px] text-[13px] font-medium",
+                  collapsed ? "justify-center px-1" : "justify-between px-[15px]",
                   isActive && !isOpen ? "bg-brand-600 text-white" : "text-night-700 hover:bg-gray-50",
                 )}
               >
@@ -59,19 +59,20 @@ export function AppSidebar({
                   </span>
                   {!collapsed && <span className="whitespace-nowrap">{item.label}</span>}
                 </span>
-                {!collapsed && (
+                {hasChildren && (
                   <span
                     className={cn(
-                      "relative flex size-[23px] shrink-0 items-center justify-center transition-transform duration-150",
+                      "relative flex shrink-0 items-center justify-center transition-transform duration-150",
+                      collapsed ? "size-4" : "size-[23px]",
                       isOpen && "rotate-90",
                     )}
                   >
                     <Image
                       src={isActive && !isOpen ? "/icons/chevron-right.svg" : "/icons/chevron-right-gray.svg"}
                       alt=""
-                      width={7}
-                      height={13}
-                      className="h-[13px] w-auto object-contain"
+                      width={collapsed ? 5 : 7}
+                      height={collapsed ? 10 : 13}
+                      className={cn("w-auto object-contain", collapsed ? "h-[10px]" : "h-[13px]")}
                     />
                   </span>
                 )}
@@ -83,33 +84,19 @@ export function AppSidebar({
               </Link>
 
               {isOpen && item.children && (
-                <div className="flex w-full flex-col items-start pb-1">
-                  {item.children.map((child) => {
-                    const isChildActive = child.key === activeChildKey;
-                    return (
-                      <Link
-                        key={child.key}
-                        href={child.href}
-                        onClick={(event) => {
-                          if (child.href === "#") event.preventDefault();
-                        }}
-                        className="flex h-[34px] w-full items-center gap-[15px] rounded-[11px] px-[23px] py-2 text-[13px] hover:bg-gray-50"
-                      >
-                        <span className="relative block size-[15px] shrink-0">
-                          <Image src={child.icon} alt="" fill sizes="15px" />
-                        </span>
-                        <span
-                          className={cn(
-                            "whitespace-nowrap",
-                            isChildActive ? "font-medium text-brand-600" : "text-night-700",
-                          )}
-                        >
-                          {child.label}
-                        </span>
-                      </Link>
-                    );
-                  })}
-                </div>
+                collapsed ? (
+                  <div className="absolute left-full top-0 z-50 ml-2 flex w-44 flex-col gap-1 rounded-[11px] border border-gray-200 bg-white p-2 shadow-lg">
+                    {item.children.map((child) => (
+                      <ChildLink key={child.key} child={child} isActive={child.key === activeChildKey} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex w-full flex-col items-start pb-1">
+                    {item.children.map((child) => (
+                      <ChildLink key={child.key} child={child} isActive={child.key === activeChildKey} />
+                    ))}
+                  </div>
+                )
               )}
             </div>
           );
@@ -131,5 +118,24 @@ export function AppSidebar({
         {!collapsed && <span className="whitespace-nowrap">Collapse bar</span>}
       </button>
     </aside>
+  );
+}
+
+function ChildLink({ child, isActive }: { child: NavChildItem; isActive: boolean }) {
+  return (
+    <Link
+      href={child.href}
+      onClick={(event) => {
+        if (child.href === "#") event.preventDefault();
+      }}
+      className="flex h-[34px] w-full items-center gap-[15px] rounded-[11px] px-[23px] py-2 text-[13px] hover:bg-gray-50"
+    >
+      <span className="relative block size-[15px] shrink-0">
+        <Image src={child.icon} alt="" fill sizes="15px" />
+      </span>
+      <span className={cn("whitespace-nowrap", isActive ? "font-medium text-brand-600" : "text-night-700")}>
+        {child.label}
+      </span>
+    </Link>
   );
 }
