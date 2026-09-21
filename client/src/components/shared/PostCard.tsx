@@ -21,7 +21,7 @@ export interface PollOption {
 
 export interface PostCardData {
   id: string;
-  variant?: "text" | "poll" | "property" | "stay" | "project" | "artisan";
+  variant?: "text" | "poll" | "property" | "stay" | "project" | "professional" | "artisan";
   authorName: string;
   roleLine: string;
   postedAt: string;
@@ -168,19 +168,19 @@ function ImageCarousel({ image }: { image: string }) {
         <button
           type="button"
           aria-label="Previous image"
-          className="flex size-[27px] items-center justify-center rounded-full bg-white shadow-[0px_0px_10px_rgba(69,71,69,0.25)]"
+          className="flex size-[21px] items-center justify-center rounded-full bg-white shadow-[0px_0px_10px_rgba(69,71,69,0.25)]"
         >
-          <span className="relative block h-4 w-[7.5px] rotate-180">
-            <Image src="/icons/carousel-arrow.svg" alt="" fill sizes="8px" />
+          <span className="relative block h-3 w-[5.5px] rotate-180">
+            <Image src="/icons/carousel-arrow.svg" alt="" fill sizes="6px" />
           </span>
         </button>
         <button
           type="button"
           aria-label="Next image"
-          className="flex size-[27px] items-center justify-center rounded-full bg-white shadow-[0px_0px_10px_rgba(69,71,69,0.25)]"
+          className="flex size-[21px] items-center justify-center rounded-full bg-white shadow-[0px_0px_10px_rgba(69,71,69,0.25)]"
         >
-          <span className="relative block h-4 w-[7.5px]">
-            <Image src="/icons/carousel-arrow.svg" alt="" fill sizes="8px" />
+          <span className="relative block h-3 w-[5.5px]">
+            <Image src="/icons/carousel-arrow.svg" alt="" fill sizes="6px" />
           </span>
         </button>
       </div>

@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useMemo, useState } from "react";
 import { AppShell } from "@/components/shared/AppShell";
 import { PostCard, type PostCardData } from "@/components/shared/PostCard";
 import { WhoToFollowCard } from "@/components/shared/WhoToFollowCard";
@@ -6,7 +9,20 @@ import { TrendingPropertiesCard } from "@/components/shared/TrendingPropertiesCa
 import { UpcomingOpenHousesCard } from "@/components/shared/UpcomingOpenHousesCard";
 import { TrendingHashtagsCard } from "@/components/shared/TrendingHashtagsCard";
 
-const FEED_TABS = ["All Posts", "Following", "Nearby", "Properties", "Stay", "Professionals", "Projects"];
+interface FeedTab {
+  label: string;
+  variant?: PostCardData["variant"];
+}
+
+const FEED_TABS: FeedTab[] = [
+  { label: "All Posts" },
+  { label: "Following" },
+  { label: "Nearby" },
+  { label: "Properties", variant: "property" },
+  { label: "Stay", variant: "stay" },
+  { label: "Professionals", variant: "professional" },
+  { label: "Projects", variant: "project" },
+];
 
 const COMPOSER_ACTIONS = [
   { key: "photo", label: "Photo", icon: "/icons/image-01.svg" },
@@ -108,7 +124,7 @@ const POSTS: PostCardData[] = [
   },
   {
     id: "5",
-    variant: "project",
+    variant: "professional",
     authorName: "Ama Boatengmaa",
     roleLine: "Architect - Studio Meridian |",
     postedAt: "27m ago",
@@ -136,8 +152,27 @@ const POSTS: PostCardData[] = [
     text: CONSULT_TEXT,
     image: "/images/post-building-01.jpg",
     actions: [
-      { label: "Request Quote", variant: "primary" },
+      { label: "Book Artisan", variant: "primary" },
       { label: "Bookmark Artisan", variant: "outline" },
+    ],
+    messageHostLabel: "Message Host",
+    likes: 42,
+    comments: 42,
+    showComposer: true,
+  },
+  {
+    id: "7",
+    variant: "project",
+    authorName: "Golden Ridge Developers",
+    roleLine: "New Development |",
+    postedAt: "3hrs ago",
+    avatar: "/images/avatar-kasapa.png",
+    verified: true,
+    text: "Breaking ground on Golden Ridge Estates — 40 serviced plots with road network and utilities already in. Reserve a plot before the next price review.",
+    image: "/images/post-building-01.jpg",
+    actions: [
+      { label: "Make Enquiry", variant: "primary" },
+      { label: "View Project", variant: "outline" },
     ],
     messageHostLabel: "Message Host",
     likes: 42,
@@ -147,14 +182,26 @@ const POSTS: PostCardData[] = [
 ];
 
 export default function HomeFeedPage() {
+  const [activeTab, setActiveTab] = useState(FEED_TABS[0].label);
+
+  const activeVariant = FEED_TABS.find((tab) => tab.label === activeTab)?.variant;
+  const filteredPosts = useMemo(
+    () => (activeTab === "All Posts" ? POSTS : POSTS.filter((post) => post.variant === activeVariant)),
+    [activeTab, activeVariant],
+  );
+
   return (
     <AppShell activeKey="feed" rightRail={<RightRail />}>
       <div className="mx-auto flex w-full max-w-[762px] flex-col gap-[15px]">
         <ComposerCard />
-        <FeedTabs />
-        {POSTS.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
+        <FeedTabs activeTab={activeTab} onSelect={setActiveTab} />
+        {filteredPosts.length > 0 ? (
+          filteredPosts.map((post) => <PostCard key={post.id} post={post} />)
+        ) : (
+          <div className="flex w-full flex-col items-center gap-[15px] rounded-[15px] border border-gray-200 bg-white p-[15px] py-9 text-center">
+            <p className="text-[13px] text-gray-500">No posts here yet — check back soon.</p>
+          </div>
+        )}
       </div>
     </AppShell>
   );
@@ -195,20 +242,21 @@ function ComposerCard() {
   );
 }
 
-function FeedTabs() {
+function FeedTabs({ activeTab, onSelect }: { activeTab: string; onSelect: (label: string) => void }) {
   return (
     <div className="no-scrollbar flex h-[42px] w-full items-center overflow-x-auto rounded-[15px] border border-[#e6e7ec] bg-white pl-[15px] pr-2.5">
-      {FEED_TABS.map((tab, index) => (
+      {FEED_TABS.map((tab) => (
         <button
-          key={tab}
+          key={tab.label}
           type="button"
+          onClick={() => onSelect(tab.label)}
           className={
-            index === 0
+            tab.label === activeTab
               ? "flex h-full shrink-0 items-center justify-center whitespace-nowrap border-b-2 border-brand-600 p-[15px] text-[12px] font-medium text-brand-600"
               : "flex h-full shrink-0 items-center justify-center whitespace-nowrap border-b border-[#e6e7ec] p-[15px] text-[12px] text-[#111826]"
           }
         >
-          {tab}
+          {tab.label}
         </button>
       ))}
     </div>
