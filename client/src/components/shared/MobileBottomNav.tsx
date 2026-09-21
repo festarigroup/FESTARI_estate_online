@@ -87,7 +87,7 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
       aria-label="Primary navigation"
       aria-hidden={!visible}
       className={cn(
-        "fixed bottom-4 left-1/2 z-40 flex w-[calc(100%-32px)] -translate-x-1/2 items-center justify-between rounded-full border border-white/40 bg-white/30 p-5 shadow-[0px_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-md transition-all duration-300 ease-out lg:hidden",
+        "no-scrollbar fixed bottom-4 left-1/2 z-40 flex w-[calc(100%-32px)] -translate-x-1/2 items-center justify-between gap-2 overflow-x-auto rounded-full border border-white/40 bg-white/60 px-4 py-4 shadow-[0px_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-xl backdrop-saturate-150 transition-all duration-300 ease-out lg:hidden",
         visible ? "translate-y-0 opacity-100" : "translate-y-24 opacity-0",
       )}
     >
@@ -112,17 +112,17 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
             }}
             aria-label={item.label}
             aria-expanded={hasChildren ? isOpen : undefined}
-            className="flex shrink-0 flex-col items-center gap-0.5"
+            className="flex shrink-0 flex-col items-center gap-1"
           >
             <NavIcon
               icon={item.icon}
               color={isActive ? "brand" : "night"}
-              size={12}
+              size={22}
               className={isActive ? undefined : "opacity-70"}
             />
             <span
               className={cn(
-                "text-[10px]",
+                "whitespace-nowrap text-sm",
                 isActive ? "font-semibold text-brand-600" : "font-normal text-night-700 opacity-70",
               )}
             >
