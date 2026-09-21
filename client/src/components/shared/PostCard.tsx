@@ -285,7 +285,7 @@ function PollBody({ post }: { post: PostCardData }) {
             ))}
           </div>
           {post.pollFooter && (
-            <p className="text-center text-[11px] font-medium text-gray-600">{post.pollFooter}</p>
+            <p className="text-left text-[11px] font-medium text-gray-600">{post.pollFooter}</p>
           )}
         </div>
       )}

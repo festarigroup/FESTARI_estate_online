@@ -47,7 +47,7 @@ export function MobileBottomNav({ activeKey = "feed" }: MobileBottomNavProps) {
       aria-label="Primary navigation"
       aria-hidden={!visible}
       className={cn(
-        "fixed bottom-4 left-1/2 z-40 flex w-[calc(100%-32px)] -translate-x-1/2 items-center justify-between rounded-full border border-gray-200 bg-[rgba(89,87,87,0.9)] px-5 py-3 shadow-[0px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300 ease-out lg:hidden",
+        "fixed bottom-4 left-1/2 z-40 flex w-[calc(100%-32px)] -translate-x-1/2 items-center justify-between rounded-full border border-gray-200 bg-white px-5 py-3 shadow-[0px_4px_10px_rgba(0,0,0,0.15)] transition-all duration-300 ease-out lg:hidden",
         visible ? "translate-y-0 opacity-100" : "translate-y-24 opacity-0",
       )}
     >
@@ -63,8 +63,18 @@ export function MobileBottomNav({ activeKey = "feed" }: MobileBottomNavProps) {
             aria-label={item.label}
             className="flex shrink-0 flex-col items-center gap-0.5"
           >
-            <NavIcon icon={item.icon} color="white" size={12} className={isActive ? "opacity-100" : "opacity-80"} />
-            <span className={cn("text-[10px] text-white", isActive ? "font-semibold" : "font-normal opacity-80")}>
+            <NavIcon
+              icon={item.icon}
+              color={isActive ? "brand" : "night"}
+              size={12}
+              className={isActive ? undefined : "opacity-70"}
+            />
+            <span
+              className={cn(
+                "text-[10px]",
+                isActive ? "font-semibold text-brand-600" : "font-normal text-night-700 opacity-70",
+              )}
+            >
               {SHORT_LABEL[item.key] ?? item.label}
             </span>
           </Link>
