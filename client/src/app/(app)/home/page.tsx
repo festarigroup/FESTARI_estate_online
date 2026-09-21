@@ -149,7 +149,7 @@ const POSTS: PostCardData[] = [
 export default function HomeFeedPage() {
   return (
     <AppShell activeKey="feed" rightRail={<RightRail />}>
-      <div className="mx-auto flex w-full max-w-[802px] flex-col gap-4">
+      <div className="mx-auto flex w-full max-w-[762px] flex-col gap-[15px]">
         <ComposerCard />
         <FeedTabs />
         {POSTS.map((post) => (
@@ -162,30 +162,30 @@ export default function HomeFeedPage() {
 
 function ComposerCard() {
   return (
-    <div className="flex w-full flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-4">
+    <div className="flex w-full flex-col gap-[15px] rounded-[15px] border border-gray-200 bg-white p-[15px]">
       <div className="flex w-full items-center justify-center gap-2.5">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-sm font-extrabold text-[#4f46e5]">
+        <span className="flex size-[38px] shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">
           SL
         </span>
         <div className="flex w-full items-center justify-between rounded-3xl bg-gray-100 p-2">
-          <p className="text-xs font-medium text-black/35">Add your comment</p>
-          <button type="button" aria-label="Post" className="relative block size-6 shrink-0">
-            <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="24px" />
+          <p className="text-[11px] font-medium text-black/35">Add your comment</p>
+          <button type="button" aria-label="Post" className="relative block size-[23px] shrink-0">
+            <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="23px" />
           </button>
         </div>
       </div>
 
       <div className="h-px w-full bg-gray-200" />
 
-      <div className="flex w-full flex-wrap items-center gap-[18px]">
+      <div className="flex w-full flex-wrap items-center gap-[17px]">
         {COMPOSER_ACTIONS.map((action) => (
           <button
             key={action.key}
             type="button"
-            className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-brand-900"
+            className="flex items-center gap-2 text-[11px] font-bold text-gray-500 hover:text-brand-900"
           >
-            <span className="relative block size-3.5 shrink-0">
-              <Image src={action.icon} alt="" fill sizes="14px" />
+            <span className="relative block size-[13px] shrink-0">
+              <Image src={action.icon} alt="" fill sizes="13px" />
             </span>
             {action.label}
           </button>
@@ -197,15 +197,15 @@ function ComposerCard() {
 
 function FeedTabs() {
   return (
-    <div className="no-scrollbar flex h-11 w-full items-center overflow-x-auto rounded-2xl border border-[#e6e7ec] bg-white pl-4 pr-2.5">
+    <div className="no-scrollbar flex h-[42px] w-full items-center overflow-x-auto rounded-[15px] border border-[#e6e7ec] bg-white pl-[15px] pr-2.5">
       {FEED_TABS.map((tab, index) => (
         <button
           key={tab}
           type="button"
           className={
             index === 0
-              ? "flex h-full shrink-0 items-center justify-center whitespace-nowrap border-b-2 border-brand-600 p-4 text-[13px] font-medium text-brand-600"
-              : "flex h-full shrink-0 items-center justify-center whitespace-nowrap border-b border-[#e6e7ec] p-4 text-[13px] text-[#111826]"
+              ? "flex h-full shrink-0 items-center justify-center whitespace-nowrap border-b-2 border-brand-600 p-[15px] text-[12px] font-medium text-brand-600"
+              : "flex h-full shrink-0 items-center justify-center whitespace-nowrap border-b border-[#e6e7ec] p-[15px] text-[12px] text-[#111826]"
           }
         >
           {tab}
@@ -217,18 +217,18 @@ function FeedTabs() {
 
 function RightRail() {
   return (
-    <div className="flex w-full flex-col gap-4">
-      <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-4">
+    <div className="flex w-full flex-col gap-[15px]">
+      <div className="flex flex-col gap-[15px] rounded-[15px] border border-gray-200 bg-white p-[15px]">
         <div>
-          <p className="text-lg font-bold text-night-900">List Your Property</p>
-          <p className="text-sm text-gray-500">Grow your visibility and connect with serious buyers.</p>
+          <p className="text-[17px] font-bold text-night-900">List Your Property</p>
+          <p className="text-[13px] text-gray-500">Grow your visibility and connect with serious buyers.</p>
         </div>
-        <div className="relative h-[120px] w-full overflow-hidden rounded-xl">
+        <div className="relative h-[114px] w-full overflow-hidden rounded-xl">
           <Image src="/images/post-building-01.jpg" alt="" fill className="object-cover" sizes="318px" />
         </div>
         <button
           type="button"
-          className="h-10 w-full rounded-lg bg-brand-900 text-sm font-medium text-white hover:bg-brand-900/90"
+          className="h-[38px] w-full rounded-lg bg-brand-900 text-[13px] font-medium text-white hover:bg-brand-900/90"
         >
           List Property
         </button>

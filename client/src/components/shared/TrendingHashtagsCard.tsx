@@ -13,18 +13,18 @@ const HASHTAGS: Hashtag[] = [
 
 export function TrendingHashtagsCard() {
   return (
-    <div className="flex w-full flex-col gap-4 rounded-2xl border border-[#e6d7ef] bg-white p-3">
+    <div className="flex w-full flex-col gap-[15px] rounded-[15px] border border-[#e6d7ef] bg-white p-[11px]">
       <div className="flex items-center justify-between">
-        <p className="text-base font-bold text-gray-700">Trending Hashtags</p>
-        <button type="button" className="text-[13px] font-medium text-brand-600">
+        <p className="text-[15px] font-bold text-gray-700">Trending Hashtags</p>
+        <button type="button" className="text-[12.5px] font-medium text-brand-600">
           View all
         </button>
       </div>
       <ul className="flex flex-col gap-2">
         {HASHTAGS.map((hashtag) => (
           <li key={hashtag.tag} className="flex items-center justify-between gap-2">
-            <p className="text-xs font-bold text-gray-700">{hashtag.tag}</p>
-            <p className="text-[10px] font-bold text-brand-900">{hashtag.posts}</p>
+            <p className="text-[11px] font-bold text-gray-700">{hashtag.tag}</p>
+            <p className="text-[9.5px] font-bold text-brand-900">{hashtag.posts}</p>
           </li>
         ))}
       </ul>

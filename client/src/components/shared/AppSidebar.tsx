@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/components/shared/nav-items";
@@ -23,8 +24,8 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        "hidden h-full shrink-0 flex-col gap-3 border border-gray-200 bg-white px-[18px] py-[17px] transition-[width] duration-200 ease-in-out lg:flex",
-        collapsed ? "w-16" : "w-60",
+        "hidden h-full shrink-0 flex-col gap-[11px] border border-gray-200 bg-white px-[17px] py-4 transition-[width] duration-200 ease-in-out lg:flex",
+        collapsed ? "w-[61px]" : "w-[228px]",
       )}
       aria-label="Primary navigation"
     >
@@ -36,36 +37,32 @@ export function AppSidebar({
 
           return (
             <div key={item.key} className="w-full">
-              <a
+              <Link
                 href={item.href}
                 aria-expanded={hasChildren && !collapsed ? isOpen : undefined}
                 aria-label={collapsed ? item.label : undefined}
                 onClick={(event) => {
                   if (item.href === "#") event.preventDefault();
-                  if (collapsed) {
-                    onToggleCollapse();
-                    return;
-                  }
-                  if (hasChildren) {
+                  if (!collapsed && hasChildren) {
                     setOpenKey((current) => (current === item.key ? null : item.key));
                   }
                 }}
                 className={cn(
-                  "group relative flex h-14 w-full items-center rounded-xl px-4 py-3 text-sm font-medium",
+                  "group relative flex h-[53px] w-full items-center rounded-[11px] px-[15px] py-[11px] text-[13px] font-medium",
                   !collapsed && "justify-between",
                   isActive && !isOpen ? "bg-brand-600 text-white" : "text-night-700 hover:bg-gray-50",
                 )}
               >
                 <span className="flex items-center gap-2">
-                  <span className="relative block size-5 shrink-0">
-                    <Image src={item.icon} alt="" fill sizes="20px" />
+                  <span className="relative block size-[19px] shrink-0">
+                    <Image src={item.icon} alt="" fill sizes="19px" />
                   </span>
                   {!collapsed && <span className="whitespace-nowrap">{item.label}</span>}
                 </span>
                 <span
                   className={cn(
                     "relative flex shrink-0 items-center justify-center transition-transform duration-150",
-                    collapsed ? "size-3.5" : "size-6",
+                    collapsed ? "size-3" : "size-[23px]",
                     isOpen && "rotate-90",
                   )}
                 >
@@ -73,8 +70,8 @@ export function AppSidebar({
                     src={isActive && !isOpen ? "/icons/chevron-right.svg" : "/icons/chevron-right-gray.svg"}
                     alt=""
                     width={collapsed ? 4 : 7}
-                    height={collapsed ? 8 : 14}
-                    className={cn("w-auto object-contain", collapsed ? "h-2" : "h-3.5")}
+                    height={collapsed ? 8 : 13}
+                    className={cn("w-auto object-contain", collapsed ? "h-[7px]" : "h-[13px]")}
                   />
                 </span>
                 {collapsed && (
@@ -82,23 +79,23 @@ export function AppSidebar({
                     {item.label}
                   </span>
                 )}
-              </a>
+              </Link>
 
               {isOpen && item.children && (
                 <div className="flex w-full flex-col items-start pb-1">
                   {item.children.map((child) => {
                     const isChildActive = child.key === activeChildKey;
                     return (
-                      <a
+                      <Link
                         key={child.key}
                         href={child.href}
                         onClick={(event) => {
                           if (child.href === "#") event.preventDefault();
                         }}
-                        className="flex h-9 w-full items-center gap-4 rounded-xl px-6 py-2 text-sm hover:bg-gray-50"
+                        className="flex h-[34px] w-full items-center gap-[15px] rounded-[11px] px-[23px] py-2 text-[13px] hover:bg-gray-50"
                       >
-                        <span className="relative block size-4 shrink-0">
-                          <Image src={child.icon} alt="" fill sizes="16px" />
+                        <span className="relative block size-[15px] shrink-0">
+                          <Image src={child.icon} alt="" fill sizes="15px" />
                         </span>
                         <span
                           className={cn(
@@ -108,7 +105,7 @@ export function AppSidebar({
                         >
                           {child.label}
                         </span>
-                      </a>
+                      </Link>
                     );
                   })}
                 </div>
@@ -122,10 +119,10 @@ export function AppSidebar({
         type="button"
         onClick={onToggleCollapse}
         title={collapsed ? "Expand sidebar" : "Collapse bar"}
-        className="flex w-full items-center gap-[10px] rounded-xl px-4 py-3 text-sm text-text-secondary-dark hover:bg-gray-50"
+        className="flex w-full items-center gap-[10px] rounded-[11px] px-[15px] py-[11px] text-[13px] text-text-secondary-dark hover:bg-gray-50"
       >
-        <span className="relative block size-6 shrink-0">
-          <Image src="/icons/collapse-bar.svg" alt="" fill sizes="24px" />
+        <span className="relative block size-[23px] shrink-0">
+          <Image src="/icons/collapse-bar.svg" alt="" fill sizes="23px" />
         </span>
         {!collapsed && <span className="whitespace-nowrap">Collapse bar</span>}
       </button>

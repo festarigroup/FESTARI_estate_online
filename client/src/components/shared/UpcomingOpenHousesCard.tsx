@@ -14,30 +14,30 @@ const OPEN_HOUSES: OpenHouse[] = [
 
 export function UpcomingOpenHousesCard() {
   return (
-    <div className="flex w-full flex-col gap-4 rounded-2xl border border-[#e6d7ef] bg-white p-3">
+    <div className="flex w-full flex-col gap-[15px] rounded-[15px] border border-[#e6d7ef] bg-white p-[11px]">
       <div className="flex items-center justify-between">
-        <p className="text-base font-bold text-gray-700">Upcoming Open Houses</p>
-        <button type="button" className="text-[13px] font-medium text-brand-600">
+        <p className="text-[15px] font-bold text-gray-700">Upcoming Open Houses</p>
+        <button type="button" className="text-[12.5px] font-medium text-brand-600">
           View all
         </button>
       </div>
-      <ul className="flex flex-col gap-4">
+      <ul className="flex flex-col gap-[15px]">
         {OPEN_HOUSES.map((house, index) => (
           <li key={index} className="flex items-center justify-between gap-2">
             <div className="flex items-start gap-2">
-              <div className="flex size-14 shrink-0 flex-col items-center justify-center rounded-2xl bg-night-900 text-white">
-                <p className="text-[15px] font-extrabold leading-[18px] tracking-tight">{house.month}</p>
-                <p className="text-[15px] font-extrabold leading-[18px] tracking-tight">{house.day}</p>
+              <div className="flex size-[53px] shrink-0 flex-col items-center justify-center rounded-2xl bg-night-900 text-white">
+                <p className="text-[14px] font-extrabold leading-[17px] tracking-tight">{house.month}</p>
+                <p className="text-[14px] font-extrabold leading-[17px] tracking-tight">{house.day}</p>
               </div>
               <div className="flex flex-col gap-0.5">
-                <p className="text-xs font-bold text-gray-700">{house.title}</p>
-                <p className="text-[9px] text-gray-500">{house.location}</p>
-                <p className="text-[10px] font-bold text-gray-700">{house.dateTime}</p>
+                <p className="text-[11px] font-bold text-gray-700">{house.title}</p>
+                <p className="text-[8.5px] text-gray-500">{house.location}</p>
+                <p className="text-[9.5px] font-bold text-gray-700">{house.dateTime}</p>
               </div>
             </div>
             <button
               type="button"
-              className="flex h-6 w-[70px] shrink-0 items-center justify-center rounded-lg border border-brand-900 text-xs text-brand-900"
+              className="flex h-[23px] w-[67px] shrink-0 items-center justify-center rounded-lg border border-brand-900 text-[11px] text-brand-900"
             >
               RSVP
             </button>
