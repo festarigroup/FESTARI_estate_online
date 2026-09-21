@@ -21,8 +21,8 @@ export function AppSidebar({
   activeKey = "feed",
   activeChildKey = "home",
 }: AppSidebarProps) {
-  const [openKey, setOpenKey] = useState<string | null>(activeKey);
-  const triggerRef = useRef<HTMLDivElement | null>(null);
+  const [openKey, setOpenKey] = useState<string | null>(null);
+  const itemRefs = useRef(new Map<string, HTMLDivElement>());
   const flyoutRef = useRef<HTMLDivElement | null>(null);
   const [flyoutPos, setFlyoutPos] = useState<{ top: number; left: number } | null>(null);
 
@@ -33,9 +33,9 @@ export function AppSidebar({
   // the flyout is portalled to <body> and positioned from the trigger's rect
   // instead of relying on CSS `absolute` (which those ancestors would clip).
   useEffect(() => {
-    if (!showFlyout) return;
+    if (!showFlyout || !openKey) return;
     const updatePosition = () => {
-      const rect = triggerRef.current?.getBoundingClientRect();
+      const rect = itemRefs.current.get(openKey)?.getBoundingClientRect();
       if (rect) setFlyoutPos({ top: rect.top, left: rect.right + 8 });
     };
     updatePosition();
@@ -49,15 +49,15 @@ export function AppSidebar({
   }, [showFlyout, openKey]);
 
   useEffect(() => {
-    if (!showFlyout) return;
+    if (!showFlyout || !openKey) return;
     const handlePointerDown = (event: PointerEvent) => {
       const target = event.target as Node;
-      if (triggerRef.current?.contains(target) || flyoutRef.current?.contains(target)) return;
+      if (itemRefs.current.get(openKey)?.contains(target) || flyoutRef.current?.contains(target)) return;
       setOpenKey(null);
     };
     document.addEventListener("pointerdown", handlePointerDown);
     return () => document.removeEventListener("pointerdown", handlePointerDown);
-  }, [showFlyout]);
+  }, [showFlyout, openKey]);
 
   return (
     <aside
@@ -74,7 +74,14 @@ export function AppSidebar({
           const isActive = item.key === activeKey;
 
           return (
-            <div key={item.key} className="relative w-full" ref={isOpen ? triggerRef : undefined}>
+            <div
+              key={item.key}
+              className="relative w-full"
+              ref={(node) => {
+                if (node) itemRefs.current.set(item.key, node);
+                else itemRefs.current.delete(item.key);
+              }}
+            >
               <Link
                 href={item.href}
                 aria-expanded={hasChildren ? isOpen : undefined}
