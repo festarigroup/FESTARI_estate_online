@@ -20,6 +20,9 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
   const flyoutRef = useRef<HTMLDivElement | null>(null);
   const [flyoutPos, setFlyoutPos] = useState<{ bottom: number; left: number } | null>(null);
 
+  const activeItem = NAV_ITEMS.find((item) => item.key === activeKey) ?? NAV_ITEMS[0];
+  const restItems = NAV_ITEMS.filter((item) => item.key !== activeItem.key);
+
   const openItem = openKey ? NAV_ITEMS.find((item) => item.key === openKey) : undefined;
   const showFlyout = !!openItem?.children?.length;
 
@@ -77,7 +80,7 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
     >
       <button
         type="button"
-        aria-label={expanded ? "Close navigation" : "Open navigation"}
+        aria-label={expanded ? "Close navigation" : activeItem.label}
         aria-expanded={expanded}
         onClick={() => {
           setExpanded((v) => !v);
@@ -85,14 +88,13 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
         }}
         className="flex shrink-0 items-center justify-center rounded-full bg-white p-[10px] shadow-[0px_4px_2px_rgba(0,0,0,0.25)]"
       >
-        <NavIcon icon="/icons/menu-square.svg" color="night" size={22} />
+        <NavIcon icon={activeItem.icon} color="brand" size={22} />
       </button>
 
       {expanded &&
-        NAV_ITEMS.map((item) => {
+        restItems.map((item) => {
           const hasChildren = !!item.children?.length;
           const isOpen = hasChildren && openKey === item.key;
-          const isActive = item.key === activeKey;
 
           return (
             <Link
@@ -108,12 +110,9 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
               aria-label={item.label}
               aria-expanded={hasChildren ? isOpen : undefined}
               title={item.label}
-              className={cn(
-                "flex shrink-0 items-center justify-center rounded-full",
-                isActive ? "bg-white p-[10px] shadow-[0px_4px_2px_rgba(0,0,0,0.25)]" : "p-2",
-              )}
+              className="flex shrink-0 items-center justify-center rounded-full p-2"
             >
-              <NavIcon icon={item.icon} color={isActive ? "brand" : "night"} size={isActive ? 22 : 18} />
+              <NavIcon icon={item.icon} color="night" size={18} />
             </Link>
           );
         })}
