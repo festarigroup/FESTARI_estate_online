@@ -29,6 +29,15 @@
   --color-night-900: #0f1621;
   --color-night-800: #121c2d;
   --color-night-700: #334154;
+
+  --color-brand-600: #498cf8;
+  --color-gray-50: #f8fafc;
+  --color-gray-100: #f1f5f9;
+  --color-gray-200: #e2e8f0;
+  --color-gray-400: #94a3b7;
+  --color-gray-500: #64748a;
+  --color-gray-700: #334154;
+  --color-text-secondary-dark: #676e85;
 }
 
 body {
