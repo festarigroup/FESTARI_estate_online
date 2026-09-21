@@ -337,18 +337,27 @@ function ActionsRow({ post }: { post: PostCardData }) {
     <div className="flex w-full flex-wrap items-center justify-between gap-2">
       <div className="flex flex-wrap items-center gap-2 sm:gap-4">
         {primary && (
-          <Button variant="primary" className="h-auto w-auto rounded-xl px-3 py-1.5 text-[10px]">
+          <Button
+            variant="primary"
+            className="h-auto w-auto rounded-xl px-3 py-1.5 text-[10px] sm:h-[38px] sm:rounded-lg sm:px-[15px] sm:py-0 sm:text-[13px]"
+          >
             {primary.label}
           </Button>
         )}
         {secondary && (
-          <Button variant={secondary.variant} className="h-auto w-auto rounded-xl px-3 py-1.5 text-[10px]">
+          <Button
+            variant={secondary.variant}
+            className="h-auto w-auto rounded-xl px-3 py-1.5 text-[10px] sm:h-[38px] sm:rounded-lg sm:px-[15px] sm:py-0 sm:text-[13px]"
+          >
             {secondary.label}
           </Button>
         )}
       </div>
       {post.messageHostLabel && (
-        <Button variant="outline-brand" className="h-auto w-auto rounded-xl px-3 py-1.5 text-[10px]">
+        <Button
+          variant="outline-brand"
+          className="h-auto w-auto rounded-xl px-3 py-1.5 text-[10px] sm:h-[38px] sm:rounded-lg sm:px-[15px] sm:py-0 sm:text-[13px]"
+        >
           {post.messageHostLabel}
         </Button>
       )}
@@ -380,10 +389,20 @@ function PostStatsBar({
             aria-label={`${likeCount} Likes`}
             onClick={() => setLiked((v) => !v)}
           >
-            <span className="relative block size-[23px] shrink-0">
-              <Image src="/icons/heart-like.svg" alt="" fill sizes="23px" />
+            <NavIcon
+              icon="/icons/heart-like.svg"
+              color="night"
+              size={23}
+              className={liked ? "bg-[#ea5e9c]" : undefined}
+            />
+            <span
+              className={cn(
+                "hidden text-[11px] font-bold sm:inline",
+                liked ? "text-[#ea5e9c]" : "text-brand-900",
+              )}
+            >
+              {likeCount} Likes
             </span>
-            <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">{likeCount} Likes</span>
           </button>
           <button
             type="button"
@@ -412,9 +431,7 @@ function PostStatsBar({
           aria-label={saved ? "Saved" : "Save"}
           onClick={() => setSaved((v) => !v)}
         >
-          <span className="relative block size-[23px] shrink-0">
-            <Image src="/icons/archive-save.svg" alt="" fill sizes="23px" />
-          </span>
+          <NavIcon icon="/icons/archive-save.svg" color={saved ? "brand" : "night"} size={23} />
           <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">{saved ? "Saved" : "Save"}</span>
         </button>
       </div>
