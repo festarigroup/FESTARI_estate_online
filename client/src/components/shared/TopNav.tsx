@@ -21,8 +21,8 @@ export function TopNav() {
   return (
     <header className="flex h-[67px] shrink-0 items-center justify-between gap-2 border-b border-gray-200 bg-white px-[15px] py-2 sm:px-[23px]">
       <div className="flex min-w-0 flex-1 items-center gap-[15px] md:gap-[38px] lg:gap-[57px] 3xl:gap-[109px] 3xl:flex-initial">
-        <div className="relative size-[34px] shrink-0 sm:hidden">
-          <Image src="/icons/logo-biltlinx-mobile.png" alt="Biltlinx" fill className="object-contain" sizes="34px" priority />
+        <div className="flex size-[34px] shrink-0 items-center justify-center rounded-full bg-brand-600 sm:hidden">
+          <span className="font-display text-base font-bold text-white">B</span>
         </div>
         <div className="relative hidden h-[36px] w-[72px] shrink-0 sm:block">
           <Image src="/icons/logo-biltlinx.png" alt="Biltlinx" fill className="object-contain" sizes="72px" priority />
@@ -50,9 +50,9 @@ export function TopNav() {
         <button
           type="button"
           aria-label="Create"
-          className="flex h-[38px] items-center justify-center gap-2 rounded-full px-2 hover:bg-gray-50 sm:rounded-lg sm:bg-brand-600 sm:px-[11px] sm:hover:bg-brand-600/90 sm:w-[93px] sm:p-[15px]"
+          className="flex size-[38px] items-center justify-center gap-2 rounded-full bg-brand-600 hover:bg-brand-600/90 sm:h-[38px] sm:w-[93px] sm:rounded-lg sm:px-[15px]"
         >
-          <NavIcon icon="/icons/add-alt.svg" color="brand" size={19} className="sm:bg-white" />
+          <NavIcon icon="/icons/add-circle-01.svg" color="white" size={19} />
           <span className="hidden text-[13px] text-white sm:inline">Create</span>
         </button>
 
