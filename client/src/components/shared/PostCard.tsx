@@ -180,7 +180,7 @@ function PostHeader({ post }: { post: PostCardData }) {
           <button
             type="button"
             aria-label="Follow"
-            className="flex h-[38px] w-[38px] items-center justify-center rounded-lg border border-brand-900 sm:w-[81px] sm:px-[15px] sm:py-2"
+            className="flex h-[38px] w-[38px] items-center justify-center rounded-lg sm:w-[81px] sm:px-[15px] sm:py-2"
           >
             <span className="relative block size-5 shrink-0 sm:hidden">
               <Image src="/icons/user-add-01.svg" alt="" fill sizes="20px" />
