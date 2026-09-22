@@ -136,7 +136,7 @@ function MobileMenuRow({ item, onNavigate }: { item: MobileMenuItem; onNavigate:
       </button>
 
       {open && (
-        <div className="absolute left-full top-0 z-10 ml-2 flex w-48 flex-col gap-0.5 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-lg">
+        <div className="absolute left-[calc(100%-28px)] top-0 z-10 flex w-48 flex-col gap-0.5 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-lg">
           {item.submenu.map((sub) => (
             <Link
               key={sub.key}
