@@ -4,13 +4,18 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { showSuccessToast } from "@/components/shared/AppToast";
+import { CreateMenu } from "@/components/shared/CreateMenu";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { comingSoonHref } from "@/lib/coming-soon";
 
 export function TopNav() {
   const router = useRouter();
+  const isTabletUp = useMediaQuery("(min-width: 640px)");
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const [createMenuOpen, setCreateMenuOpen] = useState(false);
+  const createMenuRef = useRef<HTMLDivElement | null>(null);
 
   function handleLogout() {
     setMenuOpen(false);
@@ -23,6 +28,14 @@ export function TopNav() {
     router.push(comingSoonHref(feature));
   }
 
+  function handleCreateClick() {
+    if (isTabletUp) {
+      setCreateMenuOpen((v) => !v);
+    } else {
+      goComingSoon("Create Post");
+    }
+  }
+
   useEffect(() => {
     if (!menuOpen) return;
     const handlePointerDown = (event: PointerEvent) => {
@@ -32,6 +45,16 @@ export function TopNav() {
     document.addEventListener("pointerdown", handlePointerDown);
     return () => document.removeEventListener("pointerdown", handlePointerDown);
   }, [menuOpen]);
+
+  useEffect(() => {
+    if (!createMenuOpen) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      if (createMenuRef.current?.contains(event.target as Node)) return;
+      setCreateMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [createMenuOpen]);
 
   return (
     <header className="flex h-[67px] shrink-0 items-center border-b border-gray-200 bg-white px-[15px] py-2 sm:px-[23px]">
@@ -68,15 +91,24 @@ export function TopNav() {
             </span>
           </button>
 
-          <button
-            type="button"
-            aria-label="Create"
-            onClick={() => goComingSoon("Create Post")}
-            className="flex h-[34px] items-center justify-center gap-2 rounded-xl bg-[#0072ff] px-4 hover:opacity-90 sm:h-[38px] sm:w-[93px] sm:rounded-lg sm:bg-brand-900 sm:px-[15px] sm:hover:bg-brand-900/90 sm:hover:opacity-100"
-          >
-            <NavIcon icon="/icons/add-circle-01.svg" color="white" size={19} className="hidden sm:block" />
-            <span className="text-[11px] text-white sm:text-[13px]">Create</span>
-          </button>
+          <div ref={createMenuRef} className="relative">
+            <button
+              type="button"
+              aria-label="Create"
+              aria-expanded={createMenuOpen}
+              onClick={handleCreateClick}
+              className="flex h-[34px] items-center justify-center gap-2 rounded-xl bg-[#0072ff] px-4 hover:opacity-90 sm:h-[38px] sm:w-[93px] sm:rounded-lg sm:bg-brand-900 sm:px-[15px] sm:hover:bg-brand-900/90 sm:hover:opacity-100"
+            >
+              <NavIcon icon="/icons/add-circle-01.svg" color="white" size={19} className="hidden sm:block" />
+              <span className="text-[11px] text-white sm:text-[13px]">Create</span>
+            </button>
+
+            {createMenuOpen && isTabletUp && (
+              <div className="absolute right-0 top-[calc(100%+8px)] z-50">
+                <CreateMenu onNavigate={() => setCreateMenuOpen(false)} />
+              </div>
+            )}
+          </div>
 
           <button
             type="button"
