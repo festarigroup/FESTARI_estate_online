@@ -87,7 +87,7 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
       aria-label="Primary navigation"
       aria-hidden={!visible}
       className={cn(
-        "no-scrollbar fixed bottom-4 left-1/2 z-40 flex w-[calc(100%-32px)] -translate-x-1/2 items-center justify-between overflow-x-auto rounded-full border border-white/40 bg-white/20 p-5 shadow-[0px_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-xl backdrop-saturate-150 transition-all duration-300 ease-out lg:hidden",
+        "no-scrollbar fixed bottom-4 left-1/2 z-40 flex w-[calc(100%-32px)] -translate-x-1/2 items-center justify-between overflow-x-auto rounded-full border border-white/40 bg-white/10 p-5 shadow-[0px_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-sm backdrop-saturate-150 transition-all duration-300 ease-out lg:hidden",
         visible ? "translate-y-0 opacity-100" : "translate-y-24 opacity-0",
       )}
     >
