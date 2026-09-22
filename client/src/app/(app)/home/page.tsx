@@ -33,7 +33,7 @@ const COMPOSER_ACTIONS = [
   { key: "stay", label: "Stay", icon: "/icons/guest-house-sm.svg" },
   { key: "service", label: "Service", icon: "/icons/map-pin-02-sm.svg" },
   { key: "project", label: "Project", icon: "/icons/briefcase-09.svg" },
-  { key: "events", label: "Events", icon: "/icons/timer-01.svg" },
+  { key: "events", label: "Events", icon: "/icons/event-calendar-01.svg" },
   { key: "poll", label: "Poll", icon: "/icons/chart-02.svg" },
   { key: "article", label: "Article", icon: "/icons/book-bookmark-01.svg" },
 ];
