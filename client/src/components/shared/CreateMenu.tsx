@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { CreatePostModal } from "@/components/shared/CreatePostModal";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
@@ -244,9 +243,14 @@ function CreatePostRow({ onNavigate, onOpenImagePost }: { onNavigate: () => void
   );
 }
 
-export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
+export function CreateMenu({
+  onNavigate,
+  onOpenImagePost,
+}: {
+  onNavigate: () => void;
+  onOpenImagePost: () => void;
+}) {
   const [openMobileKey, setOpenMobileKey] = useState<string | null>(null);
-  const [imagePostOpen, setImagePostOpen] = useState(false);
   const toggleMobileKey = (key: string) => setOpenMobileKey((current) => (current === key ? null : key));
 
   return (
@@ -259,7 +263,7 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
             onNavigate={onNavigate}
             open={openMobileKey === item.key}
             onToggle={() => toggleMobileKey(item.key)}
-            onOpenImagePost={() => setImagePostOpen(true)}
+            onOpenImagePost={onOpenImagePost}
           />
         ))}
         <div className="my-1 h-px w-full bg-gray-200" />
@@ -268,7 +272,7 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
           onNavigate={onNavigate}
           open={false}
           onToggle={() => {}}
-          onOpenImagePost={() => setImagePostOpen(true)}
+          onOpenImagePost={onOpenImagePost}
         />
       </div>
 
@@ -280,7 +284,7 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
               <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <CreatePostRow onNavigate={onNavigate} onOpenImagePost={() => setImagePostOpen(true)} />
+          <CreatePostRow onNavigate={onNavigate} onOpenImagePost={onOpenImagePost} />
         </div>
 
         <div className="flex w-[270px] flex-col gap-1.5 rounded-2xl border border-gray-200 bg-white p-1.5">
@@ -299,8 +303,6 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
           ))}
         </div>
       </div>
-
-      <CreatePostModal open={imagePostOpen} onClose={() => setImagePostOpen(false)} />
     </>
   );
 }
