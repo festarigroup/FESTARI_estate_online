@@ -13,7 +13,7 @@ export function AuthScreenLayout({ children, tagline, footerText }: AuthScreenLa
   return (
     <div className="relative flex h-screen items-center justify-center overflow-hidden bg-white dark:bg-night-900">
       <div className="pointer-events-none absolute inset-2 rounded-[38px] border-2 border-[#e2e8f0] dark:border-night-700 lg:hidden" />
-      <div className="grid h-full w-full max-w-[1440px] lg:grid-cols-2">
+      <div className="grid h-full w-full max-w-[1440px] lg:grid-cols-2 4xl:max-w-[1720px] 5xl:max-w-[2200px]">
         <div className="flex min-h-0 flex-col items-center overflow-y-auto px-6 py-6 sm:px-16 lg:justify-center lg:px-[104px] lg:py-0">
           <div className="mb-6 w-full lg:hidden">
             <MobileAuthHero />

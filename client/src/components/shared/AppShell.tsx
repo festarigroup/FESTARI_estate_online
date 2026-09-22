@@ -26,7 +26,7 @@ export function AppShell({ activeKey, header, children, rightRail }: AppShellPro
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-gray-50">
       <TopNav />
-      <div className="mx-auto flex w-full max-w-[1440px] flex-1 overflow-hidden">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-1 overflow-hidden 4xl:max-w-[1720px] 5xl:max-w-[2200px]">
         <AppSidebar
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsedOverride(!collapsed)}
@@ -38,17 +38,17 @@ export function AppShell({ activeKey, header, children, rightRail }: AppShellPro
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden">
           {header && (
             <div className="shrink-0 px-[15px] pt-[15px] sm:px-[23px] sm:pt-[23px]">
-              <div className="mx-auto w-full max-w-[762px]">{header}</div>
+              <div className="mx-auto w-full max-w-[762px] 4xl:max-w-[920px] 5xl:max-w-[1100px]">{header}</div>
             </div>
           )}
           {/* Extra bottom clearance below lg so the floating mobile nav pill
               never overlaps the last post. */}
           <div className="no-scrollbar flex-1 overflow-y-auto px-[15px] pb-24 sm:px-[23px] lg:pb-[23px]">
-            <div className="mx-auto w-full max-w-[762px]">{children}</div>
+            <div className="mx-auto w-full max-w-[762px] 4xl:max-w-[920px] 5xl:max-w-[1100px]">{children}</div>
           </div>
         </main>
         {rightRail && (
-          <div className="no-scrollbar hidden w-[333px] shrink-0 overflow-y-auto px-[23px] py-[23px] xl:block">
+          <div className="no-scrollbar hidden w-[333px] shrink-0 overflow-y-auto px-[23px] py-[23px] xl:block 4xl:w-[380px] 5xl:w-[420px]">
             {rightRail}
           </div>
         )}

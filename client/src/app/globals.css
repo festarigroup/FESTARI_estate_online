@@ -18,6 +18,10 @@
   /* Matches the Figma desktop frame width (1440px) where the full
      3-column feed layout (sidebar + content + right rail) fits. */
   --breakpoint-3xl: 1440px;
+  /* Beyond the Figma frame, containers step up to wider caps so large
+     monitors show more content instead of just centering with dead space. */
+  --breakpoint-4xl: 1920px;
+  --breakpoint-5xl: 2560px;
 
   --color-brand-900: #1465e6;
   --color-brand-300: #86b3fb;
