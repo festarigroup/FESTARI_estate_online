@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { cn } from "@/lib/utils";
@@ -428,6 +429,28 @@ function PostStatsBar({
 
   const likeCount = post.likes + (liked ? 1 : 0);
 
+  const handleShare = async () => {
+    const shareUrl =
+      typeof window !== "undefined" ? `${window.location.origin}${window.location.pathname}#post-${post.id}` : "";
+    const shareData = {
+      title: post.authorName,
+      text: post.text ?? post.subLine ?? "Check out this post on Biltlinx",
+      url: shareUrl,
+    };
+
+    try {
+      if (typeof navigator !== "undefined" && navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Link copied to clipboard");
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      toast.error("Couldn't share this post");
+    }
+  };
+
   return (
     <div className="flex w-full flex-col gap-2">
       <div className="flex w-full items-center justify-between sm:justify-start sm:gap-6">
@@ -465,14 +488,14 @@ function PostStatsBar({
             </span>
             <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">{post.comments} Comments</span>
           </button>
-          <div className="flex items-center gap-2" aria-label={post.shareLabel ?? "Share"}>
+          <button type="button" className="flex items-center gap-2" aria-label={post.shareLabel ?? "Share"} onClick={handleShare}>
             <span className="relative block size-[23px] shrink-0">
               <Image src="/icons/share-05.svg" alt="" fill sizes="23px" />
             </span>
             <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">
               {post.shareLabel ?? "Share"}
             </span>
-          </div>
+          </button>
         </div>
         <button
           type="button"
