@@ -87,7 +87,6 @@ const POSTS: PostCardData[] = [
     roleLine: "Sponsored by agent |",
     postedAt: "40m ago",
     avatar: "/images/avatar-kasapa.png",
-    verified: true,
     text: POST_TEXT,
     image: "/images/post-building-01.jpg",
     priceLine: "GHS 1,850.00",
@@ -109,7 +108,6 @@ const POSTS: PostCardData[] = [
     roleLine: "Labadi |",
     postedAt: "1d",
     avatar: "/images/avatar-golden-palm.png",
-    verified: true,
     image: "/images/post-hotel-pool.jpg",
     priceLine: "GHS 550.00",
     priceSuffix: "/night",
@@ -167,7 +165,6 @@ const POSTS: PostCardData[] = [
     roleLine: "New Development |",
     postedAt: "3hrs ago",
     avatar: "/images/avatar-kasapa.png",
-    verified: true,
     text: "Breaking ground on Golden Ridge Estates — 40 serviced plots with road network and utilities already in. Reserve a plot before the next price review.",
     image: "/images/post-building-01.jpg",
     actions: [
