@@ -13,6 +13,7 @@ interface MobileMenuItem {
   label: string;
   locked?: boolean;
   highlighted?: boolean;
+  flip?: boolean;
 }
 
 interface MobileMenuSection {
@@ -27,7 +28,7 @@ const MOBILE_SECTIONS: MobileMenuSection[] = [
   {
     divider: true,
     items: [
-      { key: "property", icon: "/icons/create-menu2-building.svg", label: "List property", locked: true },
+      { key: "property", icon: "/icons/create-menu2-building.svg", label: "List property", locked: true, flip: true },
       { key: "stay", icon: "/icons/create-menu2-guest-house.svg", label: "Add stay", locked: true },
       { key: "service", icon: "/icons/create-menu2-map-pin.svg", label: "Offer a service", locked: true },
       { key: "project", icon: "/icons/create-menu2-briefcase.svg", label: "Post project", locked: true },
@@ -160,7 +161,7 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
                 )}
               >
                 <span
-                  className="relative block shrink-0"
+                  className={cn("relative block shrink-0", item.flip && "rotate-180 -scale-x-100")}
                   style={{ width: item.iconSize ?? 12, height: item.iconSize ?? 12 }}
                 >
                   <Image src={item.icon} alt="" fill sizes={`${item.iconSize ?? 12}px`} />
@@ -179,16 +180,16 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
         ))}
       </div>
 
-      <div className="hidden w-[300px] flex-col gap-2 rounded-3xl bg-white p-4 shadow-[0px_20px_66px_rgba(34,48,73,0.2)] sm:flex">
+      <div className="hidden w-[300px] flex-col gap-1.5 rounded-3xl bg-white p-3 shadow-[0px_20px_66px_rgba(34,48,73,0.2)] sm:flex">
         {DESKTOP_SECTIONS.map((section, sectionIndex) => (
-          <div key={sectionIndex} className="flex w-full flex-col gap-2">
+          <div key={sectionIndex} className="flex w-full flex-col gap-1">
             {section.title && (
-              <p className="text-sm font-semibold tracking-[-0.42px] text-night-900">{section.title}</p>
+              <p className="text-[13px] font-semibold leading-4 tracking-[-0.42px] text-night-900">{section.title}</p>
             )}
             <div
               className={cn(
-                "flex w-full flex-col items-start gap-1",
-                section.divider && "border-b border-gray-200 pb-2",
+                "flex w-full flex-col items-start gap-0.5",
+                section.divider && "border-b border-gray-200 pb-1.5",
               )}
             >
               {section.items.map((item) => (
@@ -197,18 +198,18 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
                   href={comingSoonHref(item.label)}
                   onClick={onNavigate}
                   className={cn(
-                    "flex w-full items-center gap-2 rounded-xl p-2",
+                    "flex w-full items-center gap-2 rounded-xl p-1.5",
                     item.highlighted
                       ? "border-b border-gray-200 bg-[#e2edff]"
                       : "hover:bg-gray-50",
                   )}
                 >
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-900 p-1">
-                    <NavIcon icon={item.icon} color="white" size={18} />
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-900 p-1">
+                    <NavIcon icon={item.icon} color="white" size={16} />
                   </span>
                   <span className="flex min-w-0 flex-1 flex-col items-start">
-                    <span className="w-full text-sm font-medium text-night-900">{item.label}</span>
-                    <span className="w-full text-[11px] text-gray-500">{item.description}</span>
+                    <span className="w-full text-[13px] font-medium leading-4 text-night-900">{item.label}</span>
+                    <span className="w-full truncate text-[10px] leading-3 text-gray-500">{item.description}</span>
                   </span>
                   {item.locked && (
                     <span className="relative block size-2.5 shrink-0">
