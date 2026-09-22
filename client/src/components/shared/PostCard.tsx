@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
+import { FollowButton } from "@/components/shared/FollowButton";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
@@ -228,23 +229,28 @@ function PostHeader({ post }: { post: PostCardData }) {
       </div>
       <div className="flex items-center gap-4">
         {post.variant !== "poll" && (
-          <button
-            type="button"
-            onClick={() => setFollowing((v) => !v)}
-            aria-label={following ? "Following" : "Follow"}
-            aria-pressed={following}
-            className="flex h-[38px] w-[38px] items-center justify-center gap-1.5 rounded-lg sm:w-auto sm:px-[15px] sm:py-2"
-          >
-            <NavIcon
-              icon={following ? "/icons/check-circle.svg" : "/icons/user-add-01.svg"}
-              color="brand"
-              size={20}
-              className="shrink-0 sm:hidden"
+          <>
+            <button
+              type="button"
+              onClick={() => setFollowing((v) => !v)}
+              aria-label={following ? "Following" : "Follow"}
+              aria-pressed={following}
+              className="flex size-[38px] shrink-0 items-center justify-center rounded-lg sm:hidden"
+            >
+              <NavIcon
+                icon={following ? "/icons/check-circle.svg" : "/icons/user-add-01.svg"}
+                color="brand"
+                size={20}
+                className="shrink-0"
+              />
+            </button>
+            <FollowButton
+              following={following}
+              onToggle={() => setFollowing((v) => !v)}
+              name={post.authorName}
+              className="hidden sm:flex"
             />
-            <span className="hidden text-[13px] text-brand-900 sm:inline">
-              {following ? "Following" : "Follow"}
-            </span>
-          </button>
+          </>
         )}
         <button
           type="button"
