@@ -603,19 +603,20 @@ function PostStatsBar({
           <button
             type="button"
             className="flex items-center gap-2"
+            aria-pressed={liked}
             aria-label={`${likeCount} Likes`}
             onClick={() => setLiked((v) => !v)}
           >
             <NavIcon
-              icon="/icons/heart-like.svg"
+              icon={liked ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
               color="night"
               size={23}
-              className={liked ? "bg-[#ea5e9c]" : undefined}
+              className={liked ? "bg-[#ef575f]" : undefined}
             />
             <span
               className={cn(
                 "hidden text-[11px] font-bold sm:inline",
-                liked ? "text-[#ea5e9c]" : "text-brand-900",
+                liked ? "text-[#ef575f]" : "text-brand-900",
               )}
             >
               {likeCount} Likes
@@ -738,13 +739,13 @@ function CommentLikeButton({ initialLikes }: { initialLikes: number }) {
       className="flex items-center gap-1"
     >
       <NavIcon
-        icon="/icons/heart-like.svg"
+        icon={liked ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
         color="brand"
         size={11}
-        className={liked ? "bg-[#ea5e9c]" : "bg-gray-400"}
+        className={liked ? "bg-[#ef575f]" : "bg-gray-400"}
       />
       {likeCount > 0 ? (
-        <span className={cn("text-[9.5px] font-bold", liked ? "text-[#ea5e9c]" : "text-brand-900")}>
+        <span className={cn("text-[9.5px] font-bold", liked ? "text-[#ef575f]" : "text-brand-900")}>
           {likeCount}
         </span>
       ) : (
