@@ -8,6 +8,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface AppShellProps {
   activeKey?: string;
+  activeChildKey?: string;
   /** Rendered above the scrollable body, outside the scroll container —
    * genuinely fixed in place rather than relying on `position: sticky`. */
   header?: ReactNode;
@@ -15,7 +16,7 @@ interface AppShellProps {
   rightRail?: ReactNode;
 }
 
-export function AppShell({ activeKey, header, children, rightRail }: AppShellProps) {
+export function AppShell({ activeKey, activeChildKey, header, children, rightRail }: AppShellProps) {
   // Below xl (1280px) the sidebar defaults to icon-only so the feed column
   // keeps enough room; it expands automatically once there's space again,
   // unless the user has manually toggled it (that choice then sticks).
@@ -31,6 +32,7 @@ export function AppShell({ activeKey, header, children, rightRail }: AppShellPro
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsedOverride(!collapsed)}
           activeKey={activeKey}
+          activeChildKey={activeChildKey}
         />
         {/* `header` lives outside the scroll container entirely (a real,
             non-scrolling region) rather than being pinned there with
@@ -53,7 +55,7 @@ export function AppShell({ activeKey, header, children, rightRail }: AppShellPro
           </div>
         )}
       </div>
-      <MobileBottomNav activeKey={activeKey} />
+      <MobileBottomNav activeKey={activeKey} activeChildKey={activeChildKey} />
     </div>
   );
 }
