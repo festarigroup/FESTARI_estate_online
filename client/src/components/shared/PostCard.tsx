@@ -49,7 +49,7 @@ export interface PostCardData {
   postedAt: string;
   avatar: string;
   avatarPlaceholder?: boolean;
-  verified?: boolean;
+  verified?: "individual" | "organization";
   text?: string;
   truncated?: boolean;
   image?: string;
@@ -166,7 +166,16 @@ function PostHeader({ post }: { post: PostCardData }) {
           </span>
           {post.verified && (
             <span className="absolute -bottom-0.5 -right-0.5 block size-[17px]">
-              <Image src="/icons/avatar-verified-badge.svg" alt="" fill sizes="17px" />
+              <Image
+                src={
+                  post.verified === "individual"
+                    ? "/icons/avatar-verified-badge-green.svg"
+                    : "/icons/avatar-verified-badge.svg"
+                }
+                alt=""
+                fill
+                sizes="17px"
+              />
             </span>
           )}
         </span>
