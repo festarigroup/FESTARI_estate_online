@@ -422,7 +422,33 @@ function ImageLightbox({
   );
 }
 
+function parseVoteCount(votes: string) {
+  return Number(votes.replace(/,/g, "")) || 0;
+}
+
 function PollBody({ post }: { post: PostCardData }) {
+  const [counts, setCounts] = useState(() => post.pollOptions?.map((option) => parseVoteCount(option.votes)) ?? []);
+  const [votedIndex, setVotedIndex] = useState<number | null>(null);
+
+  const total = counts.reduce((sum, count) => sum + count, 0);
+  const leadingIndex = counts.length
+    ? counts.reduce((leader, count, index) => (count > counts[leader] ? index : leader), 0)
+    : -1;
+
+  function handleVote(index: number) {
+    setCounts((current) => {
+      const next = [...current];
+      if (votedIndex === index) {
+        next[index] -= 1;
+      } else {
+        if (votedIndex !== null) next[votedIndex] -= 1;
+        next[index] += 1;
+      }
+      return next;
+    });
+    setVotedIndex((current) => (current === index ? null : index));
+  }
+
   return (
     <div className="flex w-full flex-col gap-[15px]">
       {post.participantAvatars && (
@@ -448,29 +474,45 @@ function PollBody({ post }: { post: PostCardData }) {
       {post.pollOptions && (
         <div className="flex w-full flex-col gap-[15px] rounded-[15px] border border-gray-200 p-[15px]">
           <div className="flex w-full flex-col gap-2">
-            {post.pollOptions.map((option) => (
-              <div key={option.label} className="flex w-full items-center justify-between text-[13px]">
-                <div
-                  className={cn(
-                    "flex items-center gap-2 rounded-lg px-2 py-2",
-                    option.leading ? "bg-brand-900 text-white" : "bg-gray-100 text-night-900",
-                  )}
-                  style={{ width: `${Math.max(option.percent, 18)}%` }}
+            {post.pollOptions.map((option, index) => {
+              const percent = total > 0 ? Math.round((counts[index] / total) * 100) : 0;
+              const leading = index === leadingIndex && counts[index] > 0;
+              const voted = index === votedIndex;
+              return (
+                <button
+                  key={option.label}
+                  type="button"
+                  onClick={() => handleVote(index)}
+                  aria-pressed={voted}
+                  aria-label={`Vote for ${option.label}`}
+                  className="flex w-full items-center justify-between text-[13px]"
                 >
-                  <span className="font-semibold">{option.percent}%</span>
-                  <span className={cn(option.leading ? "text-white" : "text-gray-600")}>{option.label}</span>
-                  {option.leading && (
-                    <span className="relative block size-[19px] shrink-0">
-                      <Image src="/icons/check-circle.svg" alt="" fill sizes="19px" />
-                    </span>
-                  )}
-                </div>
-                <span className="font-medium text-gray-400">{option.votes}</span>
-              </div>
-            ))}
+                  <div
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg px-2 py-2 transition-all",
+                      leading ? "bg-brand-900 text-white" : "bg-gray-100 text-night-900",
+                      voted && "ring-2 ring-brand-600 ring-offset-1",
+                    )}
+                    style={{ width: `${Math.max(percent, 18)}%` }}
+                  >
+                    <span className="font-semibold">{percent}%</span>
+                    <span className={cn(leading ? "text-white" : "text-gray-600")}>{option.label}</span>
+                    {voted && (
+                      <span className="relative block size-[19px] shrink-0">
+                        <Image src="/icons/check-circle.svg" alt="" fill sizes="19px" />
+                      </span>
+                    )}
+                  </div>
+                  <span className="font-medium text-gray-400">{counts[index].toLocaleString()}</span>
+                </button>
+              );
+            })}
           </div>
           {post.pollFooter && (
-            <p className="text-left text-[11px] font-medium text-gray-600">{post.pollFooter}</p>
+            <p className="text-left text-[11px] font-medium text-gray-600">
+              {post.pollFooter.split(" — ")[0]} — {total.toLocaleString()} votes total
+              {votedIndex !== null && " · you voted"}
+            </p>
           )}
         </div>
       )}
