@@ -277,8 +277,8 @@ export default function SignUpPage() {
 
       {/* Desktop: three steps (profile, then security, then a dedicated terms step). */}
       {step === "profile" ? (
-        <div className="hidden lg:flex lg:flex-col lg:gap-4 xl:gap-8">
-          <div className="flex flex-col items-center gap-2 text-center xl:gap-3">
+        <div className="hidden lg:flex lg:flex-col lg:gap-4">
+          <div className="flex flex-col items-center gap-2 text-center">
             <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black dark:text-white">
               Create your account
             </h1>
@@ -287,7 +287,7 @@ export default function SignUpPage() {
             </p>
           </div>
 
-          <form onSubmit={handleContinue} className="flex flex-col gap-4 xl:gap-8">
+          <form onSubmit={handleContinue} className="flex flex-col gap-4">
             <SocialButtons />
 
             <Divider label="or" />
@@ -325,8 +325,8 @@ export default function SignUpPage() {
           </form>
         </div>
       ) : step === "security" ? (
-        <div className="hidden lg:flex lg:flex-col lg:gap-4 xl:gap-6">
-          <div className="flex flex-col items-center gap-2 text-center xl:gap-3">
+        <div className="hidden lg:flex lg:flex-col lg:gap-4">
+          <div className="flex flex-col items-center gap-2 text-center">
             <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black dark:text-white">
               Secure your account
             </h1>
@@ -335,7 +335,7 @@ export default function SignUpPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSecurityContinue} className="flex flex-col gap-4 xl:gap-6">
+          <form onSubmit={handleSecurityContinue} className="flex flex-col gap-4">
             <SocialButtons />
 
             <Divider label="or" />
@@ -385,8 +385,8 @@ export default function SignUpPage() {
           </form>
         </div>
       ) : (
-        <div className="hidden lg:flex lg:flex-col lg:gap-4 xl:gap-8">
-          <div className="flex flex-col items-center gap-2 text-center xl:gap-3">
+        <div className="hidden lg:flex lg:flex-col lg:gap-4">
+          <div className="flex flex-col items-center gap-2 text-center">
             <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black dark:text-white">
               Create your account
             </h1>
@@ -395,7 +395,7 @@ export default function SignUpPage() {
             </p>
           </div>
 
-          <form onSubmit={handleTermsSubmit} className="flex flex-col gap-4 xl:gap-8">
+          <form onSubmit={handleTermsSubmit} className="flex flex-col gap-4">
             <SocialButtons />
 
             <Divider label="or" />
