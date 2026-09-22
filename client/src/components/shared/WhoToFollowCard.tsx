@@ -7,13 +7,14 @@ export interface WhoToFollowPerson {
   role: string;
   avatar: string;
   avatarPlaceholder?: boolean;
-  action: "Follow" | "Connect" | "Message" | "verified";
+  verified?: boolean;
+  action: "Follow" | "Connect" | "Message";
 }
 
 const PEOPLE: WhoToFollowPerson[] = [
-  { name: "Andy Ansong", role: "Real Estate Consultant", avatar: "/icons/avatar-andy.png", action: "Follow" },
-  { name: "Edwin Adu", role: "Sales Agent", avatar: "/icons/avatar-sample.jpg", action: "Connect" },
-  { name: "Carlos Ramirez", role: "Software Engineer", avatar: "", avatarPlaceholder: true, action: "verified" },
+  { name: "Andy Ansong", role: "Real Estate Consultant", avatar: "/icons/avatar-andy.png", verified: true, action: "Follow" },
+  { name: "Edwin Adu", role: "Sales Agent", avatar: "/icons/avatar-sample.jpg", verified: true, action: "Connect" },
+  { name: "Carlos Ramirez", role: "Software Engineer", avatar: "", avatarPlaceholder: true, verified: true, action: "Message" },
 ];
 
 export function WhoToFollowCard() {
@@ -29,13 +30,20 @@ export function WhoToFollowCard() {
         {PEOPLE.map((person) => (
           <li key={person.name} className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="relative block h-[61px] w-[101px] shrink-0 overflow-hidden rounded-2xl bg-[#eef2ff]">
-                {person.avatarPlaceholder ? (
-                  <span className="absolute left-1/2 top-1/2 block size-[30px] -translate-x-1/2 -translate-y-1/2">
-                    <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="30px" />
+              <span className="relative block h-[61px] w-[101px] shrink-0">
+                <span className="relative block size-full overflow-hidden rounded-2xl bg-[#eef2ff]">
+                  {person.avatarPlaceholder ? (
+                    <span className="absolute left-1/2 top-1/2 block size-[30px] -translate-x-1/2 -translate-y-1/2">
+                      <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="30px" />
+                    </span>
+                  ) : (
+                    <Image src={person.avatar} alt={person.name} fill className="object-cover" sizes="101px" />
+                  )}
+                </span>
+                {person.verified && (
+                  <span className="absolute -bottom-1 -right-1 block size-[15px]">
+                    <Image src="/icons/avatar-verified-3xl-alt.svg" alt="Verified" fill sizes="15px" />
                   </span>
-                ) : (
-                  <Image src={person.avatar} alt={person.name} fill className="object-cover" sizes="101px" />
                 )}
               </span>
               <div className="flex flex-col">
@@ -43,18 +51,12 @@ export function WhoToFollowCard() {
                 <p className="text-[7.6px] text-gray-500">{person.role}</p>
               </div>
             </div>
-            {person.action === "verified" ? (
-              <span className="relative block size-[23px] shrink-0">
-                <Image src="/icons/avatar-verified-3xl-alt.svg" alt="Verified" fill sizes="23px" />
-              </span>
-            ) : (
-              <Link
-                href={comingSoonHref("Connections")}
-                className="flex h-[23px] w-[67px] shrink-0 items-center justify-center rounded-lg border border-brand-900 text-[11px] text-brand-900"
-              >
-                {person.action}
-              </Link>
-            )}
+            <Link
+              href={comingSoonHref("Connections")}
+              className="flex h-[23px] w-[67px] shrink-0 items-center justify-center rounded-lg border border-brand-900 text-[11px] text-brand-900"
+            >
+              {person.action}
+            </Link>
           </li>
         ))}
       </ul>
