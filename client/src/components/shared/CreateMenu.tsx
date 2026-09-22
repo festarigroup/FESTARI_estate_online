@@ -92,10 +92,10 @@ const SECTIONS: CreateMenuSection[] = [
 
 export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
   return (
-    <div className="no-scrollbar flex max-h-[min(75vh,520px)] w-[300px] flex-col gap-1.5 overflow-y-auto rounded-3xl bg-white p-3 shadow-[0px_20px_66px_rgba(34,48,73,0.2)]">
+    <div className="flex w-[300px] flex-col gap-1 rounded-2xl bg-white p-2.5 shadow-[0px_20px_66px_rgba(34,48,73,0.2)]">
       {SECTIONS.map((section) => (
-        <div key={section.title} className="flex w-full flex-col gap-1">
-          <p className="text-sm font-semibold tracking-[-0.42px] text-night-900">{section.title}</p>
+        <div key={section.title} className="flex w-full flex-col gap-0.5">
+          <p className="text-[13px] font-semibold tracking-[-0.42px] text-night-900">{section.title}</p>
           <div className="flex w-full flex-col items-start">
             {section.items.map((item, index) => (
               <Link
@@ -104,20 +104,20 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
                 onClick={onNavigate}
                 className={
                   section.divider && index === section.items.length - 1
-                    ? "flex w-full items-center gap-2 rounded-xl border-b border-gray-200 px-2 py-1.5 hover:bg-[#e2edff]"
-                    : "flex w-full items-center gap-2 rounded-xl px-2 py-1.5 hover:bg-[#e2edff]"
+                    ? "flex w-full items-center gap-2 rounded-lg border-b border-gray-200 px-1.5 py-1 hover:bg-[#e2edff]"
+                    : "flex w-full items-center gap-2 rounded-lg px-1.5 py-1 hover:bg-[#e2edff]"
                 }
               >
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-brand-900 p-1">
-                  <NavIcon icon={item.icon} color="white" size={16} />
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-900 p-1">
+                  <NavIcon icon={item.icon} color="white" size={15} />
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col items-start">
-                  <span className="w-full text-[13px] font-medium leading-5 text-night-900">{item.label}</span>
-                  <span className="w-full text-[10.5px] leading-[14px] text-gray-500">{item.description}</span>
+                  <span className="w-full text-[12.5px] font-medium leading-[18px] text-night-900">{item.label}</span>
+                  <span className="w-full truncate text-[10px] leading-[13px] text-gray-500">{item.description}</span>
                 </span>
                 {item.locked && (
-                  <span className="relative block size-3.5 shrink-0">
-                    <Image src="/icons/create-menu-lock-key.svg" alt="" fill sizes="14px" />
+                  <span className="relative block size-3 shrink-0">
+                    <Image src="/icons/create-menu-lock-key.svg" alt="" fill sizes="12px" />
                   </span>
                 )}
               </Link>
