@@ -56,7 +56,6 @@ interface DesktopMenuItem {
   key: string;
   icon: string;
   label: string;
-  description: string;
   locked?: boolean;
   highlighted?: boolean;
   submenu?: DesktopSubmenuItem[];
@@ -76,7 +75,6 @@ const DESKTOP_SECTIONS: DesktopMenuSection[] = [
         key: "post",
         icon: "/icons/create-menu-dt-add-alt.svg",
         label: "Create Post",
-        description: "Photo, video, poll or article",
         highlighted: true,
         submenu: [
           { key: "video", icon: "/icons/video-01.svg", label: "Video post" },
@@ -86,67 +84,23 @@ const DESKTOP_SECTIONS: DesktopMenuSection[] = [
     ],
   },
   {
-    title: "List something",
     divider: true,
     items: [
-      {
-        key: "property",
-        icon: "/icons/building-03.svg",
-        label: "List Property",
-        description: "Needs ownership or agency evidence",
-        locked: true,
-      },
-      {
-        key: "stay",
-        icon: "/icons/create-menu-dt-guest-house.svg",
-        label: "Add Stay",
-        description: "Needs a verified business",
-        locked: true,
-      },
-      {
-        key: "service",
-        icon: "/icons/create-menu-dt-map-pin.svg",
-        label: "Offer a Service",
-        description: "Needs Professional or Artisan capabilities",
-        locked: true,
-      },
-      {
-        key: "project",
-        icon: "/icons/create-menu-dt-briefcase.svg",
-        label: "Post Project",
-        description: "Needs developer verification",
-        locked: true,
-      },
+      { key: "property", icon: "/icons/building-03.svg", label: "List Property", locked: true },
+      { key: "stay", icon: "/icons/create-menu-dt-guest-house.svg", label: "Add Stay", locked: true },
+      { key: "service", icon: "/icons/create-menu-dt-map-pin.svg", label: "Offer a Service", locked: true },
+      { key: "project", icon: "/icons/create-menu-dt-briefcase.svg", label: "Post Project", locked: true },
     ],
   },
   {
-    title: "Bring people together",
     divider: true,
     items: [
-      {
-        key: "event",
-        icon: "/icons/create-menu-calendar-17.svg",
-        label: "Create Events",
-        description: "open house, tour or meeting",
-      },
-      {
-        key: "community",
-        icon: "/icons/create-menu-dt-user-group.svg",
-        label: "Create Community",
-        description: "Tied to an estate, project or area",
-      },
+      { key: "event", icon: "/icons/create-menu-calendar-17.svg", label: "Create Events" },
+      { key: "community", icon: "/icons/create-menu-dt-user-group.svg", label: "Create Community" },
     ],
   },
   {
-    title: "Need something done",
-    items: [
-      {
-        key: "request",
-        icon: "/icons/create-menu-dt-help-circle.svg",
-        label: "Post a Request",
-        description: "Let providers come to you with quotes",
-      },
-    ],
+    items: [{ key: "request", icon: "/icons/create-menu-dt-help-circle.svg", label: "Post a Request" }],
   },
 ];
 
@@ -192,7 +146,7 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
         ))}
       </div>
 
-      <div className="hidden w-[300px] flex-col gap-1.5 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white p-3 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] sm:flex">
+      <div className="hidden w-[280px] flex-col gap-1.5 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white p-3 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] sm:flex">
         {DESKTOP_SECTIONS.map((section, sectionIndex) => (
           <div key={sectionIndex} className="flex w-full flex-col gap-1">
             {section.title && (
@@ -215,22 +169,24 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
                     href={comingSoonHref(item.label)}
                     onClick={onNavigate}
                     className={cn(
-                      "flex w-full items-center gap-2 rounded-xl p-1.5",
+                      "flex h-8 w-full items-center gap-2 rounded-xl px-2",
                       item.highlighted
                         ? "border-b border-gray-200 bg-[#e2edff]"
                         : "hover:bg-gray-50",
                     )}
                   >
-                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-900 p-1">
-                      <NavIcon icon={item.icon} color="white" size={16} />
-                    </span>
-                    <span className="flex min-w-0 flex-1 flex-col items-start">
-                      <span className="w-full text-[13px] font-medium leading-4 text-night-900">{item.label}</span>
-                      <span className="w-full truncate text-[10px] leading-3 text-gray-500">{item.description}</span>
+                    <NavIcon icon={item.icon} color="brand" size={14} className="shrink-0 bg-brand-900" />
+                    <span
+                      className={cn(
+                        "flex-1 truncate text-sm",
+                        item.highlighted ? "font-medium text-brand-900" : "text-gray-500",
+                      )}
+                    >
+                      {item.label}
                     </span>
                     {item.locked && (
                       <span className="relative block size-2.5 shrink-0">
-                        <Image src="/icons/create-menu-dt-lock-key.svg" alt="" fill sizes="10px" />
+                        <Image src="/icons/create-menu2-lock-key.svg" alt="" fill sizes="10px" />
                       </span>
                     )}
                   </Link>
