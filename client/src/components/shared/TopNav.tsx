@@ -86,8 +86,8 @@ export function TopNav() {
             aria-label="Account menu"
             className="flex items-center gap-2 rounded-full hover:bg-gray-50"
           >
-            <span className="relative block size-10 shrink-0 overflow-hidden rounded-full">
-              <Image src="/icons/avatar-sample.jpg" alt="Madeline Price" fill className="object-cover" sizes="40px" />
+            <span className="relative block size-8 shrink-0 overflow-hidden rounded-full">
+              <Image src="/icons/avatar-sample.jpg" alt="Madeline Price" fill className="object-cover" sizes="32px" />
             </span>
             <div className="hidden flex-col items-start md:flex">
               <p className="text-[11px] font-semibold text-night-900">Madeline Price</p>
