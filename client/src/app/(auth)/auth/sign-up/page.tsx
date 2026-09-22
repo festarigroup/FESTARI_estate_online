@@ -172,14 +172,16 @@ export default function SignUpPage() {
     >
       {/* Mobile: one field per step, per the Figma mobile sign-up flow. */}
       <div className="flex flex-col gap-8 lg:hidden">
-        <div className="flex flex-col items-center gap-2 text-center">
-          <h1 className="text-[32px] font-bold leading-10 tracking-[-0.96px] text-black dark:text-white">
-            Create your account
-          </h1>
-          <p className="text-sm leading-5 text-black dark:text-white">
-            Takes under a minute. No role commitment requirement.
-          </p>
-        </div>
+        {mobileField !== "terms" && (
+          <div className="flex flex-col items-center gap-2 text-center">
+            <h1 className="text-[32px] font-bold leading-10 tracking-[-0.96px] text-black dark:text-white">
+              Create your account
+            </h1>
+            <p className="text-sm leading-5 text-black dark:text-white">
+              Takes under a minute. No role commitment requirement.
+            </p>
+          </div>
+        )}
 
         <form onSubmit={handleMobileContinue} className="flex flex-col gap-6">
           <div className="flex flex-col gap-3">
