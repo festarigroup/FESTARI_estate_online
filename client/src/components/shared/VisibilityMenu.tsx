@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
+import { createPortal } from "react-dom";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
@@ -18,16 +19,37 @@ interface VisibilityMenuProps {
   onClose: () => void;
   value: PostVisibility;
   onChange: (value: PostVisibility) => void;
+  anchorRef: RefObject<HTMLElement | null>;
 }
 
-export function VisibilityMenu({ open, onClose, value, onChange }: VisibilityMenuProps) {
+export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: VisibilityMenuProps) {
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function updatePosition() {
+      const rect = anchorRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      setPosition({ top: rect.bottom + 8, left: rect.left });
+    }
+
+    updatePosition();
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+    return () => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [open, anchorRef]);
 
   useEffect(() => {
     if (!open) return;
     const handlePointerDown = (event: PointerEvent) => {
       if (menuRef.current?.contains(event.target as Node)) return;
+      if (anchorRef.current?.contains(event.target as Node)) return;
       onClose();
     };
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -39,14 +61,15 @@ export function VisibilityMenu({ open, onClose, value, onChange }: VisibilityMen
       document.removeEventListener("pointerdown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open, onClose]);
+  }, [open, onClose, anchorRef]);
 
-  if (!open) return null;
+  if (!open || !position) return null;
 
-  return (
+  return createPortal(
     <div
       ref={menuRef}
-      className="absolute left-0 top-full z-20 mt-2 flex w-[280px] flex-col gap-4 rounded-xl bg-white px-2 py-2.5 drop-shadow-[0px_4px_2px_rgba(0,0,0,0.28)]"
+      style={{ top: position.top, left: position.left }}
+      className="fixed z-[110] flex w-[280px] flex-col gap-4 rounded-xl bg-white px-2 py-2.5 drop-shadow-[0px_4px_2px_rgba(0,0,0,0.28)]"
     >
       <div className="flex flex-col gap-0.5 px-1">
         <p className="text-sm font-semibold text-[#001f3f]">Who can view?</p>
@@ -119,6 +142,7 @@ export function VisibilityMenu({ open, onClose, value, onChange }: VisibilityMen
           className="w-full flex-1 bg-transparent text-sm text-[#94a3b7] placeholder:text-[#94a3b7] focus:outline-none"
         />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

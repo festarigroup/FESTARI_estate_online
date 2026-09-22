@@ -54,6 +54,7 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
   const wordCount = useMemo(() => (text.trim() ? text.trim().split(/\s+/).length : 0), [text]);
   const [visibilityOpen, setVisibilityOpen] = useState(false);
   const [visibility, setVisibility] = useState<PostVisibility>("everyone");
+  const visibilityTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   const [wasOpen, setWasOpen] = useState(open);
   if (open !== wasOpen) {
@@ -235,26 +236,26 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
         )}
 
         <div className="flex w-full flex-col gap-4">
-          <div className="relative w-full">
-            <button
-              type="button"
-              onClick={() => setVisibilityOpen((v) => !v)}
-              aria-expanded={visibilityOpen}
-              className="flex w-full items-center gap-2.5 px-2"
-            >
-              <NavIcon icon="/icons/create-menu-globe-visibility.svg" color="brand" size={24} className="bg-[#337df2]" />
-              <span className="text-[14.6px] font-semibold text-[#337df2]">{VISIBILITY_LABEL[visibility]}</span>
-            </button>
-            <VisibilityMenu
-              open={visibilityOpen}
-              onClose={() => setVisibilityOpen(false)}
-              value={visibility}
-              onChange={(next) => {
-                setVisibility(next);
-                setVisibilityOpen(false);
-              }}
-            />
-          </div>
+          <button
+            ref={visibilityTriggerRef}
+            type="button"
+            onClick={() => setVisibilityOpen((v) => !v)}
+            aria-expanded={visibilityOpen}
+            className="flex w-full items-center gap-2.5 px-2"
+          >
+            <NavIcon icon="/icons/create-menu-globe-visibility.svg" color="brand" size={24} className="bg-[#337df2]" />
+            <span className="text-[14.6px] font-semibold text-[#337df2]">{VISIBILITY_LABEL[visibility]}</span>
+          </button>
+          <VisibilityMenu
+            open={visibilityOpen}
+            onClose={() => setVisibilityOpen(false)}
+            value={visibility}
+            onChange={(next) => {
+              setVisibility(next);
+              setVisibilityOpen(false);
+            }}
+            anchorRef={visibilityTriggerRef}
+          />
 
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-3">
