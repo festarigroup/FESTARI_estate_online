@@ -25,7 +25,7 @@ interface VisibilityMenuProps {
 export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: VisibilityMenuProps) {
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
+  const [position, setPosition] = useState<{ bottom: number; left: number } | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -33,7 +33,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
     function updatePosition() {
       const rect = anchorRef.current?.getBoundingClientRect();
       if (!rect) return;
-      setPosition({ top: rect.bottom + 8, left: rect.left });
+      setPosition({ bottom: window.innerHeight - rect.top + 8, left: rect.left });
     }
 
     updatePosition();
@@ -68,7 +68,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
   return createPortal(
     <div
       ref={menuRef}
-      style={{ top: position.top, left: position.left }}
+      style={{ bottom: position.bottom, left: position.left }}
       className="fixed z-[110] flex w-[280px] flex-col gap-4 rounded-xl bg-white px-2 py-2.5 drop-shadow-[0px_4px_2px_rgba(0,0,0,0.28)]"
     >
       <div className="flex flex-col gap-0.5 px-1">
