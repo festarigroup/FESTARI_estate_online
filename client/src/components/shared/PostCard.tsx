@@ -82,6 +82,19 @@ interface PostCardProps {
 
 export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardProps) {
   const [showComments, setShowComments] = useState(false);
+  const [comments, setComments] = useState<CommentItem[]>(post.commentsList ?? DEFAULT_COMMENTS);
+  const [commentDraft, setCommentDraft] = useState("");
+
+  const submitComment = () => {
+    const text = commentDraft.trim();
+    if (!text) return;
+    setComments((current) => [
+      { id: `local-${Date.now()}`, authorName: "You", postedAt: "Just now", text },
+      ...current,
+    ]);
+    setCommentDraft("");
+    setShowComments(true);
+  };
 
   return (
     <article className="flex w-full flex-col gap-[15px] rounded-[29px] border border-gray-200 bg-white p-[15px] sm:rounded-[15px]">
@@ -131,21 +144,33 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
           </span>
           <input
             type="text"
+            value={commentDraft}
+            onChange={(event) => setCommentDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") submitComment();
+            }}
             placeholder="Add a comment"
             className="min-w-0 flex-1 bg-transparent text-[11px] text-night-900/70 placeholder:text-night-900/40 focus:outline-none"
           />
-          <button type="button" aria-label="Send comment" className="relative block size-[23px] shrink-0">
+          <button
+            type="button"
+            aria-label="Send comment"
+            onClick={submitComment}
+            className="relative block size-[23px] shrink-0"
+          >
             <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="23px" />
           </button>
         </div>
       )}
 
-      {showComments && <CommentsSection comments={post.commentsList ?? DEFAULT_COMMENTS} />}
+      {showComments && <CommentsSection comments={comments} />}
     </article>
   );
 }
 
 function PostHeader({ post }: { post: PostCardData }) {
+  const [following, setFollowing] = useState(false);
+
   return (
     <div className="flex w-full items-center justify-between">
       <div className="flex items-center gap-2">
@@ -190,13 +215,20 @@ function PostHeader({ post }: { post: PostCardData }) {
         {post.variant !== "poll" && (
           <button
             type="button"
-            aria-label="Follow"
-            className="flex h-[38px] w-[38px] items-center justify-center rounded-lg sm:w-[81px] sm:px-[15px] sm:py-2"
+            onClick={() => setFollowing((v) => !v)}
+            aria-label={following ? "Following" : "Follow"}
+            aria-pressed={following}
+            className="flex h-[38px] w-[38px] items-center justify-center gap-1.5 rounded-lg sm:w-auto sm:px-[15px] sm:py-2"
           >
-            <span className="relative block size-5 shrink-0 sm:hidden">
-              <Image src="/icons/user-add-01.svg" alt="" fill sizes="20px" />
+            <NavIcon
+              icon={following ? "/icons/check-circle.svg" : "/icons/user-add-01.svg"}
+              color="brand"
+              size={20}
+              className="shrink-0 sm:hidden"
+            />
+            <span className="hidden text-[13px] text-brand-900 sm:inline">
+              {following ? "Following" : "Follow"}
             </span>
-            <span className="hidden text-[13px] text-brand-900 sm:inline">Follow</span>
           </button>
         )}
         <span className="relative block size-[23px] shrink-0 sm:hidden">
