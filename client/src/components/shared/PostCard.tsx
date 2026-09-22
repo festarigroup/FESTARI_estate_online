@@ -149,19 +149,21 @@ function PostHeader({ post }: { post: PostCardData }) {
   return (
     <div className="flex w-full items-center justify-between">
       <div className="flex items-center gap-2">
-        <span
-          className={cn(
-            "relative block size-[46px] shrink-0 overflow-hidden rounded-full",
-            post.avatarPlaceholder && "flex items-center justify-center bg-[#eef2ff]",
-          )}
-        >
-          {post.avatarPlaceholder ? (
-            <span className="relative block size-[27px]">
-              <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="27px" />
-            </span>
-          ) : (
-            <Image src={post.avatar} alt={post.authorName} fill className="object-cover" sizes="46px" />
-          )}
+        <span className="relative block size-[46px] shrink-0">
+          <span
+            className={cn(
+              "relative block size-full overflow-hidden rounded-full",
+              post.avatarPlaceholder && "flex items-center justify-center bg-[#eef2ff]",
+            )}
+          >
+            {post.avatarPlaceholder ? (
+              <span className="relative block size-[27px]">
+                <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="27px" />
+              </span>
+            ) : (
+              <Image src={post.avatar} alt={post.authorName} fill className="object-cover" sizes="46px" />
+            )}
+          </span>
           {post.verified && (
             <span className="absolute -bottom-0.5 -right-0.5 block size-[17px]">
               <Image src="/icons/avatar-verified-badge.svg" alt="" fill sizes="17px" />
