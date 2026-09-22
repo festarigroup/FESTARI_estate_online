@@ -117,19 +117,18 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="flex max-h-[90vh] w-full max-w-[720px] flex-col gap-6 overflow-y-auto rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
+        className="relative flex max-h-[90vh] w-full max-w-[720px] flex-col gap-6 overflow-y-auto rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
       >
-        <div className="flex w-full items-center justify-between">
-          <p className="text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Create a Post</p>
-          <button
-            type="button"
-            aria-label="Close"
-            onClick={handleClose}
-            className="flex size-8 shrink-0 items-center justify-center rounded-full text-xl leading-none text-gray-500 hover:bg-gray-100"
-          >
-            &times;
-          </button>
-        </div>
+        <button
+          type="button"
+          aria-label="Close"
+          onClick={handleClose}
+          className="absolute -right-3 -top-3 flex size-7 items-center justify-center rounded-full border border-gray-200 bg-white text-sm leading-none text-gray-500 shadow-md hover:bg-gray-50"
+        >
+          &times;
+        </button>
+
+        <p className="text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Create a Post</p>
 
         <div className="flex w-full flex-col gap-2.5 rounded-2xl border border-gray-200 p-4">
           <div className="flex w-full items-start gap-3">
@@ -156,12 +155,14 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
           <div className="flex w-full flex-col gap-2.5 px-6">
             {options.map((option, index) => {
               const filled = option.trim().length > 0;
+              const required = index < MIN_OPTIONS;
+              const active = required || filled;
               return (
               <div
                 key={index}
                 className={cn(
                   "flex h-12 w-full items-center gap-2 rounded-lg border px-3",
-                  filled ? "border-gray-200 bg-white" : "border-dashed border-gray-200 bg-gray-50/60",
+                  active ? "border-gray-200 bg-white" : "border-dashed border-gray-200 bg-gray-50/60",
                 )}
               >
                 <input
@@ -170,10 +171,10 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
                   placeholder={`Option ${index + 1}`}
                   className={cn(
                     "w-full flex-1 text-sm focus:outline-none",
-                    filled ? "text-night-900 placeholder:text-night-900/70" : "text-gray-400 placeholder:text-gray-400",
+                    active ? "text-night-900 placeholder:text-night-900/70" : "text-gray-400 placeholder:text-gray-400",
                   )}
                 />
-                {filled && (
+                {!required && filled && (
                   <button
                     type="button"
                     aria-label={`Remove option ${index + 1}`}
