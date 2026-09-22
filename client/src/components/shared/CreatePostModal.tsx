@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { VISIBILITY_LABEL, VisibilityMenu, type PostVisibility } from "@/components/shared/VisibilityMenu";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 
@@ -51,6 +52,8 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const wordCount = useMemo(() => (text.trim() ? text.trim().split(/\s+/).length : 0), [text]);
+  const [visibilityOpen, setVisibilityOpen] = useState(false);
+  const [visibility, setVisibility] = useState<PostVisibility>("everyone");
 
   const [wasOpen, setWasOpen] = useState(open);
   if (open !== wasOpen) {
@@ -108,6 +111,8 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
   function resetState() {
     setText("");
     setFiles([]);
+    setVisibility("everyone");
+    setVisibilityOpen(false);
   }
 
   function handleClose() {
@@ -135,17 +140,18 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="relative flex max-h-[90vh] w-full max-w-[720px] flex-col gap-6 overflow-y-auto rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
+        className="relative w-full max-w-[720px]"
       >
         <button
           type="button"
           aria-label="Close"
           onClick={handleClose}
-          className="absolute -right-3 -top-3 flex size-7 items-center justify-center rounded-full border border-gray-200 bg-white text-sm leading-none text-gray-500 shadow-md hover:bg-gray-50"
+          className="absolute -right-3 -top-3 z-10 flex size-7 items-center justify-center rounded-full border border-gray-200 bg-white text-sm leading-none text-gray-500 shadow-md hover:bg-gray-50"
         >
           &times;
         </button>
 
+        <div className="flex max-h-[90vh] w-full flex-col gap-6 overflow-y-auto rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
         <p className="text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Create a Post</p>
 
         <div className="flex w-full items-start gap-3">
@@ -229,14 +235,26 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
         )}
 
         <div className="flex w-full flex-col gap-4">
-          <button
-            type="button"
-            onClick={() => router.push(comingSoonHref("Post visibility"))}
-            className="flex w-full items-center gap-2.5 px-2"
-          >
-            <NavIcon icon="/icons/create-menu-globe-visibility.svg" color="brand" size={24} className="bg-[#337df2]" />
-            <span className="text-[14.6px] font-semibold text-[#337df2]">Everyone can view</span>
-          </button>
+          <div className="relative w-full">
+            <button
+              type="button"
+              onClick={() => setVisibilityOpen((v) => !v)}
+              aria-expanded={visibilityOpen}
+              className="flex w-full items-center gap-2.5 px-2"
+            >
+              <NavIcon icon="/icons/create-menu-globe-visibility.svg" color="brand" size={24} className="bg-[#337df2]" />
+              <span className="text-[14.6px] font-semibold text-[#337df2]">{VISIBILITY_LABEL[visibility]}</span>
+            </button>
+            <VisibilityMenu
+              open={visibilityOpen}
+              onClose={() => setVisibilityOpen(false)}
+              value={visibility}
+              onChange={(next) => {
+                setVisibility(next);
+                setVisibilityOpen(false);
+              }}
+            />
+          </div>
 
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-3">
@@ -287,6 +305,7 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
           </div>
 
           <div className="h-px w-full bg-gray-200" />
+        </div>
         </div>
       </div>
     </div>,

@@ -1,0 +1,124 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { NavIcon } from "@/components/shared/NavIcon";
+import { comingSoonHref } from "@/lib/coming-soon";
+import { cn } from "@/lib/utils";
+
+export type PostVisibility = "everyone" | "followings";
+
+export const VISIBILITY_LABEL: Record<PostVisibility, string> = {
+  everyone: "Everyone can view",
+  followings: "Followings",
+};
+
+interface VisibilityMenuProps {
+  open: boolean;
+  onClose: () => void;
+  value: PostVisibility;
+  onChange: (value: PostVisibility) => void;
+}
+
+export function VisibilityMenu({ open, onClose, value, onChange }: VisibilityMenuProps) {
+  const router = useRouter();
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      if (menuRef.current?.contains(event.target as Node)) return;
+      onClose();
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      ref={menuRef}
+      className="absolute left-0 top-full z-20 mt-2 flex w-[280px] flex-col gap-4 rounded-xl bg-white px-2 py-2.5 drop-shadow-[0px_4px_2px_rgba(0,0,0,0.28)]"
+    >
+      <div className="flex flex-col gap-0.5 px-1">
+        <p className="text-sm font-semibold text-[#001f3f]">Who can view?</p>
+        <p className="text-xs font-semibold text-[#64748a]">Choose who can view this post</p>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <button
+          type="button"
+          onClick={() => onChange("everyone")}
+          className="flex w-full items-center gap-2.5 rounded-lg px-1 py-1"
+        >
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
+            <NavIcon icon="/icons/create-menu-globe-visibility.svg" color="white" size={22} />
+          </span>
+          <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Everyone can view</span>
+          {value === "everyone" && (
+            <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={20} className="bg-[#1465e6]" />
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onChange("followings")}
+          className={cn(
+            "flex w-full items-center gap-2.5 rounded-full px-1 py-1",
+            value === "followings" && "bg-[#f1f6ff]",
+          )}
+        >
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
+            <NavIcon icon="/icons/visibility-team-structure.svg" color="white" size={20} />
+          </span>
+          <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Followings</span>
+          {value === "followings" && (
+            <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={20} className="bg-[#1465e6]" />
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => router.push(comingSoonHref("Community"))}
+          className="flex w-full items-center gap-2.5 rounded-lg px-1 py-1"
+        >
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
+            <NavIcon icon="/icons/user-group.svg" color="white" size={22} />
+          </span>
+          <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Community</span>
+          <NavIcon icon="/icons/visibility-chevron-outline-right.svg" color="night" size={10} />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => router.push(comingSoonHref("Organization"))}
+          className="flex w-full items-center gap-2.5 rounded-lg px-1 py-1"
+        >
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
+            <NavIcon icon="/icons/visibility-user-check.svg" color="white" size={20} />
+          </span>
+          <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Organization</span>
+          <NavIcon icon="/icons/visibility-chevron-outline-right.svg" color="night" size={10} />
+        </button>
+      </div>
+
+      <div className="flex w-full items-center gap-2.5 rounded-xl bg-[#f6f6f9] px-1.5 py-1">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
+          <NavIcon icon="/icons/visibility-search.svg" color="white" size={20} />
+        </span>
+        <input
+          placeholder="Search Profile"
+          className="w-full flex-1 bg-transparent text-sm text-[#94a3b7] placeholder:text-[#94a3b7] focus:outline-none"
+        />
+      </div>
+    </div>
+  );
+}
