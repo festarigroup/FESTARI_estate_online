@@ -6,12 +6,10 @@ import { useEffect, useRef, useState } from "react";
 import { showSuccessToast } from "@/components/shared/AppToast";
 import { CreateMenu } from "@/components/shared/CreateMenu";
 import { NavIcon } from "@/components/shared/NavIcon";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { comingSoonHref } from "@/lib/coming-soon";
 
 export function TopNav() {
   const router = useRouter();
-  const isTabletUp = useMediaQuery("(min-width: 640px)");
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
@@ -29,11 +27,7 @@ export function TopNav() {
   }
 
   function handleCreateClick() {
-    if (isTabletUp) {
-      setCreateMenuOpen((v) => !v);
-    } else {
-      goComingSoon("Create Post");
-    }
+    setCreateMenuOpen((v) => !v);
   }
 
   useEffect(() => {
@@ -103,7 +97,7 @@ export function TopNav() {
               <span className="text-[11px] text-white sm:text-[13px]">Create</span>
             </button>
 
-            {createMenuOpen && isTabletUp && (
+            {createMenuOpen && (
               <div className="absolute right-0 top-[calc(100%+8px)] z-50">
                 <CreateMenu onNavigate={() => setCreateMenuOpen(false)} />
               </div>
