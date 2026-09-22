@@ -113,7 +113,7 @@ function DesktopMenuRow({ item, onNavigate }: { item: DesktopMenuItem; onNavigat
         onClick={onNavigate}
         className={cn(
           "flex h-8 w-full items-center gap-2 rounded-xl px-2",
-          item.highlighted ? "border-b border-gray-200 bg-[#e2edff]" : "hover:bg-white",
+          item.highlighted ? "border-b border-gray-200 bg-[#e2edff]" : "hover:bg-gray-100",
         )}
       >
         <NavIcon
@@ -131,9 +131,7 @@ function DesktopMenuRow({ item, onNavigate }: { item: DesktopMenuItem; onNavigat
           {item.label}
         </span>
         {item.locked && (
-          <span className="relative block size-2.5 shrink-0">
-            <Image src="/icons/create-menu2-lock-key.svg" alt="" fill sizes="10px" />
-          </span>
+          <NavIcon icon="/icons/create-menu2-lock-key.svg" color="night" size={10} className="shrink-0" />
         )}
       </Link>
 
@@ -200,8 +198,8 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
         ))}
       </div>
 
-      <div className="hidden w-[280px] flex-col gap-2 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-gray-50 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] sm:flex">
-        <div className="flex w-full flex-col gap-1 rounded-2xl bg-white p-2">
+      <div className="hidden w-[380px] flex-col gap-2 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white p-3 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] sm:flex">
+        <div className="flex w-full flex-col gap-1">
           <div className="flex items-center gap-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-gray-500">
               {DESKTOP_SHARE_SECTION.title}
@@ -215,7 +213,7 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
           ))}
         </div>
 
-        <div className="flex w-full flex-col gap-1.5 rounded-2xl bg-gray-100 p-2">
+        <div className="flex w-full flex-col gap-1.5 rounded-2xl border border-gray-200 bg-white p-2">
           {DESKTOP_LIST_SECTIONS.map((section, sectionIndex) => (
             <div
               key={sectionIndex}
