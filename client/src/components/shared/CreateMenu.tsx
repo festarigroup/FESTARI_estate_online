@@ -26,8 +26,8 @@ interface DesktopMenuSection {
 
 const CREATE_POST_ITEM = { key: "post", icon: "/icons/create-menu-dt-add-alt.svg", label: "Create Post" };
 const CREATE_POST_SUBMENU: DesktopSubmenuItem[] = [
-  { key: "video", icon: "/icons/video-01.svg", label: "Video post" },
-  { key: "image", icon: "/icons/image-01.svg", label: "Image post" },
+  { key: "video", icon: "/icons/video-01.svg", label: "Video Post" },
+  { key: "image", icon: "/icons/image-01.svg", label: "Image Post" },
   { key: "poll", icon: "/icons/chart-02.svg", label: "Poll" },
   { key: "article", icon: "/icons/book-bookmark-01.svg", label: "Article" },
 ];
@@ -136,7 +136,7 @@ function MobileMenuRow({ item, onNavigate }: { item: MobileMenuItem; onNavigate:
       </button>
 
       {open && (
-        <div className="absolute left-[calc(100%-28px)] top-0 z-10 flex w-48 flex-col gap-0.5 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-lg">
+        <div className="absolute left-9 top-full z-10 mt-1 flex w-40 flex-col gap-0.5 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-lg">
           {item.submenu.map((sub) => (
             <Link
               key={sub.key}
