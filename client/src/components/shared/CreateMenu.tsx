@@ -31,7 +31,7 @@ const SECTIONS: CreateMenuSection[] = [
     items: [
       {
         key: "property",
-        icon: "/icons/create-menu-calendar-date.svg",
+        icon: "/icons/create-menu-building.svg",
         label: "List Property",
         description: "Needs ownership or agency evidence",
         locked: true,
@@ -64,7 +64,7 @@ const SECTIONS: CreateMenuSection[] = [
     items: [
       {
         key: "event",
-        icon: "/icons/create-menu-calendar-date.svg",
+        icon: "/icons/create-menu-calendar-17.svg",
         label: "Create Events",
         description: "open house, tour or meeting",
       },
