@@ -26,7 +26,7 @@ export function AppShell({ activeKey, header, children, rightRail }: AppShellPro
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-gray-50">
       <TopNav />
-      <div className="mx-auto flex w-full max-w-[1440px] flex-1 overflow-hidden 4xl:max-w-[1720px] 5xl:max-w-[2200px]">
+      <div className="flex w-full flex-1 overflow-hidden">
         <AppSidebar
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsedOverride(!collapsed)}
