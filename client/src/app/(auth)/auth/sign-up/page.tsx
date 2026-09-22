@@ -22,7 +22,7 @@ const PROVIDERS = [
   { id: "apple", label: "Sign Up with Apple", iconSrc: "/brand/apple-icon.svg", invertOnDark: true },
 ] as const;
 
-const MOBILE_FIELDS = ["fullName", "email", "phone", "password"] as const;
+const MOBILE_FIELDS = ["fullName", "email", "phone", "password", "terms"] as const;
 type MobileField = (typeof MOBILE_FIELDS)[number];
 
 const STEP_ONE_TAGLINE = { highlight: "One account .", rest: "Every part of the built environment ." };
@@ -137,10 +137,9 @@ export default function SignUpPage() {
     if (mobileField === "fullName") fieldError = validateFullName(fullName);
     else if (mobileField === "email") fieldError = validateIdentifier(email, "email");
     else if (mobileField === "phone") fieldError = validateIdentifier(phone, "phone");
-    else fieldError = validatePassword(password);
+    else if (mobileField === "password") fieldError = validatePassword(password);
 
-    const termsError =
-      mobileField === "password" && !agreedToTerms ? TERMS_ERROR : undefined;
+    const termsError = mobileField === "terms" && !agreedToTerms ? TERMS_ERROR : undefined;
 
     setErrors((prev) => ({ ...prev, [mobileField]: fieldError, terms: termsError }));
     if (fieldError || termsError) return;
@@ -217,29 +216,29 @@ export default function SignUpPage() {
               />
             )}
             {mobileField === "password" && (
-              <>
-                <div className="flex flex-col gap-1">
-                  <PasswordInput
-                    id="mobile-password"
-                    label="Password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    error={errors.password}
-                  />
-                  {!errors.password && (
-                    <p className="text-xs text-muted-400 dark:text-muted-300">
-                      Use 8 or more characters with a mix of letters and numbers
-                    </p>
-                  )}
-                </div>
-                <TermsAgreement
-                  id="mobile-agree-terms"
-                  checked={agreedToTerms}
-                  onChange={setAgreedToTerms}
-                  error={errors.terms}
+              <div className="flex flex-col gap-1">
+                <PasswordInput
+                  id="mobile-password"
+                  label="Password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  error={errors.password}
                 />
-              </>
+                {!errors.password && (
+                  <p className="text-xs text-muted-400 dark:text-muted-300">
+                    Use 8 or more characters with a mix of letters and numbers
+                  </p>
+                )}
+              </div>
+            )}
+            {mobileField === "terms" && (
+              <TermsAgreement
+                id="mobile-agree-terms"
+                checked={agreedToTerms}
+                onChange={setAgreedToTerms}
+                error={errors.terms}
+              />
             )}
           </div>
 
