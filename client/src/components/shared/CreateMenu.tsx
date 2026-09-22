@@ -114,7 +114,7 @@ function MobileMenuRow({ item, onNavigate }: { item: MobileMenuItem; onNavigate:
   }
 
   return (
-    <div className="w-full">
+    <div className="relative w-full">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -136,13 +136,13 @@ function MobileMenuRow({ item, onNavigate }: { item: MobileMenuItem; onNavigate:
       </button>
 
       {open && (
-        <div className="mt-1 flex w-full flex-col gap-0.5 rounded-xl bg-gray-50 p-1.5">
+        <div className="absolute left-full top-0 z-10 ml-2 flex w-48 flex-col gap-0.5 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-lg">
           {item.submenu.map((sub) => (
             <Link
               key={sub.key}
               href={comingSoonHref(sub.label)}
               onClick={onNavigate}
-              className="flex items-center gap-3 rounded-lg p-2 hover:bg-white"
+              className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
             >
               <NavIcon icon={sub.icon} color="night" size={16} className="shrink-0" />
               <span className="text-sm text-night-900">{sub.label}</span>
