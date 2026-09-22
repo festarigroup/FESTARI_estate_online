@@ -7,8 +7,8 @@ import { showSuccessToast } from "@/components/shared/AppToast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { HangTightCard } from "@/components/shared/HangTightCard";
 import { SocialAuthButton } from "@/components/shared/SocialAuthButton";
+import { TermsAgreement } from "@/components/shared/TermsAgreement";
 import { Button } from "@/components/ui/Button";
-import { Checkbox } from "@/components/ui/Checkbox";
 import { Divider } from "@/components/ui/Divider";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
@@ -72,7 +72,6 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-  const [isAdult, setIsAdult] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [errors, setErrors] = useState<{
     fullName?: string;
@@ -112,7 +111,7 @@ export default function SignUpPage() {
     const nextErrors = {
       phone: validateIdentifier(phone, "phone"),
       password: validatePassword(password),
-      terms: isAdult && agreedToTerms ? undefined : TERMS_ERROR,
+      terms: agreedToTerms ? undefined : TERMS_ERROR,
     };
     setErrors((prev) => ({ ...prev, ...nextErrors }));
     if (nextErrors.phone || nextErrors.password || nextErrors.terms) return;
@@ -141,7 +140,7 @@ export default function SignUpPage() {
     else fieldError = validatePassword(password);
 
     const termsError =
-      mobileField === "password" && !(isAdult && agreedToTerms) ? TERMS_ERROR : undefined;
+      mobileField === "password" && !agreedToTerms ? TERMS_ERROR : undefined;
 
     setErrors((prev) => ({ ...prev, [mobileField]: fieldError, terms: termsError }));
     if (fieldError || termsError) return;
@@ -234,26 +233,12 @@ export default function SignUpPage() {
                     </p>
                   )}
                 </div>
-                <div className="flex flex-col gap-2">
-                  <Checkbox
-                    id="mobile-confirm-adult"
-                    label="I confirm I am 18 years or older"
-                    checked={isAdult}
-                    onChange={(e) => setIsAdult(e.target.checked)}
-                  />
-                  <Checkbox
-                    id="mobile-agree-terms"
-                    label={
-                      <>
-                        I agree to the <span className="underline">Terms of Service</span> and{" "}
-                        <span className="underline">Privacy Policy</span>
-                      </>
-                    }
-                    checked={agreedToTerms}
-                    onChange={(e) => setAgreedToTerms(e.target.checked)}
-                  />
-                  {errors.terms && <p className="text-xs text-[#e73d1c]">{errors.terms}</p>}
-                </div>
+                <TermsAgreement
+                  id="mobile-agree-terms"
+                  checked={agreedToTerms}
+                  onChange={setAgreedToTerms}
+                  error={errors.terms}
+                />
               </>
             )}
           </div>
@@ -379,26 +364,12 @@ export default function SignUpPage() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <Checkbox
-                id="confirm-adult"
-                label="I confirm I am 18 years or older"
-                checked={isAdult}
-                onChange={(e) => setIsAdult(e.target.checked)}
-              />
-              <Checkbox
-                id="agree-terms"
-                label={
-                  <>
-                    I agree to the <span className="underline">Terms of Service</span> and{" "}
-                    <span className="underline">Privacy Policy</span>
-                  </>
-                }
-                checked={agreedToTerms}
-                onChange={(e) => setAgreedToTerms(e.target.checked)}
-              />
-              {errors.terms && <p className="text-xs text-[#e73d1c]">{errors.terms}</p>}
-            </div>
+            <TermsAgreement
+              id="agree-terms"
+              checked={agreedToTerms}
+              onChange={setAgreedToTerms}
+              error={errors.terms}
+            />
 
             <div className="flex gap-2.5">
               <Button
