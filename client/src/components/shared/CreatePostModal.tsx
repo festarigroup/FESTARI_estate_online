@@ -198,7 +198,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
 
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-3">
-              <NavIcon icon="/icons/image-01.svg" color="brand" size={24} className="bg-[#337df2] opacity-30" />
+              <NavIcon icon="/icons/image-01.svg" color="brand" size={18} className="bg-[#337df2] opacity-30" />
               {OTHER_POST_TYPES.map((type) => (
                 <button
                   key={type.key}
@@ -206,7 +206,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
                   aria-label={type.label}
                   onClick={() => router.push(comingSoonHref(type.label))}
                 >
-                  <NavIcon icon={type.icon} color="night" size={24} />
+                  <NavIcon icon={type.icon} color="night" size={18} />
                 </button>
               ))}
             </div>
