@@ -52,8 +52,6 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
 
   if (!open) return null;
 
-  const canAddOption = options.length < MAX_OPTIONS && options.every((option) => option.trim().length > 0);
-
   function resetState() {
     setQuestion("");
     setOptions(["", ""]);
@@ -73,10 +71,6 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
 
   function updateOption(index: number, value: string) {
     setOptions((current) => withTrailingSlot(current.map((option, i) => (i === index ? value : option))));
-  }
-
-  function addOption() {
-    setOptions((current) => withTrailingSlot(current));
   }
 
   function removeOption(index: number) {
@@ -160,18 +154,26 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
           </div>
 
           <div className="flex w-full flex-col gap-2.5 px-6">
-            {options.map((option, index) => (
+            {options.map((option, index) => {
+              const filled = option.trim().length > 0;
+              return (
               <div
                 key={index}
-                className="flex h-12 w-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-3"
+                className={cn(
+                  "flex h-12 w-full items-center gap-2 rounded-lg border px-3",
+                  filled ? "border-gray-200 bg-white" : "border-dashed border-gray-200 bg-gray-50/60",
+                )}
               >
                 <input
                   value={option}
                   onChange={(event) => updateOption(index, event.target.value)}
                   placeholder={`Option ${index + 1}`}
-                  className="w-full flex-1 text-sm text-night-900 placeholder:text-night-900/70 focus:outline-none"
+                  className={cn(
+                    "w-full flex-1 text-sm focus:outline-none",
+                    filled ? "text-night-900 placeholder:text-night-900/70" : "text-gray-400 placeholder:text-gray-400",
+                  )}
                 />
-                {option.trim().length > 0 && (
+                {filled && (
                   <button
                     type="button"
                     aria-label={`Remove option ${index + 1}`}
@@ -182,7 +184,8 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
                   </button>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="flex w-full flex-col gap-1">
@@ -265,18 +268,8 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
                 <span className="whitespace-nowrap text-sm text-[#1465e6]">{wordCount} words</span>
               </div>
               <div className="h-[22px] w-px shrink-0 bg-gray-200" />
-              <button
-                type="button"
-                aria-label="Add option"
-                onClick={addOption}
-                disabled={!canAddOption}
-              >
-                <NavIcon
-                  icon="/icons/poll-add-alt.svg"
-                  color="brand"
-                  size={16}
-                  className={cn("bg-[#1465e6]", !canAddOption && "opacity-30")}
-                />
+              <button type="button" aria-label="Attach image or video" onClick={() => inputRef.current?.click()}>
+                <NavIcon icon="/icons/poll-add-alt.svg" color="brand" size={16} className="bg-[#1465e6]" />
               </button>
               <button
                 type="button"
