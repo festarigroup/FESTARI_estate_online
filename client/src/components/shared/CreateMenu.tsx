@@ -136,7 +136,7 @@ function MobileMenuRow({ item, onNavigate }: { item: MobileMenuItem; onNavigate:
       </button>
 
       {open && (
-        <div className="absolute left-9 top-full z-10 mt-1 flex w-40 flex-col gap-0.5 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-lg">
+        <div className="absolute left-9 top-full z-10 mt-1 flex w-60 flex-col gap-0.5 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-lg">
           {item.submenu.map((sub) => (
             <Link
               key={sub.key}
@@ -192,7 +192,7 @@ function CreatePostRow({ onNavigate }: { onNavigate: () => void }) {
 export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
   return (
     <>
-      <div className="flex w-[300px] flex-col gap-0.5 rounded-3xl border border-gray-200 bg-white p-2 shadow-[0px_20px_48px_-10px_rgba(0,0,0,0.12),0px_8px_20px_-6px_rgba(0,0,0,0.06)] sm:hidden">
+      <div className="flex w-60 flex-col gap-0.5 rounded-3xl border border-gray-200 bg-white p-2 shadow-[0px_20px_48px_-10px_rgba(0,0,0,0.12),0px_8px_20px_-6px_rgba(0,0,0,0.06)] sm:hidden">
         {MOBILE_ITEMS.map((item) => (
           <MobileMenuRow key={item.key} item={item} onNavigate={onNavigate} />
         ))}
