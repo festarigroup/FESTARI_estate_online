@@ -21,7 +21,6 @@ interface CreateMenuSection {
 
 const SECTIONS: CreateMenuSection[] = [
   {
-    divider: true,
     items: [{ key: "post", icon: "/icons/create-menu2-add-alt.svg", label: "Create post", highlighted: true }],
   },
   {
