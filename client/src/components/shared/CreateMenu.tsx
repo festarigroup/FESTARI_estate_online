@@ -188,7 +188,7 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
         ))}
       </div>
 
-      <div className="hidden w-[350px] flex-col items-center gap-1.5 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white/70 px-3 pb-3 pt-5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-150 sm:flex">
+      <div className="hidden w-[326px] flex-col items-center gap-1.5 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white/70 px-3 pb-3 pt-5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-150 sm:flex">
         <div className="flex w-[290px] flex-col gap-1">
           <div className="flex items-center gap-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-gray-500">Share</p>
