@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { NavIcon } from "@/components/shared/NavIcon";
@@ -75,6 +76,8 @@ interface MobileMenuItem {
   icon: string;
   label: string;
   submenu?: DesktopSubmenuItem[];
+  /** Render via <Image> as-is instead of NavIcon's color mask (the source SVG already has its own baked-in colors). */
+  rawIcon?: boolean;
 }
 
 const LISTINGS_SUBMENU: DesktopSubmenuItem[] = [
@@ -85,7 +88,7 @@ const LISTINGS_SUBMENU: DesktopSubmenuItem[] = [
 ];
 
 const MOBILE_ITEMS: MobileMenuItem[] = [
-  { key: "post", icon: "/icons/add-circle-01.svg", label: "Create post", submenu: CREATE_POST_SUBMENU },
+  { key: "post", icon: "/icons/create-menu-mobile-add-alt.svg", label: "Create post", submenu: CREATE_POST_SUBMENU, rawIcon: true },
   { key: "listings", icon: "/icons/clipboard-list-01.svg", label: "Listings", submenu: LISTINGS_SUBMENU },
   { key: "event", icon: "/icons/create-menu-calendar-17.svg", label: "Create Event" },
   { key: "community", icon: "/icons/create-menu-dt-user-group.svg", label: "Create Community" },
@@ -97,6 +100,17 @@ const MOBILE_REQUEST_ITEM: MobileMenuItem = {
   label: "Post a Request",
 };
 
+function MobileRowIcon({ item }: { item: MobileMenuItem }) {
+  if (item.rawIcon) {
+    return (
+      <span className="relative block size-5 shrink-0">
+        <Image src={item.icon} alt="" fill sizes="20px" />
+      </span>
+    );
+  }
+  return <NavIcon icon={item.icon} color="night" size={20} className="shrink-0" />;
+}
+
 function MobileMenuRow({ item, onNavigate }: { item: MobileMenuItem; onNavigate: () => void }) {
   const [open, setOpen] = useState(false);
 
@@ -107,7 +121,7 @@ function MobileMenuRow({ item, onNavigate }: { item: MobileMenuItem; onNavigate:
         onClick={onNavigate}
         className="flex h-11 w-full items-center gap-3 rounded-xl px-1 hover:bg-gray-50"
       >
-        <NavIcon icon={item.icon} color="night" size={20} className="shrink-0" />
+        <MobileRowIcon item={item} />
         <span className="flex-1 truncate text-[15px] font-medium text-night-900">{item.label}</span>
       </Link>
     );
@@ -121,7 +135,7 @@ function MobileMenuRow({ item, onNavigate }: { item: MobileMenuItem; onNavigate:
         aria-expanded={open}
         className="flex h-11 w-full items-center gap-3 rounded-xl px-1 text-left outline-none hover:bg-gray-50"
       >
-        <NavIcon icon={item.icon} color="night" size={20} className="shrink-0" />
+        <MobileRowIcon item={item} />
         <span className="flex-1 truncate text-[15px] font-medium text-night-900">{item.label}</span>
         <svg
           width="16"
