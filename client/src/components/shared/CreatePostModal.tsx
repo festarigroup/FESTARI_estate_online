@@ -140,7 +140,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
             tabIndex={0}
             className={cn(
               "flex min-h-[120px] w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed px-6 py-6 text-center",
-              dragActive ? "border-brand-900 bg-brand-900/5" : "border-[#cbd5e0] bg-[#f8fafc]",
+              dragActive ? "border-brand-900 bg-brand-900/5" : "border-[#cbd5e0] bg-[#cbd5e0]",
             )}
           >
             <input
@@ -206,7 +206,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
                   aria-label={type.label}
                   onClick={() => router.push(comingSoonHref(type.label))}
                 >
-                  <NavIcon icon={type.icon} color="night" size={18} />
+                  <NavIcon icon={type.icon} color="brand" size={18} className="bg-[#337df2]" />
                 </button>
               ))}
             </div>
