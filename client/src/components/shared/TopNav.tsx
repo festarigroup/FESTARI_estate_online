@@ -115,9 +115,9 @@ export function TopNav() {
               </button>
               <button
                 type="button"
-                className="flex h-10 w-full items-center gap-3 rounded-[10px] px-3 text-[13px] text-night-700 hover:bg-gray-50"
+                className="flex h-10 w-full items-center gap-3 rounded-[10px] px-3 text-[13px] text-red-600 hover:bg-gray-50"
               >
-                <NavIcon icon="/icons/logout-01.svg" color="night" size={18} />
+                <NavIcon icon="/icons/logout-01.svg" color="night" size={18} className="bg-red-600" />
                 Logout
               </button>
             </div>
