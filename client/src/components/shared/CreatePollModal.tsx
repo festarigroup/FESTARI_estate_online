@@ -52,6 +52,8 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
 
   if (!open) return null;
 
+  const canAddOption = options.length < MAX_OPTIONS && options.every((option) => option.trim().length > 0);
+
   function resetState() {
     setQuestion("");
     setOptions(["", ""]);
@@ -64,16 +66,26 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
     onClose();
   }
 
+  function withTrailingSlot(list: string[]) {
+    const allFilled = list.every((option) => option.trim().length > 0);
+    return allFilled && list.length < MAX_OPTIONS ? [...list, ""] : list;
+  }
+
   function updateOption(index: number, value: string) {
-    setOptions((current) => current.map((option, i) => (i === index ? value : option)));
+    setOptions((current) => withTrailingSlot(current.map((option, i) => (i === index ? value : option))));
   }
 
   function addOption() {
-    setOptions((current) => (current.length < MAX_OPTIONS ? [...current, ""] : current));
+    setOptions((current) => withTrailingSlot(current));
   }
 
   function removeOption(index: number) {
-    setOptions((current) => (current.length > MIN_OPTIONS ? current.filter((_, i) => i !== index) : current));
+    setOptions((current) => {
+      const next = current.filter((_, i) => i !== index);
+      const padded =
+        next.length < MIN_OPTIONS ? [...next, ...Array(MIN_OPTIONS - next.length).fill("")] : next;
+      return withTrailingSlot(padded);
+    });
   }
 
   function addFiles(list: FileList | null) {
@@ -159,7 +171,7 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
                   placeholder={`Option ${index + 1}`}
                   className="w-full flex-1 text-sm text-night-900 placeholder:text-night-900/70 focus:outline-none"
                 />
-                {index >= MIN_OPTIONS && (
+                {option.trim().length > 0 && (
                   <button
                     type="button"
                     aria-label={`Remove option ${index + 1}`}
@@ -257,13 +269,13 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
                 type="button"
                 aria-label="Add option"
                 onClick={addOption}
-                disabled={options.length >= MAX_OPTIONS}
+                disabled={!canAddOption}
               >
                 <NavIcon
                   icon="/icons/poll-add-alt.svg"
                   color="brand"
                   size={16}
-                  className={cn("bg-[#1465e6]", options.length >= MAX_OPTIONS && "opacity-30")}
+                  className={cn("bg-[#1465e6]", !canAddOption && "opacity-30")}
                 />
               </button>
               <button
