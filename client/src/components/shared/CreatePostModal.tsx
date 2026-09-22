@@ -24,6 +24,8 @@ const TYPE_META: Record<PostType, { accept: string[]; helper: string; errorMessa
   },
 };
 
+const MEDIA_ACCEPT = [...TYPE_META.image.accept, ...TYPE_META.video.accept];
+
 const POST_TYPE_ROW: { key: PostType | "poll" | "article"; label: string; icon: string; switchable: boolean }[] = [
   { key: "image", label: "Image Post", icon: "/icons/image-01.svg", switchable: true },
   { key: "video", label: "Video Post", icon: "/icons/video-01.svg", switchable: true },
@@ -42,7 +44,10 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
   const [postType, setPostType] = useState<PostType>(initialType);
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
-  const previews = useMemo(() => files.map((file) => URL.createObjectURL(file)), [files]);
+  const previews = useMemo(
+    () => files.map((file) => ({ url: URL.createObjectURL(file), isVideo: file.type.startsWith("video/") })),
+    [files],
+  );
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const wordCount = useMemo(() => (text.trim() ? text.trim().split(/\s+/).length : 0), [text]);
@@ -68,7 +73,7 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
   }, [open]);
 
   useEffect(() => {
-    return () => previews.forEach((url) => URL.revokeObjectURL(url));
+    return () => previews.forEach((preview) => URL.revokeObjectURL(preview.url));
   }, [previews]);
 
   if (!open) return null;
@@ -77,9 +82,9 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
 
   function addFiles(list: FileList | null) {
     if (!list) return;
-    const next = Array.from(list).filter((file) => typeMeta.accept.includes(file.type));
+    const next = Array.from(list).filter((file) => MEDIA_ACCEPT.includes(file.type));
     if (next.length === 0 && list.length > 0) {
-      showErrorToast(typeMeta.errorMessage);
+      showErrorToast("Only PNG, JPEG, GIF, MP4, MOV or WEBM files are supported");
       return;
     }
     setFiles((current) => [...current, ...next]);
@@ -161,7 +166,7 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
           ref={inputRef}
           type="file"
           multiple
-          accept={typeMeta.accept.join(",")}
+          accept={MEDIA_ACCEPT.join(",")}
           className="hidden"
           onChange={(event) => addFiles(event.target.files)}
         />
@@ -201,12 +206,15 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
           </div>
         ) : (
           <div className="flex w-full flex-wrap gap-2.5 px-2">
-            {previews.map((src, index) => (
-              <div key={src} className="relative h-[61px] w-[97px] shrink-0 overflow-hidden rounded-md bg-gray-100">
-                {postType === "video" ? (
-                  <video src={src} className="size-full object-cover" muted />
+            {previews.map((preview, index) => (
+              <div
+                key={preview.url}
+                className="relative h-[61px] w-[97px] shrink-0 overflow-hidden rounded-md bg-gray-100"
+              >
+                {preview.isVideo ? (
+                  <video src={preview.url} className="size-full object-cover" muted />
                 ) : (
-                  <Image src={src} alt="" fill className="object-cover" sizes="97px" />
+                  <Image src={preview.url} alt="" fill className="object-cover" sizes="97px" />
                 )}
                 <button
                   type="button"
