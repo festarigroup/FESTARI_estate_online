@@ -54,6 +54,7 @@ export interface PostCardData {
   text?: string;
   truncated?: boolean;
   image?: string;
+  images?: string[];
   likes: number;
   comments: number;
   shareLabel?: string;
@@ -107,7 +108,7 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
         <PollBody post={post} />
       ) : (
         <>
-          {(post.text || post.image) && (
+          {(post.text || post.image || post.images) && (
             // Mobile shows the image first with the caption below it;
             // desktop keeps the caption above the image.
             <div className="flex w-full flex-col-reverse gap-[15px] sm:flex-col">
@@ -122,7 +123,9 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
                 </div>
               )}
 
-              {post.image && <ImageCarousel image={post.image} />}
+              {(post.images ?? (post.image ? [post.image] : [])).length > 0 && (
+                <ImageCarousel images={post.images ?? [post.image!]} />
+              )}
             </div>
           )}
 
@@ -243,40 +246,54 @@ function PostHeader({ post }: { post: PostCardData }) {
   );
 }
 
-function ImageCarousel({ image }: { image: string }) {
+function ImageCarousel({ images }: { images: string[] }) {
+  const [index, setIndex] = useState(0);
+  const hasMultiple = images.length > 1;
+
+  const goTo = (next: number) => setIndex((next + images.length) % images.length);
+
   return (
     <div className="relative h-[285px] w-full overflow-hidden rounded-[29px] sm:rounded-[15px]">
-      <Image src={image} alt="" fill className="object-cover" sizes="770px" />
+      <Image src={images[index]} alt="" fill className="object-cover" sizes="770px" />
 
-      <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-between px-4">
-        <button
-          type="button"
-          aria-label="Previous image"
-          className="flex size-[21px] items-center justify-center rounded-full bg-white shadow-[0px_0px_10px_rgba(69,71,69,0.25)]"
-        >
-          <span className="relative block h-3 w-[5.5px] rotate-180">
-            <Image src="/icons/carousel-arrow.svg" alt="" fill sizes="6px" />
-          </span>
-        </button>
-        <button
-          type="button"
-          aria-label="Next image"
-          className="flex size-[21px] items-center justify-center rounded-full bg-white shadow-[0px_0px_10px_rgba(69,71,69,0.25)]"
-        >
-          <span className="relative block h-3 w-[5.5px]">
-            <Image src="/icons/carousel-arrow.svg" alt="" fill sizes="6px" />
-          </span>
-        </button>
-      </div>
+      {hasMultiple && (
+        <>
+          <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-between px-4">
+            <button
+              type="button"
+              aria-label="Previous image"
+              onClick={() => goTo(index - 1)}
+              className="flex size-[21px] items-center justify-center rounded-full bg-white shadow-[0px_0px_10px_rgba(69,71,69,0.25)]"
+            >
+              <span className="relative block h-3 w-[5.5px] rotate-180">
+                <Image src="/icons/carousel-arrow.svg" alt="" fill sizes="6px" />
+              </span>
+            </button>
+            <button
+              type="button"
+              aria-label="Next image"
+              onClick={() => goTo(index + 1)}
+              className="flex size-[21px] items-center justify-center rounded-full bg-white shadow-[0px_0px_10px_rgba(69,71,69,0.25)]"
+            >
+              <span className="relative block h-3 w-[5.5px]">
+                <Image src="/icons/carousel-arrow.svg" alt="" fill sizes="6px" />
+              </span>
+            </button>
+          </div>
 
-      <div className="absolute inset-x-0 bottom-[11px] flex items-center justify-center gap-2.5">
-        {[0, 1, 2, 3].map((dot) => (
-          <span
-            key={dot}
-            className={cn("size-[9.5px] rounded-full", dot === 0 ? "bg-brand-600" : "bg-white")}
-          />
-        ))}
-      </div>
+          <div className="absolute inset-x-0 bottom-[11px] flex items-center justify-center gap-2.5">
+            {images.map((image, dot) => (
+              <button
+                key={image + dot}
+                type="button"
+                aria-label={`Go to image ${dot + 1}`}
+                onClick={() => goTo(dot)}
+                className={cn("size-[9.5px] rounded-full", dot === index ? "bg-brand-600" : "bg-white")}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

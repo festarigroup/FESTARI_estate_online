@@ -89,7 +89,12 @@ const POSTS: PostCardData[] = [
     avatar: "/images/avatar-kasapa.png",
     verified: "organization",
     text: POST_TEXT,
-    image: "/images/post-building-01.jpg",
+    images: [
+      "/images/post-building-01.jpg",
+      "/images/trending-property-1.jpg",
+      "/images/trending-property-2.jpg",
+      "/images/trending-property-3.jpg",
+    ],
     priceLine: "GHS 1,850.00",
     subLine: "4 bedroom Detached House",
     beds: 4,
