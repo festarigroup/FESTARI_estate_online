@@ -65,7 +65,7 @@ function SignInFooter() {
 export default function SignUpPage() {
   const router = useRouter();
 
-  const [step, setStep] = useState<"profile" | "security">("profile");
+  const [step, setStep] = useState<"profile" | "security" | "terms">("profile");
   const [mobileFieldIndex, setMobileFieldIndex] = useState(0);
 
   const [fullName, setFullName] = useState("");
@@ -105,16 +105,25 @@ export default function SignUpPage() {
     router.push(`/auth/verify?${params.toString()}`);
   }
 
-  function handleSubmit(event: React.FormEvent) {
+  function handleSecurityContinue(event: React.FormEvent) {
     event.preventDefault();
 
     const nextErrors = {
       phone: validateIdentifier(phone, "phone"),
       password: validatePassword(password),
-      terms: agreedToTerms ? undefined : TERMS_ERROR,
     };
     setErrors((prev) => ({ ...prev, ...nextErrors }));
-    if (nextErrors.phone || nextErrors.password || nextErrors.terms) return;
+    if (nextErrors.phone || nextErrors.password) return;
+
+    setStep("terms");
+  }
+
+  function handleTermsSubmit(event: React.FormEvent) {
+    event.preventDefault();
+
+    const termsError = agreedToTerms ? undefined : TERMS_ERROR;
+    setErrors((prev) => ({ ...prev, terms: termsError }));
+    if (termsError) return;
 
     run(goToOtpVerification);
   }
@@ -167,8 +176,8 @@ export default function SignUpPage() {
 
   return (
     <AuthScreenLayout
-      tagline={step === "profile" ? STEP_ONE_TAGLINE : STEP_TWO_TAGLINE}
-      footerText={step === "profile" ? STEP_ONE_FOOTER : undefined}
+      tagline={step === "security" ? STEP_TWO_TAGLINE : STEP_ONE_TAGLINE}
+      footerText={step === "security" ? undefined : STEP_ONE_FOOTER}
     >
       {/* Mobile: one field per step, per the Figma mobile sign-up flow. */}
       <div className="flex flex-col gap-8 lg:hidden">
@@ -268,7 +277,7 @@ export default function SignUpPage() {
         </form>
       </div>
 
-      {/* Desktop: two multi-field steps (profile, then security). */}
+      {/* Desktop: three steps (profile, then security, then a dedicated terms step). */}
       {step === "profile" ? (
         <div className="hidden lg:flex lg:flex-col lg:gap-8">
           <div className="flex flex-col items-center gap-3 text-center">
@@ -322,7 +331,7 @@ export default function SignUpPage() {
             <SignInFooter />
           </form>
         </div>
-      ) : (
+      ) : step === "security" ? (
         <div className="hidden lg:flex lg:flex-col lg:gap-6">
           <div className="flex flex-col items-center gap-3 text-center">
             <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black dark:text-white">
@@ -333,7 +342,7 @@ export default function SignUpPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <form onSubmit={handleSecurityContinue} className="flex flex-col gap-6">
             <SocialButtons />
 
             <Divider label="or" />
@@ -365,6 +374,39 @@ export default function SignUpPage() {
               </div>
             </div>
 
+            <div className="flex gap-2.5">
+              <Button
+                type="button"
+                variant="primary"
+                className="flex-1"
+                onClick={() => setStep("profile")}
+              >
+                Back
+              </Button>
+              <Button type="submit" variant="primary" className="flex-1">
+                Continue
+              </Button>
+            </div>
+
+            <SignInFooter />
+          </form>
+        </div>
+      ) : (
+        <div className="hidden lg:flex lg:flex-col lg:gap-8">
+          <div className="flex flex-col items-center gap-3 text-center">
+            <h1 className="text-[36px] font-bold leading-[40px] tracking-[-1.08px] text-black dark:text-white">
+              Create your account
+            </h1>
+            <p className="text-sm leading-5 text-black dark:text-white">
+              Takes under a minute. No role commitment requirement.
+            </p>
+          </div>
+
+          <form onSubmit={handleTermsSubmit} className="flex flex-col gap-8">
+            <SocialButtons />
+
+            <Divider label="or" />
+
             <TermsAgreement
               id="agree-terms"
               checked={agreedToTerms}
@@ -377,12 +419,12 @@ export default function SignUpPage() {
                 type="button"
                 variant="primary"
                 className="flex-1"
-                onClick={() => setStep("profile")}
+                onClick={() => setStep("security")}
               >
                 Back
               </Button>
               <Button type="submit" variant="primary" className="flex-1">
-                Create an Account
+                Continue
               </Button>
             </div>
 
