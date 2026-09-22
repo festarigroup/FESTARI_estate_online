@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { showSuccessToast } from "@/components/shared/AppToast";
 import { CreateMenu } from "@/components/shared/CreateMenu";
+import { CreatePollModal } from "@/components/shared/CreatePollModal";
 import { CreatePostModal } from "@/components/shared/CreatePostModal";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { comingSoonHref } from "@/lib/coming-soon";
@@ -16,7 +17,7 @@ export function TopNav() {
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const createMenuRef = useRef<HTMLDivElement | null>(null);
   const [postModalOpen, setPostModalOpen] = useState(false);
-  const [postModalType, setPostModalType] = useState<"image" | "video">("image");
+  const [postModalType, setPostModalType] = useState<"image" | "video" | "poll">("image");
 
   function handleLogout() {
     setMenuOpen(false);
@@ -188,7 +189,12 @@ export function TopNav() {
         </div>
       </div>
 
-      <CreatePostModal open={postModalOpen} initialType={postModalType} onClose={() => setPostModalOpen(false)} />
+      <CreatePostModal
+        open={postModalOpen && postModalType !== "poll"}
+        initialType={postModalType === "video" ? "video" : "image"}
+        onClose={() => setPostModalOpen(false)}
+      />
+      <CreatePollModal open={postModalOpen && postModalType === "poll"} onClose={() => setPostModalOpen(false)} />
     </header>
   );
 }

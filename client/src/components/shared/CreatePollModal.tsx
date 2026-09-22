@@ -1,0 +1,278 @@
+"use client";
+
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
+import { NavIcon } from "@/components/shared/NavIcon";
+import { comingSoonHref } from "@/lib/coming-soon";
+import { cn } from "@/lib/utils";
+
+const DURATION_OPTIONS = ["1 day", "3 days", "1 week", "2 weeks", "1 month"];
+const MIN_OPTIONS = 2;
+const MAX_OPTIONS = 6;
+const MEDIA_ACCEPT = ["image/png", "image/jpeg", "image/gif", "video/mp4", "video/quicktime", "video/webm"];
+
+interface CreatePollModalProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
+  const router = useRouter();
+  const [question, setQuestion] = useState("");
+  const [options, setOptions] = useState<string[]>(["", ""]);
+  const [duration, setDuration] = useState(DURATION_OPTIONS[0]);
+  const [files, setFiles] = useState<File[]>([]);
+  const previews = useMemo(
+    () => files.map((file) => ({ url: URL.createObjectURL(file), isVideo: file.type.startsWith("video/") })),
+    [files],
+  );
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") handleClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  useEffect(() => {
+    return () => previews.forEach((preview) => URL.revokeObjectURL(preview.url));
+  }, [previews]);
+
+  if (!open) return null;
+
+  function resetState() {
+    setQuestion("");
+    setOptions(["", ""]);
+    setDuration(DURATION_OPTIONS[0]);
+    setFiles([]);
+  }
+
+  function handleClose() {
+    resetState();
+    onClose();
+  }
+
+  function updateOption(index: number, value: string) {
+    setOptions((current) => current.map((option, i) => (i === index ? value : option)));
+  }
+
+  function addOption() {
+    setOptions((current) => (current.length < MAX_OPTIONS ? [...current, ""] : current));
+  }
+
+  function removeOption(index: number) {
+    setOptions((current) => (current.length > MIN_OPTIONS ? current.filter((_, i) => i !== index) : current));
+  }
+
+  function addFiles(list: FileList | null) {
+    if (!list) return;
+    const next = Array.from(list).filter((file) => MEDIA_ACCEPT.includes(file.type));
+    if (next.length === 0 && list.length > 0) {
+      showErrorToast("Only PNG, JPEG, GIF, MP4, MOV or WEBM files are supported");
+      return;
+    }
+    setFiles((current) => [...current, ...next]);
+  }
+
+  function removeFile(index: number) {
+    setFiles((current) => current.filter((_, i) => i !== index));
+  }
+
+  function handlePost() {
+    const filledOptions = options.map((option) => option.trim()).filter(Boolean);
+    if (!question.trim() || filledOptions.length < MIN_OPTIONS) {
+      showErrorToast("Add a question and at least two options before posting");
+      return;
+    }
+    showSuccessToast("Your poll has been shared");
+    resetState();
+    onClose();
+  }
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
+      onClick={handleClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Create a poll"
+    >
+      <div
+        onClick={(event) => event.stopPropagation()}
+        className="flex max-h-[90vh] w-full max-w-[720px] flex-col gap-6 overflow-y-auto rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
+      >
+        <div className="flex w-full items-center justify-between">
+          <p className="text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Create a Post</p>
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={handleClose}
+            className="flex size-8 shrink-0 items-center justify-center rounded-full text-xl leading-none text-gray-500 hover:bg-gray-100"
+          >
+            &times;
+          </button>
+        </div>
+
+        <div className="flex w-full flex-col gap-2.5 rounded-2xl border border-gray-200 p-4">
+          <div className="flex w-full items-start gap-3">
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">
+              SL
+            </span>
+            <textarea
+              value={question}
+              onChange={(event) => setQuestion(event.target.value)}
+              rows={1}
+              placeholder="What’s your question?"
+              className="w-full flex-1 resize-none self-center rounded-lg px-3 py-3.5 text-base leading-6 text-night-900 placeholder:text-[#475568] focus:outline-none"
+            />
+            <button
+              type="button"
+              aria-label="Close poll"
+              onClick={handleClose}
+              className="mt-3 shrink-0 text-gray-400 hover:text-gray-600"
+            >
+              <NavIcon icon="/icons/poll-close-outline.svg" color="night" size={16} />
+            </button>
+          </div>
+
+          <div className="flex w-full flex-col gap-2.5 px-6">
+            {options.map((option, index) => (
+              <div
+                key={index}
+                className="flex h-12 w-full items-center gap-2 rounded-lg border border-gray-200 bg-white px-3"
+              >
+                <input
+                  value={option}
+                  onChange={(event) => updateOption(index, event.target.value)}
+                  placeholder={`Option ${index + 1}`}
+                  className="w-full flex-1 text-sm text-night-900 placeholder:text-night-900/70 focus:outline-none"
+                />
+                {index >= MIN_OPTIONS && (
+                  <button
+                    type="button"
+                    aria-label={`Remove option ${index + 1}`}
+                    onClick={() => removeOption(index)}
+                    className="shrink-0"
+                  >
+                    <NavIcon icon="/icons/poll-trash-delete.svg" color="night" size={16} className="bg-red-500" />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex w-full flex-col gap-1">
+            <p className="text-sm text-[#111826]">
+              Poll Duration<span className="text-red-500">*</span>
+            </p>
+            <div className="relative flex h-12 w-full items-center rounded-lg border border-[#cbd5e0] bg-white px-3">
+              <select
+                value={duration}
+                onChange={(event) => setDuration(event.target.value)}
+                className="w-full flex-1 appearance-none bg-transparent text-sm text-[#0f1621] focus:outline-none"
+              >
+                {DURATION_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              <NavIcon icon="/icons/poll-chevron-down.svg" color="night" size={16} className="pointer-events-none shrink-0" />
+            </div>
+          </div>
+        </div>
+
+        {previews.length > 0 && (
+          <div className="flex w-full flex-wrap gap-2 px-2">
+            {previews.map((preview, index) => (
+              <div key={preview.url} className="relative h-[61px] w-[97px] shrink-0 overflow-hidden rounded-md bg-gray-100">
+                {preview.isVideo ? (
+                  <video src={preview.url} className="size-full object-cover" muted />
+                ) : (
+                  <Image src={preview.url} alt="" fill className="object-cover" sizes="97px" />
+                )}
+                <button
+                  type="button"
+                  aria-label="Remove file"
+                  onClick={() => removeFile(index)}
+                  className="absolute left-1 top-1 flex size-4 items-center justify-center rounded-full bg-white text-[10px] leading-none text-night-900"
+                >
+                  &times;
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="flex w-full flex-col gap-4">
+          <button
+            type="button"
+            onClick={() => router.push(comingSoonHref("Post visibility"))}
+            className="flex w-full items-center gap-2.5 px-2"
+          >
+            <NavIcon icon="/icons/create-menu-globe-visibility.svg" color="brand" size={24} className="bg-[#337df2]" />
+            <span className="text-[14.6px] font-semibold text-[#337df2]">Everyone can view</span>
+          </button>
+
+          <div className="flex w-full items-center justify-between">
+            <div className="flex items-center gap-3">
+              <input
+                ref={inputRef}
+                type="file"
+                multiple
+                accept={MEDIA_ACCEPT.join(",")}
+                className="hidden"
+                onChange={(event) => addFiles(event.target.files)}
+              />
+              <button type="button" aria-label="Attach image" onClick={() => inputRef.current?.click()}>
+                <NavIcon icon="/icons/image-01.svg" color="brand" size={18} className="bg-[#337df2]" />
+              </button>
+              <button type="button" aria-label="Attach video" onClick={() => inputRef.current?.click()}>
+                <NavIcon icon="/icons/video-01.svg" color="brand" size={18} className="bg-[#337df2]" />
+              </button>
+              <NavIcon icon="/icons/chart-02.svg" color="brand" size={18} className="bg-[#337df2] opacity-30" />
+              <button type="button" aria-label="Article" onClick={() => router.push(comingSoonHref("Article"))}>
+                <NavIcon icon="/icons/book-bookmark-01.svg" color="brand" size={18} className="bg-[#337df2]" />
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <NavIcon icon="/icons/poll-in-progress.svg" color="brand" size={16} className="bg-[#1465e6]" />
+              <button
+                type="button"
+                aria-label="Add option"
+                onClick={addOption}
+                disabled={options.length >= MAX_OPTIONS}
+              >
+                <NavIcon
+                  icon="/icons/poll-add-alt.svg"
+                  color="brand"
+                  size={16}
+                  className={cn("bg-[#1465e6]", options.length >= MAX_OPTIONS && "opacity-30")}
+                />
+              </button>
+              <button
+                type="button"
+                onClick={handlePost}
+                className="flex h-8 items-center justify-center rounded-lg bg-brand-900 px-3 text-sm text-white hover:bg-brand-900/90"
+              >
+                Post
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
