@@ -111,9 +111,17 @@ function MobileRowIcon({ item }: { item: MobileMenuItem }) {
   return <NavIcon icon={item.icon} color="night" size={20} className="shrink-0" />;
 }
 
-function MobileMenuRow({ item, onNavigate }: { item: MobileMenuItem; onNavigate: () => void }) {
-  const [open, setOpen] = useState(false);
-
+function MobileMenuRow({
+  item,
+  onNavigate,
+  open,
+  onToggle,
+}: {
+  item: MobileMenuItem;
+  onNavigate: () => void;
+  open: boolean;
+  onToggle: () => void;
+}) {
   if (!item.submenu) {
     return (
       <Link
@@ -131,7 +139,7 @@ function MobileMenuRow({ item, onNavigate }: { item: MobileMenuItem; onNavigate:
     <div className="relative w-full">
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={onToggle}
         aria-expanded={open}
         className="flex h-11 w-full items-center gap-3 rounded-xl px-1 text-left outline-none hover:bg-gray-50"
       >
@@ -204,14 +212,28 @@ function CreatePostRow({ onNavigate }: { onNavigate: () => void }) {
 }
 
 export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
+  const [openMobileKey, setOpenMobileKey] = useState<string | null>(null);
+  const toggleMobileKey = (key: string) => setOpenMobileKey((current) => (current === key ? null : key));
+
   return (
     <>
       <div className="flex w-60 flex-col gap-0.5 rounded-3xl border border-gray-200 bg-white p-2 shadow-[0px_20px_48px_-10px_rgba(0,0,0,0.12),0px_8px_20px_-6px_rgba(0,0,0,0.06)] sm:hidden">
         {MOBILE_ITEMS.map((item) => (
-          <MobileMenuRow key={item.key} item={item} onNavigate={onNavigate} />
+          <MobileMenuRow
+            key={item.key}
+            item={item}
+            onNavigate={onNavigate}
+            open={openMobileKey === item.key}
+            onToggle={() => toggleMobileKey(item.key)}
+          />
         ))}
         <div className="my-1 h-px w-full bg-gray-200" />
-        <MobileMenuRow item={MOBILE_REQUEST_ITEM} onNavigate={onNavigate} />
+        <MobileMenuRow
+          item={MOBILE_REQUEST_ITEM}
+          onNavigate={onNavigate}
+          open={false}
+          onToggle={() => {}}
+        />
       </div>
 
       <div className="hidden w-[300px] flex-col items-center gap-1.5 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white/70 px-3 pb-3 pt-5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-150 sm:flex">
