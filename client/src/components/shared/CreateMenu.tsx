@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
@@ -57,31 +58,19 @@ interface DesktopMenuItem {
   icon: string;
   label: string;
   locked?: boolean;
-  highlighted?: boolean;
-  submenu?: DesktopSubmenuItem[];
 }
 
 interface DesktopMenuSection {
-  title?: string;
   items: DesktopMenuItem[];
   divider?: boolean;
 }
 
-const DESKTOP_SHARE_SECTION: DesktopMenuSection = {
-  title: "Share",
-  items: [
-    {
-      key: "post",
-      icon: "/icons/create-menu-dt-add-alt.svg",
-      label: "Create Post",
-      highlighted: true,
-      submenu: [
-        { key: "video", icon: "/icons/video-01.svg", label: "Video post" },
-        { key: "image", icon: "/icons/image-01.svg", label: "Image post" },
-      ],
-    },
-  ],
-};
+const CREATE_POST_ITEM = { key: "post", icon: "/icons/create-menu-dt-add-alt.svg", label: "Create Post" };
+const CREATE_POST_SUBMENU: DesktopSubmenuItem[] = [
+  { key: "video", icon: "/icons/video-01.svg", label: "Video post" },
+  { key: "image", icon: "/icons/image-01.svg", label: "Image post" },
+  { key: "poll", icon: "/icons/chart-02.svg", label: "Poll" },
+];
 
 const DESKTOP_LIST_SECTIONS: DesktopMenuSection[] = [
   {
@@ -107,45 +96,50 @@ const DESKTOP_LIST_SECTIONS: DesktopMenuSection[] = [
 
 function DesktopMenuRow({ item, onNavigate }: { item: DesktopMenuItem; onNavigate: () => void }) {
   return (
-    <div className={cn("relative w-full", item.submenu && "group")}>
-      <Link
-        href={comingSoonHref(item.label)}
-        onClick={onNavigate}
+    <Link
+      href={comingSoonHref(item.label)}
+      onClick={onNavigate}
+      className="flex h-8 w-full items-center gap-2 rounded-xl px-2 hover:bg-gray-100"
+    >
+      <NavIcon icon={item.icon} color="night" size={14} className="shrink-0" />
+      <span className="flex-1 truncate text-sm text-night-700">{item.label}</span>
+      {item.locked && (
+        <NavIcon icon="/icons/create-menu2-lock-key.svg" color="night" size={10} className="shrink-0" />
+      )}
+    </Link>
+  );
+}
+
+function CreatePostRow({ onNavigate }: { onNavigate: () => void }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="relative w-full">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
         className={cn(
-          "flex h-8 w-full items-center gap-2 rounded-xl px-2",
-          item.highlighted ? "border-b border-gray-200 bg-[#e2edff]" : "hover:bg-gray-100",
+          "flex h-8 w-full items-center gap-2 rounded-xl border px-2 text-left",
+          open ? "border-brand-900 bg-[#e2edff]" : "border-transparent hover:bg-gray-100",
         )}
       >
-        <NavIcon
-          icon={item.icon}
-          color="night"
-          size={14}
-          className={cn("shrink-0", item.highlighted && "bg-brand-900")}
-        />
-        <span
-          className={cn(
-            "flex-1 truncate text-sm",
-            item.highlighted ? "font-medium text-brand-900" : "text-night-700",
-          )}
-        >
-          {item.label}
-        </span>
-        {item.locked && (
-          <NavIcon icon="/icons/create-menu2-lock-key.svg" color="night" size={10} className="shrink-0" />
-        )}
-      </Link>
+        <NavIcon icon={CREATE_POST_ITEM.icon} color="night" size={14} className={cn("shrink-0", open && "bg-brand-900")} />
+        <span className="flex-1 truncate text-sm font-medium text-night-900">{CREATE_POST_ITEM.label}</span>
+        <NavIcon icon="/icons/more-horizontal.svg" color="night" size={16} className="shrink-0" />
+      </button>
 
-      {item.submenu && (
-        <div className="absolute left-full top-0 z-10 ml-2 hidden w-36 flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg group-hover:flex">
-          {item.submenu.map((sub) => (
+      {open && (
+        <div className="absolute left-1/2 top-full z-10 mt-2 flex w-72 flex-col gap-1 rounded-2xl border border-brand-900 bg-white p-2 shadow-lg">
+          {CREATE_POST_SUBMENU.map((sub) => (
             <Link
               key={sub.key}
               href={comingSoonHref(sub.label)}
               onClick={onNavigate}
-              className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-gray-50"
+              className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
             >
-              <span className="relative block size-4 shrink-0">
-                <Image src={sub.icon} alt="" fill sizes="16px" />
+              <span className="relative block size-[18px] shrink-0">
+                <Image src={sub.icon} alt="" fill sizes="18px" />
               </span>
               <span className="text-[13px] text-night-900">{sub.label}</span>
             </Link>
@@ -198,19 +192,15 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
         ))}
       </div>
 
-      <div className="hidden w-[380px] flex-col gap-2 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white p-3 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] sm:flex">
+      <div className="hidden w-[380px] flex-col gap-2 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white/70 p-3 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-150 sm:flex">
         <div className="flex w-full flex-col gap-1">
           <div className="flex items-center gap-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-gray-500">
-              {DESKTOP_SHARE_SECTION.title}
-            </p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-gray-500">Share</p>
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="text-gray-400">
               <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          {DESKTOP_SHARE_SECTION.items.map((item) => (
-            <DesktopMenuRow key={item.key} item={item} onNavigate={onNavigate} />
-          ))}
+          <CreatePostRow onNavigate={onNavigate} />
         </div>
 
         <div className="flex w-full flex-col gap-1.5 rounded-2xl border border-gray-200 bg-white p-2">
