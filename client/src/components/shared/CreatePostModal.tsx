@@ -9,26 +9,48 @@ import { NavIcon } from "@/components/shared/NavIcon";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 
-const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/gif"];
+type PostType = "image" | "video";
 
-const OTHER_POST_TYPES = [
-  { key: "video", label: "Video Post", icon: "/icons/video-01.svg" },
-  { key: "poll", label: "Poll", icon: "/icons/chart-02.svg" },
-  { key: "article", label: "Article", icon: "/icons/book-bookmark-01.svg" },
+const TYPE_META: Record<PostType, { accept: string[]; helper: string; errorMessage: string }> = {
+  image: {
+    accept: ["image/png", "image/jpeg", "image/gif"],
+    helper: "PNG, JPEG, GIF",
+    errorMessage: "Only PNG, JPEG or GIF files are supported",
+  },
+  video: {
+    accept: ["video/mp4", "video/quicktime", "video/webm"],
+    helper: "MP4, MOV, WEBM",
+    errorMessage: "Only MP4, MOV or WEBM files are supported",
+  },
+};
+
+const POST_TYPE_ROW: { key: PostType | "poll" | "article"; label: string; icon: string; switchable: boolean }[] = [
+  { key: "image", label: "Image Post", icon: "/icons/image-01.svg", switchable: true },
+  { key: "video", label: "Video Post", icon: "/icons/video-01.svg", switchable: true },
+  { key: "poll", label: "Poll", icon: "/icons/chart-02.svg", switchable: false },
+  { key: "article", label: "Article", icon: "/icons/book-bookmark-01.svg", switchable: false },
 ];
 
 interface CreatePostModalProps {
   open: boolean;
   onClose: () => void;
+  initialType?: PostType;
 }
 
-export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
+export function CreatePostModal({ open, onClose, initialType = "image" }: CreatePostModalProps) {
   const router = useRouter();
+  const [postType, setPostType] = useState<PostType>(initialType);
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const previews = useMemo(() => files.map((file) => URL.createObjectURL(file)), [files]);
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open && postType !== initialType) setPostType(initialType);
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -50,14 +72,21 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
 
   if (!open) return null;
 
+  const typeMeta = TYPE_META[postType];
+
   function addFiles(list: FileList | null) {
     if (!list) return;
-    const next = Array.from(list).filter((file) => ACCEPTED_TYPES.includes(file.type));
+    const next = Array.from(list).filter((file) => typeMeta.accept.includes(file.type));
     if (next.length === 0 && list.length > 0) {
-      showErrorToast("Only PNG, JPEG or GIF files are supported");
+      showErrorToast(typeMeta.errorMessage);
       return;
     }
     setFiles((current) => [...current, ...next]);
+  }
+
+  function switchType(next: PostType) {
+    setPostType(next);
+    setFiles([]);
   }
 
   function handleDrop(event: DragEvent<HTMLDivElement>) {
@@ -82,7 +111,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
 
   function handlePost() {
     if (!text.trim() && files.length === 0) {
-      showErrorToast("Add a caption or an image before posting");
+      showErrorToast(`Add a caption or a ${postType} before posting`);
       return;
     }
     showSuccessToast("Your post has been shared");
@@ -147,7 +176,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
               ref={inputRef}
               type="file"
               multiple
-              accept={ACCEPTED_TYPES.join(",")}
+              accept={typeMeta.accept.join(",")}
               className="hidden"
               onChange={(event) => addFiles(event.target.files)}
             />
@@ -165,14 +194,18 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
               <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={14} />
             </button>
           </div>
-          <p className="w-full text-xs text-[#53575a]">PNG, JPEG, GIF</p>
+          <p className="w-full text-xs text-[#53575a]">{typeMeta.helper}</p>
         </div>
 
         {previews.length > 0 && (
           <div className="flex w-full flex-wrap gap-2">
             {previews.map((src, index) => (
               <div key={src} className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-gray-100">
-                <Image src={src} alt="" fill className="object-cover" sizes="64px" />
+                {postType === "video" ? (
+                  <video src={src} className="size-full object-cover" muted />
+                ) : (
+                  <Image src={src} alt="" fill className="object-cover" sizes="64px" />
+                )}
                 <button
                   type="button"
                   aria-label="Remove file"
@@ -198,17 +231,32 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
 
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-3">
-              <NavIcon icon="/icons/image-01.svg" color="brand" size={18} className="bg-[#337df2] opacity-30" />
-              {OTHER_POST_TYPES.map((type) => (
-                <button
-                  key={type.key}
-                  type="button"
-                  aria-label={type.label}
-                  onClick={() => router.push(comingSoonHref(type.label))}
-                >
-                  <NavIcon icon={type.icon} color="brand" size={18} className="bg-[#337df2]" />
-                </button>
-              ))}
+              {POST_TYPE_ROW.map((item) => {
+                const active = item.key === postType;
+                if (active) {
+                  return (
+                    <NavIcon
+                      key={item.key}
+                      icon={item.icon}
+                      color="brand"
+                      size={18}
+                      className="bg-[#337df2] opacity-30"
+                    />
+                  );
+                }
+                return (
+                  <button
+                    key={item.key}
+                    type="button"
+                    aria-label={item.label}
+                    onClick={() =>
+                      item.switchable ? switchType(item.key as PostType) : router.push(comingSoonHref(item.label))
+                    }
+                  >
+                    <NavIcon icon={item.icon} color="brand" size={18} className="bg-[#337df2]" />
+                  </button>
+                );
+              })}
             </div>
             <button
               type="button"

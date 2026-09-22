@@ -15,7 +15,8 @@ export function TopNav() {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const createMenuRef = useRef<HTMLDivElement | null>(null);
-  const [imagePostOpen, setImagePostOpen] = useState(false);
+  const [postModalOpen, setPostModalOpen] = useState(false);
+  const [postModalType, setPostModalType] = useState<"image" | "video">("image");
 
   function handleLogout() {
     setMenuOpen(false);
@@ -103,7 +104,10 @@ export function TopNav() {
               <div className="absolute right-0 top-[calc(100%+8px)] z-50">
                 <CreateMenu
                   onNavigate={() => setCreateMenuOpen(false)}
-                  onOpenImagePost={() => setImagePostOpen(true)}
+                  onOpenPostModal={(type) => {
+                    setPostModalType(type);
+                    setPostModalOpen(true);
+                  }}
                 />
               </div>
             )}
@@ -184,7 +188,7 @@ export function TopNav() {
         </div>
       </div>
 
-      <CreatePostModal open={imagePostOpen} onClose={() => setImagePostOpen(false)} />
+      <CreatePostModal open={postModalOpen} initialType={postModalType} onClose={() => setPostModalOpen(false)} />
     </header>
   );
 }

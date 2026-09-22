@@ -116,13 +116,13 @@ function MobileMenuRow({
   onNavigate,
   open,
   onToggle,
-  onOpenImagePost,
+  onOpenPostModal,
 }: {
   item: MobileMenuItem;
   onNavigate: () => void;
   open: boolean;
   onToggle: () => void;
-  onOpenImagePost: () => void;
+  onOpenPostModal: (type: "image" | "video") => void;
 }) {
   if (!item.submenu) {
     return (
@@ -162,12 +162,12 @@ function MobileMenuRow({
       {open && (
         <div className="absolute left-9 top-full z-10 mt-1 flex w-60 flex-col gap-0.5 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-lg">
           {item.submenu.map((sub) =>
-            sub.key === "image" ? (
+            sub.key === "image" || sub.key === "video" ? (
               <button
                 key={sub.key}
                 type="button"
                 onClick={() => {
-                  onOpenImagePost();
+                  onOpenPostModal(sub.key as "image" | "video");
                   onNavigate();
                 }}
                 className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
@@ -193,7 +193,13 @@ function MobileMenuRow({
   );
 }
 
-function CreatePostRow({ onNavigate, onOpenImagePost }: { onNavigate: () => void; onOpenImagePost: () => void }) {
+function CreatePostRow({
+  onNavigate,
+  onOpenPostModal,
+}: {
+  onNavigate: () => void;
+  onOpenPostModal: (type: "image" | "video") => void;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -212,12 +218,12 @@ function CreatePostRow({ onNavigate, onOpenImagePost }: { onNavigate: () => void
       {open && (
         <div className="absolute left-1/2 top-full z-10 mt-2 flex w-56 flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg">
           {CREATE_POST_SUBMENU.map((sub) =>
-            sub.key === "image" ? (
+            sub.key === "image" || sub.key === "video" ? (
               <button
                 key={sub.key}
                 type="button"
                 onClick={() => {
-                  onOpenImagePost();
+                  onOpenPostModal(sub.key as "image" | "video");
                   onNavigate();
                 }}
                 className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
@@ -245,10 +251,10 @@ function CreatePostRow({ onNavigate, onOpenImagePost }: { onNavigate: () => void
 
 export function CreateMenu({
   onNavigate,
-  onOpenImagePost,
+  onOpenPostModal,
 }: {
   onNavigate: () => void;
-  onOpenImagePost: () => void;
+  onOpenPostModal: (type: "image" | "video") => void;
 }) {
   const [openMobileKey, setOpenMobileKey] = useState<string | null>(null);
   const toggleMobileKey = (key: string) => setOpenMobileKey((current) => (current === key ? null : key));
@@ -263,7 +269,7 @@ export function CreateMenu({
             onNavigate={onNavigate}
             open={openMobileKey === item.key}
             onToggle={() => toggleMobileKey(item.key)}
-            onOpenImagePost={onOpenImagePost}
+            onOpenPostModal={onOpenPostModal}
           />
         ))}
         <div className="my-1 h-px w-full bg-gray-200" />
@@ -272,7 +278,7 @@ export function CreateMenu({
           onNavigate={onNavigate}
           open={false}
           onToggle={() => {}}
-          onOpenImagePost={onOpenImagePost}
+          onOpenPostModal={onOpenPostModal}
         />
       </div>
 
@@ -284,7 +290,7 @@ export function CreateMenu({
               <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <CreatePostRow onNavigate={onNavigate} onOpenImagePost={onOpenImagePost} />
+          <CreatePostRow onNavigate={onNavigate} onOpenPostModal={onOpenPostModal} />
         </div>
 
         <div className="flex w-[270px] flex-col gap-1.5 rounded-2xl border border-gray-200 bg-white p-1.5">
