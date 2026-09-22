@@ -50,10 +50,10 @@ export function TopNav() {
         <button
           type="button"
           aria-label="Create"
-          className="flex size-[38px] items-center justify-center gap-2 rounded-full bg-brand-900 hover:bg-brand-900/90 sm:h-[38px] sm:w-[93px] sm:rounded-lg sm:px-[15px]"
+          className="flex h-[34px] items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#00c6ff] to-[#0072ff] px-4 hover:opacity-90 sm:h-[38px] sm:w-[93px] sm:rounded-lg sm:bg-none sm:bg-brand-900 sm:px-[15px] sm:hover:bg-brand-900/90 sm:hover:opacity-100"
         >
-          <NavIcon icon="/icons/add-circle-01.svg" color="white" size={19} />
-          <span className="hidden text-[13px] text-white sm:inline">Create</span>
+          <NavIcon icon="/icons/add-circle-01.svg" color="white" size={19} className="hidden sm:block" />
+          <span className="text-[11px] text-white sm:text-[13px]">Create</span>
         </button>
 
         <button
@@ -86,8 +86,8 @@ export function TopNav() {
             aria-label="Account menu"
             className="flex items-center gap-2 rounded-full hover:bg-gray-50"
           >
-            <span className="relative block size-[30px] shrink-0 overflow-hidden rounded-full">
-              <Image src="/icons/avatar-sample.jpg" alt="Madeline Price" fill className="object-cover" sizes="30px" />
+            <span className="relative block size-10 shrink-0 overflow-hidden rounded-full">
+              <Image src="/icons/avatar-sample.jpg" alt="Madeline Price" fill className="object-cover" sizes="40px" />
             </span>
             <div className="hidden flex-col items-start md:flex">
               <p className="text-[11px] font-semibold text-night-900">Madeline Price</p>
