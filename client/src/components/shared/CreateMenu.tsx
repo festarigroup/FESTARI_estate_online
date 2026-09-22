@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { CreatePostModal } from "@/components/shared/CreatePostModal";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
@@ -116,11 +117,13 @@ function MobileMenuRow({
   onNavigate,
   open,
   onToggle,
+  onOpenImagePost,
 }: {
   item: MobileMenuItem;
   onNavigate: () => void;
   open: boolean;
   onToggle: () => void;
+  onOpenImagePost: () => void;
 }) {
   if (!item.submenu) {
     return (
@@ -159,24 +162,39 @@ function MobileMenuRow({
 
       {open && (
         <div className="absolute left-9 top-full z-10 mt-1 flex w-60 flex-col gap-0.5 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-lg">
-          {item.submenu.map((sub) => (
-            <Link
-              key={sub.key}
-              href={comingSoonHref(sub.label)}
-              onClick={onNavigate}
-              className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
-            >
-              <NavIcon icon={sub.icon} color="night" size={16} className="shrink-0" />
-              <span className="text-sm text-night-900">{sub.label}</span>
-            </Link>
-          ))}
+          {item.submenu.map((sub) =>
+            sub.key === "image" ? (
+              <button
+                key={sub.key}
+                type="button"
+                onClick={() => {
+                  onOpenImagePost();
+                  onNavigate();
+                }}
+                className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
+              >
+                <NavIcon icon={sub.icon} color="night" size={16} className="shrink-0" />
+                <span className="text-sm text-night-900">{sub.label}</span>
+              </button>
+            ) : (
+              <Link
+                key={sub.key}
+                href={comingSoonHref(sub.label)}
+                onClick={onNavigate}
+                className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
+              >
+                <NavIcon icon={sub.icon} color="night" size={16} className="shrink-0" />
+                <span className="text-sm text-night-900">{sub.label}</span>
+              </Link>
+            ),
+          )}
         </div>
       )}
     </div>
   );
 }
 
-function CreatePostRow({ onNavigate }: { onNavigate: () => void }) {
+function CreatePostRow({ onNavigate, onOpenImagePost }: { onNavigate: () => void; onOpenImagePost: () => void }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -194,17 +212,32 @@ function CreatePostRow({ onNavigate }: { onNavigate: () => void }) {
 
       {open && (
         <div className="absolute left-1/2 top-full z-10 mt-2 flex w-56 flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg">
-          {CREATE_POST_SUBMENU.map((sub) => (
-            <Link
-              key={sub.key}
-              href={comingSoonHref(sub.label)}
-              onClick={onNavigate}
-              className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
-            >
-              <NavIcon icon={sub.icon} color="night" size={14} className="shrink-0" />
-              <span className="text-[13px] text-night-900">{sub.label}</span>
-            </Link>
-          ))}
+          {CREATE_POST_SUBMENU.map((sub) =>
+            sub.key === "image" ? (
+              <button
+                key={sub.key}
+                type="button"
+                onClick={() => {
+                  onOpenImagePost();
+                  onNavigate();
+                }}
+                className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
+              >
+                <NavIcon icon={sub.icon} color="night" size={14} className="shrink-0" />
+                <span className="text-[13px] text-night-900">{sub.label}</span>
+              </button>
+            ) : (
+              <Link
+                key={sub.key}
+                href={comingSoonHref(sub.label)}
+                onClick={onNavigate}
+                className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
+              >
+                <NavIcon icon={sub.icon} color="night" size={14} className="shrink-0" />
+                <span className="text-[13px] text-night-900">{sub.label}</span>
+              </Link>
+            ),
+          )}
         </div>
       )}
     </div>
@@ -213,6 +246,7 @@ function CreatePostRow({ onNavigate }: { onNavigate: () => void }) {
 
 export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
   const [openMobileKey, setOpenMobileKey] = useState<string | null>(null);
+  const [imagePostOpen, setImagePostOpen] = useState(false);
   const toggleMobileKey = (key: string) => setOpenMobileKey((current) => (current === key ? null : key));
 
   return (
@@ -225,6 +259,7 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
             onNavigate={onNavigate}
             open={openMobileKey === item.key}
             onToggle={() => toggleMobileKey(item.key)}
+            onOpenImagePost={() => setImagePostOpen(true)}
           />
         ))}
         <div className="my-1 h-px w-full bg-gray-200" />
@@ -233,6 +268,7 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
           onNavigate={onNavigate}
           open={false}
           onToggle={() => {}}
+          onOpenImagePost={() => setImagePostOpen(true)}
         />
       </div>
 
@@ -244,7 +280,7 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
               <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <CreatePostRow onNavigate={onNavigate} />
+          <CreatePostRow onNavigate={onNavigate} onOpenImagePost={() => setImagePostOpen(true)} />
         </div>
 
         <div className="flex w-[270px] flex-col gap-1.5 rounded-2xl border border-gray-200 bg-white p-1.5">
@@ -263,6 +299,8 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
           ))}
         </div>
       </div>
+
+      <CreatePostModal open={imagePostOpen} onClose={() => setImagePostOpen(false)} />
     </>
   );
 }
