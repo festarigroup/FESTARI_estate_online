@@ -45,6 +45,7 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
   const previews = useMemo(() => files.map((file) => URL.createObjectURL(file)), [files]);
   const [dragActive, setDragActive] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const wordCount = useMemo(() => (text.trim() ? text.trim().split(/\s+/).length : 0), [text]);
 
   const [wasOpen, setWasOpen] = useState(open);
   if (open !== wasOpen) {
@@ -156,61 +157,62 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
           />
         </div>
 
-        <div className="flex w-full flex-col gap-1">
-          <div
-            onDragOver={(event) => {
-              event.preventDefault();
-              setDragActive(true);
-            }}
-            onDragLeave={() => setDragActive(false)}
-            onDrop={handleDrop}
-            onClick={() => inputRef.current?.click()}
-            role="button"
-            tabIndex={0}
-            className={cn(
-              "flex min-h-[120px] w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed px-6 py-6 text-center",
-              dragActive ? "border-brand-900 bg-brand-900/5" : "border-[#cbd5e0] bg-[#cbd5e0]/30",
-            )}
-          >
-            <input
-              ref={inputRef}
-              type="file"
-              multiple
-              accept={typeMeta.accept.join(",")}
-              className="hidden"
-              onChange={(event) => addFiles(event.target.files)}
-            />
-            <p className="text-xs text-[#19161d]">Drag and drop files here</p>
-            <p className="text-xs text-[#86888a]">or</p>
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                inputRef.current?.click();
-              }}
-              className="flex h-6 items-center justify-center gap-1.5 rounded-[40px] bg-[#19161d] px-2 text-xs text-white"
-            >
-              Choose files
-              <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={14} />
-            </button>
-          </div>
-          <p className="w-full text-xs text-[#53575a]">{typeMeta.helper}</p>
-        </div>
+        <input
+          ref={inputRef}
+          type="file"
+          multiple
+          accept={typeMeta.accept.join(",")}
+          className="hidden"
+          onChange={(event) => addFiles(event.target.files)}
+        />
 
-        {previews.length > 0 && (
-          <div className="flex w-full flex-wrap gap-2">
+        {previews.length === 0 ? (
+          <div className="flex w-full flex-col gap-1">
+            <div
+              onDragOver={(event) => {
+                event.preventDefault();
+                setDragActive(true);
+              }}
+              onDragLeave={() => setDragActive(false)}
+              onDrop={handleDrop}
+              onClick={() => inputRef.current?.click()}
+              role="button"
+              tabIndex={0}
+              className={cn(
+                "flex min-h-[120px] w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed px-6 py-6 text-center",
+                dragActive ? "border-brand-900 bg-brand-900/5" : "border-[#cbd5e0] bg-[#cbd5e0]/30",
+              )}
+            >
+              <p className="text-xs text-[#19161d]">Drag and drop files here</p>
+              <p className="text-xs text-[#86888a]">or</p>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  inputRef.current?.click();
+                }}
+                className="flex h-6 items-center justify-center gap-1.5 rounded-[40px] bg-[#19161d] px-2 text-xs text-white"
+              >
+                Choose files
+                <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={14} />
+              </button>
+            </div>
+            <p className="w-full text-xs text-[#53575a]">{typeMeta.helper}</p>
+          </div>
+        ) : (
+          <div className="flex w-full flex-wrap gap-2.5 px-2">
             {previews.map((src, index) => (
-              <div key={src} className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+              <div key={src} className="relative h-[61px] w-[97px] shrink-0 overflow-hidden rounded-md bg-gray-100">
                 {postType === "video" ? (
                   <video src={src} className="size-full object-cover" muted />
                 ) : (
-                  <Image src={src} alt="" fill className="object-cover" sizes="64px" />
+                  <Image src={src} alt="" fill className="object-cover" sizes="97px" />
                 )}
                 <button
                   type="button"
                   aria-label="Remove file"
                   onClick={() => removeFile(index)}
-                  className="absolute right-1 top-1 flex size-4 items-center justify-center rounded-full bg-black/60 text-[10px] leading-none text-white"
+                  className="absolute left-1 top-1 flex size-4 items-center justify-center rounded-full bg-white text-[10px] leading-none text-night-900"
                 >
                   &times;
                 </button>
@@ -258,13 +260,23 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
                 );
               })}
             </div>
-            <button
-              type="button"
-              onClick={handlePost}
-              className="flex h-8 items-center justify-center rounded-lg bg-brand-900 px-3 text-sm text-white hover:bg-brand-900/90"
-            >
-              Post
-            </button>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-0.5">
+                <NavIcon icon="/icons/poll-in-progress.svg" color="brand" size={16} className="bg-[#1465e6]" />
+                <span className="whitespace-nowrap text-sm text-[#1465e6]">{wordCount} words</span>
+              </div>
+              <div className="h-[22px] w-px shrink-0 bg-gray-200" />
+              <button type="button" aria-label="Add more files" onClick={() => inputRef.current?.click()}>
+                <NavIcon icon="/icons/poll-add-alt.svg" color="brand" size={16} className="bg-[#1465e6]" />
+              </button>
+              <button
+                type="button"
+                onClick={handlePost}
+                className="flex h-8 items-center justify-center rounded-lg bg-brand-900 px-3 text-sm text-white hover:bg-brand-900/90"
+              >
+                Post
+              </button>
+            </div>
           </div>
 
           <div className="h-px w-full bg-gray-200" />
