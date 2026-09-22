@@ -30,6 +30,7 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
     [files],
   );
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const wordCount = useMemo(() => (question.trim() ? question.trim().split(/\s+/).length : 0), [question]);
 
   useEffect(() => {
     if (!open) return;
@@ -247,7 +248,11 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
               </button>
             </div>
             <div className="flex items-center gap-2">
-              <NavIcon icon="/icons/poll-in-progress.svg" color="brand" size={16} className="bg-[#1465e6]" />
+              <div className="flex items-center gap-0.5">
+                <NavIcon icon="/icons/poll-in-progress.svg" color="brand" size={16} className="bg-[#1465e6]" />
+                <span className="whitespace-nowrap text-sm text-[#1465e6]">{wordCount} words</span>
+              </div>
+              <div className="h-[22px] w-px shrink-0 bg-gray-200" />
               <button
                 type="button"
                 aria-label="Add option"
