@@ -180,7 +180,7 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
         ))}
       </div>
 
-      <div className="hidden w-[300px] flex-col gap-1.5 rounded-3xl bg-white p-3 shadow-[0px_20px_66px_rgba(34,48,73,0.2)] sm:flex">
+      <div className="hidden w-[300px] flex-col gap-1.5 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white p-3 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] sm:flex">
         {DESKTOP_SECTIONS.map((section, sectionIndex) => (
           <div key={sectionIndex} className="flex w-full flex-col gap-1">
             {section.title && (
