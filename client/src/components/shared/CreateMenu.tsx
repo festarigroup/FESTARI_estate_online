@@ -46,6 +46,12 @@ const MOBILE_SECTIONS: MobileMenuSection[] = [
   },
 ];
 
+interface DesktopSubmenuItem {
+  key: string;
+  icon: string;
+  label: string;
+}
+
 interface DesktopMenuItem {
   key: string;
   icon: string;
@@ -53,6 +59,7 @@ interface DesktopMenuItem {
   description: string;
   locked?: boolean;
   highlighted?: boolean;
+  submenu?: DesktopSubmenuItem[];
 }
 
 interface DesktopMenuSection {
@@ -63,6 +70,7 @@ interface DesktopMenuSection {
 
 const DESKTOP_SECTIONS: DesktopMenuSection[] = [
   {
+    title: "Share",
     items: [
       {
         key: "post",
@@ -70,6 +78,10 @@ const DESKTOP_SECTIONS: DesktopMenuSection[] = [
         label: "Create Post",
         description: "Photo, video, poll or article",
         highlighted: true,
+        submenu: [
+          { key: "video", icon: "/icons/video-01.svg", label: "Video post" },
+          { key: "image", icon: "/icons/image-01.svg", label: "Image post" },
+        ],
       },
     ],
   },
@@ -184,7 +196,12 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
         {DESKTOP_SECTIONS.map((section, sectionIndex) => (
           <div key={sectionIndex} className="flex w-full flex-col gap-1">
             {section.title && (
-              <p className="text-[13px] font-semibold leading-4 tracking-[-0.42px] text-night-900">{section.title}</p>
+              <div className="flex items-center gap-1">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-gray-500">{section.title}</p>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="text-gray-400">
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
             )}
             <div
               className={cn(
@@ -193,30 +210,49 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
               )}
             >
               {section.items.map((item) => (
-                <Link
-                  key={item.key}
-                  href={comingSoonHref(item.label)}
-                  onClick={onNavigate}
-                  className={cn(
-                    "flex w-full items-center gap-2 rounded-xl p-1.5",
-                    item.highlighted
-                      ? "border-b border-gray-200 bg-[#e2edff]"
-                      : "hover:bg-gray-50",
-                  )}
-                >
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-900 p-1">
-                    <NavIcon icon={item.icon} color="white" size={16} />
-                  </span>
-                  <span className="flex min-w-0 flex-1 flex-col items-start">
-                    <span className="w-full text-[13px] font-medium leading-4 text-night-900">{item.label}</span>
-                    <span className="w-full truncate text-[10px] leading-3 text-gray-500">{item.description}</span>
-                  </span>
-                  {item.locked && (
-                    <span className="relative block size-2.5 shrink-0">
-                      <Image src="/icons/create-menu-dt-lock-key.svg" alt="" fill sizes="10px" />
+                <div key={item.key} className={cn("relative w-full", item.submenu && "group")}>
+                  <Link
+                    href={comingSoonHref(item.label)}
+                    onClick={onNavigate}
+                    className={cn(
+                      "flex w-full items-center gap-2 rounded-xl p-1.5",
+                      item.highlighted
+                        ? "border-b border-gray-200 bg-[#e2edff]"
+                        : "hover:bg-gray-50",
+                    )}
+                  >
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-900 p-1">
+                      <NavIcon icon={item.icon} color="white" size={16} />
                     </span>
+                    <span className="flex min-w-0 flex-1 flex-col items-start">
+                      <span className="w-full text-[13px] font-medium leading-4 text-night-900">{item.label}</span>
+                      <span className="w-full truncate text-[10px] leading-3 text-gray-500">{item.description}</span>
+                    </span>
+                    {item.locked && (
+                      <span className="relative block size-2.5 shrink-0">
+                        <Image src="/icons/create-menu-dt-lock-key.svg" alt="" fill sizes="10px" />
+                      </span>
+                    )}
+                  </Link>
+
+                  {item.submenu && (
+                    <div className="absolute left-full top-0 z-10 ml-2 hidden w-36 flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg group-hover:flex">
+                      {item.submenu.map((sub) => (
+                        <Link
+                          key={sub.key}
+                          href={comingSoonHref(sub.label)}
+                          onClick={onNavigate}
+                          className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-gray-50"
+                        >
+                          <span className="relative block size-4 shrink-0">
+                            <Image src={sub.icon} alt="" fill sizes="16px" />
+                          </span>
+                          <span className="text-[13px] text-night-900">{sub.label}</span>
+                        </Link>
+                      ))}
+                    </div>
                   )}
-                </Link>
+                </div>
               ))}
             </div>
           </div>
