@@ -551,13 +551,37 @@ function CommentRow({ comment }: { comment: CommentItem }) {
           <p className="shrink-0 text-[9.5px] text-gray-500">{comment.postedAt}</p>
         </div>
         <p className="whitespace-pre-line text-[13px] leading-[1.5] text-gray-600">{comment.text}</p>
-        {!!comment.likes && (
-          <div className="flex items-center gap-1">
-            <NavIcon icon="/icons/heart-like.svg" color="brand" size={11} className="bg-[#ea5e9c]" />
-            <span className="text-[9.5px] font-bold text-brand-900">{comment.likes}</span>
-          </div>
-        )}
+        <CommentLikeButton initialLikes={comment.likes ?? 0} />
       </div>
     </div>
+  );
+}
+
+function CommentLikeButton({ initialLikes }: { initialLikes: number }) {
+  const [liked, setLiked] = useState(false);
+  const likeCount = initialLikes + (liked ? 1 : 0);
+
+  return (
+    <button
+      type="button"
+      onClick={() => setLiked((v) => !v)}
+      aria-pressed={liked}
+      aria-label={liked ? "Unlike comment" : "Like comment"}
+      className="flex items-center gap-1"
+    >
+      <NavIcon
+        icon="/icons/heart-like.svg"
+        color="brand"
+        size={11}
+        className={liked ? "bg-[#ea5e9c]" : "bg-gray-400"}
+      />
+      {likeCount > 0 ? (
+        <span className={cn("text-[9.5px] font-bold", liked ? "text-[#ea5e9c]" : "text-brand-900")}>
+          {likeCount}
+        </span>
+      ) : (
+        <span className="text-[9.5px] font-bold text-gray-400">Like</span>
+      )}
+    </button>
   );
 }
