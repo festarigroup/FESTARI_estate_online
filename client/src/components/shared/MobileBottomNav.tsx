@@ -116,14 +116,14 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
           >
             <NavIcon
               icon={item.icon}
-              color={isActive ? "brand" : "night"}
+              color="night"
               size={22}
-              className={isActive ? undefined : "opacity-70"}
+              className={isActive ? "bg-brand-900" : "bg-[#001f3f] opacity-70"}
             />
             <span
               className={cn(
                 "whitespace-nowrap text-sm",
-                isActive ? "font-semibold text-brand-600" : "font-normal text-night-700 opacity-70",
+                isActive ? "font-semibold text-brand-900" : "font-normal text-[#001f3f] opacity-70",
               )}
             >
               {SHORT_LABEL[item.key] ?? item.label}
