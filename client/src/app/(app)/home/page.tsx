@@ -91,9 +91,10 @@ const POSTS: PostCardData[] = [
     text: POST_TEXT,
     images: [
       "/images/post-building-01.jpg",
-      "/images/trending-property-1.jpg",
-      "/images/trending-property-2.jpg",
-      "/images/trending-property-3.jpg",
+      "/images/post-property-exterior.jpg",
+      "/images/post-property-living-room.jpg",
+      "/images/post-property-kitchen.jpg",
+      "/images/post-property-bedroom.jpg",
     ],
     priceLine: "GHS 1,850.00",
     subLine: "4 bedroom Detached House",
