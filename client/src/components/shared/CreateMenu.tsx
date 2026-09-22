@@ -200,8 +200,8 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
         <MobileMenuRow item={MOBILE_REQUEST_ITEM} onNavigate={onNavigate} />
       </div>
 
-      <div className="hidden w-[326px] flex-col items-center gap-1.5 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white/70 px-3 pb-3 pt-5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-150 sm:flex">
-        <div className="flex w-[290px] flex-col gap-1">
+      <div className="hidden w-[300px] flex-col items-center gap-1.5 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white/70 px-3 pb-3 pt-5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-150 sm:flex">
+        <div className="flex w-[270px] flex-col gap-1">
           <div className="flex items-center gap-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-gray-500">Share</p>
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="text-gray-400">
@@ -211,7 +211,7 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
           <CreatePostRow onNavigate={onNavigate} />
         </div>
 
-        <div className="flex w-[290px] flex-col gap-1.5 rounded-2xl border border-gray-200 bg-white p-1.5">
+        <div className="flex w-[270px] flex-col gap-1.5 rounded-2xl border border-gray-200 bg-white p-1.5">
           {DESKTOP_LIST_SECTIONS.map((section, sectionIndex) => (
             <div
               key={sectionIndex}
