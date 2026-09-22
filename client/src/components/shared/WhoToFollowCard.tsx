@@ -1,6 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { comingSoonHref } from "@/lib/coming-soon";
+import { cn } from "@/lib/utils";
 
 export interface WhoToFollowPerson {
   name: string;
@@ -8,13 +12,12 @@ export interface WhoToFollowPerson {
   avatar: string;
   avatarPlaceholder?: boolean;
   verified?: boolean;
-  action: "Follow" | "Connect" | "Message";
 }
 
 const PEOPLE: WhoToFollowPerson[] = [
-  { name: "Andy Ansong", role: "Real Estate Consultant", avatar: "/icons/avatar-andy.png", verified: true, action: "Follow" },
-  { name: "Edwin Adu", role: "Sales Agent", avatar: "/icons/avatar-sample.jpg", verified: true, action: "Connect" },
-  { name: "Carlos Ramirez", role: "Software Engineer", avatar: "", avatarPlaceholder: true, verified: true, action: "Message" },
+  { name: "Andy Ansong", role: "Real Estate Consultant", avatar: "/icons/avatar-andy.png", verified: true },
+  { name: "Edwin Adu", role: "Sales Agent", avatar: "/icons/avatar-sample.jpg", verified: true },
+  { name: "Carlos Ramirez", role: "Software Engineer", avatar: "", avatarPlaceholder: true, verified: true },
 ];
 
 export function WhoToFollowCard() {
@@ -51,15 +54,31 @@ export function WhoToFollowCard() {
                 <p className="text-[7.6px] text-gray-500">{person.role}</p>
               </div>
             </div>
-            <Link
-              href={comingSoonHref("Connections")}
-              className="flex h-[23px] w-[67px] shrink-0 items-center justify-center rounded-lg border border-brand-900 text-[11px] text-brand-900"
-            >
-              {person.action}
-            </Link>
+            <FollowButton name={person.name} />
           </li>
         ))}
       </ul>
     </div>
+  );
+}
+
+function FollowButton({ name }: { name: string }) {
+  const [following, setFollowing] = useState(false);
+
+  return (
+    <button
+      type="button"
+      onClick={() => setFollowing((v) => !v)}
+      aria-pressed={following}
+      aria-label={following ? `Unfollow ${name}` : `Follow ${name}`}
+      className={cn(
+        "flex h-[23px] w-[67px] shrink-0 items-center justify-center rounded-lg border text-[11px] transition-colors",
+        following
+          ? "border-brand-900 bg-brand-900 text-white hover:bg-brand-900/90"
+          : "border-brand-900 bg-white text-brand-900 hover:bg-brand-900/5",
+      )}
+    >
+      {following ? "Following" : "Follow"}
+    </button>
   );
 }
