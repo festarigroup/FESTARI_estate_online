@@ -67,22 +67,23 @@ interface DesktopMenuSection {
   divider?: boolean;
 }
 
-const DESKTOP_SECTIONS: DesktopMenuSection[] = [
-  {
-    title: "Share",
-    items: [
-      {
-        key: "post",
-        icon: "/icons/create-menu-dt-add-alt.svg",
-        label: "Create Post",
-        highlighted: true,
-        submenu: [
-          { key: "video", icon: "/icons/video-01.svg", label: "Video post" },
-          { key: "image", icon: "/icons/image-01.svg", label: "Image post" },
-        ],
-      },
-    ],
-  },
+const DESKTOP_SHARE_SECTION: DesktopMenuSection = {
+  title: "Share",
+  items: [
+    {
+      key: "post",
+      icon: "/icons/create-menu-dt-add-alt.svg",
+      label: "Create Post",
+      highlighted: true,
+      submenu: [
+        { key: "video", icon: "/icons/video-01.svg", label: "Video post" },
+        { key: "image", icon: "/icons/image-01.svg", label: "Image post" },
+      ],
+    },
+  ],
+};
+
+const DESKTOP_LIST_SECTIONS: DesktopMenuSection[] = [
   {
     divider: true,
     items: [
@@ -103,6 +104,59 @@ const DESKTOP_SECTIONS: DesktopMenuSection[] = [
     items: [{ key: "request", icon: "/icons/create-menu-dt-help-circle.svg", label: "Post a Request" }],
   },
 ];
+
+function DesktopMenuRow({ item, onNavigate }: { item: DesktopMenuItem; onNavigate: () => void }) {
+  return (
+    <div className={cn("relative w-full", item.submenu && "group")}>
+      <Link
+        href={comingSoonHref(item.label)}
+        onClick={onNavigate}
+        className={cn(
+          "flex h-8 w-full items-center gap-2 rounded-xl px-2",
+          item.highlighted ? "border-b border-gray-200 bg-[#e2edff]" : "hover:bg-white",
+        )}
+      >
+        <NavIcon
+          icon={item.icon}
+          color="night"
+          size={14}
+          className={cn("shrink-0", item.highlighted && "bg-brand-900")}
+        />
+        <span
+          className={cn(
+            "flex-1 truncate text-sm",
+            item.highlighted ? "font-medium text-brand-900" : "text-night-700",
+          )}
+        >
+          {item.label}
+        </span>
+        {item.locked && (
+          <span className="relative block size-2.5 shrink-0">
+            <Image src="/icons/create-menu2-lock-key.svg" alt="" fill sizes="10px" />
+          </span>
+        )}
+      </Link>
+
+      {item.submenu && (
+        <div className="absolute left-full top-0 z-10 ml-2 hidden w-36 flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg group-hover:flex">
+          {item.submenu.map((sub) => (
+            <Link
+              key={sub.key}
+              href={comingSoonHref(sub.label)}
+              onClick={onNavigate}
+              className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-gray-50"
+            >
+              <span className="relative block size-4 shrink-0">
+                <Image src={sub.icon} alt="" fill sizes="16px" />
+              </span>
+              <span className="text-[13px] text-night-900">{sub.label}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
   return (
@@ -146,73 +200,36 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
         ))}
       </div>
 
-      <div className="hidden w-[280px] flex-col gap-1.5 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white p-3 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] sm:flex">
-        {DESKTOP_SECTIONS.map((section, sectionIndex) => (
-          <div key={sectionIndex} className="flex w-full flex-col gap-1">
-            {section.title && (
-              <div className="flex items-center gap-1">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-gray-500">{section.title}</p>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="text-gray-400">
-                  <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-            )}
+      <div className="hidden w-[280px] flex-col gap-2 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-gray-50 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] sm:flex">
+        <div className="flex w-full flex-col gap-1 rounded-2xl bg-white p-2">
+          <div className="flex items-center gap-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-gray-500">
+              {DESKTOP_SHARE_SECTION.title}
+            </p>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="text-gray-400">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          {DESKTOP_SHARE_SECTION.items.map((item) => (
+            <DesktopMenuRow key={item.key} item={item} onNavigate={onNavigate} />
+          ))}
+        </div>
+
+        <div className="flex w-full flex-col gap-1.5 rounded-2xl bg-gray-100 p-2">
+          {DESKTOP_LIST_SECTIONS.map((section, sectionIndex) => (
             <div
+              key={sectionIndex}
               className={cn(
                 "flex w-full flex-col items-start gap-0.5",
                 section.divider && "border-b border-gray-200 pb-1.5",
               )}
             >
               {section.items.map((item) => (
-                <div key={item.key} className={cn("relative w-full", item.submenu && "group")}>
-                  <Link
-                    href={comingSoonHref(item.label)}
-                    onClick={onNavigate}
-                    className={cn(
-                      "flex h-8 w-full items-center gap-2 rounded-xl px-2",
-                      item.highlighted
-                        ? "border-b border-gray-200 bg-[#e2edff]"
-                        : "hover:bg-gray-50",
-                    )}
-                  >
-                    <NavIcon icon={item.icon} color="brand" size={14} className="shrink-0 bg-brand-900" />
-                    <span
-                      className={cn(
-                        "flex-1 truncate text-sm",
-                        item.highlighted ? "font-medium text-brand-900" : "text-gray-500",
-                      )}
-                    >
-                      {item.label}
-                    </span>
-                    {item.locked && (
-                      <span className="relative block size-2.5 shrink-0">
-                        <Image src="/icons/create-menu2-lock-key.svg" alt="" fill sizes="10px" />
-                      </span>
-                    )}
-                  </Link>
-
-                  {item.submenu && (
-                    <div className="absolute left-full top-0 z-10 ml-2 hidden w-36 flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg group-hover:flex">
-                      {item.submenu.map((sub) => (
-                        <Link
-                          key={sub.key}
-                          href={comingSoonHref(sub.label)}
-                          onClick={onNavigate}
-                          className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-gray-50"
-                        >
-                          <span className="relative block size-4 shrink-0">
-                            <Image src={sub.icon} alt="" fill sizes="16px" />
-                          </span>
-                          <span className="text-[13px] text-night-900">{sub.label}</span>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <DesktopMenuRow key={item.key} item={item} onNavigate={onNavigate} />
               ))}
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </>
   );
