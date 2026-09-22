@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { NavIcon } from "@/components/shared/NavIcon";
 import { comingSoonHref } from "@/lib/coming-soon";
 
 interface CreateMenuItem {
@@ -31,7 +32,7 @@ const SECTIONS: CreateMenuSection[] = [
     items: [
       {
         key: "property",
-        icon: "/icons/create-menu-building.svg",
+        icon: "/icons/building-03.svg",
         label: "List Property",
         description: "Needs ownership or agency evidence",
         locked: true,
@@ -91,9 +92,9 @@ const SECTIONS: CreateMenuSection[] = [
 
 export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
   return (
-    <div className="flex w-[300px] flex-col gap-2 rounded-3xl bg-white p-4 shadow-[0px_20px_66px_rgba(34,48,73,0.2)]">
+    <div className="no-scrollbar flex max-h-[min(75vh,520px)] w-[300px] flex-col gap-1.5 overflow-y-auto rounded-3xl bg-white p-3 shadow-[0px_20px_66px_rgba(34,48,73,0.2)]">
       {SECTIONS.map((section) => (
-        <div key={section.title} className="flex w-full flex-col gap-2">
+        <div key={section.title} className="flex w-full flex-col gap-1">
           <p className="text-sm font-semibold tracking-[-0.42px] text-night-900">{section.title}</p>
           <div className="flex w-full flex-col items-start">
             {section.items.map((item, index) => (
@@ -103,18 +104,16 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
                 onClick={onNavigate}
                 className={
                   section.divider && index === section.items.length - 1
-                    ? "flex w-full items-center gap-2 border-b border-gray-200 p-2"
-                    : "flex w-full items-center gap-2 p-2 hover:bg-gray-50"
+                    ? "flex w-full items-center gap-2 rounded-xl border-b border-gray-200 px-2 py-1.5 hover:bg-[#e2edff]"
+                    : "flex w-full items-center gap-2 rounded-xl px-2 py-1.5 hover:bg-[#e2edff]"
                 }
               >
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-brand-900 p-1">
-                  <span className="relative block size-[18px]">
-                    <Image src={item.icon} alt="" fill sizes="18px" />
-                  </span>
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-brand-900 p-1">
+                  <NavIcon icon={item.icon} color="white" size={16} />
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col items-start">
-                  <span className="w-full text-sm font-medium text-night-900">{item.label}</span>
-                  <span className="w-full text-[11px] text-gray-500">{item.description}</span>
+                  <span className="w-full text-[13px] font-medium leading-5 text-night-900">{item.label}</span>
+                  <span className="w-full text-[10.5px] leading-[14px] text-gray-500">{item.description}</span>
                 </span>
                 {item.locked && (
                   <span className="relative block size-3.5 shrink-0">
