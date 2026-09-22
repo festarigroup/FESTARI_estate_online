@@ -100,7 +100,7 @@ export function CreatePostModal({ open, onClose }: CreatePostModalProps) {
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="flex max-h-[90vh] w-full max-w-[560px] flex-col gap-6 overflow-y-auto rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
+        className="flex max-h-[90vh] w-full max-w-[720px] flex-col gap-6 overflow-y-auto rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
       >
         <div className="flex w-full items-center justify-between">
           <p className="text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Create a Post</p>
