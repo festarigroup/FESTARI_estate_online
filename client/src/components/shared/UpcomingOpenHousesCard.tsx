@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { comingSoonHref } from "@/lib/coming-soon";
+
 interface OpenHouse {
   month: string;
   day: string;
@@ -17,9 +20,9 @@ export function UpcomingOpenHousesCard() {
     <div className="flex w-full flex-col gap-[15px] rounded-[15px] border border-[#e6d7ef] bg-white p-[11px]">
       <div className="flex items-center justify-between">
         <p className="text-[15px] font-bold text-gray-700">Upcoming Open Houses</p>
-        <button type="button" className="text-[12.5px] font-medium text-brand-600">
+        <Link href={comingSoonHref("Open Houses")} className="text-[12.5px] font-medium text-brand-600">
           View all
-        </button>
+        </Link>
       </div>
       <ul className="flex flex-col gap-[15px]">
         {OPEN_HOUSES.map((house, index) => (
@@ -35,12 +38,12 @@ export function UpcomingOpenHousesCard() {
                 <p className="text-[9.5px] font-bold text-gray-700">{house.dateTime}</p>
               </div>
             </div>
-            <button
-              type="button"
+            <Link
+              href={comingSoonHref("Open House RSVP")}
               className="flex h-[23px] w-[67px] shrink-0 items-center justify-center rounded-lg border border-brand-900 text-[11px] text-brand-900"
             >
               RSVP
-            </button>
+            </Link>
           </li>
         ))}
       </ul>

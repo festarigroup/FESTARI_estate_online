@@ -1,11 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 
 export type PostActionVariant = "primary" | "outline" | "outline-brand";
@@ -87,6 +89,7 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<CommentItem[]>(post.commentsList ?? DEFAULT_COMMENTS);
   const [commentDraft, setCommentDraft] = useState("");
+  const [textExpanded, setTextExpanded] = useState(false);
 
   const submitComment = () => {
     const text = commentDraft.trim();
@@ -115,10 +118,16 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
             <div className="flex w-full flex-col-reverse gap-[15px] sm:flex-col">
               {post.text && (
                 <div className="flex w-full items-center gap-0.5 text-sm leading-5">
-                  <p className="min-w-0 flex-1 truncate text-[#1e293b]">{post.text}</p>
+                  <p className={cn("min-w-0 flex-1 text-[#1e293b]", !textExpanded && "truncate")}>
+                    {post.text}
+                  </p>
                   {post.truncated !== false && (
-                    <button type="button" className="shrink-0 font-bold text-gray-400">
-                      more
+                    <button
+                      type="button"
+                      onClick={() => setTextExpanded((v) => !v)}
+                      className="shrink-0 font-bold text-gray-400"
+                    >
+                      {textExpanded ? "less" : "more"}
                     </button>
                   )}
                 </div>
@@ -174,6 +183,7 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
 }
 
 function PostHeader({ post }: { post: PostCardData }) {
+  const router = useRouter();
   const [following, setFollowing] = useState(false);
 
   return (
@@ -236,12 +246,22 @@ function PostHeader({ post }: { post: PostCardData }) {
             </span>
           </button>
         )}
-        <span className="relative block size-[23px] shrink-0 sm:hidden">
-          <Image src="/icons/more-horizontal.svg" alt="Post options" fill sizes="23px" />
-        </span>
-        <span className="relative hidden size-[23px] shrink-0 sm:block">
-          <Image src="/icons/menu-03.svg" alt="Post options" fill sizes="23px" />
-        </span>
+        <button
+          type="button"
+          aria-label="Post options"
+          onClick={() => router.push(comingSoonHref("Post options"))}
+          className="relative block size-[23px] shrink-0 sm:hidden"
+        >
+          <Image src="/icons/more-horizontal.svg" alt="" fill sizes="23px" />
+        </button>
+        <button
+          type="button"
+          aria-label="Post options"
+          onClick={() => router.push(comingSoonHref("Post options"))}
+          className="relative hidden size-[23px] shrink-0 sm:block"
+        >
+          <Image src="/icons/menu-03.svg" alt="" fill sizes="23px" />
+        </button>
       </div>
     </div>
   );
@@ -497,6 +517,7 @@ function PriceRow({ post }: { post: PostCardData }) {
 }
 
 function ActionsRow({ post }: { post: PostCardData }) {
+  const router = useRouter();
   const [primary, secondary] = post.actions ?? [];
   return (
     <div className="flex w-full flex-wrap items-center justify-between gap-2">
@@ -504,6 +525,7 @@ function ActionsRow({ post }: { post: PostCardData }) {
         {primary && (
           <Button
             variant="primary"
+            onClick={() => router.push(comingSoonHref(primary.label))}
             className="h-auto w-auto rounded-xl px-3 py-1.5 text-[10px] sm:h-[38px] sm:rounded-lg sm:px-[15px] sm:py-0 sm:text-[13px]"
           >
             {primary.label}
@@ -512,6 +534,7 @@ function ActionsRow({ post }: { post: PostCardData }) {
         {secondary && (
           <Button
             variant={secondary.variant}
+            onClick={() => router.push(comingSoonHref(secondary.label))}
             className="h-auto w-auto rounded-xl px-3 py-1.5 text-[10px] sm:h-[38px] sm:rounded-lg sm:px-[15px] sm:py-0 sm:text-[13px]"
           >
             {secondary.label}
@@ -521,6 +544,7 @@ function ActionsRow({ post }: { post: PostCardData }) {
       {post.messageHostLabel && (
         <Button
           variant="outline-brand"
+          onClick={() => router.push(comingSoonHref(post.messageHostLabel!))}
           className="h-auto w-auto rounded-xl px-3 py-1.5 text-[10px] sm:h-[38px] sm:rounded-lg sm:px-[15px] sm:py-0 sm:text-[13px]"
         >
           {post.messageHostLabel}

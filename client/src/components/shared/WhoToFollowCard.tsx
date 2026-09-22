@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import { comingSoonHref } from "@/lib/coming-soon";
 
 export interface WhoToFollowPerson {
   name: string;
@@ -19,9 +21,9 @@ export function WhoToFollowCard() {
     <div className="flex w-full flex-col gap-[15px] rounded-[15px] border border-[#e6d7ef] bg-white p-[11px]">
       <div className="flex items-center justify-between">
         <p className="text-[15px] font-bold text-gray-700">Who to follow</p>
-        <button type="button" className="text-[12.5px] font-medium text-brand-600">
+        <Link href={comingSoonHref("Who to Follow")} className="text-[12.5px] font-medium text-brand-600">
           View all
-        </button>
+        </Link>
       </div>
       <ul className="flex flex-col gap-[15px]">
         {PEOPLE.map((person) => (
@@ -46,12 +48,12 @@ export function WhoToFollowCard() {
                 <Image src="/icons/avatar-verified-3xl-alt.svg" alt="Verified" fill sizes="23px" />
               </span>
             ) : (
-              <button
-                type="button"
+              <Link
+                href={comingSoonHref("Connections")}
                 className="flex h-[23px] w-[67px] shrink-0 items-center justify-center rounded-lg border border-brand-900 text-[11px] text-brand-900"
               >
                 {person.action}
-              </button>
+              </Link>
             )}
           </li>
         ))}

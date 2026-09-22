@@ -1,3 +1,5 @@
+import { comingSoonHref } from "@/lib/coming-soon";
+
 export interface NavChildItem {
   key: string;
   label: string;
@@ -13,6 +15,8 @@ export interface NavItem {
   children?: NavChildItem[];
 }
 
+const comingSoon = comingSoonHref;
+
 export const NAV_ITEMS: NavItem[] = [
   {
     key: "feed",
@@ -21,7 +25,7 @@ export const NAV_ITEMS: NavItem[] = [
     href: "/home",
     children: [
       { key: "home", label: "Home", icon: "/icons/home-03.svg", href: "/home" },
-      { key: "discover", label: "Discover", icon: "/icons/compass-01.svg", href: "#" },
+      { key: "discover", label: "Discover", icon: "/icons/compass-01.svg", href: comingSoon("Discover") },
     ],
   },
   {
@@ -30,8 +34,8 @@ export const NAV_ITEMS: NavItem[] = [
     icon: "/icons/user-star-01.svg",
     href: "#",
     children: [
-      { key: "professionals", label: "Professionals", icon: "/icons/briefcase-09.svg", href: "#" },
-      { key: "artisans", label: "Artisans", icon: "/icons/hammer-01.svg", href: "#" },
+      { key: "professionals", label: "Professionals", icon: "/icons/briefcase-09.svg", href: comingSoon("Professionals") },
+      { key: "artisans", label: "Artisans", icon: "/icons/hammer-01.svg", href: comingSoon("Artisans") },
     ],
   },
   {
@@ -40,8 +44,8 @@ export const NAV_ITEMS: NavItem[] = [
     icon: "/icons/timer-clock-watch.svg",
     href: "#",
     children: [
-      { key: "services", label: "Services", icon: "/icons/settings-02.svg", href: "#" },
-      { key: "request-board", label: "Request Board", icon: "/icons/clipboard-list-01.svg", href: "#" },
+      { key: "services", label: "Services", icon: "/icons/settings-02.svg", href: comingSoon("Services") },
+      { key: "request-board", label: "Request Board", icon: "/icons/clipboard-list-01.svg", href: comingSoon("Request Board") },
     ],
   },
   {
@@ -50,8 +54,8 @@ export const NAV_ITEMS: NavItem[] = [
     icon: "/icons/user-group.svg",
     href: "#",
     children: [
-      { key: "communities", label: "Communities", icon: "/icons/message-03.svg", href: "#" },
-      { key: "concierge", label: "Concierge", icon: "/icons/concierge-bell-01.svg", href: "#" },
+      { key: "communities", label: "Communities", icon: "/icons/message-03.svg", href: comingSoon("Communities") },
+      { key: "concierge", label: "Concierge", icon: "/icons/concierge-bell-01.svg", href: comingSoon("Concierge") },
     ],
   },
   {
@@ -60,8 +64,8 @@ export const NAV_ITEMS: NavItem[] = [
     icon: "/icons/guest-house.svg",
     href: "#",
     children: [
-      { key: "stay", label: "Stay", icon: "/icons/guest-house-sm.svg", href: "#" },
-      { key: "events", label: "Events", icon: "/icons/calendar-01.svg", href: "#" },
+      { key: "stay", label: "Stay", icon: "/icons/guest-house-sm.svg", href: comingSoon("Stay") },
+      { key: "events", label: "Events", icon: "/icons/calendar-01.svg", href: comingSoon("Events") },
     ],
   },
   {
@@ -70,8 +74,8 @@ export const NAV_ITEMS: NavItem[] = [
     icon: "/icons/archive-add.svg",
     href: "#",
     children: [
-      { key: "saved", label: "Saved", icon: "/icons/archive-save.svg", href: "#" },
-      { key: "workspace", label: "My Workspace", icon: "/icons/folder-01.svg", href: "#" },
+      { key: "saved", label: "Saved", icon: "/icons/archive-save.svg", href: comingSoon("Saved") },
+      { key: "workspace", label: "My Workspace", icon: "/icons/folder-01.svg", href: comingSoon("My Workspace") },
     ],
   },
 ];

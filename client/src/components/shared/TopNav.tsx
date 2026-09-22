@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { comingSoonHref } from "@/lib/coming-soon";
 
 export function TopNav() {
   const router = useRouter();
@@ -15,6 +16,11 @@ export function TopNav() {
     setMenuOpen(false);
     showSuccessToast("You've been logged out");
     router.push("/auth");
+  }
+
+  function goComingSoon(feature: string) {
+    setMenuOpen(false);
+    router.push(comingSoonHref(feature));
   }
 
   useEffect(() => {
@@ -38,18 +44,23 @@ export function TopNav() {
             <Image src="/icons/logo-biltlinx.png" alt="Biltlinx" fill className="object-contain" sizes="72px" priority />
           </div>
 
-          <div className="hidden h-[46px] min-w-0 flex-1 items-center gap-2 rounded-lg border border-gray-200 bg-white px-[11px] py-[13px] sm:flex sm:max-w-[350px]">
+          <button
+            type="button"
+            onClick={() => goComingSoon("Search")}
+            className="hidden h-[46px] min-w-0 flex-1 items-center gap-2 rounded-lg border border-gray-200 bg-white px-[11px] py-[13px] text-left sm:flex sm:max-w-[350px]"
+          >
             <span className="relative block size-[15px] shrink-0">
               <Image src="/icons/search.svg" alt="" fill sizes="15px" />
             </span>
             <span className="truncate text-[13px] text-gray-500">Search anything</span>
-          </div>
+          </button>
         </div>
 
         <div className="flex shrink-0 items-center gap-1 py-1 sm:gap-2 sm:px-2">
           <button
             type="button"
             aria-label="Search"
+            onClick={() => goComingSoon("Search")}
             className="relative flex size-[38px] items-center justify-center rounded-full hover:bg-gray-50 sm:hidden"
           >
             <span className="relative block size-[19px] shrink-0">
@@ -60,6 +71,7 @@ export function TopNav() {
           <button
             type="button"
             aria-label="Create"
+            onClick={() => goComingSoon("Create Post")}
             className="flex h-[34px] items-center justify-center gap-2 rounded-xl bg-[#0072ff] px-4 hover:opacity-90 sm:h-[38px] sm:w-[93px] sm:rounded-lg sm:bg-brand-900 sm:px-[15px] sm:hover:bg-brand-900/90 sm:hover:opacity-100"
           >
             <NavIcon icon="/icons/add-circle-01.svg" color="white" size={19} className="hidden sm:block" />
@@ -69,6 +81,7 @@ export function TopNav() {
           <button
             type="button"
             aria-label="Messages"
+            onClick={() => goComingSoon("Messages")}
             className="relative hidden size-[38px] shrink-0 items-center justify-center rounded-full hover:bg-gray-50 sm:flex"
           >
             <span className="relative block size-[19px] shrink-0">
@@ -80,6 +93,7 @@ export function TopNav() {
           <button
             type="button"
             aria-label="Notifications"
+            onClick={() => goComingSoon("Notifications")}
             className="relative hidden size-[38px] shrink-0 items-center justify-center rounded-full hover:bg-gray-50 sm:flex"
           >
             <span className="relative block size-[19px] shrink-0">
@@ -111,6 +125,7 @@ export function TopNav() {
               <div className="absolute right-0 top-[calc(100%+8px)] z-50 flex w-48 flex-col gap-1 rounded-[11px] border border-gray-200 bg-white p-2 shadow-lg">
                 <button
                   type="button"
+                  onClick={() => goComingSoon("Messages")}
                   className="flex h-10 w-full items-center gap-3 rounded-[10px] px-3 text-[13px] text-night-700 hover:bg-gray-50 sm:hidden"
                 >
                   <NavIcon icon="/icons/message-programming.svg" color="night" size={18} />
@@ -118,6 +133,7 @@ export function TopNav() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => goComingSoon("Notifications")}
                   className="flex h-10 w-full items-center gap-3 rounded-[10px] px-3 text-[13px] text-night-700 hover:bg-gray-50 sm:hidden"
                 >
                   <NavIcon icon="/icons/notification.svg" color="night" size={18} />

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/shared/AppShell";
 import { PostCard, type PostCardData } from "@/components/shared/PostCard";
@@ -8,6 +9,7 @@ import { WhoToFollowCard } from "@/components/shared/WhoToFollowCard";
 import { TrendingPropertiesCard } from "@/components/shared/TrendingPropertiesCard";
 import { UpcomingOpenHousesCard } from "@/components/shared/UpcomingOpenHousesCard";
 import { TrendingHashtagsCard } from "@/components/shared/TrendingHashtagsCard";
+import { comingSoonHref } from "@/lib/coming-soon";
 
 interface FeedTab {
   label: string;
@@ -227,21 +229,24 @@ function ComposerCard() {
         <span className="flex size-[38px] shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">
           SL
         </span>
-        <div className="flex w-full items-center justify-between rounded-3xl bg-gray-100 p-2">
+        <Link
+          href={comingSoonHref("Create Post")}
+          className="flex w-full items-center justify-between rounded-3xl bg-gray-100 p-2"
+        >
           <p className="text-[11px] font-medium text-black/35">Add your comment</p>
-          <button type="button" aria-label="Post" className="relative block size-[23px] shrink-0">
+          <span className="relative block size-[23px] shrink-0">
             <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="23px" />
-          </button>
-        </div>
+          </span>
+        </Link>
       </div>
 
       <div className="h-px w-full bg-gray-200" />
 
       <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:gap-[17px]">
         {COMPOSER_ACTIONS.map((action) => (
-          <button
+          <Link
             key={action.key}
-            type="button"
+            href={comingSoonHref(action.label)}
             aria-label={action.label}
             className="flex items-center gap-2 text-[11px] font-bold text-gray-500 hover:text-brand-900"
           >
@@ -249,7 +254,7 @@ function ComposerCard() {
               <Image src={action.icon} alt="" fill sizes="16px" />
             </span>
             <span className="hidden sm:inline">{action.label}</span>
-          </button>
+          </Link>
         ))}
       </div>
     </div>
@@ -288,12 +293,12 @@ function RightRail() {
         <div className="relative h-[114px] w-full overflow-hidden rounded-xl">
           <Image src="/images/post-building-01.jpg" alt="" fill className="object-cover" sizes="318px" />
         </div>
-        <button
-          type="button"
-          className="h-[38px] w-full rounded-lg bg-brand-900 text-[13px] font-medium text-white hover:bg-brand-900/90"
+        <Link
+          href={comingSoonHref("List Property")}
+          className="flex h-[38px] w-full items-center justify-center rounded-lg bg-brand-900 text-[13px] font-medium text-white hover:bg-brand-900/90"
         >
           List Property
-        </button>
+        </Link>
       </div>
 
       <WhoToFollowCard />

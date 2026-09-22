@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { comingSoonHref } from "@/lib/coming-soon";
+
 interface Hashtag {
   tag: string;
   posts: string;
@@ -16,9 +19,9 @@ export function TrendingHashtagsCard() {
     <div className="flex w-full flex-col gap-[15px] rounded-[15px] border border-[#e6d7ef] bg-white p-[11px]">
       <div className="flex items-center justify-between">
         <p className="text-[15px] font-bold text-gray-700">Trending Hashtags</p>
-        <button type="button" className="text-[12.5px] font-medium text-brand-600">
+        <Link href={comingSoonHref("Trending Hashtags")} className="text-[12.5px] font-medium text-brand-600">
           View all
-        </button>
+        </Link>
       </div>
       <ul className="flex flex-col gap-2">
         {HASHTAGS.map((hashtag) => (
