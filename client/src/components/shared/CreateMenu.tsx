@@ -121,7 +121,7 @@ function CreatePostRow({ onNavigate }: { onNavigate: () => void }) {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         className={cn(
-          "flex h-8 w-full items-center gap-2 rounded-xl border px-2 text-left",
+          "flex h-8 w-full items-center gap-2 rounded-xl border px-2 text-left outline-none",
           open ? "border-brand-900" : "border-transparent hover:bg-gray-100",
         )}
       >
