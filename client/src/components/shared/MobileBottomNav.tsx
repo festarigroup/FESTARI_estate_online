@@ -117,12 +117,12 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
             <NavIcon
               icon={item.icon}
               color="night"
-              size={9}
+              size={12}
               className={isActive ? "bg-brand-900" : "bg-[#001f3f] opacity-70"}
             />
             <span
               className={cn(
-                "whitespace-nowrap text-[8px]",
+                "whitespace-nowrap text-[10px]",
                 isActive ? "font-semibold text-brand-900" : "font-normal text-[#001f3f] opacity-70",
               )}
             >
