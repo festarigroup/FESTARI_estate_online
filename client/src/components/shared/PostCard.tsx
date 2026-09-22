@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
 import { NavIcon } from "@/components/shared/NavIcon";
@@ -248,13 +249,27 @@ function PostHeader({ post }: { post: PostCardData }) {
 
 function ImageCarousel({ images }: { images: string[] }) {
   const [index, setIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const hasMultiple = images.length > 1;
 
   const goTo = (next: number) => setIndex((next + images.length) % images.length);
 
   return (
     <div className="relative h-[285px] w-full overflow-hidden rounded-[29px] sm:rounded-[15px]">
-      <Image src={images[index]} alt="" fill className="object-cover" sizes="770px" />
+      <button
+        type="button"
+        aria-label="View full image"
+        onClick={() => setLightboxOpen(true)}
+        className="absolute inset-0 block size-full"
+      >
+        <Image src={images[index]} alt="" fill className="object-cover" sizes="770px" />
+      </button>
+
+      {lightboxOpen &&
+        createPortal(
+          <ImageLightbox images={images} index={index} onIndexChange={goTo} onClose={() => setLightboxOpen(false)} />,
+          document.body,
+        )}
 
       {hasMultiple && (
         <>
@@ -291,6 +306,89 @@ function ImageCarousel({ images }: { images: string[] }) {
                 className={cn("size-[9.5px] rounded-full", dot === index ? "bg-brand-600" : "bg-white")}
               />
             ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function ImageLightbox({
+  images,
+  index,
+  onIndexChange,
+  onClose,
+}: {
+  images: string[];
+  index: number;
+  onIndexChange: (next: number) => void;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+      if (event.key === "ArrowLeft") onIndexChange(index - 1);
+      if (event.key === "ArrowRight") onIndexChange(index + 1);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [index, onIndexChange, onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image viewer"
+    >
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+      >
+        <span className="text-2xl leading-none">&times;</span>
+      </button>
+
+      <div className="relative h-full w-full max-w-4xl" onClick={(event) => event.stopPropagation()}>
+        <Image src={images[index]} alt="" fill className="object-contain" sizes="100vw" />
+      </div>
+
+      {images.length > 1 && (
+        <>
+          <button
+            type="button"
+            aria-label="Previous image"
+            onClick={(event) => {
+              event.stopPropagation();
+              onIndexChange(index - 1);
+            }}
+            className="absolute left-4 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+          >
+            <span className="relative block h-3 w-[5.5px] rotate-180">
+              <Image src="/icons/carousel-arrow.svg" alt="" fill sizes="6px" className="invert" />
+            </span>
+          </button>
+          <button
+            type="button"
+            aria-label="Next image"
+            onClick={(event) => {
+              event.stopPropagation();
+              onIndexChange(index + 1);
+            }}
+            className="absolute right-4 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+          >
+            <span className="relative block h-3 w-[5.5px]">
+              <Image src="/icons/carousel-arrow.svg" alt="" fill sizes="6px" className="invert" />
+            </span>
+          </button>
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[13px] font-medium text-white">
+            {index + 1} / {images.length}
           </div>
         </>
       )}
