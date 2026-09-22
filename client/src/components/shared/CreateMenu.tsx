@@ -149,7 +149,7 @@ function CreatePostRow({ onNavigate }: { onNavigate: () => void }) {
 export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
   return (
     <>
-      <div className="flex w-[240px] flex-col gap-2 rounded-3xl border border-gray-200 bg-white p-2 shadow-[0px_0px_20px_rgba(69,71,69,0.15)] sm:hidden">
+      <div className="flex w-[240px] flex-col gap-2 rounded-3xl border border-gray-200 bg-white p-2 shadow-[0px_20px_48px_-10px_rgba(0,0,0,0.12),0px_8px_20px_-6px_rgba(0,0,0,0.06)] sm:hidden">
         {MOBILE_SECTIONS.map((section, sectionIndex) => (
           <div
             key={sectionIndex}
