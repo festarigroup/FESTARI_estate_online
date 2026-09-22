@@ -350,7 +350,7 @@ function ImageLightbox({
         type="button"
         aria-label="Close"
         onClick={onClose}
-        className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+        className="absolute right-4 top-4 z-10 flex size-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
       >
         <span className="text-2xl leading-none">&times;</span>
       </button>
