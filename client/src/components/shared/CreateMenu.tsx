@@ -1,51 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
-
-interface MobileMenuItem {
-  key: string;
-  icon: string;
-  iconSize?: number;
-  label: string;
-  locked?: boolean;
-  highlighted?: boolean;
-  flip?: boolean;
-}
-
-interface MobileMenuSection {
-  items: MobileMenuItem[];
-  divider?: boolean;
-}
-
-const MOBILE_SECTIONS: MobileMenuSection[] = [
-  {
-    items: [{ key: "post", icon: "/icons/create-menu2-add-alt.svg", label: "Create post", highlighted: true }],
-  },
-  {
-    divider: true,
-    items: [
-      { key: "property", icon: "/icons/create-menu2-building.svg", label: "List property", locked: true, flip: true },
-      { key: "stay", icon: "/icons/create-menu2-guest-house.svg", label: "Add stay", locked: true },
-      { key: "service", icon: "/icons/create-menu2-map-pin.svg", label: "Offer a service", locked: true },
-      { key: "project", icon: "/icons/create-menu2-briefcase.svg", label: "Post project", locked: true },
-    ],
-  },
-  {
-    divider: true,
-    items: [
-      { key: "event", icon: "/icons/create-menu2-calendar-date.svg", label: "Create events" },
-      { key: "community", icon: "/icons/create-menu2-user-group.svg", label: "Create community" },
-    ],
-  },
-  {
-    items: [{ key: "request", icon: "/icons/create-menu2-help-circle.svg", label: "Post a request", iconSize: 18 }],
-  },
-];
 
 interface DesktopSubmenuItem {
   key: string;
@@ -111,6 +70,90 @@ function DesktopMenuRow({ item, onNavigate }: { item: DesktopMenuItem; onNavigat
   );
 }
 
+interface MobileMenuItem {
+  key: string;
+  icon: string;
+  label: string;
+  submenu?: DesktopSubmenuItem[];
+}
+
+const LISTINGS_SUBMENU: DesktopSubmenuItem[] = [
+  { key: "property", icon: "/icons/building-03.svg", label: "List Property" },
+  { key: "stay", icon: "/icons/create-menu-dt-guest-house.svg", label: "Add Stay" },
+  { key: "service", icon: "/icons/create-menu-dt-map-pin.svg", label: "Offer a Service" },
+  { key: "project", icon: "/icons/create-menu-dt-briefcase.svg", label: "Post Project" },
+];
+
+const MOBILE_ITEMS: MobileMenuItem[] = [
+  { key: "post", icon: "/icons/add-circle-01.svg", label: "Create post", submenu: CREATE_POST_SUBMENU },
+  { key: "listings", icon: "/icons/clipboard-list-01.svg", label: "Listings", submenu: LISTINGS_SUBMENU },
+  { key: "event", icon: "/icons/create-menu-calendar-17.svg", label: "Create Event" },
+  { key: "community", icon: "/icons/create-menu-dt-user-group.svg", label: "Create Community" },
+];
+
+const MOBILE_REQUEST_ITEM: MobileMenuItem = {
+  key: "request",
+  icon: "/icons/create-menu-dt-help-circle.svg",
+  label: "Post a Request",
+};
+
+function MobileMenuRow({ item, onNavigate }: { item: MobileMenuItem; onNavigate: () => void }) {
+  const [open, setOpen] = useState(false);
+
+  if (!item.submenu) {
+    return (
+      <Link
+        href={comingSoonHref(item.label)}
+        onClick={onNavigate}
+        className="flex h-11 w-full items-center gap-3 rounded-xl px-1 hover:bg-gray-50"
+      >
+        <NavIcon icon={item.icon} color="night" size={20} className="shrink-0" />
+        <span className="flex-1 truncate text-[15px] font-medium text-night-900">{item.label}</span>
+      </Link>
+    );
+  }
+
+  return (
+    <div className="w-full">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex h-11 w-full items-center gap-3 rounded-xl px-1 text-left outline-none hover:bg-gray-50"
+      >
+        <NavIcon icon={item.icon} color="night" size={20} className="shrink-0" />
+        <span className="flex-1 truncate text-[15px] font-medium text-night-900">{item.label}</span>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+          className={cn("shrink-0 text-gray-400 transition-transform", open && "rotate-90")}
+        >
+          <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="mt-1 flex w-full flex-col gap-0.5 rounded-xl bg-gray-50 p-1.5">
+          {item.submenu.map((sub) => (
+            <Link
+              key={sub.key}
+              href={comingSoonHref(sub.label)}
+              onClick={onNavigate}
+              className="flex items-center gap-3 rounded-lg p-2 hover:bg-white"
+            >
+              <NavIcon icon={sub.icon} color="night" size={16} className="shrink-0" />
+              <span className="text-sm text-night-900">{sub.label}</span>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function CreatePostRow({ onNavigate }: { onNavigate: () => void }) {
   const [open, setOpen] = useState(false);
 
@@ -149,43 +192,12 @@ function CreatePostRow({ onNavigate }: { onNavigate: () => void }) {
 export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
   return (
     <>
-      <div className="flex w-[240px] flex-col gap-2 rounded-3xl border border-gray-200 bg-white p-2 shadow-[0px_20px_48px_-10px_rgba(0,0,0,0.12),0px_8px_20px_-6px_rgba(0,0,0,0.06)] sm:hidden">
-        {MOBILE_SECTIONS.map((section, sectionIndex) => (
-          <div
-            key={sectionIndex}
-            className={cn(
-              "flex w-full flex-col items-start gap-1",
-              section.divider && "border-b border-gray-200 pb-2",
-            )}
-          >
-            {section.items.map((item) => (
-              <Link
-                key={item.key}
-                href={comingSoonHref(item.label)}
-                onClick={onNavigate}
-                className={cn(
-                  "flex h-8 w-full items-center gap-2 rounded-2xl px-2",
-                  item.highlighted ? "bg-[#e2edff]" : "hover:bg-gray-50",
-                )}
-              >
-                <span
-                  className={cn("relative block shrink-0", item.flip && "rotate-180 -scale-x-100")}
-                  style={{ width: item.iconSize ?? 12, height: item.iconSize ?? 12 }}
-                >
-                  <Image src={item.icon} alt="" fill sizes={`${item.iconSize ?? 12}px`} />
-                </span>
-                <span className={cn("flex-1 truncate text-sm", item.highlighted ? "text-brand-900" : "text-gray-500")}>
-                  {item.label}
-                </span>
-                {item.locked && (
-                  <span className="relative block size-[7px] shrink-0">
-                    <Image src="/icons/create-menu2-lock-key.svg" alt="" fill sizes="7px" />
-                  </span>
-                )}
-              </Link>
-            ))}
-          </div>
+      <div className="flex w-[300px] flex-col gap-0.5 rounded-3xl border border-gray-200 bg-white p-2 shadow-[0px_20px_48px_-10px_rgba(0,0,0,0.12),0px_8px_20px_-6px_rgba(0,0,0,0.06)] sm:hidden">
+        {MOBILE_ITEMS.map((item) => (
+          <MobileMenuRow key={item.key} item={item} onNavigate={onNavigate} />
         ))}
+        <div className="my-1 h-px w-full bg-gray-200" />
+        <MobileMenuRow item={MOBILE_REQUEST_ITEM} onNavigate={onNavigate} />
       </div>
 
       <div className="hidden w-[326px] flex-col items-center gap-1.5 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white/70 px-3 pb-3 pt-5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-150 sm:flex">
