@@ -1,12 +1,21 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
 
 export function TopNav() {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
+
+  function handleLogout() {
+    setMenuOpen(false);
+    showSuccessToast("You've been logged out");
+    router.push("/auth");
+  }
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -116,6 +125,7 @@ export function TopNav() {
                 </button>
                 <button
                   type="button"
+                  onClick={handleLogout}
                   className="flex h-10 w-full items-center gap-3 rounded-[10px] px-3 text-[13px] text-red-600 hover:bg-gray-50"
                 >
                   <NavIcon icon="/icons/logout-01.svg" color="night" size={18} className="bg-red-600" />
