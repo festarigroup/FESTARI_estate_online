@@ -70,6 +70,7 @@ const CREATE_POST_SUBMENU: DesktopSubmenuItem[] = [
   { key: "video", icon: "/icons/video-01.svg", label: "Video post" },
   { key: "image", icon: "/icons/image-01.svg", label: "Image post" },
   { key: "poll", icon: "/icons/chart-02.svg", label: "Poll" },
+  { key: "article", icon: "/icons/book-bookmark-01.svg", label: "Article" },
 ];
 
 const DESKTOP_LIST_SECTIONS: DesktopMenuSection[] = [
@@ -121,7 +122,7 @@ function CreatePostRow({ onNavigate }: { onNavigate: () => void }) {
         aria-expanded={open}
         className={cn(
           "flex h-8 w-full items-center gap-2 rounded-xl border px-2 text-left",
-          open ? "border-brand-900 bg-[#e2edff]" : "border-transparent hover:bg-gray-100",
+          open ? "border-brand-900" : "border-transparent hover:bg-gray-100",
         )}
       >
         <NavIcon icon={CREATE_POST_ITEM.icon} color="night" size={14} className={cn("shrink-0", open && "bg-brand-900")} />
@@ -130,7 +131,7 @@ function CreatePostRow({ onNavigate }: { onNavigate: () => void }) {
       </button>
 
       {open && (
-        <div className="absolute left-1/2 top-full z-10 mt-2 flex w-72 flex-col gap-1 rounded-2xl border border-brand-900 bg-white p-2 shadow-lg">
+        <div className="absolute left-1/2 top-full z-10 mt-2 flex w-72 flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg">
           {CREATE_POST_SUBMENU.map((sub) => (
             <Link
               key={sub.key}
@@ -138,9 +139,7 @@ function CreatePostRow({ onNavigate }: { onNavigate: () => void }) {
               onClick={onNavigate}
               className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
             >
-              <span className="relative block size-[18px] shrink-0">
-                <Image src={sub.icon} alt="" fill sizes="18px" />
-              </span>
+              <NavIcon icon={sub.icon} color="night" size={14} className="shrink-0" />
               <span className="text-[13px] text-night-900">{sub.label}</span>
             </Link>
           ))}
