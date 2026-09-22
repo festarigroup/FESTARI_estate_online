@@ -55,7 +55,7 @@ export function OtpInput({ value, onChange, error }: OtpInputProps) {
             aria-label={`Digit ${index + 1}`}
             aria-invalid={error}
             className={cn(
-              "h-12 min-w-0 flex-1 rounded-[16px] bg-surface-button text-center text-base text-ink focus:outline-none focus:ring-2 focus:ring-brand-900 dark:bg-night-800 dark:text-white lg:rounded-xl",
+              "h-12 min-w-0 flex-1 rounded-[20px] bg-surface-button text-center text-base text-ink focus:outline-none focus:ring-2 focus:ring-brand-900 dark:bg-night-800 dark:text-white lg:rounded-xl",
               error && "ring-2 ring-[#e73d1c] focus:ring-[#e73d1c]",
             )}
           />

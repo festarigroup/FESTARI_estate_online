@@ -8,12 +8,12 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         social:
-          "h-12 rounded-[16px] lg:rounded-xl bg-surface-button text-ink hover:bg-muted-300/40 dark:bg-night-800 dark:text-white dark:hover:bg-night-700/60",
+          "h-12 rounded-[20px] lg:rounded-xl bg-surface-button text-ink hover:bg-muted-300/40 dark:bg-night-800 dark:text-white dark:hover:bg-night-700/60",
         link: "h-auto w-auto p-0 font-medium text-brand-900 underline underline-offset-2 hover:text-brand-900/80",
-        primary: "h-10 rounded-[16px] lg:rounded-lg bg-brand-900 text-white hover:bg-brand-900/90",
-        secondary: "h-10 rounded-[16px] lg:rounded-lg bg-brand-300 text-white hover:bg-brand-300/90",
-        outline: "h-10 rounded-[16px] lg:rounded-lg border border-gray-200 bg-white text-night-900 hover:bg-gray-50",
-        "outline-brand": "h-10 rounded-[16px] lg:rounded-lg border border-brand-900 bg-white text-brand-900 hover:bg-brand-900/5",
+        primary: "h-10 rounded-[20px] lg:rounded-lg bg-brand-900 text-white hover:bg-brand-900/90",
+        secondary: "h-10 rounded-[20px] lg:rounded-lg bg-brand-300 text-white hover:bg-brand-300/90",
+        outline: "h-10 rounded-[20px] lg:rounded-lg border border-gray-200 bg-white text-night-900 hover:bg-gray-50",
+        "outline-brand": "h-10 rounded-[20px] lg:rounded-lg border border-brand-900 bg-white text-brand-900 hover:bg-brand-900/5",
       },
     },
     defaultVariants: {

@@ -17,7 +17,7 @@ export function Input({ label, id, className, error, ...props }: InputProps) {
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${id}-error` : undefined}
         className={cn(
-          "h-12 w-full rounded-[16px] border border-muted-300 px-3 text-sm text-ink placeholder:text-muted-400 focus:outline-none focus:ring-2 focus:ring-brand-900 lg:rounded-lg",
+          "h-12 w-full rounded-[20px] border border-muted-300 px-3 text-sm text-ink placeholder:text-muted-400 focus:outline-none focus:ring-2 focus:ring-brand-900 lg:rounded-lg",
           "dark:border-night-700 dark:bg-night-800 dark:text-white dark:placeholder:text-muted-400",
           error && "border-[#e73d1c] focus:ring-[#e73d1c]",
           className,
