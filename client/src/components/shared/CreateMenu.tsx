@@ -120,18 +120,15 @@ function CreatePostRow({ onNavigate }: { onNavigate: () => void }) {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className={cn(
-          "flex h-8 w-full items-center gap-2 rounded-xl border px-2 text-left outline-none",
-          open ? "border-brand-900" : "border-transparent hover:bg-gray-100",
-        )}
+        className="flex h-8 w-full items-center gap-2 rounded-xl border border-brand-900 px-2 text-left outline-none hover:bg-gray-100"
       >
-        <NavIcon icon={CREATE_POST_ITEM.icon} color="night" size={14} className={cn("shrink-0", open && "bg-brand-900")} />
+        <NavIcon icon={CREATE_POST_ITEM.icon} color="night" size={14} className="shrink-0 bg-brand-900" />
         <span className="flex-1 truncate text-sm font-medium text-night-900">{CREATE_POST_ITEM.label}</span>
         <NavIcon icon="/icons/more-horizontal.svg" color="night" size={16} className="shrink-0" />
       </button>
 
       {open && (
-        <div className="absolute left-1/2 top-full z-10 mt-2 flex w-72 flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg">
+        <div className="absolute left-1/2 top-full z-10 mt-2 flex w-56 flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg">
           {CREATE_POST_SUBMENU.map((sub) => (
             <Link
               key={sub.key}
@@ -191,7 +188,7 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
         ))}
       </div>
 
-      <div className="hidden w-[380px] flex-col gap-2 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white/70 p-3 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-150 sm:flex">
+      <div className="hidden w-[320px] flex-col gap-1.5 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white/70 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-150 sm:flex">
         <div className="flex w-full flex-col gap-1">
           <div className="flex items-center gap-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-gray-500">Share</p>
@@ -202,7 +199,7 @@ export function CreateMenu({ onNavigate }: { onNavigate: () => void }) {
           <CreatePostRow onNavigate={onNavigate} />
         </div>
 
-        <div className="flex w-full flex-col gap-1.5 rounded-2xl border border-gray-200 bg-white p-2">
+        <div className="flex w-full flex-col gap-1.5 rounded-2xl border border-gray-200 bg-white p-1.5">
           {DESKTOP_LIST_SECTIONS.map((section, sectionIndex) => (
             <div
               key={sectionIndex}
