@@ -31,7 +31,7 @@ const SECTIONS: CreateMenuSection[] = [
     items: [
       {
         key: "property",
-        icon: "/icons/create-menu-building.svg",
+        icon: "/icons/create-menu-calendar-date.svg",
         label: "List Property",
         description: "Needs ownership or agency evidence",
         locked: true,
