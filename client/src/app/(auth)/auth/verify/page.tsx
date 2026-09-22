@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { showSuccessToast } from "@/components/shared/AppToast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
@@ -13,6 +13,7 @@ import { isCompleteOtp } from "@/lib/validation";
 import { cn } from "@/lib/utils";
 
 function VerifyContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const identifier = searchParams.get("identifier") || "Useraccount@gmail.com";
   const channel = searchParams.get("channel") === "phone" ? "phone" : "email";
@@ -36,11 +37,10 @@ function VerifyContent() {
     setOtpError(incomplete);
     if (incomplete) return;
 
-    run(() =>
-      showSuccessToast(
-        isSignup ? "Account created! Welcome to Biltlinx" : "You're verified! Full sign-in is coming soon",
-      ),
-    );
+    run(() => {
+      showSuccessToast(isSignup ? "Account created! Welcome to Biltlinx" : "Welcome back!");
+      router.push("/home");
+    });
   }
 
   if (pending) {
