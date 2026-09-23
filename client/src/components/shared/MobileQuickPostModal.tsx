@@ -9,25 +9,14 @@ import { VisibilityMenu, DEFAULT_VISIBILITY, type PostVisibility } from "@/compo
 import { cn } from "@/lib/utils";
 
 const MEDIA_ACCEPT = ["image/png", "image/jpeg", "image/gif", "video/mp4", "video/quicktime", "video/webm"];
-const ACCEPT_FOR_INTENT: Record<"image" | "video", string[]> = {
-  image: ["image/png", "image/jpeg", "image/gif"],
-  video: ["video/mp4", "video/quicktime", "video/webm"],
-};
 
 interface MobileQuickPostModalProps {
   open: boolean;
   onClose: () => void;
   onSwitchType?: (type: "poll" | "article") => void;
-  /** When set, opens the file picker for that media type as soon as the card opens. */
-  initialAttachIntent?: "image" | "video";
 }
 
-export function MobileQuickPostModal({
-  open,
-  onClose,
-  onSwitchType,
-  initialAttachIntent,
-}: MobileQuickPostModalProps) {
+export function MobileQuickPostModal({ open, onClose, onSwitchType }: MobileQuickPostModalProps) {
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const previews = useMemo(
@@ -38,8 +27,6 @@ export function MobileQuickPostModal({
   const [visibilityOpen, setVisibilityOpen] = useState(false);
   const [visibility, setVisibility] = useState<PostVisibility>(DEFAULT_VISIBILITY);
   const visibilityTriggerRef = useRef<HTMLButtonElement | null>(null);
-  const autoOpenedRef = useRef(false);
-  const attachAccept = initialAttachIntent ? ACCEPT_FOR_INTENT[initialAttachIntent] : MEDIA_ACCEPT;
 
   useEffect(() => {
     if (!open) return;
@@ -59,17 +46,6 @@ export function MobileQuickPostModal({
     return () => previews.forEach((preview) => URL.revokeObjectURL(preview.url));
   }, [previews]);
 
-  useEffect(() => {
-    if (!open) {
-      autoOpenedRef.current = false;
-      return;
-    }
-    if (initialAttachIntent && !autoOpenedRef.current) {
-      autoOpenedRef.current = true;
-      inputRef.current?.click();
-    }
-  }, [open, initialAttachIntent]);
-
   if (!open) return null;
 
   function resetState() {
@@ -86,15 +62,9 @@ export function MobileQuickPostModal({
 
   function addFiles(list: FileList | null) {
     if (!list) return;
-    const next = Array.from(list).filter((file) => attachAccept.includes(file.type));
+    const next = Array.from(list).filter((file) => MEDIA_ACCEPT.includes(file.type));
     if (next.length === 0 && list.length > 0) {
-      showErrorToast(
-        initialAttachIntent === "image"
-          ? "Only PNG, JPEG or GIF files are supported"
-          : initialAttachIntent === "video"
-            ? "Only MP4, MOV or WEBM files are supported"
-            : "Only PNG, JPEG, GIF, MP4, MOV or WEBM files are supported",
-      );
+      showErrorToast("Only PNG, JPEG, GIF, MP4, MOV or WEBM files are supported");
       return;
     }
     setFiles((current) => [...current, ...next]);
@@ -184,7 +154,7 @@ export function MobileQuickPostModal({
               ref={inputRef}
               type="file"
               multiple
-              accept={attachAccept.join(",")}
+              accept={MEDIA_ACCEPT.join(",")}
               className="hidden"
               onChange={(event) => addFiles(event.target.files)}
             />
