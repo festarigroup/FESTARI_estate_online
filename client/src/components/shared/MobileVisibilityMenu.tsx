@@ -22,7 +22,7 @@ const COMMUNITY_ITEMS: SelectSheetItem[] = [
   { name: "Community 5", role: "Chief Strategy Officer", avatar: "/icons/avatar-sample.jpg" },
 ];
 
-const MENU_WIDTH = 190;
+const MENU_WIDTH = 220;
 
 function Row({
   label,
@@ -48,16 +48,16 @@ function Row({
       onClick={onClick}
       aria-expanded={ariaExpanded}
       className={cn(
-        "flex w-full items-center gap-3 rounded-[15px] px-3 py-1.5",
+        "flex w-full items-center gap-3 rounded-lg p-2",
         active && "bg-[rgba(239,239,239,0.85)]",
       )}
     >
-      <NavIcon icon={icon} color="night" size={14} />
-      <span className={cn("flex-1 text-left text-xs font-semibold tracking-[-0.36px]", active ? "text-[#171717]" : "text-[#262626]")}>
+      <NavIcon icon={icon} color="night" size={16} className="shrink-0" />
+      <span className={cn("flex-1 text-left text-sm font-medium", active ? "text-[#171717]" : "text-night-900")}>
         {label}
       </span>
       {hasChevron && (
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-[#94a3b7]">
+        <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-[#94a3b7]">
           <path d="M5 3L9 7L5 11" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )}

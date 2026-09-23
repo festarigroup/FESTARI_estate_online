@@ -41,6 +41,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
   const [pollOptions, setPollOptions] = useState<string[]>([]);
   const [addingOption, setAddingOption] = useState(false);
   const [newOption, setNewOption] = useState("");
+  const [editingOptionIndex, setEditingOptionIndex] = useState<number | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [optionOverlayCenter, setOptionOverlayCenter] = useState<{ top: number; left: number } | null>(null);
   const [files, setFiles] = useState<File[]>([]);
@@ -103,13 +104,29 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
     const rect = cardRef.current?.getBoundingClientRect();
     if (rect) setOptionOverlayCenter({ top: rect.top + rect.height / 2, left: rect.left + rect.width / 2 });
     setNewOption("");
+    setEditingOptionIndex(null);
+    setAddingOption(true);
+  }
+
+  function openEditOption(index: number) {
+    const rect = cardRef.current?.getBoundingClientRect();
+    if (rect) setOptionOverlayCenter({ top: rect.top + rect.height / 2, left: rect.left + rect.width / 2 });
+    setNewOption(pollOptions[index]);
+    setEditingOptionIndex(index);
     setAddingOption(true);
   }
 
   function confirmAddOption() {
     const value = newOption.trim();
-    if (value) setPollOptions((current) => [...current, value]);
+    if (value) {
+      if (editingOptionIndex !== null) {
+        setPollOptions((current) => current.map((option, i) => (i === editingOptionIndex ? value : option)));
+      } else {
+        setPollOptions((current) => [...current, value]);
+      }
+    }
     setNewOption("");
+    setEditingOptionIndex(null);
     setAddingOption(false);
   }
 
@@ -258,15 +275,38 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
         {mode === "poll" && (
           <div className="flex w-full flex-col gap-2">
             {pollOptions.map((option, index) => (
-              <button
+              <div
                 key={index}
-                type="button"
-                aria-label={`Remove option: ${option}`}
-                onClick={() => removePollOption(index)}
-                className="flex w-full items-center rounded-lg border border-gray-200 px-3 py-1.5 text-left hover:bg-gray-50"
+                className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5"
               >
-                <p className="w-full truncate text-sm text-night-900">{option}</p>
-              </button>
+                <p className="w-full flex-1 truncate text-sm text-night-900">{option}</p>
+                <button
+                  type="button"
+                  aria-label={`Edit option: ${option}`}
+                  onClick={() => openEditOption(index)}
+                  className="shrink-0 text-gray-400 hover:text-night-900"
+                >
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path
+                      d="M11.5 2.5a1.5 1.5 0 0 1 2.12 2.12l-8 8-3 1 1-3 8-8Z"
+                      stroke="currentColor"
+                      strokeWidth="1.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  aria-label={`Remove option: ${option}`}
+                  onClick={() => removePollOption(index)}
+                  className="shrink-0 text-gray-400 hover:text-red-600"
+                >
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M3 4h10M6.5 4V2.5h3V4M4.5 4l.5 9.5h6l.5-9.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </div>
             ))}
             <div className="flex w-full items-center justify-between">
               <p className="text-sm font-bold text-night-900">Options</p>
@@ -445,10 +485,13 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
         createPortal(
           <div
             className="fixed inset-0 z-[130] bg-black/50"
-            onClick={() => setAddingOption(false)}
+            onClick={() => {
+              setAddingOption(false);
+              setEditingOptionIndex(null);
+            }}
             role="dialog"
             aria-modal="true"
-            aria-label="Add poll option"
+            aria-label={editingOptionIndex !== null ? "Edit poll option" : "Add poll option"}
           >
             <div
               onClick={(event) => event.stopPropagation()}
@@ -462,7 +505,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                 onKeyDown={(event) => {
                   if (event.key === "Enter") confirmAddOption();
                 }}
-                placeholder={`Option ${pollOptions.length + 1}`}
+                placeholder={editingOptionIndex !== null ? "Edit option" : `Option ${pollOptions.length + 1}`}
                 className="w-full flex-1 text-sm text-night-900 placeholder:text-night-900/70 focus:outline-none"
               />
               <button
@@ -471,7 +514,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                 disabled={!newOption.trim()}
                 className={cn("shrink-0 text-sm", newOption.trim() ? "text-brand-900" : "text-gray-300")}
               >
-                Add
+                {editingOptionIndex !== null ? "Save" : "Add"}
               </button>
             </div>
           </div>,
