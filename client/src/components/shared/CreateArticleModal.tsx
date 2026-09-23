@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
@@ -13,7 +12,6 @@ import {
   type PostVisibility,
 } from "@/components/shared/VisibilityMenu";
 import { usePostsFeed } from "@/context/PostsContext";
-import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 
 type SwitchablePostType = "media" | "poll" | "article";
@@ -40,7 +38,6 @@ interface CreateArticleModalProps {
 }
 
 export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticleModalProps) {
-  const router = useRouter();
   const { addPost } = usePostsFeed();
   const [headline, setHeadline] = useState("");
   const [bodyEmpty, setBodyEmpty] = useState(true);
@@ -230,34 +227,18 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
 
             <div className="flex w-full items-center justify-between">
               <div className="flex items-center gap-3">
-                {POST_TYPE_ROW.map((item) => {
-                  const active = item.key === "article";
-                  if (active) {
-                    return (
-                      <NavIcon
-                        key={item.key}
-                        icon={item.icon}
-                        color="brand"
-                        size={18}
-                        className="bg-[#337df2] opacity-30"
-                      />
-                    );
-                  }
-                  return (
-                    <button
-                      key={item.key}
-                      type="button"
-                      aria-label={item.label}
-                      onClick={() =>
-                        item.key === "media" || item.key === "poll"
-                          ? onSwitchType?.(item.key)
-                          : router.push(comingSoonHref(item.label))
-                      }
-                    >
-                      <NavIcon icon={item.icon} color="brand" size={18} className="bg-[#337df2]" />
-                    </button>
-                  );
-                })}
+                {POST_TYPE_ROW.map((item) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    aria-label={item.key === "media" ? "Attach media" : item.label}
+                    onClick={() => {
+                      if (item.key === "media" || item.key === "poll") onSwitchType?.(item.key);
+                    }}
+                  >
+                    <NavIcon icon={item.icon} color="brand" size={18} className="bg-[#337df2]" />
+                  </button>
+                ))}
               </div>
               <button
                 type="button"

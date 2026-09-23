@@ -239,25 +239,16 @@ export function CreatePostModal({ open, onClose, onSwitchType }: CreatePostModal
 
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-3">
-              {POST_TYPE_ROW.map((item) => {
-                const active = item.key === "media";
-                if (active) {
-                  return (
-                    <NavIcon
-                      key={item.key}
-                      icon={item.icon}
-                      color="brand"
-                      size={18}
-                      className="bg-[#337df2] opacity-30"
-                    />
-                  );
-                }
-                return (
-                  <button key={item.key} type="button" aria-label={item.label} onClick={() => onSwitchType?.(item.key)}>
-                    <NavIcon icon={item.icon} color="brand" size={18} className="bg-[#337df2]" />
-                  </button>
-                );
-              })}
+              {POST_TYPE_ROW.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  aria-label={item.key === "media" ? "Attach media" : item.label}
+                  onClick={() => (item.key === "media" ? inputRef.current?.click() : onSwitchType?.(item.key))}
+                >
+                  <NavIcon icon={item.icon} color="brand" size={18} className="bg-[#337df2]" />
+                </button>
+              ))}
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-0.5">
