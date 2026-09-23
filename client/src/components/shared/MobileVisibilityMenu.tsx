@@ -2,13 +2,22 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
+import { MobileSelectSheet, type SelectSheetItem } from "@/components/shared/MobileSelectSheet";
 import { NavIcon } from "@/components/shared/NavIcon";
-import { SideListMenu } from "@/components/shared/SideListMenu";
 import { type PostVisibility } from "@/components/shared/VisibilityMenu";
 import { cn } from "@/lib/utils";
 
-const COMMUNITY_ITEMS = ["Community 5", "Community 9", "Community 4", "Community 8", "Community 5", "Community 3", "Community 2"];
-const ORGANIZATION_ITEMS = COMMUNITY_ITEMS.map((item) => item.replace("Community", "Organization"));
+const ORGANIZATION_ITEMS: SelectSheetItem[] = [
+  { name: "Organization 1", role: "Lead Product Designer", avatar: "/icons/avatar-sample.jpg" },
+  { name: "Organization 2", role: "Product Designer", avatar: "/icons/avatar-andy.png", disabled: true },
+  { name: "Organization 3", role: "Head of Design", avatar: "/icons/avatar-sample.jpg" },
+  { name: "Organization 4", role: "Product Designer", avatar: "/icons/avatar-andy.png" },
+  { name: "Organization 5", role: "Chief Strategy Officer", avatar: "/icons/avatar-sample.jpg" },
+];
+const COMMUNITY_ITEMS: SelectSheetItem[] = ORGANIZATION_ITEMS.map((item) => ({
+  ...item,
+  name: item.name.replace("Organization", "Community"),
+}));
 
 const MENU_WIDTH = 190;
 
@@ -67,10 +76,8 @@ interface MobileVisibilityMenuProps {
 export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef }: MobileVisibilityMenuProps) {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = useState<{ bottom: number; left: number } | null>(null);
-  const communityRef = useRef<HTMLButtonElement | null>(null);
-  const organizationRef = useRef<HTMLButtonElement | null>(null);
-  const [communityOpen, setCommunityOpen] = useState(false);
-  const [organizationOpen, setOrganizationOpen] = useState(false);
+  const [communitySheetOpen, setCommunitySheetOpen] = useState(false);
+  const [organizationSheetOpen, setOrganizationSheetOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -96,7 +103,7 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
     const handlePointerDown = (event: PointerEvent) => {
       if (menuRef.current?.contains(event.target as Node)) return;
       if (anchorRef.current?.contains(event.target as Node)) return;
-      if ((event.target as HTMLElement).closest?.("[data-side-list-menu]")) return;
+      if ((event.target as HTMLElement).closest?.("[data-mobile-select-sheet]")) return;
       onClose();
     };
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -135,46 +142,40 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
         icon="/icons/user-group.svg"
         active={value.kind === "community"}
         hasChevron
-        buttonRef={communityRef}
-        ariaExpanded={communityOpen}
-        onClick={() => {
-          setCommunityOpen((v) => !v);
-          setOrganizationOpen(false);
-        }}
+        ariaExpanded={communitySheetOpen}
+        onClick={() => setCommunitySheetOpen(true)}
       />
       <Row
         label="Organization"
         icon="/icons/visibility-user-check.svg"
         active={value.kind === "organization"}
         hasChevron
-        buttonRef={organizationRef}
-        ariaExpanded={organizationOpen}
-        onClick={() => {
-          setOrganizationOpen((v) => !v);
-          setCommunityOpen(false);
-        }}
+        ariaExpanded={organizationSheetOpen}
+        onClick={() => setOrganizationSheetOpen(true)}
       />
 
-      <SideListMenu
-        open={communityOpen}
-        onClose={() => setCommunityOpen(false)}
-        anchorRef={communityRef}
+      <MobileSelectSheet
+        open={communitySheetOpen}
+        onClose={() => setCommunitySheetOpen(false)}
+        title="Select Community"
         items={COMMUNITY_ITEMS}
-        onSelect={(item) => {
-          setCommunityOpen(false);
-          onChange({ kind: "community", names: [item] });
-          onClose();
+        selected={value.kind === "community" ? value.names : []}
+        onToggle={(name) => {
+          const current = value.kind === "community" ? value.names : [];
+          const next = current.includes(name) ? current.filter((n) => n !== name) : [...current, name];
+          onChange(next.length > 0 ? { kind: "community", names: next } : { kind: "everyone" });
         }}
       />
-      <SideListMenu
-        open={organizationOpen}
-        onClose={() => setOrganizationOpen(false)}
-        anchorRef={organizationRef}
+      <MobileSelectSheet
+        open={organizationSheetOpen}
+        onClose={() => setOrganizationSheetOpen(false)}
+        title="Select Organization"
         items={ORGANIZATION_ITEMS}
-        onSelect={(item) => {
-          setOrganizationOpen(false);
-          onChange({ kind: "organization", names: [item] });
-          onClose();
+        selected={value.kind === "organization" ? value.names : []}
+        onToggle={(name) => {
+          const current = value.kind === "organization" ? value.names : [];
+          const next = current.includes(name) ? current.filter((n) => n !== name) : [...current, name];
+          onChange(next.length > 0 ? { kind: "organization", names: next } : { kind: "everyone" });
         }}
       />
 

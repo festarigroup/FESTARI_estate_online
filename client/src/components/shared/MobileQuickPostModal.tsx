@@ -421,7 +421,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
               value={visibility}
               onChange={(next) => {
                 setVisibility(next);
-                setVisibilityOpen(false);
+                if (next.kind === "everyone" || next.kind === "followings") setVisibilityOpen(false);
               }}
               anchorRef={visibilityTriggerRef}
             />

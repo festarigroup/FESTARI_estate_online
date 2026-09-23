@@ -1,0 +1,172 @@
+"use client";
+
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import { cn } from "@/lib/utils";
+
+export interface SelectSheetItem {
+  name: string;
+  role: string;
+  avatar: string;
+  disabled?: boolean;
+}
+
+interface MobileSelectSheetProps {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  items: SelectSheetItem[];
+  selected: string[];
+  onToggle: (name: string) => void;
+}
+
+/** The bottom-sheet picker used on mobile when choosing communities/organizations
+ * (Figma node 404:15742) — replaces the desktop side popover on small screens. */
+export function MobileSelectSheet({ open, onClose, title, items, selected, onToggle }: MobileSelectSheetProps) {
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [query, setQuery] = useState("");
+
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (!open) {
+      setSearchOpen(false);
+      setQuery("");
+    }
+  }
+
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  if (!open) return null;
+
+  const filteredItems = query.trim()
+    ? items.filter((item) => item.name.toLowerCase().includes(query.trim().toLowerCase()))
+    : items;
+  const selectableItems = items.filter((item) => !item.disabled);
+  const allSelected = selectableItems.length > 0 && selectableItems.every((item) => selected.includes(item.name));
+
+  function toggleAll() {
+    selectableItems.forEach((item) => {
+      const isSelected = selected.includes(item.name);
+      if (allSelected && isSelected) onToggle(item.name);
+      if (!allSelected && !isSelected) onToggle(item.name);
+    });
+  }
+
+  return createPortal(
+    <div
+      data-mobile-select-sheet
+      className="fixed inset-0 z-[130] flex items-end bg-black/50"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+    >
+      <div
+        onClick={(event) => event.stopPropagation()}
+        className="flex max-h-[85vh] w-full flex-col gap-4 rounded-t-[32px] bg-white pb-6 pt-4 shadow-[0px_-4px_8px_0px_rgba(69,71,69,0.15)]"
+      >
+        <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154]" />
+
+        <div className="flex w-full items-center gap-2.5 px-6">
+          <button type="button" aria-label="Close" onClick={onClose} className="flex size-6 shrink-0 items-center justify-center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M20 12H4M4 12L11 5M4 12L11 19" stroke="#141b34" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <p className="flex-1 text-center text-lg font-bold tracking-[-0.54px] text-black">{title}</p>
+          <button
+            type="button"
+            aria-label="Search"
+            onClick={() => setSearchOpen((v) => !v)}
+            className="flex size-[26px] shrink-0 items-center justify-center rounded-full bg-brand-900"
+          >
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <circle cx="7" cy="7" r="5" stroke="white" strokeWidth="1.5" />
+              <path d="M11 11L14.5 14.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        {searchOpen && (
+          <div className="px-6">
+            <input
+              autoFocus
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={`Search ${title.replace("Select ", "").toLowerCase()}`}
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-night-900 placeholder:text-gray-400 focus:outline-none"
+            />
+          </div>
+        )}
+
+        <div className="flex w-full flex-col overflow-hidden rounded-lg border border-[#f1f5f9] px-6">
+          <div className="w-full overflow-y-auto">
+            <button
+              type="button"
+              onClick={toggleAll}
+              className="flex w-full items-center gap-3 bg-[#f8fafc] px-3 py-2.5"
+            >
+              <Checkbox checked={allSelected} />
+              <span className="text-xs font-medium text-[#111826]">Select all</span>
+            </button>
+
+            {filteredItems.length === 0 ? (
+              <p className="px-3 py-4 text-sm text-gray-400">No matches</p>
+            ) : (
+              filteredItems.map((item) => {
+                const isSelected = selected.includes(item.name);
+                return (
+                  <button
+                    key={item.name}
+                    type="button"
+                    disabled={item.disabled}
+                    onClick={() => onToggle(item.name)}
+                    className={cn(
+                      "flex w-full items-center gap-3 border-b border-[#f1f5f9] p-3 last:border-b-0",
+                      item.disabled && "opacity-50",
+                    )}
+                  >
+                    <Checkbox checked={isSelected} />
+                    <span className="relative block size-8 shrink-0 overflow-hidden rounded-full border-[0.4px] border-[#ebebeb] bg-white">
+                      <Image src={item.avatar} alt="" fill className="object-cover" sizes="32px" />
+                    </span>
+                    <div className="flex min-w-0 flex-1 flex-col items-start text-left">
+                      <p className="truncate text-sm font-semibold text-[#111826]">{item.name}</p>
+                      <p className="truncate text-[10px] text-[#64748a]">{item.role}</p>
+                    </div>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+function Checkbox({ checked }: { checked: boolean }) {
+  return (
+    <span
+      className={cn(
+        "flex size-[18px] shrink-0 items-center justify-center rounded-[4px] border",
+        checked ? "border-[#337df2] bg-[#337df2]" : "border-[#cbd5e0] bg-white",
+      )}
+    >
+      {checked && (
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2 6L5 9L10 3" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )}
+    </span>
+  );
+}
