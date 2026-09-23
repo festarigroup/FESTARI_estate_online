@@ -80,14 +80,11 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
       : [];
 
   function toggleProfile(name: string) {
-    setAddedProfiles((current) => {
-      if (current.includes(name)) {
-        showSuccessToast(`${name} removed from this post's audience`);
-        return current.filter((added) => added !== name);
-      }
-      showSuccessToast(`${name} added to this post's audience`);
-      return [...current, name];
-    });
+    const alreadyAdded = addedProfiles.includes(name);
+    setAddedProfiles((current) =>
+      alreadyAdded ? current.filter((added) => added !== name) : [...current, name],
+    );
+    showSuccessToast(alreadyAdded ? `${name} removed from this post's audience` : `${name} added to this post's audience`);
   }
 
   useEffect(() => {
