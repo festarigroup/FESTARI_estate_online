@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { SideListMenu } from "@/components/shared/SideListMenu";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +14,9 @@ export const VISIBILITY_LABEL: Record<PostVisibility, string> = {
   everyone: "Everyone can view",
   followings: "Followings",
 };
+
+const COMMUNITY_ITEMS = ["Community 5", "Community 9", "Community 4", "Community 8", "Community 5", "Community 3", "Community 2"];
+const ORGANIZATION_ITEMS = COMMUNITY_ITEMS.map((item) => item.replace("Community", "Organization"));
 
 interface VisibilityMenuProps {
   open: boolean;
@@ -26,6 +30,10 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = useState<{ bottom: number; left: number } | null>(null);
+  const communityRef = useRef<HTMLButtonElement | null>(null);
+  const organizationRef = useRef<HTMLButtonElement | null>(null);
+  const [communityOpen, setCommunityOpen] = useState(false);
+  const [organizationOpen, setOrganizationOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -50,6 +58,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
     const handlePointerDown = (event: PointerEvent) => {
       if (menuRef.current?.contains(event.target as Node)) return;
       if (anchorRef.current?.contains(event.target as Node)) return;
+      if ((event.target as HTMLElement).closest?.("[data-side-list-menu]")) return;
       onClose();
     };
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -109,8 +118,13 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
         </button>
 
         <button
+          ref={communityRef}
           type="button"
-          onClick={() => router.push(comingSoonHref("Community"))}
+          onClick={() => {
+            setCommunityOpen((v) => !v);
+            setOrganizationOpen(false);
+          }}
+          aria-expanded={communityOpen}
           className="flex w-full items-center gap-2 rounded-lg px-1 py-1"
         >
           <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
@@ -121,8 +135,13 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
         </button>
 
         <button
+          ref={organizationRef}
           type="button"
-          onClick={() => router.push(comingSoonHref("Organization"))}
+          onClick={() => {
+            setOrganizationOpen((v) => !v);
+            setCommunityOpen(false);
+          }}
+          aria-expanded={organizationOpen}
           className="flex w-full items-center gap-2 rounded-lg px-1 py-1"
         >
           <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
@@ -132,6 +151,27 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
           <NavIcon icon="/icons/visibility-chevron-outline-right.svg" color="night" size={10} />
         </button>
       </div>
+
+      <SideListMenu
+        open={communityOpen}
+        onClose={() => setCommunityOpen(false)}
+        anchorRef={communityRef}
+        items={COMMUNITY_ITEMS}
+        onSelect={(item) => {
+          setCommunityOpen(false);
+          router.push(comingSoonHref(item));
+        }}
+      />
+      <SideListMenu
+        open={organizationOpen}
+        onClose={() => setOrganizationOpen(false)}
+        anchorRef={organizationRef}
+        items={ORGANIZATION_ITEMS}
+        onSelect={(item) => {
+          setOrganizationOpen(false);
+          router.push(comingSoonHref(item));
+        }}
+      />
 
       <div className="flex w-full items-center gap-2 rounded-xl bg-[#f6f6f9] px-1.5 py-1.5">
         <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
