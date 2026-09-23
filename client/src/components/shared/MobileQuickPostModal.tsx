@@ -182,13 +182,13 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
       return;
     }
 
-    const hasContent = mode === "article" ? !bodyEmpty || text.trim() : text.trim() || files.length > 0;
+    const hasContent = mode === "article" ? !bodyEmpty : text.trim() || files.length > 0;
     if (!hasContent) {
-      showErrorToast(mode === "article" ? "Add a headline or some content before posting" : "Add a caption or a file before posting");
+      showErrorToast(mode === "article" ? "Add some content before posting" : "Add a caption or a file before posting");
       return;
     }
     if (mode === "article") {
-      addPost({ kind: "article", headline: text, body: bodyRef.current?.textContent ?? "" });
+      addPost({ kind: "article", headline: "", body: bodyRef.current?.textContent ?? "" });
     } else {
       addPost({ kind: "media", text, files });
     }
@@ -244,18 +244,15 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
             placeholder="What’s your question?...."
             className="w-full text-sm leading-6 text-night-900 placeholder:text-gray-400 focus:outline-none"
           />
-        ) : (
+        ) : mode === "post" ? (
           <textarea
             value={text}
             onChange={(event) => setText(event.target.value)}
-            rows={mode === "article" ? 2 : 3}
+            rows={3}
             placeholder="What’s happening twin? Write something down..."
-            className={cn(
-              "w-full resize-none text-sm leading-6 text-night-900 placeholder:text-gray-400 focus:outline-none",
-              mode === "article" && "shrink-0",
-            )}
+            className="w-full resize-none text-sm leading-6 text-night-900 placeholder:text-gray-400 focus:outline-none"
           />
-        )}
+        ) : null}
 
         {mode === "poll" && (
           <div className="flex w-full flex-col gap-2">
@@ -324,8 +321,8 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
             <div className="h-px w-full shrink-0 bg-gray-200" />
             <div className="relative w-full min-h-0 flex-1 overflow-y-auto">
               {bodyEmpty && (
-                <p className="pointer-events-none absolute left-0 top-0 text-sm text-[#cbd5e0]">
-                  Start writing your insight, market trends, buyer guides, how-to advice…
+                <p className="pointer-events-none absolute left-0 top-0 text-sm text-gray-400">
+                  What’s happening twin? Write something down...
                 </p>
               )}
               <div
