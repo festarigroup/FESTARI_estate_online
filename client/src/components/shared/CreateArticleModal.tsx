@@ -155,7 +155,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
           onClick={handleClose}
           className="absolute -right-3 -top-3 z-10 flex size-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-md hover:bg-gray-50"
         >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true">
             <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </button>
