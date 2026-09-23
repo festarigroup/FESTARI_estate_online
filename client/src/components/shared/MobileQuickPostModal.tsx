@@ -79,6 +79,8 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
 
   if (!open) return null;
 
+  const pollReady = pollQuestion.trim().length > 0 && pollOptions.filter((option) => option.trim()).length >= 2;
+
   function resetState() {
     setText("");
     if (bodyRef.current) bodyRef.current.innerHTML = "";
@@ -195,7 +197,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
         onClick={(event) => event.stopPropagation()}
         className={cn(
           "flex w-full max-w-[340px] flex-col gap-3 overflow-y-auto rounded-[36px] bg-white p-4 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]",
-          mode === "post" && "aspect-square",
+          (mode === "post" || mode === "poll") && "aspect-square",
         )}
       >
         <div className="flex w-full items-start justify-between gap-2">
@@ -240,12 +242,15 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
         {mode === "poll" && (
           <div className="flex w-full flex-col gap-2">
             {pollOptions.map((option, index) => (
-              <div key={index} className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
-                <p className="w-full flex-1 truncate text-sm text-night-900">{option}</p>
-                <button type="button" aria-label={`Remove option ${index + 1}`} onClick={() => removePollOption(index)}>
-                  <NavIcon icon="/icons/poll-trash-delete.svg" color="night" size={14} className="bg-red-500" />
-                </button>
-              </div>
+              <button
+                key={index}
+                type="button"
+                aria-label={`Remove option: ${option}`}
+                onClick={() => removePollOption(index)}
+                className="flex w-full items-center rounded-lg border border-gray-200 px-3 py-1.5 text-left hover:bg-gray-50"
+              >
+                <p className="w-full truncate text-sm text-night-900">{option}</p>
+              </button>
             ))}
             <div className="flex w-full items-center justify-between">
               <p className="text-sm font-bold text-night-900">Options</p>
@@ -403,7 +408,10 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
           <button
             type="button"
             onClick={handlePost}
-            className="flex h-8 items-center justify-center rounded-lg bg-brand-900 px-4 text-sm text-white hover:bg-brand-900/90"
+            className={cn(
+              "flex h-8 items-center justify-center rounded-[13px] px-4 text-sm text-white",
+              mode === "poll" && !pollReady ? "bg-[#86b3fb]" : "bg-brand-900 hover:bg-brand-900/90",
+            )}
           >
             Post
           </button>
