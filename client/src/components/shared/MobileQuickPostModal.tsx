@@ -94,7 +94,7 @@ export function MobileQuickPostModal({ open, onClose, onSwitchType }: MobileQuic
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="flex w-full max-w-[340px] flex-col gap-3 rounded-[36px] bg-white p-4 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]"
+        className="flex aspect-square w-full max-w-[340px] flex-col gap-3 overflow-y-auto rounded-[36px] bg-white p-4 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]"
       >
         <div className="flex w-full items-start justify-between gap-2">
           <div className="flex items-center gap-2.5">
