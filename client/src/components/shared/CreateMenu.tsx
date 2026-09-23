@@ -116,13 +116,13 @@ function MobileMenuRow({
   onNavigate,
   open,
   onToggle,
-  onOpenPostModal,
+  onOpenMobilePostModal,
 }: {
   item: MobileMenuItem;
   onNavigate: () => void;
   open: boolean;
   onToggle: () => void;
-  onOpenPostModal: (type: "image" | "video" | "poll" | "article") => void;
+  onOpenMobilePostModal: (type: "image" | "video" | "poll" | "article") => void;
 }) {
   if (!item.submenu) {
     return (
@@ -167,7 +167,7 @@ function MobileMenuRow({
                 key={sub.key}
                 type="button"
                 onClick={() => {
-                  onOpenPostModal(sub.key as "image" | "video" | "poll" | "article");
+                  onOpenMobilePostModal(sub.key as "image" | "video" | "poll" | "article");
                   onNavigate();
                 }}
                 className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
@@ -252,9 +252,11 @@ function CreatePostRow({
 export function CreateMenu({
   onNavigate,
   onOpenPostModal,
+  onOpenMobilePostModal,
 }: {
   onNavigate: () => void;
   onOpenPostModal: (type: "image" | "video" | "poll" | "article") => void;
+  onOpenMobilePostModal: (type: "image" | "video" | "poll" | "article") => void;
 }) {
   const [openMobileKey, setOpenMobileKey] = useState<string | null>(null);
   const toggleMobileKey = (key: string) => setOpenMobileKey((current) => (current === key ? null : key));
@@ -269,7 +271,7 @@ export function CreateMenu({
             onNavigate={onNavigate}
             open={openMobileKey === item.key}
             onToggle={() => toggleMobileKey(item.key)}
-            onOpenPostModal={onOpenPostModal}
+            onOpenMobilePostModal={onOpenMobilePostModal}
           />
         ))}
         <div className="my-1 h-px w-full bg-gray-200" />
@@ -278,7 +280,7 @@ export function CreateMenu({
           onNavigate={onNavigate}
           open={false}
           onToggle={() => {}}
-          onOpenPostModal={onOpenPostModal}
+          onOpenMobilePostModal={onOpenMobilePostModal}
         />
       </div>
 

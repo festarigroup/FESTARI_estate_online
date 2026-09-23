@@ -370,7 +370,14 @@ function MobileComposerCard() {
           </button>
           {moreOpen && (
             <div className="absolute left-0 top-[calc(100%+8px)] z-50">
-              <CreateMenu onNavigate={() => setMoreOpen(false)} onOpenPostModal={openPostModal} />
+              <CreateMenu
+                onNavigate={() => setMoreOpen(false)}
+                onOpenPostModal={openPostModal}
+                onOpenMobilePostModal={(type) => {
+                  setQuickPostMode(type === "poll" || type === "article" ? type : "post");
+                  setQuickPostOpen(true);
+                }}
+              />
             </div>
           )}
         </div>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { showSuccessToast } from "@/components/shared/AppToast";
 import { CreateMenu } from "@/components/shared/CreateMenu";
+import { MobileQuickPostModal, type QuickComposerMode } from "@/components/shared/MobileQuickPostModal";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { usePostModals } from "@/hooks/usePostModals";
 import { comingSoonHref } from "@/lib/coming-soon";
@@ -16,6 +17,13 @@ export function TopNav() {
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const createMenuRef = useRef<HTMLDivElement | null>(null);
   const { openPostModal, modals } = usePostModals();
+  const [mobileQuickOpen, setMobileQuickOpen] = useState(false);
+  const [mobileQuickMode, setMobileQuickMode] = useState<QuickComposerMode>("post");
+
+  function openMobileQuickPost(type: "image" | "video" | "poll" | "article") {
+    setMobileQuickMode(type === "poll" || type === "article" ? type : "post");
+    setMobileQuickOpen(true);
+  }
 
   function handleLogout() {
     setMenuOpen(false);
@@ -101,7 +109,11 @@ export function TopNav() {
 
             {createMenuOpen && (
               <div className="absolute right-0 top-[calc(100%+8px)] z-50">
-                <CreateMenu onNavigate={() => setCreateMenuOpen(false)} onOpenPostModal={openPostModal} />
+                <CreateMenu
+                  onNavigate={() => setCreateMenuOpen(false)}
+                  onOpenPostModal={openPostModal}
+                  onOpenMobilePostModal={openMobileQuickPost}
+                />
               </div>
             )}
           </div>
@@ -182,6 +194,11 @@ export function TopNav() {
       </div>
 
       {modals}
+      <MobileQuickPostModal
+        open={mobileQuickOpen}
+        onClose={() => setMobileQuickOpen(false)}
+        initialMode={mobileQuickMode}
+      />
     </header>
   );
 }
