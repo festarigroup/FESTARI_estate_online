@@ -306,22 +306,22 @@ function MobileComposerCard() {
       <div className="h-px w-full bg-gray-200" />
 
       <div className="flex w-full items-center gap-[18px]">
-        <button type="button" aria-label="Image Post" onClick={() => openPostModal("image")}>
+        <button type="button" aria-label="Image Post" onClick={() => setQuickPostOpen(true)}>
           <span className="relative block size-3.5">
             <Image src="/icons/image-01.svg" alt="" fill sizes="14px" />
           </span>
         </button>
-        <button type="button" aria-label="Video Post" onClick={() => openPostModal("video")}>
+        <button type="button" aria-label="Video Post" onClick={() => setQuickPostOpen(true)}>
           <span className="relative block size-3.5">
             <Image src="/icons/video-01.svg" alt="" fill sizes="14px" />
           </span>
         </button>
-        <button type="button" aria-label="Poll" onClick={() => openPostModal("poll")}>
+        <button type="button" aria-label="Poll" onClick={() => setQuickPostOpen(true)}>
           <span className="relative block size-3.5">
             <Image src="/icons/chart-02.svg" alt="" fill sizes="14px" />
           </span>
         </button>
-        <button type="button" aria-label="Article" onClick={() => openPostModal("article")}>
+        <button type="button" aria-label="Article" onClick={() => setQuickPostOpen(true)}>
           <span className="relative block size-3.5">
             <Image src="/icons/book-bookmark-01.svg" alt="" fill sizes="14px" />
           </span>
