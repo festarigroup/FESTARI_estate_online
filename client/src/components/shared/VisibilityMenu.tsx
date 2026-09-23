@@ -33,7 +33,7 @@ export function getVisibilityIcon(value: PostVisibility): string {
     case "everyone":
       return "/icons/create-menu-globe-visibility.svg";
     case "followings":
-      return "/icons/visibility-team-structure.svg";
+      return "/icons/user-add-01.svg";
     case "community":
       return "/icons/user-group.svg";
     case "organization":
@@ -79,9 +79,15 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
       ? SEARCH_PROFILES.filter((profile) => profile.name.toLowerCase().includes(profileQuery.trim().toLowerCase()))
       : [];
 
-  function addProfile(name: string) {
-    setAddedProfiles((current) => (current.includes(name) ? current : [...current, name]));
-    showSuccessToast(`${name} added to this post's audience`);
+  function toggleProfile(name: string) {
+    setAddedProfiles((current) => {
+      if (current.includes(name)) {
+        showSuccessToast(`${name} removed from this post's audience`);
+        return current.filter((added) => added !== name);
+      }
+      showSuccessToast(`${name} added to this post's audience`);
+      return [...current, name];
+    });
   }
 
   useEffect(() => {
@@ -158,7 +164,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
           )}
         >
           <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
-            <NavIcon icon="/icons/visibility-team-structure.svg" color="white" size={14} />
+            <NavIcon icon="/icons/user-add-01.svg" color="white" size={14} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Followings</span>
           {value.kind === "followings" && (
@@ -263,13 +269,17 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
                 </div>
                 <button
                   type="button"
-                  aria-label={added ? `${profile.name} added` : `Add ${profile.name}`}
-                  onClick={() => addProfile(profile.name)}
-                  disabled={added}
-                  className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#f1f6ff] text-brand-900 disabled:opacity-40"
+                  aria-label={added ? `Remove ${profile.name}` : `Add ${profile.name}`}
+                  onClick={() => toggleProfile(profile.name)}
+                  className={cn(
+                    "flex size-6 shrink-0 items-center justify-center rounded-full",
+                    added ? "bg-[#fee2e2] text-red-600" : "bg-[#f1f6ff] text-brand-900",
+                  )}
                 >
                   {added ? (
-                    <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={12} className="bg-[#1465e6]" />
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
                   ) : (
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                       <path d="M6 1V11M1 6H11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
