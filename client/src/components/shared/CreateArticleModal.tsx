@@ -221,9 +221,10 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
               value={visibility}
               onChange={(next) => {
                 setVisibility(next);
-                setVisibilityOpen(false);
+                if (next.kind === "everyone" || next.kind === "followings") setVisibilityOpen(false);
               }}
               anchorRef={visibilityTriggerRef}
+              enableMultiSelect
             />
 
             <div className="h-px w-full bg-gray-200" />

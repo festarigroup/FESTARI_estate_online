@@ -11,10 +11,14 @@ import { cn } from "@/lib/utils";
 export type PostVisibility =
   | { kind: "everyone" }
   | { kind: "followings" }
-  | { kind: "community"; name: string }
-  | { kind: "organization"; name: string };
+  | { kind: "community"; names: string[] }
+  | { kind: "organization"; names: string[] };
 
 export const DEFAULT_VISIBILITY: PostVisibility = { kind: "everyone" };
+
+function formatNames(names: string[]): string {
+  return names.length > 1 ? `${names[0]} +${names.length - 1}` : names[0];
+}
 
 export function getVisibilityLabel(value: PostVisibility): string {
   switch (value.kind) {
@@ -24,7 +28,7 @@ export function getVisibilityLabel(value: PostVisibility): string {
       return "Followings";
     case "community":
     case "organization":
-      return value.name;
+      return formatNames(value.names);
   }
 }
 
@@ -62,9 +66,11 @@ interface VisibilityMenuProps {
   value: PostVisibility;
   onChange: (value: PostVisibility) => void;
   anchorRef: RefObject<HTMLElement | null>;
+  /** Desktop composers let you search and pick several communities/organizations at once. */
+  enableMultiSelect?: boolean;
 }
 
-export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: VisibilityMenuProps) {
+export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enableMultiSelect = false }: VisibilityMenuProps) {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = useState<{ bottom: number; left: number } | null>(null);
   const communityRef = useRef<HTMLButtonElement | null>(null);
@@ -183,7 +189,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
             <NavIcon icon="/icons/user-group.svg" color="white" size={16} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">
-            {value.kind === "community" ? value.name : "Community"}
+            {value.kind === "community" ? formatNames(value.names) : "Community"}
           </span>
           {value.kind === "community" ? (
             <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
@@ -206,7 +212,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
             <NavIcon icon="/icons/visibility-user-check.svg" color="white" size={14} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">
-            {value.kind === "organization" ? value.name : "Organization"}
+            {value.kind === "organization" ? formatNames(value.names) : "Organization"}
           </span>
           {value.kind === "organization" ? (
             <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
@@ -221,9 +227,18 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
         onClose={() => setCommunityOpen(false)}
         anchorRef={communityRef}
         items={COMMUNITY_ITEMS}
+        title={enableMultiSelect ? "Your Communities" : undefined}
+        searchable={enableMultiSelect}
+        multiple={enableMultiSelect}
+        selected={value.kind === "community" ? value.names : []}
+        onToggle={(item) => {
+          const current = value.kind === "community" ? value.names : [];
+          const next = current.includes(item) ? current.filter((name) => name !== item) : [...current, item];
+          onChange(next.length > 0 ? { kind: "community", names: next } : DEFAULT_VISIBILITY);
+        }}
         onSelect={(item) => {
           setCommunityOpen(false);
-          onChange({ kind: "community", name: item });
+          onChange({ kind: "community", names: [item] });
           onClose();
         }}
       />
@@ -232,9 +247,18 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
         onClose={() => setOrganizationOpen(false)}
         anchorRef={organizationRef}
         items={ORGANIZATION_ITEMS}
+        title={enableMultiSelect ? "Your Organizations" : undefined}
+        searchable={enableMultiSelect}
+        multiple={enableMultiSelect}
+        selected={value.kind === "organization" ? value.names : []}
+        onToggle={(item) => {
+          const current = value.kind === "organization" ? value.names : [];
+          const next = current.includes(item) ? current.filter((name) => name !== item) : [...current, item];
+          onChange(next.length > 0 ? { kind: "organization", names: next } : DEFAULT_VISIBILITY);
+        }}
         onSelect={(item) => {
           setOrganizationOpen(false);
-          onChange({ kind: "organization", name: item });
+          onChange({ kind: "organization", names: [item] });
           onClose();
         }}
       />

@@ -266,9 +266,10 @@ export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModal
             value={visibility}
             onChange={(next) => {
               setVisibility(next);
-              setVisibilityOpen(false);
+              if (next.kind === "everyone" || next.kind === "followings") setVisibilityOpen(false);
             }}
             anchorRef={visibilityTriggerRef}
+            enableMultiSelect
           />
 
           <div className="flex w-full items-center justify-between">

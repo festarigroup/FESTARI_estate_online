@@ -261,9 +261,10 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
             value={visibility}
             onChange={(next) => {
               setVisibility(next);
-              setVisibilityOpen(false);
+              if (next.kind === "everyone" || next.kind === "followings") setVisibilityOpen(false);
             }}
             anchorRef={visibilityTriggerRef}
+            enableMultiSelect
           />
 
           <div className="flex w-full items-center justify-between">
