@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { AppShell } from "@/components/shared/AppShell";
-import { CreateMenu } from "@/components/shared/CreateMenu";
+import { showSuccessToast } from "@/components/shared/AppToast";
 import { MobileQuickPostModal, type QuickComposerMode } from "@/components/shared/MobileQuickPostModal";
 import { PostCard, type PostCardData } from "@/components/shared/PostCard";
 import { WhoToFollowCard } from "@/components/shared/WhoToFollowCard";
@@ -41,6 +41,11 @@ const COMPOSER_ACTIONS = [
   { key: "poll", label: "Poll", icon: "/icons/chart-02.svg" },
   { key: "article", label: "Article", icon: "/icons/book-bookmark-01.svg" },
 ];
+
+/** The desktop composer's icons the mobile card doesn't show up front; the "more" toggle reveals these. */
+const MORE_COMPOSER_ACTIONS = COMPOSER_ACTIONS.filter((action) =>
+  ["property", "stay", "service", "project", "events"].includes(action.key),
+);
 
 const POST_TEXT =
   "Land prices in East Legon Hills are up nearly 12% this quarter. If you're thinking of buying in the next 6 months, now's worth a serious look.";
@@ -272,21 +277,20 @@ function ComposerCard() {
 }
 
 function MobileComposerCard() {
-  const { openPostModal, modals } = usePostModals();
+  const { modals } = usePostModals();
+  const { addPost } = usePostsFeed();
+  const [commentDraft, setCommentDraft] = useState("");
   const [moreOpen, setMoreOpen] = useState(false);
-  const moreRef = useRef<HTMLDivElement | null>(null);
   const [quickPostOpen, setQuickPostOpen] = useState(false);
   const [quickPostMode, setQuickPostMode] = useState<QuickComposerMode>("post");
 
-  useEffect(() => {
-    if (!moreOpen) return;
-    const handleClick = (event: MouseEvent) => {
-      if (moreRef.current?.contains(event.target as Node)) return;
-      setMoreOpen(false);
-    };
-    document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
-  }, [moreOpen]);
+  function submitComment() {
+    const text = commentDraft.trim();
+    if (!text) return;
+    addPost({ kind: "media", text, files: [] });
+    showSuccessToast("Your post has been shared");
+    setCommentDraft("");
+  }
 
   return (
     <div className="flex w-full flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-4 sm:hidden">
@@ -295,24 +299,32 @@ function MobileComposerCard() {
           SL
           <span className="absolute bottom-0 right-0 size-2.5 rounded-full border-[1.5px] border-white bg-[#22c55e]" />
         </span>
-        <button
-          type="button"
-          onClick={() => {
-            setQuickPostMode("post");
-            setQuickPostOpen(true);
-          }}
-          className="flex w-full items-center justify-between rounded-3xl bg-gray-100 p-2"
-        >
-          <p className="text-xs font-medium text-black/35">Add a comment</p>
-          <span className="relative block size-6 shrink-0">
+        <div className="flex w-full items-center justify-between gap-2 rounded-3xl border border-transparent bg-gray-100 p-2 focus-within:border-brand-900 focus-within:bg-white">
+          <input
+            type="text"
+            value={commentDraft}
+            onChange={(event) => setCommentDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") submitComment();
+            }}
+            placeholder="Add a comment"
+            className="min-w-0 flex-1 bg-transparent text-xs text-night-900 placeholder:text-black/35 focus:outline-none"
+          />
+          <button
+            type="button"
+            aria-label="Send"
+            onClick={submitComment}
+            disabled={!commentDraft.trim()}
+            className="relative block size-6 shrink-0 disabled:opacity-30"
+          >
             <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="24px" />
-          </span>
-        </button>
+          </button>
+        </div>
       </div>
 
       <div className="h-px w-full bg-gray-200" />
 
-      <div className="flex w-full items-center gap-[18px]">
+      <div className="flex w-full flex-wrap items-center gap-[18px]">
         <button
           type="button"
           aria-label="Image Post"
@@ -362,25 +374,20 @@ function MobileComposerCard() {
           </span>
         </button>
 
-        <div ref={moreRef} className="relative">
-          <button type="button" aria-label="More options" onClick={() => setMoreOpen((v) => !v)}>
-            <span className="relative block size-4">
-              <Image src="/icons/more-horizontal.svg" alt="" fill sizes="16px" />
-            </span>
-          </button>
-          {moreOpen && (
-            <div className="absolute left-0 top-[calc(100%+8px)] z-50">
-              <CreateMenu
-                onNavigate={() => setMoreOpen(false)}
-                onOpenPostModal={openPostModal}
-                onOpenMobilePostModal={(type) => {
-                  setQuickPostMode(type === "poll" || type === "article" ? type : "post");
-                  setQuickPostOpen(true);
-                }}
-              />
-            </div>
-          )}
-        </div>
+        {moreOpen &&
+          MORE_COMPOSER_ACTIONS.map((action) => (
+            <Link key={action.key} href={comingSoonHref(action.label)} aria-label={action.label}>
+              <span className="relative block size-3.5">
+                <Image src={action.icon} alt="" fill sizes="14px" />
+              </span>
+            </Link>
+          ))}
+
+        <button type="button" aria-label="More options" aria-expanded={moreOpen} onClick={() => setMoreOpen((v) => !v)}>
+          <span className="relative block size-4">
+            <Image src="/icons/more-horizontal.svg" alt="" fill sizes="16px" />
+          </span>
+        </button>
       </div>
 
       {modals}
