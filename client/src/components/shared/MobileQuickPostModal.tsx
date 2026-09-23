@@ -38,6 +38,8 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
   const [pollOptions, setPollOptions] = useState<string[]>([]);
   const [addingOption, setAddingOption] = useState(false);
   const [newOption, setNewOption] = useState("");
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const [optionOverlayCenter, setOptionOverlayCenter] = useState<{ top: number; left: number } | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const previews = useMemo(
     () => files.map((file) => ({ url: URL.createObjectURL(file), isVideo: file.type.startsWith("video/") })),
@@ -95,6 +97,8 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
   }
 
   function openAddOption() {
+    const rect = cardRef.current?.getBoundingClientRect();
+    if (rect) setOptionOverlayCenter({ top: rect.top + rect.height / 2, left: rect.left + rect.width / 2 });
     setNewOption("");
     setAddingOption(true);
   }
@@ -187,13 +191,14 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-start justify-center bg-black/50 p-4 pt-20"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
       aria-label={mode === "article" ? "Create an article" : mode === "poll" ? "Create a poll" : "Create a post"}
     >
       <div
+        ref={cardRef}
         onClick={(event) => event.stopPropagation()}
         className={cn(
           "flex w-full max-w-[340px] flex-col gap-3 overflow-y-auto rounded-[36px] bg-white p-4 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]",
@@ -419,9 +424,10 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
       </div>
 
       {addingOption &&
+        optionOverlayCenter &&
         createPortal(
           <div
-            className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
+            className="fixed inset-0 z-[130] bg-black/50"
             onClick={() => setAddingOption(false)}
             role="dialog"
             aria-modal="true"
@@ -429,7 +435,8 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
           >
             <div
               onClick={(event) => event.stopPropagation()}
-              className="flex h-12 w-full max-w-[276px] items-center gap-2 rounded-2xl border border-gray-200 bg-white px-3 py-1.5 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
+              style={{ top: optionOverlayCenter.top, left: optionOverlayCenter.left }}
+              className="fixed flex h-12 w-[calc(100%-2rem)] max-w-[276px] -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-2xl border border-gray-200 bg-white px-3 py-1.5 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
             >
               <input
                 autoFocus
