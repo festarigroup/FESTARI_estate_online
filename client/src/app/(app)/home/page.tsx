@@ -12,7 +12,7 @@ import { TrendingPropertiesCard } from "@/components/shared/TrendingPropertiesCa
 import { UpcomingOpenHousesCard } from "@/components/shared/UpcomingOpenHousesCard";
 import { TrendingHashtagsCard } from "@/components/shared/TrendingHashtagsCard";
 import { usePostsFeed } from "@/context/PostsContext";
-import { usePostModals } from "@/hooks/usePostModals";
+import { usePostModals, type PostModalType } from "@/hooks/usePostModals";
 import { comingSoonHref } from "@/lib/coming-soon";
 
 interface FeedTab {
@@ -31,7 +31,7 @@ const FEED_TABS: FeedTab[] = [
 ];
 
 const COMPOSER_ACTIONS = [
-  { key: "media", label: "Media", icon: "/icons/image-01.svg" },
+  { key: "media", label: "Media", icon: "/icons/poll-add-alt.svg" },
   { key: "property", label: "Property", icon: "/icons/building-03.svg" },
   { key: "stay", label: "Stay", icon: "/icons/guest-house-sm.svg" },
   { key: "service", label: "Service", icon: "/icons/map-pin-02-sm.svg" },
@@ -232,7 +232,11 @@ export default function HomeFeedPage() {
   );
 }
 
+const LINKED_COMPOSER_KEYS = ["media", "poll", "article"] as const;
+
 function ComposerCard() {
+  const { openPostModal, modals } = usePostModals();
+
   return (
     <>
       <div className="hidden w-full flex-col gap-[15px] rounded-[15px] border border-gray-200 bg-white p-[15px] sm:flex">
@@ -240,36 +244,53 @@ function ComposerCard() {
           <span className="flex size-[38px] shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">
             SL
           </span>
-          <Link
-            href={comingSoonHref("Create Post")}
+          <button
+            type="button"
+            onClick={() => openPostModal("media")}
             className="flex w-full items-center justify-between rounded-3xl bg-gray-100 p-2"
           >
             <p className="text-[11px] font-medium text-black/35">Add your comment</p>
             <span className="relative block size-[23px] shrink-0">
               <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="23px" />
             </span>
-          </Link>
+          </button>
         </div>
 
         <div className="h-px w-full bg-gray-200" />
 
         <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:gap-[17px]">
-          {COMPOSER_ACTIONS.map((action) => (
-            <Link
-              key={action.key}
-              href={comingSoonHref(action.label)}
-              aria-label={action.label}
-              className="flex items-center gap-2 text-[11px] font-bold text-gray-500 hover:text-brand-900"
-            >
-              <span className="relative block size-4 shrink-0 sm:size-[13px]">
-                <Image src={action.icon} alt="" fill sizes="16px" />
-              </span>
-              <span className="hidden sm:inline">{action.label}</span>
-            </Link>
-          ))}
+          {COMPOSER_ACTIONS.map((action) =>
+            (LINKED_COMPOSER_KEYS as readonly string[]).includes(action.key) ? (
+              <button
+                key={action.key}
+                type="button"
+                aria-label={action.label}
+                onClick={() => openPostModal(action.key as PostModalType)}
+                className="flex items-center gap-2 text-[11px] font-bold text-gray-500 hover:text-brand-900"
+              >
+                <span className="relative block size-4 shrink-0 sm:size-[13px]">
+                  <Image src={action.icon} alt="" fill sizes="16px" />
+                </span>
+                <span className="hidden sm:inline">{action.label}</span>
+              </button>
+            ) : (
+              <Link
+                key={action.key}
+                href={comingSoonHref(action.label)}
+                aria-label={action.label}
+                className="flex items-center gap-2 text-[11px] font-bold text-gray-500 hover:text-brand-900"
+              >
+                <span className="relative block size-4 shrink-0 sm:size-[13px]">
+                  <Image src={action.icon} alt="" fill sizes="16px" />
+                </span>
+                <span className="hidden sm:inline">{action.label}</span>
+              </Link>
+            ),
+          )}
         </div>
       </div>
 
+      {modals}
       <MobileComposerCard />
     </>
   );
@@ -333,7 +354,7 @@ function MobileComposerCard() {
           }}
         >
           <span className="relative block size-3.5">
-            <Image src="/icons/image-01.svg" alt="" fill sizes="14px" />
+            <Image src="/icons/poll-add-alt.svg" alt="" fill sizes="14px" />
           </span>
         </button>
         <button
