@@ -164,7 +164,7 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
             value={text}
             onChange={(event) => setText(event.target.value)}
             rows={2}
-            placeholder="What’s happening twin? Write somn down..."
+            placeholder="What’s happening twin? Write something down..."
             className="min-h-[80px] w-full flex-1 resize-none rounded-lg px-3 py-3.5 text-base leading-6 text-night-900 placeholder:text-[#475568] focus:outline-none"
           />
         </div>
