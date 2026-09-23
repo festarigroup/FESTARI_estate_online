@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/shared/AppShell";
 import { CreateMenu } from "@/components/shared/CreateMenu";
-import { MobileQuickPostModal } from "@/components/shared/MobileQuickPostModal";
+import { MobileQuickPostModal, type QuickComposerMode } from "@/components/shared/MobileQuickPostModal";
 import { PostCard, type PostCardData } from "@/components/shared/PostCard";
 import { WhoToFollowCard } from "@/components/shared/WhoToFollowCard";
 import { TrendingPropertiesCard } from "@/components/shared/TrendingPropertiesCard";
@@ -273,7 +273,7 @@ function MobileComposerCard() {
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement | null>(null);
   const [quickPostOpen, setQuickPostOpen] = useState(false);
-  const [quickPostMode, setQuickPostMode] = useState<"post" | "article">("post");
+  const [quickPostMode, setQuickPostMode] = useState<QuickComposerMode>("post");
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -338,7 +338,7 @@ function MobileComposerCard() {
           type="button"
           aria-label="Poll"
           onClick={() => {
-            setQuickPostMode("post");
+            setQuickPostMode("poll");
             setQuickPostOpen(true);
           }}
         >
@@ -374,15 +374,7 @@ function MobileComposerCard() {
       </div>
 
       {modals}
-      <MobileQuickPostModal
-        open={quickPostOpen}
-        onClose={() => setQuickPostOpen(false)}
-        initialMode={quickPostMode}
-        onSwitchType={(type) => {
-          setQuickPostOpen(false);
-          openPostModal(type);
-        }}
-      />
+      <MobileQuickPostModal open={quickPostOpen} onClose={() => setQuickPostOpen(false)} initialMode={quickPostMode} />
     </div>
   );
 }

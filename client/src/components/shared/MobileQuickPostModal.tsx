@@ -19,25 +19,23 @@ const TOOLBAR_ACTIONS = [
   { key: "bullet", label: "Bullet list", glyph: "•", className: "" },
 ] as const;
 
-type QuickComposerMode = "post" | "article";
+const MAX_POLL_OPTIONS = 6;
+
+export type QuickComposerMode = "post" | "article" | "poll";
 
 interface MobileQuickPostModalProps {
   open: boolean;
   onClose: () => void;
   initialMode?: QuickComposerMode;
-  onSwitchType?: (type: "poll") => void;
 }
 
-export function MobileQuickPostModal({
-  open,
-  onClose,
-  initialMode = "post",
-  onSwitchType,
-}: MobileQuickPostModalProps) {
+export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: MobileQuickPostModalProps) {
   const [mode, setMode] = useState<QuickComposerMode>(initialMode);
   const [text, setText] = useState("");
   const [bodyEmpty, setBodyEmpty] = useState(true);
   const bodyRef = useRef<HTMLDivElement | null>(null);
+  const [pollQuestion, setPollQuestion] = useState("");
+  const [pollOptions, setPollOptions] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   const previews = useMemo(
     () => files.map((file) => ({ url: URL.createObjectURL(file), isVideo: file.type.startsWith("video/") })),
@@ -78,9 +76,23 @@ export function MobileQuickPostModal({
     setText("");
     if (bodyRef.current) bodyRef.current.innerHTML = "";
     setBodyEmpty(true);
+    setPollQuestion("");
+    setPollOptions([]);
     setFiles([]);
     setVisibility(DEFAULT_VISIBILITY);
     setVisibilityOpen(false);
+  }
+
+  function addPollOption() {
+    setPollOptions((current) => (current.length < MAX_POLL_OPTIONS ? [...current, ""] : current));
+  }
+
+  function updatePollOption(index: number, value: string) {
+    setPollOptions((current) => current.map((option, i) => (i === index ? value : option)));
+  }
+
+  function removePollOption(index: number) {
+    setPollOptions((current) => current.filter((_, i) => i !== index));
   }
 
   function handleClose() {
@@ -136,6 +148,18 @@ export function MobileQuickPostModal({
   }
 
   function handlePost() {
+    if (mode === "poll") {
+      const filledOptions = pollOptions.map((option) => option.trim()).filter(Boolean);
+      if (!pollQuestion.trim() || filledOptions.length < 2) {
+        showErrorToast("Add a question and at least two options before posting");
+        return;
+      }
+      showSuccessToast("Your poll has been shared");
+      resetState();
+      onClose();
+      return;
+    }
+
     const hasContent = mode === "article" ? !bodyEmpty || text.trim() : text.trim() || files.length > 0;
     if (!hasContent) {
       showErrorToast(mode === "article" ? "Add a headline or some content before posting" : "Add a caption or a file before posting");
@@ -152,7 +176,7 @@ export function MobileQuickPostModal({
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
-      aria-label={mode === "article" ? "Create an article" : "Create a post"}
+      aria-label={mode === "article" ? "Create an article" : mode === "poll" ? "Create a poll" : "Create a post"}
     >
       <div
         onClick={(event) => event.stopPropagation()}
@@ -183,13 +207,60 @@ export function MobileQuickPostModal({
           </button>
         </div>
 
-        <textarea
-          value={text}
-          onChange={(event) => setText(event.target.value)}
-          rows={mode === "article" ? 2 : 3}
-          placeholder="What’s happening twin? Write something down..."
-          className="w-full resize-none text-sm leading-6 text-night-900 placeholder:text-gray-400 focus:outline-none"
-        />
+        {mode === "poll" ? (
+          <input
+            value={pollQuestion}
+            onChange={(event) => setPollQuestion(event.target.value)}
+            placeholder="What’s your question?...."
+            className="w-full text-sm leading-6 text-night-900 placeholder:text-gray-400 focus:outline-none"
+          />
+        ) : (
+          <textarea
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+            rows={mode === "article" ? 2 : 3}
+            placeholder="What’s happening twin? Write something down..."
+            className="w-full resize-none text-sm leading-6 text-night-900 placeholder:text-gray-400 focus:outline-none"
+          />
+        )}
+
+        {mode === "poll" && (
+          <div className="flex w-full flex-col gap-2">
+            <div className="flex w-full items-center justify-between">
+              <p className="text-sm font-bold text-night-900">Options</p>
+              <button
+                type="button"
+                aria-label="Add option"
+                onClick={addPollOption}
+                disabled={pollOptions.length >= MAX_POLL_OPTIONS}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                  className={cn("text-night-900", pollOptions.length >= MAX_POLL_OPTIONS && "opacity-30")}
+                >
+                  <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+            {pollOptions.map((option, index) => (
+              <div key={index} className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
+                <input
+                  value={option}
+                  onChange={(event) => updatePollOption(index, event.target.value)}
+                  placeholder={`Option ${index + 1}`}
+                  className="w-full flex-1 text-sm text-night-900 placeholder:text-night-900/70 focus:outline-none"
+                />
+                <button type="button" aria-label={`Remove option ${index + 1}`} onClick={() => removePollOption(index)}>
+                  <NavIcon icon="/icons/poll-trash-delete.svg" color="night" size={14} className="bg-red-500" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
         {mode === "article" && (
           <>
@@ -281,8 +352,13 @@ export function MobileQuickPostModal({
             >
               <NavIcon icon="/icons/article-toolbar-link.svg" color="brand" size={16} className="bg-[#337df2]" />
             </button>
-            <button type="button" aria-label="Poll" onClick={() => onSwitchType?.("poll")}>
-              <NavIcon icon="/icons/chart-02.svg" color="brand" size={18} className="bg-[#337df2]" />
+            <button type="button" aria-label="Poll" onClick={() => setMode("poll")}>
+              <NavIcon
+                icon="/icons/chart-02.svg"
+                color="brand"
+                size={18}
+                className={cn("bg-[#337df2]", mode === "poll" && "opacity-30")}
+              />
             </button>
             <button
               type="button"
