@@ -209,7 +209,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
         ref={cardRef}
         onClick={(event) => event.stopPropagation()}
         className={cn(
-          "flex w-full flex-col gap-3 rounded-[36px] bg-white p-7 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]",
+          "flex w-full flex-col gap-3 rounded-[36px] bg-white p-6 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]",
           mode === "article" ? "max-w-[400px] max-h-[85vh] overflow-hidden" : "max-w-[340px] overflow-y-auto",
           mode === "poll" && (pollOptions.length === 0 ? "aspect-[1/0.7]" : "aspect-square"),
           mode === "post" && (files.length === 0 ? "aspect-[1/0.7]" : "aspect-square"),
@@ -319,7 +319,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
               )}
             </div>
             <div className="h-px w-full shrink-0 bg-gray-200" />
-            <div className="relative w-full min-h-0 flex-1 overflow-y-auto">
+            <div className="relative w-full max-h-[220px] overflow-y-auto">
               {bodyEmpty && (
                 <p className="pointer-events-none absolute left-0 top-0 text-sm text-gray-400">
                   What’s happening twin? Write something down...
