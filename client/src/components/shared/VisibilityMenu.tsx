@@ -33,7 +33,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
     function updatePosition() {
       const rect = anchorRef.current?.getBoundingClientRect();
       if (!rect) return;
-      setPosition({ bottom: window.innerHeight - rect.top + 4, left: rect.left });
+      setPosition({ bottom: window.innerHeight - rect.top + 4, left: rect.left + 16 });
     }
 
     updatePosition();
@@ -69,25 +69,25 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
     <div
       ref={menuRef}
       style={{ bottom: position.bottom, left: position.left }}
-      className="fixed z-[110] flex w-[280px] flex-col gap-2.5 rounded-xl bg-white px-2 py-2 drop-shadow-[0px_4px_2px_rgba(0,0,0,0.28)]"
+      className="fixed z-[110] flex w-[280px] flex-col gap-3 rounded-xl bg-white px-2.5 py-3 drop-shadow-[0px_4px_2px_rgba(0,0,0,0.28)]"
     >
       <div className="flex flex-col gap-0.5 px-1">
         <p className="text-sm font-semibold text-[#001f3f]">Who can view?</p>
         <p className="text-xs font-semibold text-[#64748a]">Choose who can view this post</p>
       </div>
 
-      <div className="flex flex-col gap-0.5">
+      <div className="flex flex-col gap-1">
         <button
           type="button"
           onClick={() => onChange("everyone")}
-          className="flex w-full items-center gap-2 rounded-lg px-1 py-0.5"
+          className="flex w-full items-center gap-2 rounded-lg px-1 py-1"
         >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
-            <NavIcon icon="/icons/create-menu-globe-visibility.svg" color="white" size={20} />
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
+            <NavIcon icon="/icons/create-menu-globe-visibility.svg" color="white" size={16} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Everyone can view</span>
           {value === "everyone" && (
-            <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={18} className="bg-[#1465e6]" />
+            <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
           )}
         </button>
 
@@ -95,26 +95,26 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
           type="button"
           onClick={() => onChange("followings")}
           className={cn(
-            "flex w-full items-center gap-2 rounded-full px-1 py-0.5",
+            "flex w-full items-center gap-2 rounded-full px-1 py-1",
             value === "followings" && "bg-[#f1f6ff]",
           )}
         >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
-            <NavIcon icon="/icons/visibility-team-structure.svg" color="white" size={18} />
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
+            <NavIcon icon="/icons/visibility-team-structure.svg" color="white" size={14} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Followings</span>
           {value === "followings" && (
-            <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={18} className="bg-[#1465e6]" />
+            <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
           )}
         </button>
 
         <button
           type="button"
           onClick={() => router.push(comingSoonHref("Community"))}
-          className="flex w-full items-center gap-2 rounded-lg px-1 py-0.5"
+          className="flex w-full items-center gap-2 rounded-lg px-1 py-1"
         >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
-            <NavIcon icon="/icons/user-group.svg" color="white" size={20} />
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
+            <NavIcon icon="/icons/user-group.svg" color="white" size={16} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Community</span>
           <NavIcon icon="/icons/visibility-chevron-outline-right.svg" color="night" size={10} />
@@ -123,19 +123,19 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
         <button
           type="button"
           onClick={() => router.push(comingSoonHref("Organization"))}
-          className="flex w-full items-center gap-2 rounded-lg px-1 py-0.5"
+          className="flex w-full items-center gap-2 rounded-lg px-1 py-1"
         >
-          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
-            <NavIcon icon="/icons/visibility-user-check.svg" color="white" size={18} />
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
+            <NavIcon icon="/icons/visibility-user-check.svg" color="white" size={14} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Organization</span>
           <NavIcon icon="/icons/visibility-chevron-outline-right.svg" color="night" size={10} />
         </button>
       </div>
 
-      <div className="flex w-full items-center gap-2 rounded-xl bg-[#f6f6f9] px-1.5 py-1">
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
-          <NavIcon icon="/icons/visibility-search.svg" color="white" size={18} />
+      <div className="flex w-full items-center gap-2 rounded-xl bg-[#f6f6f9] px-1.5 py-1.5">
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
+          <NavIcon icon="/icons/visibility-search.svg" color="white" size={14} />
         </span>
         <input
           placeholder="Search Profile"
