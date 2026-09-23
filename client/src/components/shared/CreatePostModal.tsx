@@ -131,7 +131,7 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
       showErrorToast(`Add a caption or a ${postType} before posting`);
       return;
     }
-    addPost({ text, files });
+    addPost({ kind: "media", text, files });
     showSuccessToast("Your post has been shared");
     resetState();
     onClose();

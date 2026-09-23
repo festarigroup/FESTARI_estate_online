@@ -11,6 +11,7 @@ import {
   getVisibilityLabel,
   type PostVisibility,
 } from "@/components/shared/VisibilityMenu";
+import { usePostsFeed } from "@/context/PostsContext";
 import { cn } from "@/lib/utils";
 
 const DURATION_OPTIONS = ["1 day", "3 days", "1 week", "2 weeks", "1 month"];
@@ -25,6 +26,7 @@ interface CreatePollModalProps {
 }
 
 export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModalProps) {
+  const { addPost } = usePostsFeed();
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState<string[]>(["", ""]);
   const [duration, setDuration] = useState(DURATION_OPTIONS[0]);
@@ -111,6 +113,7 @@ export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModal
       showErrorToast("Add a question and at least two options before posting");
       return;
     }
+    addPost({ kind: "poll", question, options });
     showSuccessToast("Your poll has been shared");
     resetState();
     onClose();

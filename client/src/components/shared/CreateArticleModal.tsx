@@ -11,6 +11,7 @@ import {
   getVisibilityLabel,
   type PostVisibility,
 } from "@/components/shared/VisibilityMenu";
+import { usePostsFeed } from "@/context/PostsContext";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +41,7 @@ interface CreateArticleModalProps {
 
 export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticleModalProps) {
   const router = useRouter();
+  const { addPost } = usePostsFeed();
   const [headline, setHeadline] = useState("");
   const [bodyEmpty, setBodyEmpty] = useState(true);
   const bodyRef = useRef<HTMLDivElement | null>(null);
@@ -114,6 +116,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
       showErrorToast("Add a headline or some content before posting");
       return;
     }
+    addPost({ kind: "article", headline, body: bodyRef.current?.textContent ?? "" });
     showSuccessToast("Your article has been shared");
     resetState();
     onClose();

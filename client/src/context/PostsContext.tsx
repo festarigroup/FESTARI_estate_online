@@ -3,10 +3,10 @@
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 import type { PostCardData } from "@/components/shared/PostCard";
 
-export interface NewPostInput {
-  text: string;
-  files: File[];
-}
+export type NewPostInput =
+  | { kind: "media"; text: string; files: File[] }
+  | { kind: "poll"; question: string; options: string[] }
+  | { kind: "article"; headline: string; body: string };
 
 const CURRENT_USER = {
   authorName: "Madeline Price",
@@ -14,26 +14,54 @@ const CURRENT_USER = {
   avatar: "/icons/avatar-sample.jpg",
 } as const;
 
-function buildPostFromComposer({ text, files }: NewPostInput): PostCardData {
-  const isVideo = files.some((file) => file.type.startsWith("video/"));
-  const urls = files.map((file) => URL.createObjectURL(file));
+const TODAY = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
-  return {
+function buildPost(input: NewPostInput): PostCardData {
+  const base = {
     id: `local-${Date.now()}`,
-    variant: "text",
     authorName: CURRENT_USER.authorName,
     roleLine: CURRENT_USER.roleLine,
     postedAt: "Just now",
     avatar: CURRENT_USER.avatar,
-    verified: "individual",
-    text: text.trim() || undefined,
+    verified: "individual" as const,
+    likes: 0,
+    comments: 0,
+    showComposer: true,
+  };
+
+  if (input.kind === "poll") {
+    return {
+      ...base,
+      variant: "poll",
+      question: input.question.trim(),
+      pollOptions: input.options
+        .map((option) => option.trim())
+        .filter(Boolean)
+        .map((label) => ({ label, percent: 0, votes: "0" })),
+      pollFooter: `${TODAY} — 0 votes total`,
+    };
+  }
+
+  if (input.kind === "article") {
+    return {
+      ...base,
+      variant: "text",
+      text: [input.headline.trim(), input.body.trim()].filter(Boolean).join("\n\n"),
+      truncated: true,
+    };
+  }
+
+  const isVideo = input.files.some((file) => file.type.startsWith("video/"));
+  const urls = input.files.map((file) => URL.createObjectURL(file));
+
+  return {
+    ...base,
+    variant: "text",
+    text: input.text.trim() || undefined,
     truncated: false,
     video: isVideo ? urls[0] : undefined,
     image: !isVideo && urls.length === 1 ? urls[0] : undefined,
     images: !isVideo && urls.length > 1 ? urls : undefined,
-    likes: 0,
-    comments: 0,
-    showComposer: true,
   };
 }
 
@@ -48,7 +76,7 @@ export function PostsProvider({ children }: { children: ReactNode }) {
   const [posts, setPosts] = useState<PostCardData[]>([]);
 
   const addPost = useCallback((input: NewPostInput) => {
-    setPosts((current) => [buildPostFromComposer(input), ...current]);
+    setPosts((current) => [buildPost(input), ...current]);
   }, []);
 
   return <PostsContext.Provider value={{ posts, addPost }}>{children}</PostsContext.Provider>;

@@ -175,6 +175,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
         showErrorToast("Add a question and at least two options before posting");
         return;
       }
+      addPost({ kind: "poll", question: pollQuestion, options: pollOptions });
       showSuccessToast("Your poll has been shared");
       resetState();
       onClose();
@@ -186,7 +187,11 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
       showErrorToast(mode === "article" ? "Add a headline or some content before posting" : "Add a caption or a file before posting");
       return;
     }
-    if (mode === "post") addPost({ text, files });
+    if (mode === "article") {
+      addPost({ kind: "article", headline: text, body: bodyRef.current?.textContent ?? "" });
+    } else {
+      addPost({ kind: "media", text, files });
+    }
     showSuccessToast(mode === "article" ? "Your article has been shared" : "Your post has been shared");
     resetState();
     onClose();
