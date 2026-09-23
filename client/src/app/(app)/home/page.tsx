@@ -31,7 +31,7 @@ const FEED_TABS: FeedTab[] = [
 ];
 
 const COMPOSER_ACTIONS = [
-  { key: "media", label: "Media", icon: "/icons/poll-add-alt.svg" },
+  { key: "media", label: "Media", icon: "/icons/image-01.svg" },
   { key: "property", label: "Property", icon: "/icons/building-03.svg" },
   { key: "stay", label: "Stay", icon: "/icons/guest-house-sm.svg" },
   { key: "service", label: "Service", icon: "/icons/map-pin-02-sm.svg" },
@@ -354,7 +354,7 @@ function MobileComposerCard() {
           }}
         >
           <span className="relative block size-3.5">
-            <Image src="/icons/poll-add-alt.svg" alt="" fill sizes="14px" />
+            <Image src="/icons/image-01.svg" alt="" fill sizes="14px" />
           </span>
         </button>
         <button

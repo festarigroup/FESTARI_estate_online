@@ -27,7 +27,7 @@ interface DesktopMenuSection {
 
 const CREATE_POST_ITEM = { key: "post", icon: "/icons/create-menu-dt-add-alt.svg", label: "Create Post" };
 const CREATE_POST_SUBMENU: DesktopSubmenuItem[] = [
-  { key: "media", icon: "/icons/poll-add-alt.svg", label: "Media" },
+  { key: "media", icon: "/icons/image-01.svg", label: "Media" },
   { key: "poll", icon: "/icons/chart-02.svg", label: "Poll" },
   { key: "article", icon: "/icons/book-bookmark-01.svg", label: "Article" },
 ];

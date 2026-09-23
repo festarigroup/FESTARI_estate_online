@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 type SwitchablePostType = "media" | "poll" | "article";
 
 const POST_TYPE_ROW: { key: SwitchablePostType; label: string; icon: string }[] = [
-  { key: "media", label: "Media", icon: "/icons/poll-add-alt.svg" },
+  { key: "media", label: "Media", icon: "/icons/article-toolbar-link.svg" },
   { key: "poll", label: "Poll", icon: "/icons/chart-02.svg" },
   { key: "article", label: "Article", icon: "/icons/book-bookmark-01.svg" },
 ];
