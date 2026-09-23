@@ -2,13 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/shared/AppShell";
+import { CreateMenu } from "@/components/shared/CreateMenu";
 import { PostCard, type PostCardData } from "@/components/shared/PostCard";
 import { WhoToFollowCard } from "@/components/shared/WhoToFollowCard";
 import { TrendingPropertiesCard } from "@/components/shared/TrendingPropertiesCard";
 import { UpcomingOpenHousesCard } from "@/components/shared/UpcomingOpenHousesCard";
 import { TrendingHashtagsCard } from "@/components/shared/TrendingHashtagsCard";
+import { usePostModals } from "@/hooks/usePostModals";
 import { comingSoonHref } from "@/lib/coming-soon";
 
 interface FeedTab {
@@ -224,39 +226,119 @@ export default function HomeFeedPage() {
 
 function ComposerCard() {
   return (
-    <div className="flex w-full flex-col gap-[15px] rounded-[15px] border border-gray-200 bg-white p-[15px]">
-      <div className="flex w-full items-center justify-center gap-2.5">
-        <span className="flex size-[38px] shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">
+    <>
+      <div className="hidden w-full flex-col gap-[15px] rounded-[15px] border border-gray-200 bg-white p-[15px] sm:flex">
+        <div className="flex w-full items-center justify-center gap-2.5">
+          <span className="flex size-[38px] shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">
+            SL
+          </span>
+          <Link
+            href={comingSoonHref("Create Post")}
+            className="flex w-full items-center justify-between rounded-3xl bg-gray-100 p-2"
+          >
+            <p className="text-[11px] font-medium text-black/35">Add your comment</p>
+            <span className="relative block size-[23px] shrink-0">
+              <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="23px" />
+            </span>
+          </Link>
+        </div>
+
+        <div className="h-px w-full bg-gray-200" />
+
+        <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:gap-[17px]">
+          {COMPOSER_ACTIONS.map((action) => (
+            <Link
+              key={action.key}
+              href={comingSoonHref(action.label)}
+              aria-label={action.label}
+              className="flex items-center gap-2 text-[11px] font-bold text-gray-500 hover:text-brand-900"
+            >
+              <span className="relative block size-4 shrink-0 sm:size-[13px]">
+                <Image src={action.icon} alt="" fill sizes="16px" />
+              </span>
+              <span className="hidden sm:inline">{action.label}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <MobileComposerCard />
+    </>
+  );
+}
+
+function MobileComposerCard() {
+  const { openPostModal, modals } = usePostModals();
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!moreOpen) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      if (moreRef.current?.contains(event.target as Node)) return;
+      setMoreOpen(false);
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [moreOpen]);
+
+  return (
+    <div className="flex w-full flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-4 sm:hidden">
+      <div className="flex w-full items-center gap-2.5">
+        <span className="relative flex size-10 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-base font-extrabold text-[#4f46e5]">
           SL
+          <span className="absolute bottom-0 right-0 size-2.5 rounded-full border-[1.5px] border-white bg-[#22c55e]" />
         </span>
         <Link
           href={comingSoonHref("Create Post")}
           className="flex w-full items-center justify-between rounded-3xl bg-gray-100 p-2"
         >
-          <p className="text-[11px] font-medium text-black/35">Add your comment</p>
-          <span className="relative block size-[23px] shrink-0">
-            <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="23px" />
+          <p className="text-xs font-medium text-black/35">Add a comment</p>
+          <span className="relative block size-6 shrink-0">
+            <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="24px" />
           </span>
         </Link>
       </div>
 
       <div className="h-px w-full bg-gray-200" />
 
-      <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:gap-[17px]">
-        {COMPOSER_ACTIONS.map((action) => (
-          <Link
-            key={action.key}
-            href={comingSoonHref(action.label)}
-            aria-label={action.label}
-            className="flex items-center gap-2 text-[11px] font-bold text-gray-500 hover:text-brand-900"
-          >
-            <span className="relative block size-4 shrink-0 sm:size-[13px]">
-              <Image src={action.icon} alt="" fill sizes="16px" />
+      <div className="flex w-full items-center gap-[18px]">
+        <button type="button" aria-label="Image Post" onClick={() => openPostModal("image")}>
+          <span className="relative block size-3.5">
+            <Image src="/icons/image-01.svg" alt="" fill sizes="14px" />
+          </span>
+        </button>
+        <button type="button" aria-label="Video Post" onClick={() => openPostModal("video")}>
+          <span className="relative block size-3.5">
+            <Image src="/icons/video-01.svg" alt="" fill sizes="14px" />
+          </span>
+        </button>
+        <button type="button" aria-label="Poll" onClick={() => openPostModal("poll")}>
+          <span className="relative block size-3.5">
+            <Image src="/icons/chart-02.svg" alt="" fill sizes="14px" />
+          </span>
+        </button>
+        <button type="button" aria-label="Article" onClick={() => openPostModal("article")}>
+          <span className="relative block size-3.5">
+            <Image src="/icons/book-bookmark-01.svg" alt="" fill sizes="14px" />
+          </span>
+        </button>
+
+        <div ref={moreRef} className="relative">
+          <button type="button" aria-label="More options" onClick={() => setMoreOpen((v) => !v)}>
+            <span className="relative block size-4">
+              <Image src="/icons/more-horizontal.svg" alt="" fill sizes="16px" />
             </span>
-            <span className="hidden sm:inline">{action.label}</span>
-          </Link>
-        ))}
+          </button>
+          {moreOpen && (
+            <div className="absolute left-0 top-[calc(100%+8px)] z-50">
+              <CreateMenu onNavigate={() => setMoreOpen(false)} onOpenPostModal={openPostModal} />
+            </div>
+          )}
+        </div>
       </div>
+
+      {modals}
     </div>
   );
 }

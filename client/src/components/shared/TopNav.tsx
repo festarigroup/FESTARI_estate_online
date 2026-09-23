@@ -4,14 +4,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { showSuccessToast } from "@/components/shared/AppToast";
-import { CreateArticleModal } from "@/components/shared/CreateArticleModal";
 import { CreateMenu } from "@/components/shared/CreateMenu";
-import { CreatePollModal } from "@/components/shared/CreatePollModal";
-import { CreatePostModal } from "@/components/shared/CreatePostModal";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { usePostModals } from "@/hooks/usePostModals";
 import { comingSoonHref } from "@/lib/coming-soon";
-
-type PostModalType = "image" | "video" | "poll" | "article";
 
 export function TopNav() {
   const router = useRouter();
@@ -19,8 +15,7 @@ export function TopNav() {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const createMenuRef = useRef<HTMLDivElement | null>(null);
-  const [postModalOpen, setPostModalOpen] = useState(false);
-  const [postModalType, setPostModalType] = useState<PostModalType>("image");
+  const { openPostModal, modals } = usePostModals();
 
   function handleLogout() {
     setMenuOpen(false);
@@ -35,11 +30,6 @@ export function TopNav() {
 
   function handleCreateClick() {
     setCreateMenuOpen((v) => !v);
-  }
-
-  function openPostModal(type: PostModalType) {
-    setPostModalType(type);
-    setPostModalOpen(true);
   }
 
   useEffect(() => {
@@ -191,22 +181,7 @@ export function TopNav() {
         </div>
       </div>
 
-      <CreatePostModal
-        open={postModalOpen && (postModalType === "image" || postModalType === "video")}
-        initialType={postModalType === "video" ? "video" : "image"}
-        onClose={() => setPostModalOpen(false)}
-        onSwitchType={openPostModal}
-      />
-      <CreatePollModal
-        open={postModalOpen && postModalType === "poll"}
-        onClose={() => setPostModalOpen(false)}
-        onSwitchType={openPostModal}
-      />
-      <CreateArticleModal
-        open={postModalOpen && postModalType === "article"}
-        onClose={() => setPostModalOpen(false)}
-        onSwitchType={openPostModal}
-      />
+      {modals}
     </header>
   );
 }
