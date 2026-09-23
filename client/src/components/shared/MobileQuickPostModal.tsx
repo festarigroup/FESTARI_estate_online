@@ -36,6 +36,8 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const [pollQuestion, setPollQuestion] = useState("");
   const [pollOptions, setPollOptions] = useState<string[]>([]);
+  const [addingOption, setAddingOption] = useState(false);
+  const [newOption, setNewOption] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const previews = useMemo(
     () => files.map((file) => ({ url: URL.createObjectURL(file), isVideo: file.type.startsWith("video/") })),
@@ -55,7 +57,12 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") handleClose();
+      if (event.key !== "Escape") return;
+      if (addingOption) {
+        setAddingOption(false);
+        return;
+      }
+      handleClose();
     };
     document.addEventListener("keydown", handleKeyDown);
     document.body.style.overflow = "hidden";
@@ -64,7 +71,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
       document.body.style.overflow = "";
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, addingOption]);
 
   useEffect(() => {
     return () => previews.forEach((preview) => URL.revokeObjectURL(preview.url));
@@ -78,17 +85,23 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
     setBodyEmpty(true);
     setPollQuestion("");
     setPollOptions([]);
+    setAddingOption(false);
+    setNewOption("");
     setFiles([]);
     setVisibility(DEFAULT_VISIBILITY);
     setVisibilityOpen(false);
   }
 
-  function addPollOption() {
-    setPollOptions((current) => (current.length < MAX_POLL_OPTIONS ? [...current, ""] : current));
+  function openAddOption() {
+    setNewOption("");
+    setAddingOption(true);
   }
 
-  function updatePollOption(index: number, value: string) {
-    setPollOptions((current) => current.map((option, i) => (i === index ? value : option)));
+  function confirmAddOption() {
+    const value = newOption.trim();
+    if (value) setPollOptions((current) => [...current, value]);
+    setNewOption("");
+    if (pollOptions.length + 1 >= MAX_POLL_OPTIONS) setAddingOption(false);
   }
 
   function removePollOption(index: number) {
@@ -226,12 +239,20 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
 
         {mode === "poll" && (
           <div className="flex w-full flex-col gap-2">
+            {pollOptions.map((option, index) => (
+              <div key={index} className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
+                <p className="w-full flex-1 truncate text-sm text-night-900">{option}</p>
+                <button type="button" aria-label={`Remove option ${index + 1}`} onClick={() => removePollOption(index)}>
+                  <NavIcon icon="/icons/poll-trash-delete.svg" color="night" size={14} className="bg-red-500" />
+                </button>
+              </div>
+            ))}
             <div className="flex w-full items-center justify-between">
               <p className="text-sm font-bold text-night-900">Options</p>
               <button
                 type="button"
                 aria-label="Add option"
-                onClick={addPollOption}
+                onClick={openAddOption}
                 disabled={pollOptions.length >= MAX_POLL_OPTIONS}
               >
                 <svg
@@ -246,19 +267,6 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                 </svg>
               </button>
             </div>
-            {pollOptions.map((option, index) => (
-              <div key={index} className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5">
-                <input
-                  value={option}
-                  onChange={(event) => updatePollOption(index, event.target.value)}
-                  placeholder={`Option ${index + 1}`}
-                  className="w-full flex-1 text-sm text-night-900 placeholder:text-night-900/70 focus:outline-none"
-                />
-                <button type="button" aria-label={`Remove option ${index + 1}`} onClick={() => removePollOption(index)}>
-                  <NavIcon icon="/icons/poll-trash-delete.svg" color="night" size={14} className="bg-red-500" />
-                </button>
-              </div>
-            ))}
           </div>
         )}
 
@@ -401,6 +409,42 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
           </button>
         </div>
       </div>
+
+      {addingOption &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[130] flex items-center justify-center bg-black/50 p-4"
+            onClick={() => setAddingOption(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Add poll option"
+          >
+            <div
+              onClick={(event) => event.stopPropagation()}
+              className="flex h-12 w-full max-w-[276px] items-center gap-2 rounded-2xl border border-gray-200 bg-white px-3 py-1.5 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
+            >
+              <input
+                autoFocus
+                value={newOption}
+                onChange={(event) => setNewOption(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") confirmAddOption();
+                }}
+                placeholder={`Option ${pollOptions.length + 1}`}
+                className="w-full flex-1 text-sm text-night-900 placeholder:text-night-900/70 focus:outline-none"
+              />
+              <button
+                type="button"
+                onClick={confirmAddOption}
+                disabled={!newOption.trim()}
+                className={cn("shrink-0 text-sm", newOption.trim() ? "text-brand-900" : "text-gray-300")}
+              >
+                Add
+              </button>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>,
     document.body,
   );
