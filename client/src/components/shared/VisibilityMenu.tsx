@@ -1,19 +1,30 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { SideListMenu } from "@/components/shared/SideListMenu";
-import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 
-export type PostVisibility = "everyone" | "followings";
+export type PostVisibility =
+  | { kind: "everyone" }
+  | { kind: "followings" }
+  | { kind: "community"; name: string }
+  | { kind: "organization"; name: string };
 
-export const VISIBILITY_LABEL: Record<PostVisibility, string> = {
-  everyone: "Everyone can view",
-  followings: "Followings",
-};
+export const DEFAULT_VISIBILITY: PostVisibility = { kind: "everyone" };
+
+export function getVisibilityLabel(value: PostVisibility): string {
+  switch (value.kind) {
+    case "everyone":
+      return "Everyone can view";
+    case "followings":
+      return "Followings";
+    case "community":
+    case "organization":
+      return value.name;
+  }
+}
 
 const COMMUNITY_ITEMS = ["Community 5", "Community 9", "Community 4", "Community 8", "Community 5", "Community 3", "Community 2"];
 const ORGANIZATION_ITEMS = COMMUNITY_ITEMS.map((item) => item.replace("Community", "Organization"));
@@ -27,7 +38,6 @@ interface VisibilityMenuProps {
 }
 
 export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: VisibilityMenuProps) {
-  const router = useRouter();
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = useState<{ bottom: number; left: number } | null>(null);
   const communityRef = useRef<HTMLButtonElement | null>(null);
@@ -88,31 +98,31 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
       <div className="flex flex-col gap-1">
         <button
           type="button"
-          onClick={() => onChange("everyone")}
+          onClick={() => onChange({ kind: "everyone" })}
           className="flex w-full items-center gap-2 rounded-lg px-1 py-1"
         >
           <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
             <NavIcon icon="/icons/create-menu-globe-visibility.svg" color="white" size={16} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Everyone can view</span>
-          {value === "everyone" && (
+          {value.kind === "everyone" && (
             <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
           )}
         </button>
 
         <button
           type="button"
-          onClick={() => onChange("followings")}
+          onClick={() => onChange({ kind: "followings" })}
           className={cn(
             "flex w-full items-center gap-2 rounded-full px-1 py-1",
-            value === "followings" && "bg-[#f1f6ff]",
+            value.kind === "followings" && "bg-[#f1f6ff]",
           )}
         >
           <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
             <NavIcon icon="/icons/visibility-team-structure.svg" color="white" size={14} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Followings</span>
-          {value === "followings" && (
+          {value.kind === "followings" && (
             <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
           )}
         </button>
@@ -130,8 +140,14 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
           <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
             <NavIcon icon="/icons/user-group.svg" color="white" size={16} />
           </span>
-          <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Community</span>
-          <NavIcon icon="/icons/visibility-chevron-outline-right.svg" color="night" size={10} />
+          <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">
+            {value.kind === "community" ? value.name : "Community"}
+          </span>
+          {value.kind === "community" ? (
+            <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
+          ) : (
+            <NavIcon icon="/icons/visibility-chevron-outline-right.svg" color="night" size={10} />
+          )}
         </button>
 
         <button
@@ -147,8 +163,14 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
           <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
             <NavIcon icon="/icons/visibility-user-check.svg" color="white" size={14} />
           </span>
-          <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Organization</span>
-          <NavIcon icon="/icons/visibility-chevron-outline-right.svg" color="night" size={10} />
+          <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">
+            {value.kind === "organization" ? value.name : "Organization"}
+          </span>
+          {value.kind === "organization" ? (
+            <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
+          ) : (
+            <NavIcon icon="/icons/visibility-chevron-outline-right.svg" color="night" size={10} />
+          )}
         </button>
       </div>
 
@@ -159,7 +181,8 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
         items={COMMUNITY_ITEMS}
         onSelect={(item) => {
           setCommunityOpen(false);
-          router.push(comingSoonHref(item));
+          onChange({ kind: "community", name: item });
+          onClose();
         }}
       />
       <SideListMenu
@@ -169,7 +192,8 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
         items={ORGANIZATION_ITEMS}
         onSelect={(item) => {
           setOrganizationOpen(false);
-          router.push(comingSoonHref(item));
+          onChange({ kind: "organization", name: item });
+          onClose();
         }}
       />
 

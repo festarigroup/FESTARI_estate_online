@@ -5,7 +5,12 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
-import { VISIBILITY_LABEL, VisibilityMenu, type PostVisibility } from "@/components/shared/VisibilityMenu";
+import {
+  DEFAULT_VISIBILITY,
+  VisibilityMenu,
+  getVisibilityLabel,
+  type PostVisibility,
+} from "@/components/shared/VisibilityMenu";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 
@@ -40,7 +45,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
   const [body, setBody] = useState("");
   const bodyRef = useRef<HTMLTextAreaElement | null>(null);
   const [visibilityOpen, setVisibilityOpen] = useState(false);
-  const [visibility, setVisibility] = useState<PostVisibility>("everyone");
+  const [visibility, setVisibility] = useState<PostVisibility>(DEFAULT_VISIBILITY);
   const visibilityTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
@@ -62,7 +67,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
   function resetState() {
     setHeadline("");
     setBody("");
-    setVisibility("everyone");
+    setVisibility(DEFAULT_VISIBILITY);
     setVisibilityOpen(false);
   }
 
@@ -220,7 +225,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
               className="flex w-full items-center gap-2.5 px-2"
             >
               <NavIcon icon="/icons/create-menu-globe-visibility.svg" color="brand" size={24} className="bg-[#337df2]" />
-              <span className="text-[14.6px] font-semibold text-[#337df2]">{VISIBILITY_LABEL[visibility]}</span>
+              <span className="text-[14.6px] font-semibold text-[#337df2]">{getVisibilityLabel(visibility)}</span>
             </button>
             <VisibilityMenu
               open={visibilityOpen}
