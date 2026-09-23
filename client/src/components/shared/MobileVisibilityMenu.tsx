@@ -150,7 +150,7 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
       />
       <Row
         label="Organization"
-        icon="/icons/visibility-user-check.svg"
+        icon="/icons/organization-logo.svg"
         active={value.kind === "organization"}
         hasChevron
         ariaExpanded={organizationSheetOpen}

@@ -41,7 +41,7 @@ export function getVisibilityIcon(value: PostVisibility): string {
     case "community":
       return "/icons/user-group.svg";
     case "organization":
-      return "/icons/visibility-user-check.svg";
+      return "/icons/organization-logo.svg";
   }
 }
 
@@ -209,7 +209,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
           className="flex w-full items-center gap-2 rounded-lg px-1 py-1"
         >
           <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
-            <NavIcon icon="/icons/visibility-user-check.svg" color="white" size={14} />
+            <NavIcon icon="/icons/organization-logo.svg" color="white" size={14} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">
             {value.kind === "organization" ? formatNames(value.names) : "Organization"}
