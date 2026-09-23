@@ -319,7 +319,10 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
               )}
             </div>
             <div className="h-px w-full shrink-0 bg-gray-200" />
-            <div className="relative w-full max-h-[220px] overflow-y-auto">
+            <div
+              className="relative w-full max-h-[220px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-transparent"
+              style={{ scrollbarWidth: "thin", scrollbarColor: "#cbd5e0 transparent" }}
+            >
               {bodyEmpty && (
                 <p className="pointer-events-none absolute left-0 top-0 text-sm text-gray-400">
                   What’s happening twin? Write something down...
