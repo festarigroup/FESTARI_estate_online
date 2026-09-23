@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { VisibilityMenu, DEFAULT_VISIBILITY, type PostVisibility } from "@/components/shared/VisibilityMenu";
+import { usePostsFeed } from "@/context/PostsContext";
 import { cn } from "@/lib/utils";
 
 const MEDIA_ACCEPT = ["image/png", "image/jpeg", "image/gif", "video/mp4", "video/quicktime", "video/webm"];
@@ -30,6 +31,7 @@ interface MobileQuickPostModalProps {
 }
 
 export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: MobileQuickPostModalProps) {
+  const { addPost } = usePostsFeed();
   const [mode, setMode] = useState<QuickComposerMode>(initialMode);
   const [text, setText] = useState("");
   const [bodyEmpty, setBodyEmpty] = useState(true);
@@ -184,6 +186,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
       showErrorToast(mode === "article" ? "Add a headline or some content before posting" : "Add a caption or a file before posting");
       return;
     }
+    if (mode === "post") addPost({ text, files });
     showSuccessToast(mode === "article" ? "Your article has been shared" : "Your post has been shared");
     resetState();
     onClose();

@@ -12,6 +12,7 @@ import {
   type PostVisibility,
 } from "@/components/shared/VisibilityMenu";
 import { cn } from "@/lib/utils";
+import { usePostsFeed } from "@/context/PostsContext";
 
 type PostType = "image" | "video";
 
@@ -45,6 +46,7 @@ interface CreatePostModalProps {
 }
 
 export function CreatePostModal({ open, onClose, initialType = "image", onSwitchType }: CreatePostModalProps) {
+  const { addPost } = usePostsFeed();
   const [postType, setPostType] = useState<PostType>(initialType);
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
@@ -129,6 +131,7 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
       showErrorToast(`Add a caption or a ${postType} before posting`);
       return;
     }
+    addPost({ text, files });
     showSuccessToast("Your post has been shared");
     resetState();
     onClose();

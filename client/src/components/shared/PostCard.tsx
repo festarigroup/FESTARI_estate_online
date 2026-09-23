@@ -59,6 +59,7 @@ export interface PostCardData {
   truncated?: boolean;
   image?: string;
   images?: string[];
+  video?: string;
   likes: number;
   comments: number;
   shareLabel?: string;
@@ -113,7 +114,7 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
         <PollBody post={post} />
       ) : (
         <>
-          {(post.text || post.image || post.images) && (
+          {(post.text || post.image || post.images || post.video) && (
             // Mobile shows the image first with the caption below it;
             // desktop keeps the caption above the image.
             <div className="flex w-full flex-col-reverse gap-[15px] sm:flex-col">
@@ -134,8 +135,16 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
                 </div>
               )}
 
-              {(post.images ?? (post.image ? [post.image] : [])).length > 0 && (
-                <ImageCarousel images={post.images ?? [post.image!]} />
+              {post.video ? (
+                <video
+                  src={post.video}
+                  controls
+                  className="h-[285px] w-full rounded-[29px] object-cover sm:rounded-[15px]"
+                />
+              ) : (
+                (post.images ?? (post.image ? [post.image] : [])).length > 0 && (
+                  <ImageCarousel images={post.images ?? [post.image!]} />
+                )
               )}
             </div>
           )}

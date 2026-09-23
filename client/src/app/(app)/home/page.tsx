@@ -11,6 +11,7 @@ import { WhoToFollowCard } from "@/components/shared/WhoToFollowCard";
 import { TrendingPropertiesCard } from "@/components/shared/TrendingPropertiesCard";
 import { UpcomingOpenHousesCard } from "@/components/shared/UpcomingOpenHousesCard";
 import { TrendingHashtagsCard } from "@/components/shared/TrendingHashtagsCard";
+import { usePostsFeed } from "@/context/PostsContext";
 import { usePostModals } from "@/hooks/usePostModals";
 import { comingSoonHref } from "@/lib/coming-soon";
 
@@ -194,11 +195,13 @@ const POSTS: PostCardData[] = [
 
 export default function HomeFeedPage() {
   const [activeTab, setActiveTab] = useState(FEED_TABS[0].label);
+  const { posts: userPosts } = usePostsFeed();
 
+  const allPosts = useMemo(() => [...userPosts, ...POSTS], [userPosts]);
   const activeVariant = FEED_TABS.find((tab) => tab.label === activeTab)?.variant;
   const filteredPosts = useMemo(
-    () => (activeTab === "All Posts" ? POSTS : POSTS.filter((post) => post.variant === activeVariant)),
-    [activeTab, activeVariant],
+    () => (activeTab === "All Posts" ? allPosts : allPosts.filter((post) => post.variant === activeVariant)),
+    [activeTab, activeVariant, allPosts],
   );
 
   return (
