@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/shared/AppShell";
 import { CreateMenu } from "@/components/shared/CreateMenu";
+import { MobileQuickPostModal } from "@/components/shared/MobileQuickPostModal";
 import { PostCard, type PostCardData } from "@/components/shared/PostCard";
 import { WhoToFollowCard } from "@/components/shared/WhoToFollowCard";
 import { TrendingPropertiesCard } from "@/components/shared/TrendingPropertiesCard";
@@ -271,6 +272,7 @@ function MobileComposerCard() {
   const { openPostModal, modals } = usePostModals();
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement | null>(null);
+  const [quickPostOpen, setQuickPostOpen] = useState(false);
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -289,15 +291,16 @@ function MobileComposerCard() {
           SL
           <span className="absolute bottom-0 right-0 size-2.5 rounded-full border-[1.5px] border-white bg-[#22c55e]" />
         </span>
-        <Link
-          href={comingSoonHref("Create Post")}
+        <button
+          type="button"
+          onClick={() => setQuickPostOpen(true)}
           className="flex w-full items-center justify-between rounded-3xl bg-gray-100 p-2"
         >
           <p className="text-xs font-medium text-black/35">Add a comment</p>
           <span className="relative block size-6 shrink-0">
             <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="24px" />
           </span>
-        </Link>
+        </button>
       </div>
 
       <div className="h-px w-full bg-gray-200" />
@@ -339,6 +342,14 @@ function MobileComposerCard() {
       </div>
 
       {modals}
+      <MobileQuickPostModal
+        open={quickPostOpen}
+        onClose={() => setQuickPostOpen(false)}
+        onSwitchType={(type) => {
+          setQuickPostOpen(false);
+          openPostModal(type);
+        }}
+      />
     </div>
   );
 }
