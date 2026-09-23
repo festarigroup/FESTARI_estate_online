@@ -31,8 +31,7 @@ const FEED_TABS: FeedTab[] = [
 ];
 
 const COMPOSER_ACTIONS = [
-  { key: "photo", label: "Photo", icon: "/icons/image-01.svg" },
-  { key: "video", label: "Video", icon: "/icons/video-01.svg" },
+  { key: "media", label: "Media", icon: "/icons/image-01.svg" },
   { key: "property", label: "Property", icon: "/icons/building-03.svg" },
   { key: "stay", label: "Stay", icon: "/icons/guest-house-sm.svg" },
   { key: "service", label: "Service", icon: "/icons/map-pin-02-sm.svg" },
@@ -327,7 +326,7 @@ function MobileComposerCard() {
       <div className="flex w-full flex-wrap items-center gap-[18px]">
         <button
           type="button"
-          aria-label="Image Post"
+          aria-label="Media"
           onClick={() => {
             setQuickPostMode("post");
             setQuickPostOpen(true);
@@ -335,18 +334,6 @@ function MobileComposerCard() {
         >
           <span className="relative block size-3.5">
             <Image src="/icons/image-01.svg" alt="" fill sizes="14px" />
-          </span>
-        </button>
-        <button
-          type="button"
-          aria-label="Video Post"
-          onClick={() => {
-            setQuickPostMode("post");
-            setQuickPostOpen(true);
-          }}
-        >
-          <span className="relative block size-3.5">
-            <Image src="/icons/video-01.svg" alt="" fill sizes="14px" />
           </span>
         </button>
         <button

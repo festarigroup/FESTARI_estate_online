@@ -15,26 +15,11 @@ import {
 import { cn } from "@/lib/utils";
 import { usePostsFeed } from "@/context/PostsContext";
 
-type PostType = "image" | "video";
+const MEDIA_ACCEPT = ["image/png", "image/jpeg", "image/gif", "video/mp4", "video/quicktime", "video/webm"];
+const MEDIA_HELPER = "PNG, JPEG, GIF, MP4, MOV, WEBM";
 
-const TYPE_META: Record<PostType, { accept: string[]; helper: string; errorMessage: string }> = {
-  image: {
-    accept: ["image/png", "image/jpeg", "image/gif"],
-    helper: "PNG, JPEG, GIF",
-    errorMessage: "Only PNG, JPEG or GIF files are supported",
-  },
-  video: {
-    accept: ["video/mp4", "video/quicktime", "video/webm"],
-    helper: "MP4, MOV, WEBM",
-    errorMessage: "Only MP4, MOV or WEBM files are supported",
-  },
-};
-
-const MEDIA_ACCEPT = [...TYPE_META.image.accept, ...TYPE_META.video.accept];
-
-const POST_TYPE_ROW: { key: PostType | "poll" | "article"; label: string; icon: string }[] = [
-  { key: "image", label: "Image Post", icon: "/icons/image-01.svg" },
-  { key: "video", label: "Video Post", icon: "/icons/video-01.svg" },
+const POST_TYPE_ROW: { key: "media" | "poll" | "article"; label: string; icon: string }[] = [
+  { key: "media", label: "Media", icon: "/icons/image-01.svg" },
   { key: "poll", label: "Poll", icon: "/icons/chart-02.svg" },
   { key: "article", label: "Article", icon: "/icons/book-bookmark-01.svg" },
 ];
@@ -42,13 +27,11 @@ const POST_TYPE_ROW: { key: PostType | "poll" | "article"; label: string; icon: 
 interface CreatePostModalProps {
   open: boolean;
   onClose: () => void;
-  initialType?: PostType;
-  onSwitchType?: (type: "image" | "video" | "poll" | "article") => void;
+  onSwitchType?: (type: "media" | "poll" | "article") => void;
 }
 
-export function CreatePostModal({ open, onClose, initialType = "image", onSwitchType }: CreatePostModalProps) {
+export function CreatePostModal({ open, onClose, onSwitchType }: CreatePostModalProps) {
   const { addPost } = usePostsFeed();
-  const [postType, setPostType] = useState<PostType>(initialType);
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const previews = useMemo(
@@ -61,12 +44,6 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
   const [visibilityOpen, setVisibilityOpen] = useState(false);
   const [visibility, setVisibility] = useState<PostVisibility>(DEFAULT_VISIBILITY);
   const visibilityTriggerRef = useRef<HTMLButtonElement | null>(null);
-
-  const [wasOpen, setWasOpen] = useState(open);
-  if (open !== wasOpen) {
-    setWasOpen(open);
-    if (open && postType !== initialType) setPostType(initialType);
-  }
 
   useEffect(() => {
     if (!open) return;
@@ -88,8 +65,6 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
 
   if (!open) return null;
 
-  const typeMeta = TYPE_META[postType];
-
   function addFiles(list: FileList | null) {
     if (!list) return;
     const next = Array.from(list).filter((file) => MEDIA_ACCEPT.includes(file.type));
@@ -98,11 +73,6 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
       return;
     }
     setFiles((current) => [...current, ...next]);
-  }
-
-  function switchType(next: PostType) {
-    setPostType(next);
-    setFiles([]);
   }
 
   function handleDrop(event: DragEvent<HTMLDivElement>) {
@@ -129,7 +99,7 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
 
   function handlePost() {
     if (!text.trim() && files.length === 0) {
-      showErrorToast(`Add a caption or a ${postType} before posting`);
+      showErrorToast("Add a caption or a file before posting");
       return;
     }
     addPost({ kind: "media", text, files });
@@ -217,7 +187,7 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
                 <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={14} />
               </button>
             </div>
-            <p className="w-full text-xs text-[#53575a]">{typeMeta.helper}</p>
+            <p className="w-full text-xs text-[#53575a]">{MEDIA_HELPER}</p>
           </div>
         ) : (
           <div className="flex w-full flex-wrap gap-2.5 px-2">
@@ -270,7 +240,7 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-3">
               {POST_TYPE_ROW.map((item) => {
-                const active = item.key === postType;
+                const active = item.key === "media";
                 if (active) {
                   return (
                     <NavIcon
@@ -283,18 +253,7 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
                   );
                 }
                 return (
-                  <button
-                    key={item.key}
-                    type="button"
-                    aria-label={item.label}
-                    onClick={() => {
-                      if (item.key === "image" || item.key === "video") {
-                        switchType(item.key);
-                      } else {
-                        onSwitchType?.(item.key);
-                      }
-                    }}
-                  >
+                  <button key={item.key} type="button" aria-label={item.label} onClick={() => onSwitchType?.(item.key)}>
                     <NavIcon icon={item.icon} color="brand" size={18} className="bg-[#337df2]" />
                   </button>
                 );

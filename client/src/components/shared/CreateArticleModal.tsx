@@ -16,11 +16,10 @@ import { usePostsFeed } from "@/context/PostsContext";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 
-type SwitchablePostType = "image" | "video" | "poll" | "article";
+type SwitchablePostType = "media" | "poll" | "article";
 
 const POST_TYPE_ROW: { key: SwitchablePostType; label: string; icon: string }[] = [
-  { key: "image", label: "Image Post", icon: "/icons/image-01.svg" },
-  { key: "video", label: "Video Post", icon: "/icons/video-01.svg" },
+  { key: "media", label: "Media", icon: "/icons/image-01.svg" },
   { key: "poll", label: "Poll", icon: "/icons/chart-02.svg" },
   { key: "article", label: "Article", icon: "/icons/book-bookmark-01.svg" },
 ];
@@ -37,7 +36,7 @@ const TOOLBAR_ACTIONS = [
 interface CreateArticleModalProps {
   open: boolean;
   onClose: () => void;
-  onSwitchType?: (type: "image" | "video" | "poll") => void;
+  onSwitchType?: (type: "media" | "poll") => void;
 }
 
 export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticleModalProps) {
@@ -250,7 +249,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
                       type="button"
                       aria-label={item.label}
                       onClick={() =>
-                        item.key === "image" || item.key === "video" || item.key === "poll"
+                        item.key === "media" || item.key === "poll"
                           ? onSwitchType?.(item.key)
                           : router.push(comingSoonHref(item.label))
                       }

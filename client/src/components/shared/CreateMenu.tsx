@@ -27,8 +27,7 @@ interface DesktopMenuSection {
 
 const CREATE_POST_ITEM = { key: "post", icon: "/icons/create-menu-dt-add-alt.svg", label: "Create Post" };
 const CREATE_POST_SUBMENU: DesktopSubmenuItem[] = [
-  { key: "video", icon: "/icons/video-01.svg", label: "Video Post" },
-  { key: "image", icon: "/icons/image-01.svg", label: "Image Post" },
+  { key: "media", icon: "/icons/image-01.svg", label: "Media" },
   { key: "poll", icon: "/icons/chart-02.svg", label: "Poll" },
   { key: "article", icon: "/icons/book-bookmark-01.svg", label: "Article" },
 ];
@@ -122,7 +121,7 @@ function MobileMenuRow({
   onNavigate: () => void;
   open: boolean;
   onToggle: () => void;
-  onOpenMobilePostModal: (type: "image" | "video" | "poll" | "article") => void;
+  onOpenMobilePostModal: (type: "media" | "poll" | "article") => void;
 }) {
   if (!item.submenu) {
     return (
@@ -162,12 +161,12 @@ function MobileMenuRow({
       {open && (
         <div className="absolute left-9 top-full z-10 mt-1 flex w-60 flex-col gap-0.5 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-lg">
           {item.submenu.map((sub) =>
-            sub.key === "image" || sub.key === "video" || sub.key === "poll" || sub.key === "article" ? (
+            sub.key === "media" || sub.key === "poll" || sub.key === "article" ? (
               <button
                 key={sub.key}
                 type="button"
                 onClick={() => {
-                  onOpenMobilePostModal(sub.key as "image" | "video" | "poll" | "article");
+                  onOpenMobilePostModal(sub.key as "media" | "poll" | "article");
                   onNavigate();
                 }}
                 className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
@@ -198,7 +197,7 @@ function CreatePostRow({
   onOpenPostModal,
 }: {
   onNavigate: () => void;
-  onOpenPostModal: (type: "image" | "video" | "poll" | "article") => void;
+  onOpenPostModal: (type: "media" | "poll" | "article") => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -218,12 +217,12 @@ function CreatePostRow({
       {open && (
         <div className="absolute left-1/2 top-full z-10 mt-2 flex w-56 flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg">
           {CREATE_POST_SUBMENU.map((sub) =>
-            sub.key === "image" || sub.key === "video" || sub.key === "poll" || sub.key === "article" ? (
+            sub.key === "media" || sub.key === "poll" || sub.key === "article" ? (
               <button
                 key={sub.key}
                 type="button"
                 onClick={() => {
-                  onOpenPostModal(sub.key as "image" | "video" | "poll" | "article");
+                  onOpenPostModal(sub.key as "media" | "poll" | "article");
                   onNavigate();
                 }}
                 className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
@@ -255,8 +254,8 @@ export function CreateMenu({
   onOpenMobilePostModal,
 }: {
   onNavigate: () => void;
-  onOpenPostModal: (type: "image" | "video" | "poll" | "article") => void;
-  onOpenMobilePostModal: (type: "image" | "video" | "poll" | "article") => void;
+  onOpenPostModal: (type: "media" | "poll" | "article") => void;
+  onOpenMobilePostModal: (type: "media" | "poll" | "article") => void;
 }) {
   const [openMobileKey, setOpenMobileKey] = useState<string | null>(null);
   const toggleMobileKey = (key: string) => setOpenMobileKey((current) => (current === key ? null : key));

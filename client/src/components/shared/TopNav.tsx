@@ -20,7 +20,7 @@ export function TopNav() {
   const [mobileQuickOpen, setMobileQuickOpen] = useState(false);
   const [mobileQuickMode, setMobileQuickMode] = useState<QuickComposerMode>("post");
 
-  function openMobileQuickPost(type: "image" | "video" | "poll" | "article") {
+  function openMobileQuickPost(type: "media" | "poll" | "article") {
     setMobileQuickMode(type === "poll" || type === "article" ? type : "post");
     setMobileQuickOpen(true);
   }
