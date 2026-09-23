@@ -210,12 +210,12 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
         onClick={(event) => event.stopPropagation()}
         className={cn(
           "flex w-full flex-col gap-3 rounded-[36px] bg-white p-7 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]",
-          mode === "article" ? "max-w-[400px] overflow-visible" : "max-w-[340px] overflow-y-auto",
+          mode === "article" ? "max-w-[400px] max-h-[85vh] overflow-hidden" : "max-w-[340px] overflow-y-auto",
           mode === "poll" && (pollOptions.length === 0 ? "aspect-[1/0.7]" : "aspect-square"),
           mode === "post" && (files.length === 0 ? "aspect-[1/0.7]" : "aspect-square"),
         )}
       >
-        <div className="flex w-full items-start justify-between gap-2">
+        <div className="flex w-full shrink-0 items-start justify-between gap-2">
           <div className="flex items-center gap-2.5">
             <span className="relative block size-12 shrink-0">
               <span className="relative block size-full overflow-hidden rounded-full bg-[#eef2ff]">
@@ -250,7 +250,10 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
             onChange={(event) => setText(event.target.value)}
             rows={mode === "article" ? 2 : 3}
             placeholder="What’s happening twin? Write something down..."
-            className="w-full resize-none text-sm leading-6 text-night-900 placeholder:text-gray-400 focus:outline-none"
+            className={cn(
+              "w-full resize-none text-sm leading-6 text-night-900 placeholder:text-gray-400 focus:outline-none",
+              mode === "article" && "shrink-0",
+            )}
           />
         )}
 
@@ -292,7 +295,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
 
         {mode === "article" && (
           <>
-            <div className="flex w-full items-center gap-3.5">
+            <div className="flex w-full shrink-0 items-center gap-3.5">
               {TOOLBAR_ACTIONS.map((action) =>
                 action.key === "link" ? (
                   <button
@@ -318,8 +321,8 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                 ),
               )}
             </div>
-            <div className="h-px w-full bg-gray-200" />
-            <div className="relative w-full">
+            <div className="h-px w-full shrink-0 bg-gray-200" />
+            <div className="relative w-full min-h-0 flex-1 overflow-y-auto">
               {bodyEmpty && (
                 <p className="pointer-events-none absolute left-0 top-0 text-sm text-[#cbd5e0]">
                   Start writing your insight, market trends, buyer guides, how-to advice…
@@ -360,7 +363,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
           </div>
         )}
 
-        <div className="mt-auto flex w-full flex-col gap-3">
+        <div className="mt-auto flex w-full shrink-0 flex-col gap-3">
         <div className="h-px w-full shrink-0 bg-[#f5f5f5]" />
         <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-3">
