@@ -10,14 +10,34 @@ import { cn } from "@/lib/utils";
 
 const MEDIA_ACCEPT = ["image/png", "image/jpeg", "image/gif", "video/mp4", "video/quicktime", "video/webm"];
 
+const TOOLBAR_ACTIONS = [
+  { key: "italic", label: "Italic", glyph: "I", className: "italic" },
+  { key: "bold", label: "Bold", glyph: "B", className: "font-bold" },
+  { key: "h1", label: "Heading", glyph: "H", className: "font-bold" },
+  { key: "link", label: "Link", glyph: null, className: "" },
+  { key: "quote", label: "Quote", glyph: "”", className: "font-bold" },
+  { key: "bullet", label: "Bullet list", glyph: "•", className: "" },
+] as const;
+
+type QuickComposerMode = "post" | "article";
+
 interface MobileQuickPostModalProps {
   open: boolean;
   onClose: () => void;
-  onSwitchType?: (type: "poll" | "article") => void;
+  initialMode?: QuickComposerMode;
+  onSwitchType?: (type: "poll") => void;
 }
 
-export function MobileQuickPostModal({ open, onClose, onSwitchType }: MobileQuickPostModalProps) {
+export function MobileQuickPostModal({
+  open,
+  onClose,
+  initialMode = "post",
+  onSwitchType,
+}: MobileQuickPostModalProps) {
+  const [mode, setMode] = useState<QuickComposerMode>(initialMode);
   const [text, setText] = useState("");
+  const [bodyEmpty, setBodyEmpty] = useState(true);
+  const bodyRef = useRef<HTMLDivElement | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const previews = useMemo(
     () => files.map((file) => ({ url: URL.createObjectURL(file), isVideo: file.type.startsWith("video/") })),
@@ -27,6 +47,12 @@ export function MobileQuickPostModal({ open, onClose, onSwitchType }: MobileQuic
   const [visibilityOpen, setVisibilityOpen] = useState(false);
   const [visibility, setVisibility] = useState<PostVisibility>(DEFAULT_VISIBILITY);
   const visibilityTriggerRef = useRef<HTMLButtonElement | null>(null);
+
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) setMode(initialMode);
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -50,6 +76,8 @@ export function MobileQuickPostModal({ open, onClose, onSwitchType }: MobileQuic
 
   function resetState() {
     setText("");
+    if (bodyRef.current) bodyRef.current.innerHTML = "";
+    setBodyEmpty(true);
     setFiles([]);
     setVisibility(DEFAULT_VISIBILITY);
     setVisibilityOpen(false);
@@ -74,12 +102,46 @@ export function MobileQuickPostModal({ open, onClose, onSwitchType }: MobileQuic
     setFiles((current) => current.filter((_, i) => i !== index));
   }
 
+  function handleBodyInput() {
+    setBodyEmpty((bodyRef.current?.textContent?.trim().length ?? 0) === 0);
+  }
+
+  function applyFormat(command: string, value?: string) {
+    bodyRef.current?.focus();
+    document.execCommand(command, false, value);
+    handleBodyInput();
+  }
+
+  function handleToolbarAction(key: (typeof TOOLBAR_ACTIONS)[number]["key"]) {
+    switch (key) {
+      case "italic":
+        return applyFormat("italic");
+      case "bold":
+        return applyFormat("bold");
+      case "h1":
+        return applyFormat("formatBlock", "h1");
+      case "quote":
+        return applyFormat("formatBlock", "blockquote");
+      case "bullet":
+        return applyFormat("insertUnorderedList");
+      case "link": {
+        const selection = window.getSelection();
+        if (!selection || selection.isCollapsed) {
+          showErrorToast("Select some text first to turn it into a link");
+          return;
+        }
+        return applyFormat("createLink", "https://");
+      }
+    }
+  }
+
   function handlePost() {
-    if (!text.trim() && files.length === 0) {
-      showErrorToast("Add a caption or a file before posting");
+    const hasContent = mode === "article" ? !bodyEmpty || text.trim() : text.trim() || files.length > 0;
+    if (!hasContent) {
+      showErrorToast(mode === "article" ? "Add a headline or some content before posting" : "Add a caption or a file before posting");
       return;
     }
-    showSuccessToast("Your post has been shared");
+    showSuccessToast(mode === "article" ? "Your article has been shared" : "Your post has been shared");
     resetState();
     onClose();
   }
@@ -90,11 +152,14 @@ export function MobileQuickPostModal({ open, onClose, onSwitchType }: MobileQuic
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
-      aria-label="Create a post"
+      aria-label={mode === "article" ? "Create an article" : "Create a post"}
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="flex aspect-square w-full max-w-[340px] flex-col gap-3 overflow-y-auto rounded-[36px] bg-white p-4 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]"
+        className={cn(
+          "flex w-full max-w-[340px] flex-col gap-3 overflow-y-auto rounded-[36px] bg-white p-4 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]",
+          mode === "post" && "aspect-square",
+        )}
       >
         <div className="flex w-full items-start justify-between gap-2">
           <div className="flex items-center gap-2.5">
@@ -121,10 +186,58 @@ export function MobileQuickPostModal({ open, onClose, onSwitchType }: MobileQuic
         <textarea
           value={text}
           onChange={(event) => setText(event.target.value)}
-          rows={3}
+          rows={mode === "article" ? 2 : 3}
           placeholder="What’s happening twin? Write something down..."
           className="w-full resize-none text-sm leading-6 text-night-900 placeholder:text-gray-400 focus:outline-none"
         />
+
+        {mode === "article" && (
+          <>
+            <div className="flex w-full items-center gap-3.5">
+              {TOOLBAR_ACTIONS.map((action) =>
+                action.key === "link" ? (
+                  <button
+                    key={action.key}
+                    type="button"
+                    aria-label={action.label}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => handleToolbarAction(action.key)}
+                  >
+                    <NavIcon icon="/icons/article-toolbar-link.svg" color="night" size={12} />
+                  </button>
+                ) : (
+                  <button
+                    key={action.key}
+                    type="button"
+                    aria-label={action.label}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => handleToolbarAction(action.key)}
+                    className={cn("text-sm text-[#001f3f]", action.className)}
+                  >
+                    {action.glyph}
+                  </button>
+                ),
+              )}
+            </div>
+            <div className="h-px w-full bg-gray-200" />
+            <div className="relative w-full">
+              {bodyEmpty && (
+                <p className="pointer-events-none absolute left-0 top-0 text-sm text-[#cbd5e0]">
+                  Start writing your insight, market trends, buyer guides, how-to advice…
+                </p>
+              )}
+              <div
+                ref={bodyRef}
+                contentEditable
+                onInput={handleBodyInput}
+                role="textbox"
+                aria-multiline="true"
+                aria-label="Article body"
+                className="min-h-[70px] w-full text-sm text-night-900 focus:outline-none [&_blockquote]:border-l-2 [&_blockquote]:border-gray-300 [&_blockquote]:pl-3 [&_blockquote]:text-gray-600 [&_h1]:text-lg [&_h1]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_a]:text-brand-900 [&_a]:underline"
+              />
+            </div>
+          </>
+        )}
 
         {previews.length > 0 && (
           <div className="flex w-full flex-wrap gap-2">
@@ -148,7 +261,7 @@ export function MobileQuickPostModal({ open, onClose, onSwitchType }: MobileQuic
           </div>
         )}
 
-        <div className="flex w-full items-center justify-between">
+        <div className="mt-auto flex w-full items-center justify-between">
           <div className="flex items-center gap-3">
             <input
               ref={inputRef}
@@ -158,17 +271,38 @@ export function MobileQuickPostModal({ open, onClose, onSwitchType }: MobileQuic
               className="hidden"
               onChange={(event) => addFiles(event.target.files)}
             />
-            <button type="button" aria-label="Attach files" onClick={() => inputRef.current?.click()}>
+            <button
+              type="button"
+              aria-label="Attach files"
+              onClick={() => {
+                setMode("post");
+                inputRef.current?.click();
+              }}
+            >
               <NavIcon icon="/icons/article-toolbar-link.svg" color="brand" size={16} className="bg-[#337df2]" />
             </button>
             <button type="button" aria-label="Poll" onClick={() => onSwitchType?.("poll")}>
               <NavIcon icon="/icons/chart-02.svg" color="brand" size={18} className="bg-[#337df2]" />
             </button>
-            <button type="button" aria-label="Article" onClick={() => onSwitchType?.("article")}>
-              <NavIcon icon="/icons/book-bookmark-01.svg" color="brand" size={18} className="bg-[#337df2]" />
+            <button
+              type="button"
+              aria-label="Article"
+              onClick={() => setMode("article")}
+            >
+              <NavIcon
+                icon="/icons/book-bookmark-01.svg"
+                color="brand"
+                size={18}
+                className={cn("bg-[#337df2]", mode === "article" && "opacity-30")}
+              />
             </button>
             <div className="h-4 w-px shrink-0 bg-gray-200" />
-            <button ref={visibilityTriggerRef} type="button" aria-label="Post visibility" onClick={() => setVisibilityOpen((v) => !v)}>
+            <button
+              ref={visibilityTriggerRef}
+              type="button"
+              aria-label="Post visibility"
+              onClick={() => setVisibilityOpen((v) => !v)}
+            >
               <NavIcon icon="/icons/create-menu-globe-visibility.svg" color="brand" size={20} className="bg-[#337df2]" />
             </button>
             <VisibilityMenu
@@ -185,9 +319,7 @@ export function MobileQuickPostModal({ open, onClose, onSwitchType }: MobileQuic
           <button
             type="button"
             onClick={handlePost}
-            className={cn(
-              "flex h-8 items-center justify-center rounded-lg bg-brand-900 px-4 text-sm text-white hover:bg-brand-900/90",
-            )}
+            className="flex h-8 items-center justify-center rounded-lg bg-brand-900 px-4 text-sm text-white hover:bg-brand-900/90"
           >
             Post
           </button>

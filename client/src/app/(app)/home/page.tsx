@@ -273,6 +273,7 @@ function MobileComposerCard() {
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement | null>(null);
   const [quickPostOpen, setQuickPostOpen] = useState(false);
+  const [quickPostMode, setQuickPostMode] = useState<"post" | "article">("post");
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -293,7 +294,10 @@ function MobileComposerCard() {
         </span>
         <button
           type="button"
-          onClick={() => setQuickPostOpen(true)}
+          onClick={() => {
+            setQuickPostMode("post");
+            setQuickPostOpen(true);
+          }}
           className="flex w-full items-center justify-between rounded-3xl bg-gray-100 p-2"
         >
           <p className="text-xs font-medium text-black/35">Add a comment</p>
@@ -306,22 +310,50 @@ function MobileComposerCard() {
       <div className="h-px w-full bg-gray-200" />
 
       <div className="flex w-full items-center gap-[18px]">
-        <button type="button" aria-label="Image Post" onClick={() => setQuickPostOpen(true)}>
+        <button
+          type="button"
+          aria-label="Image Post"
+          onClick={() => {
+            setQuickPostMode("post");
+            setQuickPostOpen(true);
+          }}
+        >
           <span className="relative block size-3.5">
             <Image src="/icons/image-01.svg" alt="" fill sizes="14px" />
           </span>
         </button>
-        <button type="button" aria-label="Video Post" onClick={() => setQuickPostOpen(true)}>
+        <button
+          type="button"
+          aria-label="Video Post"
+          onClick={() => {
+            setQuickPostMode("post");
+            setQuickPostOpen(true);
+          }}
+        >
           <span className="relative block size-3.5">
             <Image src="/icons/video-01.svg" alt="" fill sizes="14px" />
           </span>
         </button>
-        <button type="button" aria-label="Poll" onClick={() => setQuickPostOpen(true)}>
+        <button
+          type="button"
+          aria-label="Poll"
+          onClick={() => {
+            setQuickPostMode("post");
+            setQuickPostOpen(true);
+          }}
+        >
           <span className="relative block size-3.5">
             <Image src="/icons/chart-02.svg" alt="" fill sizes="14px" />
           </span>
         </button>
-        <button type="button" aria-label="Article" onClick={() => setQuickPostOpen(true)}>
+        <button
+          type="button"
+          aria-label="Article"
+          onClick={() => {
+            setQuickPostMode("article");
+            setQuickPostOpen(true);
+          }}
+        >
           <span className="relative block size-3.5">
             <Image src="/icons/book-bookmark-01.svg" alt="" fill sizes="14px" />
           </span>
@@ -345,6 +377,7 @@ function MobileComposerCard() {
       <MobileQuickPostModal
         open={quickPostOpen}
         onClose={() => setQuickPostOpen(false)}
+        initialMode={quickPostMode}
         onSwitchType={(type) => {
           setQuickPostOpen(false);
           openPostModal(type);
