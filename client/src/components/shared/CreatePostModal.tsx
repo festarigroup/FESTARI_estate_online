@@ -1,13 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { VISIBILITY_LABEL, VisibilityMenu, type PostVisibility } from "@/components/shared/VisibilityMenu";
-import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 
 type PostType = "image" | "video";
@@ -38,11 +36,10 @@ interface CreatePostModalProps {
   open: boolean;
   onClose: () => void;
   initialType?: PostType;
-  onSwitchType?: (type: "image" | "video" | "poll") => void;
+  onSwitchType?: (type: "image" | "video" | "poll" | "article") => void;
 }
 
 export function CreatePostModal({ open, onClose, initialType = "image", onSwitchType }: CreatePostModalProps) {
-  const router = useRouter();
   const [postType, setPostType] = useState<PostType>(initialType);
   const [text, setText] = useState("");
   const [files, setFiles] = useState<File[]>([]);
@@ -281,10 +278,8 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
                     onClick={() => {
                       if (item.key === "image" || item.key === "video") {
                         switchType(item.key);
-                      } else if (item.key === "poll") {
-                        onSwitchType?.("poll");
                       } else {
-                        router.push(comingSoonHref(item.label));
+                        onSwitchType?.(item.key);
                       }
                     }}
                   >

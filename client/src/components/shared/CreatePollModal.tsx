@@ -1,13 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { VISIBILITY_LABEL, VisibilityMenu, type PostVisibility } from "@/components/shared/VisibilityMenu";
-import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 
 const DURATION_OPTIONS = ["1 day", "3 days", "1 week", "2 weeks", "1 month"];
@@ -18,11 +16,10 @@ const MEDIA_ACCEPT = ["image/png", "image/jpeg", "image/gif", "video/mp4", "vide
 interface CreatePollModalProps {
   open: boolean;
   onClose: () => void;
-  onSwitchType?: (type: "image" | "video" | "poll") => void;
+  onSwitchType?: (type: "image" | "video" | "poll" | "article") => void;
 }
 
 export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModalProps) {
-  const router = useRouter();
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState<string[]>(["", ""]);
   const [duration, setDuration] = useState(DURATION_OPTIONS[0]);
@@ -280,7 +277,7 @@ export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModal
                 <NavIcon icon="/icons/video-01.svg" color="brand" size={18} className="bg-[#337df2]" />
               </button>
               <NavIcon icon="/icons/chart-02.svg" color="brand" size={18} className="bg-[#337df2] opacity-30" />
-              <button type="button" aria-label="Article" onClick={() => router.push(comingSoonHref("Article"))}>
+              <button type="button" aria-label="Article" onClick={() => onSwitchType?.("article")}>
                 <NavIcon icon="/icons/book-bookmark-01.svg" color="brand" size={18} className="bg-[#337df2]" />
               </button>
             </div>
