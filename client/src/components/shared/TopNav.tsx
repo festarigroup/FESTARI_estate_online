@@ -34,6 +34,11 @@ export function TopNav() {
     setCreateMenuOpen((v) => !v);
   }
 
+  function openPostModal(type: "image" | "video" | "poll") {
+    setPostModalType(type);
+    setPostModalOpen(true);
+  }
+
   useEffect(() => {
     if (!menuOpen) return;
     const handlePointerDown = (event: PointerEvent) => {
@@ -103,13 +108,7 @@ export function TopNav() {
 
             {createMenuOpen && (
               <div className="absolute right-0 top-[calc(100%+8px)] z-50">
-                <CreateMenu
-                  onNavigate={() => setCreateMenuOpen(false)}
-                  onOpenPostModal={(type) => {
-                    setPostModalType(type);
-                    setPostModalOpen(true);
-                  }}
-                />
+                <CreateMenu onNavigate={() => setCreateMenuOpen(false)} onOpenPostModal={openPostModal} />
               </div>
             )}
           </div>
@@ -193,8 +192,13 @@ export function TopNav() {
         open={postModalOpen && postModalType !== "poll"}
         initialType={postModalType === "video" ? "video" : "image"}
         onClose={() => setPostModalOpen(false)}
+        onSwitchType={openPostModal}
       />
-      <CreatePollModal open={postModalOpen && postModalType === "poll"} onClose={() => setPostModalOpen(false)} />
+      <CreatePollModal
+        open={postModalOpen && postModalType === "poll"}
+        onClose={() => setPostModalOpen(false)}
+        onSwitchType={openPostModal}
+      />
     </header>
   );
 }

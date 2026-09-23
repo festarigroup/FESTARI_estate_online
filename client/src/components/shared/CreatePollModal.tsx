@@ -18,9 +18,10 @@ const MEDIA_ACCEPT = ["image/png", "image/jpeg", "image/gif", "video/mp4", "vide
 interface CreatePollModalProps {
   open: boolean;
   onClose: () => void;
+  onSwitchType?: (type: "image" | "video" | "poll") => void;
 }
 
-export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
+export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModalProps) {
   const router = useRouter();
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState<string[]>(["", ""]);
@@ -272,10 +273,10 @@ export function CreatePollModal({ open, onClose }: CreatePollModalProps) {
                 className="hidden"
                 onChange={(event) => addFiles(event.target.files)}
               />
-              <button type="button" aria-label="Attach image" onClick={() => inputRef.current?.click()}>
+              <button type="button" aria-label="Image Post" onClick={() => onSwitchType?.("image")}>
                 <NavIcon icon="/icons/image-01.svg" color="brand" size={18} className="bg-[#337df2]" />
               </button>
-              <button type="button" aria-label="Attach video" onClick={() => inputRef.current?.click()}>
+              <button type="button" aria-label="Video Post" onClick={() => onSwitchType?.("video")}>
                 <NavIcon icon="/icons/video-01.svg" color="brand" size={18} className="bg-[#337df2]" />
               </button>
               <NavIcon icon="/icons/chart-02.svg" color="brand" size={18} className="bg-[#337df2] opacity-30" />

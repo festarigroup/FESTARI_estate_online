@@ -27,20 +27,21 @@ const TYPE_META: Record<PostType, { accept: string[]; helper: string; errorMessa
 
 const MEDIA_ACCEPT = [...TYPE_META.image.accept, ...TYPE_META.video.accept];
 
-const POST_TYPE_ROW: { key: PostType | "poll" | "article"; label: string; icon: string; switchable: boolean }[] = [
-  { key: "image", label: "Image Post", icon: "/icons/image-01.svg", switchable: true },
-  { key: "video", label: "Video Post", icon: "/icons/video-01.svg", switchable: true },
-  { key: "poll", label: "Poll", icon: "/icons/chart-02.svg", switchable: false },
-  { key: "article", label: "Article", icon: "/icons/book-bookmark-01.svg", switchable: false },
+const POST_TYPE_ROW: { key: PostType | "poll" | "article"; label: string; icon: string }[] = [
+  { key: "image", label: "Image Post", icon: "/icons/image-01.svg" },
+  { key: "video", label: "Video Post", icon: "/icons/video-01.svg" },
+  { key: "poll", label: "Poll", icon: "/icons/chart-02.svg" },
+  { key: "article", label: "Article", icon: "/icons/book-bookmark-01.svg" },
 ];
 
 interface CreatePostModalProps {
   open: boolean;
   onClose: () => void;
   initialType?: PostType;
+  onSwitchType?: (type: "image" | "video" | "poll") => void;
 }
 
-export function CreatePostModal({ open, onClose, initialType = "image" }: CreatePostModalProps) {
+export function CreatePostModal({ open, onClose, initialType = "image", onSwitchType }: CreatePostModalProps) {
   const router = useRouter();
   const [postType, setPostType] = useState<PostType>(initialType);
   const [text, setText] = useState("");
@@ -277,9 +278,15 @@ export function CreatePostModal({ open, onClose, initialType = "image" }: Create
                     key={item.key}
                     type="button"
                     aria-label={item.label}
-                    onClick={() =>
-                      item.switchable ? switchType(item.key as PostType) : router.push(comingSoonHref(item.label))
-                    }
+                    onClick={() => {
+                      if (item.key === "image" || item.key === "video") {
+                        switchType(item.key);
+                      } else if (item.key === "poll") {
+                        onSwitchType?.("poll");
+                      } else {
+                        router.push(comingSoonHref(item.label));
+                      }
+                    }}
                   >
                     <NavIcon icon={item.icon} color="brand" size={18} className="bg-[#337df2]" />
                   </button>
