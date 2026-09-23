@@ -42,8 +42,8 @@ interface CreateArticleModalProps {
 export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticleModalProps) {
   const router = useRouter();
   const [headline, setHeadline] = useState("");
-  const [body, setBody] = useState("");
-  const bodyRef = useRef<HTMLTextAreaElement | null>(null);
+  const [bodyEmpty, setBodyEmpty] = useState(true);
+  const bodyRef = useRef<HTMLDivElement | null>(null);
   const [visibilityOpen, setVisibilityOpen] = useState(false);
   const [visibility, setVisibility] = useState<PostVisibility>(DEFAULT_VISIBILITY);
   const visibilityTriggerRef = useRef<HTMLButtonElement | null>(null);
@@ -66,9 +66,14 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
 
   function resetState() {
     setHeadline("");
-    setBody("");
+    if (bodyRef.current) bodyRef.current.innerHTML = "";
+    setBodyEmpty(true);
     setVisibility(DEFAULT_VISIBILITY);
     setVisibilityOpen(false);
+  }
+
+  function handleBodyInput() {
+    setBodyEmpty((bodyRef.current?.textContent?.trim().length ?? 0) === 0);
   }
 
   function handleClose() {
@@ -76,67 +81,39 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
     onClose();
   }
 
-  function wrapSelection(marker: string) {
-    const textarea = bodyRef.current;
-    if (!textarea) return;
-    const { selectionStart, selectionEnd, value } = textarea;
-    const selected = value.slice(selectionStart, selectionEnd) || "text";
-    const next = `${value.slice(0, selectionStart)}${marker}${selected}${marker}${value.slice(selectionEnd)}`;
-    setBody(next);
-    requestAnimationFrame(() => {
-      textarea.focus();
-      textarea.setSelectionRange(selectionStart + marker.length, selectionStart + marker.length + selected.length);
-    });
-  }
-
-  function prefixCurrentLine(prefix: string) {
-    const textarea = bodyRef.current;
-    if (!textarea) return;
-    const { selectionStart, value } = textarea;
-    const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
-    const next = `${value.slice(0, lineStart)}${prefix}${value.slice(lineStart)}`;
-    setBody(next);
-    requestAnimationFrame(() => {
-      textarea.focus();
-      textarea.setSelectionRange(selectionStart + prefix.length, selectionStart + prefix.length);
-    });
-  }
-
-  function insertLink() {
-    const textarea = bodyRef.current;
-    if (!textarea) return;
-    const { selectionStart, selectionEnd, value } = textarea;
-    const selected = value.slice(selectionStart, selectionEnd) || "link text";
-    const snippet = `[${selected}](https://)`;
-    const next = `${value.slice(0, selectionStart)}${snippet}${value.slice(selectionEnd)}`;
-    setBody(next);
-    requestAnimationFrame(() => {
-      textarea.focus();
-      textarea.setSelectionRange(selectionStart + snippet.length, selectionStart + snippet.length);
-    });
+  function applyFormat(command: string, value?: string) {
+    bodyRef.current?.focus();
+    document.execCommand(command, false, value);
+    handleBodyInput();
   }
 
   function handleToolbarAction(key: (typeof TOOLBAR_ACTIONS)[number]["key"]) {
     switch (key) {
       case "italic":
-        return wrapSelection("*");
+        return applyFormat("italic");
       case "bold":
-        return wrapSelection("**");
+        return applyFormat("bold");
       case "h1":
-        return prefixCurrentLine("# ");
+        return applyFormat("formatBlock", "h1");
       case "h2":
-        return prefixCurrentLine("## ");
+        return applyFormat("formatBlock", "h2");
       case "quote":
-        return prefixCurrentLine("> ");
+        return applyFormat("formatBlock", "blockquote");
       case "bullet":
-        return prefixCurrentLine("- ");
-      case "link":
-        return insertLink();
+        return applyFormat("insertUnorderedList");
+      case "link": {
+        const selection = window.getSelection();
+        if (!selection || selection.isCollapsed) {
+          showErrorToast("Select some text first to turn it into a link");
+          return;
+        }
+        return applyFormat("createLink", "https://");
+      }
     }
   }
 
   function handlePost() {
-    if (!headline.trim() && !body.trim()) {
+    if (!headline.trim() && bodyEmpty) {
       showErrorToast("Add a headline or some content before posting");
       return;
     }
@@ -189,6 +166,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
                     key={action.key}
                     type="button"
                     aria-label={action.label}
+                    onMouseDown={(event) => event.preventDefault()}
                     onClick={() => handleToolbarAction(action.key)}
                   >
                     <NavIcon icon="/icons/article-toolbar-link.svg" color="night" size={12} />
@@ -198,6 +176,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
                     key={action.key}
                     type="button"
                     aria-label={action.label}
+                    onMouseDown={(event) => event.preventDefault()}
                     onClick={() => handleToolbarAction(action.key)}
                     className={cn("text-sm text-[#001f3f]", action.className)}
                   >
@@ -206,14 +185,22 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
                 ),
               )}
             </div>
-            <textarea
-              ref={bodyRef}
-              value={body}
-              onChange={(event) => setBody(event.target.value)}
-              rows={5}
-              placeholder="Start writing your insight, market trends, buyer guides, how-to advice…"
-              className="w-full flex-1 resize-none border-t border-[#e2e8f0] bg-white px-3 py-2 text-sm text-night-900 placeholder:text-[#cbd5e0] focus:outline-none"
-            />
+            <div className="relative w-full flex-1 border-t border-[#e2e8f0] bg-white">
+              {bodyEmpty && (
+                <p className="pointer-events-none absolute left-3 top-2 text-sm text-[#cbd5e0]">
+                  Start writing your insight, market trends, buyer guides, how-to advice…
+                </p>
+              )}
+              <div
+                ref={bodyRef}
+                contentEditable
+                onInput={handleBodyInput}
+                role="textbox"
+                aria-multiline="true"
+                aria-label="Article body"
+                className="min-h-[110px] w-full px-3 py-2 text-sm text-night-900 focus:outline-none [&_blockquote]:border-l-2 [&_blockquote]:border-gray-300 [&_blockquote]:pl-3 [&_blockquote]:text-gray-600 [&_h1]:text-xl [&_h1]:font-bold [&_h2]:text-lg [&_h2]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_a]:text-brand-900 [&_a]:underline"
+              />
+            </div>
           </div>
 
           <div className="flex w-full flex-col gap-4">
