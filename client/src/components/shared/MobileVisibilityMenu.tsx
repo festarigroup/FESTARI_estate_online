@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { MobileSelectSheet, type SelectSheetItem } from "@/components/shared/MobileSelectSheet";
 import { NavIcon } from "@/components/shared/NavIcon";
-import { type PostVisibility } from "@/components/shared/VisibilityMenu";
+import { buildCustomVisibility, type PostVisibility } from "@/components/shared/VisibilityMenu";
 import { cn } from "@/lib/utils";
 
 const ORGANIZATION_ITEMS: SelectSheetItem[] = [
@@ -143,7 +143,7 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
       <Row
         label="Community"
         icon="/icons/user-group.svg"
-        active={value.kind === "community"}
+        active={value.kind === "custom" && value.communities.length > 0}
         hasChevron
         ariaExpanded={communitySheetOpen}
         onClick={() => setCommunitySheetOpen(true)}
@@ -151,7 +151,7 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
       <Row
         label="Organization"
         icon="/icons/org.svg"
-        active={value.kind === "organization"}
+        active={value.kind === "custom" && value.organizations.length > 0}
         hasChevron
         ariaExpanded={organizationSheetOpen}
         onClick={() => setOrganizationSheetOpen(true)}
@@ -162,9 +162,9 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
         onClose={() => setCommunitySheetOpen(false)}
         title="Select Community"
         items={COMMUNITY_ITEMS}
-        selected={value.kind === "community" ? value.names : []}
+        selected={value.kind === "custom" ? value.communities : []}
         onChangeSelected={(names) => {
-          onChange(names.length > 0 ? { kind: "community", names } : { kind: "everyone" });
+          onChange(buildCustomVisibility(names, value.kind === "custom" ? value.organizations : []));
         }}
       />
       <MobileSelectSheet
@@ -172,9 +172,9 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
         onClose={() => setOrganizationSheetOpen(false)}
         title="Select Organization"
         items={ORGANIZATION_ITEMS}
-        selected={value.kind === "organization" ? value.names : []}
+        selected={value.kind === "custom" ? value.organizations : []}
         onChangeSelected={(names) => {
-          onChange(names.length > 0 ? { kind: "organization", names } : { kind: "everyone" });
+          onChange(buildCustomVisibility(value.kind === "custom" ? value.communities : [], names));
         }}
       />
 

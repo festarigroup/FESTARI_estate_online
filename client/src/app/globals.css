@@ -96,6 +96,19 @@ body {
   animation: toast-leave 0.15s ease-in forwards;
 }
 
+@keyframes sheet-slide-up {
+  from {
+    transform: translate3d(0, 100%, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-sheet-slide-up {
+  animation: sheet-slide-up 0.25s ease-out;
+}
+
 /* Keeps scrolling functional while hiding the browser scrollbar chrome,
    matching Figma's frame rendering (no visible scrollbar). */
 .no-scrollbar {

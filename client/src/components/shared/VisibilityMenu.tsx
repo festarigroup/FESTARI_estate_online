@@ -11,10 +11,16 @@ import { cn } from "@/lib/utils";
 export type PostVisibility =
   | { kind: "everyone" }
   | { kind: "followings" }
-  | { kind: "community"; names: string[] }
-  | { kind: "organization"; names: string[] };
+  | { kind: "custom"; communities: string[]; organizations: string[] };
 
 export const DEFAULT_VISIBILITY: PostVisibility = { kind: "everyone" };
+
+/** Builds a "custom" visibility from the given lists, falling back to "everyone" when both are empty. */
+export function buildCustomVisibility(communities: string[], organizations: string[]): PostVisibility {
+  return communities.length > 0 || organizations.length > 0
+    ? { kind: "custom", communities, organizations }
+    : DEFAULT_VISIBILITY;
+}
 
 function formatNames(names: string[]): string {
   return names.length > 1 ? `${names[0]} +${names.length - 1}` : names[0];
@@ -26,9 +32,8 @@ export function getVisibilityLabel(value: PostVisibility): string {
       return "Everyone can view";
     case "followings":
       return "Followings";
-    case "community":
-    case "organization":
-      return formatNames(value.names);
+    case "custom":
+      return formatNames([...value.communities, ...value.organizations]);
   }
 }
 
@@ -38,10 +43,8 @@ export function getVisibilityIcon(value: PostVisibility): string {
       return "/icons/create-menu-globe-visibility.svg";
     case "followings":
       return "/icons/user-add-01.svg";
-    case "community":
-      return "/icons/user-group.svg";
-    case "organization":
-      return "/icons/org.svg";
+    case "custom":
+      return value.organizations.length > 0 ? "/icons/org.svg" : "/icons/user-group.svg";
   }
 }
 
@@ -189,9 +192,9 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
             <NavIcon icon="/icons/user-group.svg" color="white" size={16} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">
-            {value.kind === "community" ? formatNames(value.names) : "Community"}
+            {value.kind === "custom" && value.communities.length > 0 ? formatNames(value.communities) : "Community"}
           </span>
-          {value.kind === "community" ? (
+          {value.kind === "custom" && value.communities.length > 0 ? (
             <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
           ) : (
             <NavIcon icon="/icons/visibility-chevron-outline-right.svg" color="night" size={10} />
@@ -212,9 +215,9 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
             <NavIcon icon="/icons/org.svg" color="white" size={14} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">
-            {value.kind === "organization" ? formatNames(value.names) : "Organization"}
+            {value.kind === "custom" && value.organizations.length > 0 ? formatNames(value.organizations) : "Organization"}
           </span>
-          {value.kind === "organization" ? (
+          {value.kind === "custom" && value.organizations.length > 0 ? (
             <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
           ) : (
             <NavIcon icon="/icons/visibility-chevron-outline-right.svg" color="night" size={10} />
@@ -230,15 +233,18 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
         title={enableMultiSelect ? "Your Communities" : undefined}
         searchable={enableMultiSelect}
         multiple={enableMultiSelect}
-        selected={value.kind === "community" ? value.names : []}
+        selected={value.kind === "custom" ? value.communities : []}
         onToggle={(item) => {
-          const current = value.kind === "community" ? value.names : [];
-          const next = current.includes(item) ? current.filter((name) => name !== item) : [...current, item];
-          onChange(next.length > 0 ? { kind: "community", names: next } : DEFAULT_VISIBILITY);
+          const currentCommunities = value.kind === "custom" ? value.communities : [];
+          const currentOrganizations = value.kind === "custom" ? value.organizations : [];
+          const next = currentCommunities.includes(item)
+            ? currentCommunities.filter((name) => name !== item)
+            : [...currentCommunities, item];
+          onChange(buildCustomVisibility(next, currentOrganizations));
         }}
         onSelect={(item) => {
           setCommunityOpen(false);
-          onChange({ kind: "community", names: [item] });
+          onChange(buildCustomVisibility([item], value.kind === "custom" ? value.organizations : []));
           onClose();
         }}
       />
@@ -251,15 +257,18 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
         title={enableMultiSelect ? "Your Organizations" : undefined}
         searchable={enableMultiSelect}
         multiple={enableMultiSelect}
-        selected={value.kind === "organization" ? value.names : []}
+        selected={value.kind === "custom" ? value.organizations : []}
         onToggle={(item) => {
-          const current = value.kind === "organization" ? value.names : [];
-          const next = current.includes(item) ? current.filter((name) => name !== item) : [...current, item];
-          onChange(next.length > 0 ? { kind: "organization", names: next } : DEFAULT_VISIBILITY);
+          const currentCommunities = value.kind === "custom" ? value.communities : [];
+          const currentOrganizations = value.kind === "custom" ? value.organizations : [];
+          const next = currentOrganizations.includes(item)
+            ? currentOrganizations.filter((name) => name !== item)
+            : [...currentOrganizations, item];
+          onChange(buildCustomVisibility(currentCommunities, next));
         }}
         onSelect={(item) => {
           setOrganizationOpen(false);
-          onChange({ kind: "organization", names: [item] });
+          onChange(buildCustomVisibility(value.kind === "custom" ? value.communities : [], [item]));
           onClose();
         }}
       />

@@ -51,7 +51,7 @@ export function MobileSelectSheet({ open, onClose, title, items, selected, onCha
   const filteredItems = query.trim()
     ? items.filter((item) => item.name.toLowerCase().includes(query.trim().toLowerCase()))
     : items;
-  const selectableItems = items.filter((item) => !item.disabled);
+  const selectableItems = filteredItems.filter((item) => !item.disabled);
   const allSelected = selectableItems.length > 0 && selectableItems.every((item) => selected.includes(item.name));
 
   function toggleItem(name: string) {
@@ -79,7 +79,7 @@ export function MobileSelectSheet({ open, onClose, title, items, selected, onCha
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="flex max-h-[85vh] w-full flex-col gap-4 rounded-t-[32px] bg-white pb-6 pt-4 shadow-[0px_-4px_8px_0px_rgba(69,71,69,0.15)]"
+        className="flex max-h-[85vh] w-full animate-sheet-slide-up flex-col gap-4 rounded-t-[32px] bg-white pb-6 pt-4 shadow-[0px_-4px_8px_0px_rgba(69,71,69,0.15)]"
       >
         <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154]" />
 
