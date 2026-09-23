@@ -119,7 +119,7 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
             // desktop keeps the caption above the image.
             <div className="flex w-full flex-col-reverse gap-[15px] sm:flex-col">
               {post.text && (
-                <div className="flex w-full items-center gap-0.5 text-sm leading-5">
+                <div className="flex w-full items-end gap-0.5 text-sm leading-5">
                   <p className={cn("min-w-0 flex-1 text-[#1e293b]", !textExpanded && "truncate")}>
                     {post.text}
                   </p>
