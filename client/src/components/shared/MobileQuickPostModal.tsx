@@ -107,7 +107,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
     const value = newOption.trim();
     if (value) setPollOptions((current) => [...current, value]);
     setNewOption("");
-    if (pollOptions.length + 1 >= MAX_POLL_OPTIONS) setAddingOption(false);
+    setAddingOption(false);
   }
 
   function removePollOption(index: number) {
