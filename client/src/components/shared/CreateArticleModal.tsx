@@ -29,7 +29,6 @@ const TOOLBAR_ACTIONS = [
   { key: "h1", label: "Heading 1", glyph: "H", className: "font-bold" },
   { key: "link", label: "Link", glyph: null, className: "" },
   { key: "quote", label: "Quote", glyph: "”", className: "font-bold" },
-  { key: "h2", label: "Heading 2", glyph: "H", className: "font-bold" },
   { key: "bullet", label: "Bullet list", glyph: "•", className: "" },
 ] as const;
 
@@ -95,8 +94,6 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
         return applyFormat("bold");
       case "h1":
         return applyFormat("formatBlock", "h1");
-      case "h2":
-        return applyFormat("formatBlock", "h2");
       case "quote":
         return applyFormat("formatBlock", "blockquote");
       case "bullet":
