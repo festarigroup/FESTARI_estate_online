@@ -5,7 +5,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
-import { VisibilityMenu, DEFAULT_VISIBILITY, getVisibilityIcon, type PostVisibility } from "@/components/shared/VisibilityMenu";
+import { MobileVisibilityMenu } from "@/components/shared/MobileVisibilityMenu";
+import { DEFAULT_VISIBILITY, getVisibilityIcon, type PostVisibility } from "@/components/shared/VisibilityMenu";
 import { usePostsFeed } from "@/context/PostsContext";
 import { cn } from "@/lib/utils";
 
@@ -414,7 +415,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
             >
               <NavIcon icon={getVisibilityIcon(visibility)} color="brand" size={20} className="bg-[#337df2]" />
             </button>
-            <VisibilityMenu
+            <MobileVisibilityMenu
               open={visibilityOpen}
               onClose={() => setVisibilityOpen(false)}
               value={visibility}
