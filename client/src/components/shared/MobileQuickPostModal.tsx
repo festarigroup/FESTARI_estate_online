@@ -209,10 +209,10 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
         ref={cardRef}
         onClick={(event) => event.stopPropagation()}
         className={cn(
-          "flex w-full max-w-[340px] flex-col gap-3 overflow-y-auto rounded-[36px] bg-white p-7 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]",
+          "flex w-full flex-col gap-3 rounded-[36px] bg-white p-7 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]",
+          mode === "article" ? "max-w-[400px] overflow-visible" : "max-w-[340px] overflow-y-auto",
           mode === "poll" && (pollOptions.length === 0 ? "aspect-[1/0.7]" : "aspect-square"),
           mode === "post" && (files.length === 0 ? "aspect-[1/0.7]" : "aspect-square"),
-          mode === "article" && (bodyEmpty && !text.trim() ? "aspect-[1/0.7]" : "aspect-square"),
         )}
       >
         <div className="flex w-full items-start justify-between gap-2">
