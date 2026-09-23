@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
+import { showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { SideListMenu } from "@/components/shared/SideListMenu";
 import { cn } from "@/lib/utils";
@@ -26,6 +28,31 @@ export function getVisibilityLabel(value: PostVisibility): string {
   }
 }
 
+export function getVisibilityIcon(value: PostVisibility): string {
+  switch (value.kind) {
+    case "everyone":
+      return "/icons/create-menu-globe-visibility.svg";
+    case "followings":
+      return "/icons/visibility-team-structure.svg";
+    case "community":
+      return "/icons/user-group.svg";
+    case "organization":
+      return "/icons/visibility-user-check.svg";
+  }
+}
+
+interface SearchProfile {
+  name: string;
+  role: string;
+  avatar: string;
+}
+
+const SEARCH_PROFILES: SearchProfile[] = [
+  { name: "Andy Ansong", role: "Real Estate Consultant", avatar: "/icons/avatar-andy.png" },
+  { name: "Edwin Adu", role: "Sales Agent", avatar: "/icons/avatar-sample.jpg" },
+  { name: "Madeline Price", role: "Researcher", avatar: "/icons/avatar-sample.jpg" },
+];
+
 const COMMUNITY_ITEMS = ["Community 5", "Community 9", "Community 4", "Community 8", "Community 5", "Community 3", "Community 2"];
 const ORGANIZATION_ITEMS = COMMUNITY_ITEMS.map((item) => item.replace("Community", "Organization"));
 
@@ -44,6 +71,18 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
   const organizationRef = useRef<HTMLButtonElement | null>(null);
   const [communityOpen, setCommunityOpen] = useState(false);
   const [organizationOpen, setOrganizationOpen] = useState(false);
+  const [profileQuery, setProfileQuery] = useState("");
+  const [addedProfiles, setAddedProfiles] = useState<string[]>([]);
+
+  const matchingProfiles =
+    profileQuery.trim().length > 0
+      ? SEARCH_PROFILES.filter((profile) => profile.name.toLowerCase().includes(profileQuery.trim().toLowerCase()))
+      : [];
+
+  function addProfile(name: string) {
+    setAddedProfiles((current) => (current.includes(name) ? current : [...current, name]));
+    showSuccessToast(`${name} added to this post's audience`);
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -202,10 +241,46 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef }: Vi
           <NavIcon icon="/icons/visibility-search.svg" color="white" size={14} />
         </span>
         <input
+          value={profileQuery}
+          onChange={(event) => setProfileQuery(event.target.value)}
           placeholder="Search Profile"
           className="w-full flex-1 bg-transparent text-sm text-[#94a3b7] placeholder:text-[#94a3b7] focus:outline-none"
         />
       </div>
+
+      {matchingProfiles.length > 0 && (
+        <ul className="flex max-h-[160px] w-full flex-col gap-1 overflow-y-auto">
+          {matchingProfiles.map((profile) => {
+            const added = addedProfiles.includes(profile.name);
+            return (
+              <li key={profile.name} className="flex w-full items-center gap-2 rounded-lg px-1 py-1">
+                <span className="relative block size-7 shrink-0 overflow-hidden rounded-full bg-[#eef2ff]">
+                  <Image src={profile.avatar} alt="" fill className="object-cover" sizes="28px" />
+                </span>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <p className="truncate text-sm font-medium text-[#2d264b]">{profile.name}</p>
+                  <p className="truncate text-xs text-[#94a3b7]">{profile.role}</p>
+                </div>
+                <button
+                  type="button"
+                  aria-label={added ? `${profile.name} added` : `Add ${profile.name}`}
+                  onClick={() => addProfile(profile.name)}
+                  disabled={added}
+                  className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#f1f6ff] text-brand-900 disabled:opacity-40"
+                >
+                  {added ? (
+                    <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={12} className="bg-[#1465e6]" />
+                  ) : (
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M6 1V11M1 6H11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>,
     document.body,
   );

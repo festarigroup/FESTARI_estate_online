@@ -8,6 +8,7 @@ import { NavIcon } from "@/components/shared/NavIcon";
 import {
   DEFAULT_VISIBILITY,
   VisibilityMenu,
+  getVisibilityIcon,
   getVisibilityLabel,
   type PostVisibility,
 } from "@/components/shared/VisibilityMenu";
@@ -251,7 +252,7 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
             aria-expanded={visibilityOpen}
             className="flex w-full items-center gap-2.5 px-2"
           >
-            <NavIcon icon="/icons/create-menu-globe-visibility.svg" color="brand" size={24} className="bg-[#337df2]" />
+            <NavIcon icon={getVisibilityIcon(visibility)} color="brand" size={24} className="bg-[#337df2]" />
             <span className="text-[14.6px] font-semibold text-[#337df2]">{getVisibilityLabel(visibility)}</span>
           </button>
           <VisibilityMenu
