@@ -8,16 +8,19 @@ import { type PostVisibility } from "@/components/shared/VisibilityMenu";
 import { cn } from "@/lib/utils";
 
 const ORGANIZATION_ITEMS: SelectSheetItem[] = [
-  { name: "Organization 1", role: "Lead Product Designer", avatar: "/icons/avatar-sample.jpg" },
-  { name: "Organization 2", role: "Product Designer", avatar: "/icons/avatar-andy.png", disabled: true },
-  { name: "Organization 3", role: "Head of Design", avatar: "/icons/avatar-sample.jpg" },
-  { name: "Organization 4", role: "Product Designer", avatar: "/icons/avatar-andy.png" },
-  { name: "Organization 5", role: "Chief Strategy Officer", avatar: "/icons/avatar-sample.jpg" },
+  { name: "Organization 1", role: "Lead Product Designer", avatar: "/icons/organization-logo.svg", avatarIsIcon: true },
+  { name: "Organization 2", role: "Product Designer", avatar: "/icons/organization-logo.svg", avatarIsIcon: true, disabled: true },
+  { name: "Organization 3", role: "Head of Design", avatar: "/icons/organization-logo.svg", avatarIsIcon: true },
+  { name: "Organization 4", role: "Product Designer", avatar: "/icons/organization-logo.svg", avatarIsIcon: true },
+  { name: "Organization 5", role: "Chief Strategy Officer", avatar: "/icons/organization-logo.svg", avatarIsIcon: true },
 ];
-const COMMUNITY_ITEMS: SelectSheetItem[] = ORGANIZATION_ITEMS.map((item) => ({
-  ...item,
-  name: item.name.replace("Organization", "Community"),
-}));
+const COMMUNITY_ITEMS: SelectSheetItem[] = [
+  { name: "Community 1", role: "Lead Product Designer", avatar: "/icons/avatar-sample.jpg" },
+  { name: "Community 2", role: "Product Designer", avatar: "/icons/avatar-andy.png", disabled: true },
+  { name: "Community 3", role: "Head of Design", avatar: "/icons/avatar-sample.jpg" },
+  { name: "Community 4", role: "Product Designer", avatar: "/icons/avatar-andy.png" },
+  { name: "Community 5", role: "Chief Strategy Officer", avatar: "/icons/avatar-sample.jpg" },
+];
 
 const MENU_WIDTH = 190;
 
@@ -160,10 +163,8 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
         title="Select Community"
         items={COMMUNITY_ITEMS}
         selected={value.kind === "community" ? value.names : []}
-        onToggle={(name) => {
-          const current = value.kind === "community" ? value.names : [];
-          const next = current.includes(name) ? current.filter((n) => n !== name) : [...current, name];
-          onChange(next.length > 0 ? { kind: "community", names: next } : { kind: "everyone" });
+        onChangeSelected={(names) => {
+          onChange(names.length > 0 ? { kind: "community", names } : { kind: "everyone" });
         }}
       />
       <MobileSelectSheet
@@ -172,10 +173,8 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
         title="Select Organization"
         items={ORGANIZATION_ITEMS}
         selected={value.kind === "organization" ? value.names : []}
-        onToggle={(name) => {
-          const current = value.kind === "organization" ? value.names : [];
-          const next = current.includes(name) ? current.filter((n) => n !== name) : [...current, name];
-          onChange(next.length > 0 ? { kind: "organization", names: next } : { kind: "everyone" });
+        onChangeSelected={(names) => {
+          onChange(names.length > 0 ? { kind: "organization", names } : { kind: "everyone" });
         }}
       />
 

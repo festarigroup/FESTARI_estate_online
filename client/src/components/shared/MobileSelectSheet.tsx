@@ -9,6 +9,8 @@ export interface SelectSheetItem {
   name: string;
   role: string;
   avatar: string;
+  /** True for a generic icon (e.g. an organization logo glyph) instead of a photo, so it's contained rather than cropped. */
+  avatarIsIcon?: boolean;
   disabled?: boolean;
 }
 
@@ -18,12 +20,12 @@ interface MobileSelectSheetProps {
   title: string;
   items: SelectSheetItem[];
   selected: string[];
-  onToggle: (name: string) => void;
+  onChangeSelected: (next: string[]) => void;
 }
 
 /** The bottom-sheet picker used on mobile when choosing communities/organizations
  * (Figma node 404:15742) — replaces the desktop side popover on small screens. */
-export function MobileSelectSheet({ open, onClose, title, items, selected, onToggle }: MobileSelectSheetProps) {
+export function MobileSelectSheet({ open, onClose, title, items, selected, onChangeSelected }: MobileSelectSheetProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -52,12 +54,18 @@ export function MobileSelectSheet({ open, onClose, title, items, selected, onTog
   const selectableItems = items.filter((item) => !item.disabled);
   const allSelected = selectableItems.length > 0 && selectableItems.every((item) => selected.includes(item.name));
 
+  function toggleItem(name: string) {
+    onChangeSelected(selected.includes(name) ? selected.filter((n) => n !== name) : [...selected, name]);
+  }
+
   function toggleAll() {
-    selectableItems.forEach((item) => {
-      const isSelected = selected.includes(item.name);
-      if (allSelected && isSelected) onToggle(item.name);
-      if (!allSelected && !isSelected) onToggle(item.name);
-    });
+    if (allSelected) {
+      const selectableNames = new Set(selectableItems.map((item) => item.name));
+      onChangeSelected(selected.filter((name) => !selectableNames.has(name)));
+    } else {
+      const namesToAdd = selectableItems.map((item) => item.name);
+      onChangeSelected(Array.from(new Set([...selected, ...namesToAdd])));
+    }
   }
 
   return createPortal(
@@ -81,43 +89,50 @@ export function MobileSelectSheet({ open, onClose, title, items, selected, onTog
               <path d="M20 12H4M4 12L11 5M4 12L11 19" stroke="#141b34" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-          <p className="flex-1 text-center text-lg font-bold tracking-[-0.54px] text-black">{title}</p>
-          <button
-            type="button"
-            aria-label="Search"
-            onClick={() => setSearchOpen((v) => !v)}
-            className="flex size-[26px] shrink-0 items-center justify-center rounded-full bg-brand-900"
-          >
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <circle cx="7" cy="7" r="5" stroke="white" strokeWidth="1.5" />
-              <path d="M11 11L14.5 14.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          </button>
-        </div>
-
-        {searchOpen && (
-          <div className="px-6">
+          {searchOpen ? (
             <input
               autoFocus
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={`Search ${title.replace("Select ", "").toLowerCase()}`}
-              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-night-900 placeholder:text-gray-400 focus:outline-none"
+              className="flex-1 rounded-lg border border-gray-200 px-3 py-1.5 text-sm text-night-900 placeholder:text-gray-400 focus:outline-none"
             />
-          </div>
-        )}
+          ) : (
+            <p className="flex-1 text-center text-lg font-bold tracking-[-0.54px] text-black">{title}</p>
+          )}
+          <button
+            type="button"
+            aria-label={searchOpen ? "Close search" : "Search"}
+            onClick={() => {
+              setSearchOpen((v) => !v);
+              setQuery("");
+            }}
+            className="flex size-[26px] shrink-0 items-center justify-center rounded-full bg-brand-900"
+          >
+            {searchOpen ? (
+              <svg width="13" height="13" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M1 1L11 11M11 1L1 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            ) : (
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="7" cy="7" r="5" stroke="white" strokeWidth="1.5" />
+                <path d="M11 11L14.5 14.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            )}
+          </button>
+        </div>
 
         <div className="flex w-full flex-col overflow-hidden rounded-lg border border-[#f1f5f9] px-6">
-          <div className="w-full overflow-y-auto">
-            <button
-              type="button"
-              onClick={toggleAll}
-              className="flex w-full items-center gap-3 bg-[#f8fafc] px-3 py-2.5"
-            >
-              <Checkbox checked={allSelected} />
-              <span className="text-xs font-medium text-[#111826]">Select all</span>
-            </button>
+          <button
+            type="button"
+            onClick={toggleAll}
+            className="flex w-full shrink-0 items-center gap-3 bg-[#f8fafc] px-3 py-2.5"
+          >
+            <Checkbox checked={allSelected} />
+            <span className="text-xs font-medium text-[#111826]">Select all</span>
+          </button>
 
+          <div className="max-h-[336px] w-full overflow-y-auto">
             {filteredItems.length === 0 ? (
               <p className="px-3 py-4 text-sm text-gray-400">No matches</p>
             ) : (
@@ -128,15 +143,26 @@ export function MobileSelectSheet({ open, onClose, title, items, selected, onTog
                     key={item.name}
                     type="button"
                     disabled={item.disabled}
-                    onClick={() => onToggle(item.name)}
+                    onClick={() => toggleItem(item.name)}
                     className={cn(
                       "flex w-full items-center gap-3 border-b border-[#f1f5f9] p-3 last:border-b-0",
                       item.disabled && "opacity-50",
                     )}
                   >
                     <Checkbox checked={isSelected} />
-                    <span className="relative block size-8 shrink-0 overflow-hidden rounded-full border-[0.4px] border-[#ebebeb] bg-white">
-                      <Image src={item.avatar} alt="" fill className="object-cover" sizes="32px" />
+                    <span
+                      className={cn(
+                        "relative block size-8 shrink-0 overflow-hidden rounded-full border-[0.4px] border-[#ebebeb] bg-white",
+                        item.avatarIsIcon && "p-1.5",
+                      )}
+                    >
+                      <Image
+                        src={item.avatar}
+                        alt=""
+                        fill
+                        className={item.avatarIsIcon ? "object-contain" : "object-cover"}
+                        sizes="32px"
+                      />
                     </span>
                     <div className="flex min-w-0 flex-1 flex-col items-start text-left">
                       <p className="truncate text-sm font-semibold text-[#111826]">{item.name}</p>

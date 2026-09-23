@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
+import { NavIcon } from "@/components/shared/NavIcon";
 
 interface SideListMenuProps {
   open: boolean;
@@ -16,6 +17,8 @@ interface SideListMenuProps {
   title?: string;
   selected?: string[];
   onToggle?: (item: string) => void;
+  /** Leading icon shown before every row (e.g. the organization logo glyph). */
+  icon?: string;
 }
 
 export function SideListMenu({
@@ -29,6 +32,7 @@ export function SideListMenu({
   title,
   selected = [],
   onToggle,
+  icon,
 }: SideListMenuProps) {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
@@ -134,8 +138,9 @@ export function SideListMenu({
                 key={`${item}-${index}`}
                 type="button"
                 onClick={() => (multiple ? onToggle?.(item) : onSelect?.(item))}
-                className="flex h-6 w-full items-center gap-2.5 text-left text-sm font-medium text-[#334154] hover:text-brand-900"
+                className="flex h-6 w-full items-center gap-2 text-left text-sm font-medium text-[#334154] hover:text-brand-900"
               >
+                {icon && <NavIcon icon={icon} color="night" size={14} className="shrink-0" />}
                 <span className="flex-1 truncate">{item}</span>
                 {isSelected && (
                   <svg

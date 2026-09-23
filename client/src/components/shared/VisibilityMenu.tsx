@@ -247,6 +247,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
         onClose={() => setOrganizationOpen(false)}
         anchorRef={organizationRef}
         items={ORGANIZATION_ITEMS}
+        icon="/icons/organization-logo.svg"
         title={enableMultiSelect ? "Your Organizations" : undefined}
         searchable={enableMultiSelect}
         multiple={enableMultiSelect}
