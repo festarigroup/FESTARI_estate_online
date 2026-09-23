@@ -8,11 +8,11 @@ import { type PostVisibility } from "@/components/shared/VisibilityMenu";
 import { cn } from "@/lib/utils";
 
 const ORGANIZATION_ITEMS: SelectSheetItem[] = [
-  { name: "Organization 1", role: "Lead Product Designer", avatar: "/icons/organization-logo.svg", avatarIsIcon: true },
-  { name: "Organization 2", role: "Product Designer", avatar: "/icons/organization-logo.svg", avatarIsIcon: true, disabled: true },
-  { name: "Organization 3", role: "Head of Design", avatar: "/icons/organization-logo.svg", avatarIsIcon: true },
-  { name: "Organization 4", role: "Product Designer", avatar: "/icons/organization-logo.svg", avatarIsIcon: true },
-  { name: "Organization 5", role: "Chief Strategy Officer", avatar: "/icons/organization-logo.svg", avatarIsIcon: true },
+  { name: "Organization 1", role: "Lead Product Designer", avatar: "/icons/org.svg", avatarIsIcon: true },
+  { name: "Organization 2", role: "Product Designer", avatar: "/icons/org.svg", avatarIsIcon: true, disabled: true },
+  { name: "Organization 3", role: "Head of Design", avatar: "/icons/org.svg", avatarIsIcon: true },
+  { name: "Organization 4", role: "Product Designer", avatar: "/icons/org.svg", avatarIsIcon: true },
+  { name: "Organization 5", role: "Chief Strategy Officer", avatar: "/icons/org.svg", avatarIsIcon: true },
 ];
 const COMMUNITY_ITEMS: SelectSheetItem[] = [
   { name: "Community 1", role: "Lead Product Designer", avatar: "/icons/avatar-sample.jpg" },
@@ -150,7 +150,7 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
       />
       <Row
         label="Organization"
-        icon="/icons/organization-logo.svg"
+        icon="/icons/org.svg"
         active={value.kind === "organization"}
         hasChevron
         ariaExpanded={organizationSheetOpen}

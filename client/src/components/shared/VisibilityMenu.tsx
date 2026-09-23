@@ -41,7 +41,7 @@ export function getVisibilityIcon(value: PostVisibility): string {
     case "community":
       return "/icons/user-group.svg";
     case "organization":
-      return "/icons/organization-logo.svg";
+      return "/icons/org.svg";
   }
 }
 
@@ -209,7 +209,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
           className="flex w-full items-center gap-2 rounded-lg px-1 py-1"
         >
           <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
-            <NavIcon icon="/icons/organization-logo.svg" color="white" size={14} />
+            <NavIcon icon="/icons/org.svg" color="white" size={14} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">
             {value.kind === "organization" ? formatNames(value.names) : "Organization"}
@@ -247,7 +247,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
         onClose={() => setOrganizationOpen(false)}
         anchorRef={organizationRef}
         items={ORGANIZATION_ITEMS}
-        icon="/icons/organization-logo.svg"
+        icon="/icons/org.svg"
         title={enableMultiSelect ? "Your Organizations" : undefined}
         searchable={enableMultiSelect}
         multiple={enableMultiSelect}
