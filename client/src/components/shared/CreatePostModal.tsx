@@ -160,7 +160,7 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
           </svg>
         </button>
 
-        <div className="flex max-h-[90vh] w-full flex-col gap-6 overflow-y-auto rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
+        <div className="flex max-h-[90vh] w-full flex-col gap-6 overflow-y-auto rounded-2xl bg-white/95 p-8 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
         <p className="text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Create a Post</p>
 
         <div className="flex w-full items-start gap-3">
@@ -264,6 +264,8 @@ export function CreatePostModal({ open, onClose, initialType = "image", onSwitch
             }}
             anchorRef={visibilityTriggerRef}
           />
+
+          <div className="h-px w-full border-t border-[#f5f5f5]" />
 
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-3">
