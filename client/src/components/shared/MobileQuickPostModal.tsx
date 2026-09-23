@@ -209,7 +209,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
         ref={cardRef}
         onClick={(event) => event.stopPropagation()}
         className={cn(
-          "flex w-full max-w-[340px] flex-col gap-3 overflow-y-auto rounded-[36px] bg-white p-4 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]",
+          "flex w-full max-w-[340px] flex-col gap-3 overflow-y-auto rounded-[36px] bg-white p-6 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]",
           mode === "poll" && (pollOptions.length === 0 ? "aspect-[1/0.7]" : "aspect-square"),
           mode === "post" && (files.length === 0 ? "aspect-[1/0.7]" : "aspect-square"),
           mode === "article" && (bodyEmpty && !text.trim() ? "aspect-[1/0.7]" : "aspect-square"),
@@ -360,7 +360,9 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
           </div>
         )}
 
-        <div className="mt-auto flex w-full items-center justify-between">
+        <div className="mt-auto flex w-full flex-col gap-3">
+        <div className="h-px w-full shrink-0 bg-[#f5f5f5]" />
+        <div className="flex w-full items-center justify-between">
           <div className="flex items-center gap-3">
             <input
               ref={inputRef}
@@ -430,6 +432,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
           >
             Post
           </button>
+        </div>
         </div>
       </div>
 
