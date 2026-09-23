@@ -280,12 +280,12 @@ function MobileComposerCard() {
 
   useEffect(() => {
     if (!moreOpen) return;
-    const handlePointerDown = (event: PointerEvent) => {
+    const handleClick = (event: MouseEvent) => {
       if (moreRef.current?.contains(event.target as Node)) return;
       setMoreOpen(false);
     };
-    document.addEventListener("pointerdown", handlePointerDown);
-    return () => document.removeEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
   }, [moreOpen]);
 
   return (
