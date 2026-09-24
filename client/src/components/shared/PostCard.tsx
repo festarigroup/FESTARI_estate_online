@@ -660,10 +660,11 @@ function PostStatsBar({
             onClick={() => setLiked((v) => !v)}
           >
             <NavIcon
+              key={liked ? "liked" : "unliked"}
               icon={liked ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
               color="night"
               size={23}
-              className={liked ? "bg-[#ef575f]" : undefined}
+              className={liked ? "bg-[#ef575f] animate-like-pop" : undefined}
             />
             <span
               className={cn(
@@ -793,10 +794,11 @@ function CommentLikeButton({ initialLikes }: { initialLikes: number }) {
       className="flex items-center gap-1"
     >
       <NavIcon
+        key={liked ? "liked" : "unliked"}
         icon={liked ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
         color="brand"
         size={11}
-        className={liked ? "bg-[#ef575f]" : "bg-gray-400"}
+        className={liked ? "bg-[#ef575f] animate-like-pop" : "bg-gray-400"}
       />
       {likeCount > 0 ? (
         <span className={cn("text-[9.5px] font-bold", liked ? "text-[#ef575f]" : "text-brand-900")}>
