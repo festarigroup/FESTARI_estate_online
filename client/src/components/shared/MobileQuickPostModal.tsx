@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { MobileVisibilityMenu } from "@/components/shared/MobileVisibilityMenu";
+import { DURATION_OPTIONS, PollDurationDropdown } from "@/components/shared/PollDurationDropdown";
 import { DEFAULT_VISIBILITY, getVisibilityIcon, type PostVisibility } from "@/components/shared/VisibilityMenu";
 import { usePostsFeed } from "@/context/PostsContext";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const [pollQuestion, setPollQuestion] = useState("");
   const [pollOptions, setPollOptions] = useState<string[]>([]);
+  const [duration, setDuration] = useState(DURATION_OPTIONS[0]);
   const [addingOption, setAddingOption] = useState(false);
   const [newOption, setNewOption] = useState("");
   const [editingOptionIndex, setEditingOptionIndex] = useState<number | null>(null);
@@ -93,6 +95,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
     setBodyEmpty(true);
     setPollQuestion("");
     setPollOptions([]);
+    setDuration(DURATION_OPTIONS[0]);
     setAddingOption(false);
     setNewOption("");
     setFiles([]);
@@ -317,6 +320,12 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                   <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
               </button>
+            </div>
+            <div className="flex w-full flex-col gap-1">
+              <p className="text-sm text-[#111826]">
+                Poll Duration<span className="text-red-500">*</span>
+              </p>
+              <PollDurationDropdown value={duration} onChange={setDuration} />
             </div>
           </div>
         )}

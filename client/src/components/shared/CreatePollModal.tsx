@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { DURATION_OPTIONS, PollDurationDropdown } from "@/components/shared/PollDurationDropdown";
 import {
   DEFAULT_VISIBILITY,
   VisibilityMenu,
@@ -15,7 +16,6 @@ import {
 import { usePostsFeed } from "@/context/PostsContext";
 import { cn } from "@/lib/utils";
 
-const DURATION_OPTIONS = ["1 day", "3 days", "1 week", "2 weeks", "1 month"];
 const MIN_OPTIONS = 2;
 const MAX_OPTIONS = 6;
 const MEDIA_ACCEPT = ["image/png", "image/jpeg", "image/gif", "video/mp4", "video/quicktime", "video/webm"];
@@ -210,20 +210,7 @@ export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModal
             <p className="text-sm text-[#111826]">
               Poll Duration<span className="text-red-500">*</span>
             </p>
-            <div className="relative flex h-12 w-full items-center rounded-lg border border-[#cbd5e0] bg-white px-3">
-              <select
-                value={duration}
-                onChange={(event) => setDuration(event.target.value)}
-                className="w-full flex-1 appearance-none bg-transparent text-sm text-[#0f1621] focus:outline-none"
-              >
-                {DURATION_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-              <NavIcon icon="/icons/poll-chevron-down.svg" color="night" size={16} className="pointer-events-none shrink-0" />
-            </div>
+            <PollDurationDropdown value={duration} onChange={setDuration} />
           </div>
         </div>
 
