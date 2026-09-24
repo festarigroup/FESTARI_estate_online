@@ -21,7 +21,7 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex size-14 items-center justify-center rounded-full bg-[#e6e6e6] shadow-[0px_4px_10px_rgba(0,0,0,0.15)]"
+        className="flex size-14 items-center justify-center rounded-full bg-[#e6e6e6] shadow-[0px_8px_20px_-4px_rgba(0,0,0,0.35)]"
       >
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
           {open ? (
