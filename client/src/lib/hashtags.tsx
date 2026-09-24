@@ -12,7 +12,7 @@ export function renderWithHashtags(text: string): ReactNode {
     if (part) nodes.push(part);
     if (matches[index]) {
       nodes.push(
-        <span key={index} className="font-semibold text-brand-900">
+        <span key={index} className="font-semibold text-[#f088b6]">
           {matches[index]}
         </span>,
       );

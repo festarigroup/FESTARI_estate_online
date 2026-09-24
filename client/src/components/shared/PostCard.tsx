@@ -477,7 +477,7 @@ function PollBody({ post }: { post: PostCardData }) {
       {post.question && (
         <p className="text-[13px] leading-5 text-[#1e293b]">
           {post.question}{" "}
-          {post.hashtags && <span className="font-semibold text-brand-900">{post.hashtags}</span>}
+          {post.hashtags && <span className="font-semibold text-[#f088b6]">{post.hashtags}</span>}
         </p>
       )}
 
