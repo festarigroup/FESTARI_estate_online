@@ -23,7 +23,7 @@ const SHORT_LABEL: Record<string, string> = {
   you: "You",
 };
 
-export function MobileBottomNav({ activeKey = "feed", activeChildKey = "discover" }: MobileBottomNavProps) {
+export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }: MobileBottomNavProps) {
   const [visible, setVisible] = useState(true);
   const hideTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
