@@ -95,16 +95,16 @@ export function TopNav() {
             </span>
           </button>
 
-          <div ref={createMenuRef} className="relative hidden sm:block">
+          <div ref={createMenuRef} className="relative">
             <button
               type="button"
               aria-label="Create"
               aria-expanded={createMenuOpen}
               onClick={handleCreateClick}
-              className="flex h-[38px] w-[93px] items-center justify-center gap-2 rounded-lg bg-brand-900 px-[15px] hover:bg-brand-900/90"
+              className="flex h-[34px] items-center justify-center gap-2 rounded-[20px] bg-[#0072ff] px-4 hover:opacity-90 sm:h-[38px] sm:w-[93px] sm:rounded-lg sm:bg-brand-900 sm:px-[15px] sm:hover:bg-brand-900/90 sm:hover:opacity-100"
             >
-              <NavIcon icon="/icons/add-circle-01.svg" color="white" size={19} />
-              <span className="text-[13px] text-white">Create</span>
+              <NavIcon icon="/icons/add-circle-01.svg" color="white" size={19} className="hidden sm:block" />
+              <span className="text-[11px] text-white sm:text-[13px]">Create</span>
             </button>
 
             {createMenuOpen && (
