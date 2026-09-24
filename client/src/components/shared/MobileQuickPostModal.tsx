@@ -284,27 +284,17 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                   type="button"
                   aria-label={`Edit option: ${option}`}
                   onClick={() => openEditOption(index)}
-                  className="shrink-0 text-gray-400 hover:text-night-900"
+                  className="shrink-0"
                 >
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path
-                      d="M11.5 2.5a1.5 1.5 0 0 1 2.12 2.12l-8 8-3 1 1-3 8-8Z"
-                      stroke="currentColor"
-                      strokeWidth="1.4"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                  <NavIcon icon="/icons/poll-option-edit.svg" color="night" size={14} className="bg-gray-400 hover:bg-night-900" />
                 </button>
                 <button
                   type="button"
                   aria-label={`Remove option: ${option}`}
                   onClick={() => removePollOption(index)}
-                  className="shrink-0 text-gray-400 hover:text-red-600"
+                  className="shrink-0"
                 >
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M3 4h10M6.5 4V2.5h3V4M4.5 4l.5 9.5h6l.5-9.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
+                  <NavIcon icon="/icons/poll-option-delete.svg" color="night" size={14} className="bg-red-500" />
                 </button>
               </div>
             ))}
@@ -343,7 +333,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => handleToolbarAction(action.key)}
                   >
-                    <NavIcon icon="/icons/article-toolbar-link.svg" color="night" size={12} />
+                    <NavIcon icon="/icons/article-toolbar-link-bold.svg" color="night" size={12} />
                   </button>
                 ) : (
                   <button
@@ -424,11 +414,11 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                 inputRef.current?.click();
               }}
             >
-              <NavIcon icon="/icons/article-toolbar-link.svg" color="brand" size={16} className="bg-[#337df2]" />
+              <NavIcon icon="/icons/article-toolbar-link-bold.svg" color="brand" size={16} className="bg-[#337df2]" />
             </button>
             <button type="button" aria-label="Poll" onClick={() => setMode("poll")}>
               <NavIcon
-                icon="/icons/chart-02.svg"
+                icon="/icons/chart-02-bold.svg"
                 color="brand"
                 size={18}
                 className={cn("bg-[#337df2]", mode === "poll" && "opacity-30")}
@@ -440,7 +430,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
               onClick={() => setMode("article")}
             >
               <NavIcon
-                icon="/icons/book-bookmark-01.svg"
+                icon="/icons/book-bookmark-01-bold.svg"
                 color="brand"
                 size={18}
                 className={cn("bg-[#337df2]", mode === "article" && "opacity-30")}

@@ -1,11 +1,25 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
+import { showSuccessToast } from "@/components/shared/AppToast";
 import { MobileSelectSheet, type SelectSheetItem } from "@/components/shared/MobileSelectSheet";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { buildCustomVisibility, type PostVisibility } from "@/components/shared/VisibilityMenu";
 import { cn } from "@/lib/utils";
+
+interface SearchProfile {
+  name: string;
+  role: string;
+  avatar: string;
+}
+
+const SEARCH_PROFILES: SearchProfile[] = [
+  { name: "Andy Ansong", role: "Real Estate Consultant", avatar: "/icons/avatar-andy.png" },
+  { name: "Edwin Adu", role: "Sales Agent", avatar: "/icons/avatar-sample.jpg" },
+  { name: "Madeline Price", role: "Researcher", avatar: "/icons/avatar-sample.jpg" },
+];
 
 const ORGANIZATION_ITEMS: SelectSheetItem[] = [
   { name: "Organization 1", role: "Lead Product Designer", avatar: "/icons/org.svg", avatarIsIcon: true },
@@ -81,6 +95,21 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
   const [position, setPosition] = useState<{ bottom: number; left: number } | null>(null);
   const [communitySheetOpen, setCommunitySheetOpen] = useState(false);
   const [organizationSheetOpen, setOrganizationSheetOpen] = useState(false);
+  const [profileQuery, setProfileQuery] = useState("");
+  const [addedProfiles, setAddedProfiles] = useState<string[]>([]);
+
+  const matchingProfiles =
+    profileQuery.trim().length > 0
+      ? SEARCH_PROFILES.filter((profile) => profile.name.toLowerCase().includes(profileQuery.trim().toLowerCase()))
+      : [];
+
+  function toggleProfile(name: string) {
+    const alreadyAdded = addedProfiles.includes(name);
+    setAddedProfiles((current) =>
+      alreadyAdded ? current.filter((added) => added !== name) : [...current, name],
+    );
+    showSuccessToast(alreadyAdded ? `${name} removed from this post's audience` : `${name} added to this post's audience`);
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -183,8 +212,51 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
           <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.4" />
           <path d="M11 11L14 14" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
         </svg>
-        <span className="truncate text-[10px] font-medium text-gray-400">Search Profile</span>
+        <input
+          value={profileQuery}
+          onChange={(event) => setProfileQuery(event.target.value)}
+          placeholder="Search Profile"
+          className="w-full flex-1 bg-transparent text-[10px] font-medium text-night-900 placeholder:text-gray-400 focus:outline-none"
+        />
       </div>
+
+      {matchingProfiles.length > 0 && (
+        <ul className="flex max-h-[160px] w-full flex-col gap-1 overflow-y-auto">
+          {matchingProfiles.map((profile) => {
+            const added = addedProfiles.includes(profile.name);
+            return (
+              <li key={profile.name} className="flex w-full items-center gap-2 rounded-lg px-1 py-1">
+                <span className="relative block size-7 shrink-0 overflow-hidden rounded-full bg-[#eef2ff]">
+                  <Image src={profile.avatar} alt="" fill className="object-cover" sizes="28px" />
+                </span>
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <p className="truncate text-xs font-medium text-[#2d264b]">{profile.name}</p>
+                  <p className="truncate text-[10px] text-[#94a3b7]">{profile.role}</p>
+                </div>
+                <button
+                  type="button"
+                  aria-label={added ? `Remove ${profile.name}` : `Add ${profile.name}`}
+                  onClick={() => toggleProfile(profile.name)}
+                  className={cn(
+                    "flex size-6 shrink-0 items-center justify-center rounded-full",
+                    added ? "bg-[#fee2e2] text-red-600" : "bg-[#f1f6ff] text-brand-900",
+                  )}
+                >
+                  {added ? (
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                  ) : (
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M6 1V11M1 6H11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    </svg>
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>,
     document.body,
   );

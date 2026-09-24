@@ -198,7 +198,7 @@ export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModal
                     onClick={() => removeOption(index)}
                     className="shrink-0"
                   >
-                    <NavIcon icon="/icons/poll-trash-delete.svg" color="night" size={16} className="bg-red-500" />
+                    <NavIcon icon="/icons/poll-option-delete.svg" color="night" size={16} className="bg-red-500" />
                   </button>
                 )}
               </div>
