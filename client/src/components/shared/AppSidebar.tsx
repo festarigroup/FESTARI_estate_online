@@ -19,7 +19,7 @@ export function AppSidebar({
   collapsed,
   onToggleCollapse,
   activeKey = "feed",
-  activeChildKey = "home",
+  activeChildKey = "discover",
 }: AppSidebarProps) {
   const [openKey, setOpenKey] = useState<string | null>(null);
   const itemRefs = useRef(new Map<string, HTMLDivElement>());

@@ -24,10 +24,10 @@ export const NAV_ITEMS: NavItem[] = [
     key: "feed",
     label: "Feed",
     icon: "/icons/grid-view.svg",
-    href: "/home",
+    href: "#",
     children: [
-      { key: "home", label: "Home", icon: "/icons/home-03.svg", href: "/home" },
-      { key: "discover", label: "Discover", icon: "/icons/compass-01.svg", href: childComingSoon("Discover", "feed", "discover") },
+      { key: "home", label: "Home", icon: "/icons/home-03.svg", href: childComingSoon("Home", "feed", "home") },
+      { key: "discover", label: "Discover", icon: "/icons/compass-01.svg", href: "/home" },
     ],
   },
   {
