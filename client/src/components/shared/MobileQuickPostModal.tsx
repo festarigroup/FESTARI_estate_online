@@ -500,11 +500,12 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
               />
               <button
                 type="button"
+                aria-label={editingOptionIndex !== null ? "Save option" : "Add option"}
                 onClick={confirmAddOption}
                 disabled={!newOption.trim()}
-                className={cn("shrink-0 text-sm", newOption.trim() ? "text-brand-900" : "text-gray-300")}
+                className={cn("relative block size-[23px] shrink-0", !newOption.trim() && "opacity-30")}
               >
-                {editingOptionIndex !== null ? "Save" : "Add"}
+                <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="23px" />
               </button>
             </div>
           </div>,
