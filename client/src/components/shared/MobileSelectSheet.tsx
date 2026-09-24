@@ -86,7 +86,7 @@ export function MobileSelectSheet({ open, onClose, title, items, selected, onCha
         <div className="flex w-full items-center gap-2.5 px-6">
           <button type="button" aria-label="Close" onClick={onClose} className="flex size-6 shrink-0 items-center justify-center">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M20 12H4M4 12L11 5M4 12L11 19" stroke="#141b34" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M20 12H4M4 12L11 5M4 12L11 19" stroke="#141b34" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
           {searchOpen ? (
@@ -111,12 +111,12 @@ export function MobileSelectSheet({ open, onClose, title, items, selected, onCha
           >
             {searchOpen ? (
               <svg width="13" height="13" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                <path d="M1 1L11 11M11 1L1 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                <path d="M1 1L11 11M11 1L1 11" stroke="white" strokeWidth="2.2" strokeLinecap="round" />
               </svg>
             ) : (
               <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <circle cx="7" cy="7" r="5" stroke="white" strokeWidth="1.5" />
-                <path d="M11 11L14.5 14.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                <circle cx="7" cy="7" r="5" stroke="white" strokeWidth="2.2" />
+                <path d="M11 11L14.5 14.5" stroke="white" strokeWidth="2.2" strokeLinecap="round" />
               </svg>
             )}
           </button>
@@ -190,7 +190,7 @@ function Checkbox({ checked }: { checked: boolean }) {
     >
       {checked && (
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-          <path d="M2 6L5 9L10 3" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M2 6L5 9L10 3" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )}
     </span>
