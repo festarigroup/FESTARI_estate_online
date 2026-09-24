@@ -104,6 +104,20 @@ export function AppSidebar({
                 </span>
                 {hasChildren && (
                   <span
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${isOpen ? "Collapse" : "Expand"} ${item.label}`}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setOpenKey((current) => (current === item.key ? null : item.key));
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key !== "Enter" && event.key !== " ") return;
+                      event.preventDefault();
+                      event.stopPropagation();
+                      setOpenKey((current) => (current === item.key ? null : item.key));
+                    }}
                     className={cn(
                       "relative flex shrink-0 items-center justify-center transition-transform duration-150",
                       collapsed ? "size-4" : "size-[23px]",
