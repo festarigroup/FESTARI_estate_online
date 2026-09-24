@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
+import { MobileCreateGrid } from "@/components/shared/MobileCreateGrid";
+import { MobileQuickPostModal, type QuickComposerMode } from "@/components/shared/MobileQuickPostModal";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { NAV_ITEMS, type NavChildItem } from "@/components/shared/nav-items";
 
@@ -11,17 +13,6 @@ interface MobileBottomNavProps {
   activeKey?: string;
   activeChildKey?: string;
 }
-
-// Shorter labels than the sidebar's full names (e.g. "Stay and Events"), to
-// fit this compact bar's tight per-item columns (Figma node 252:65144).
-const SHORT_LABEL: Record<string, string> = {
-  feed: "Feed",
-  people: "People",
-  services: "Service",
-  community: "Community",
-  stay: "Stay",
-  you: "You",
-};
 
 export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }: MobileBottomNavProps) {
   const [visible, setVisible] = useState(true);
@@ -32,13 +23,23 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
   const flyoutRef = useRef<HTMLDivElement | null>(null);
   const [flyoutPos, setFlyoutPos] = useState<{ bottom: number; left: number } | null>(null);
 
+  const [gridOpen, setGridOpen] = useState(false);
+  const [mobileQuickOpen, setMobileQuickOpen] = useState(false);
+  const [mobileQuickMode, setMobileQuickMode] = useState<QuickComposerMode>("post");
+
   const openItem = openKey ? NAV_ITEMS.find((item) => item.key === openKey) : undefined;
   const showFlyout = !!openItem?.children?.length;
+
+  function openMobileQuickPost(type: "media" | "poll" | "article") {
+    setMobileQuickMode(type === "poll" || type === "article" ? type : "post");
+    setMobileQuickOpen(true);
+  }
 
   useEffect(() => {
     const handleScroll = () => {
       setVisible(false);
       setOpenKey(null);
+      setGridOpen(false);
       if (hideTimeout.current) clearTimeout(hideTimeout.current);
       hideTimeout.current = setTimeout(() => setVisible(true), 600);
     };
@@ -83,54 +84,68 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
   }, [showFlyout, openKey]);
 
   return (
-    <nav
-      aria-label="Primary navigation"
-      aria-hidden={!visible}
+    <div
       className={cn(
-        "no-scrollbar fixed bottom-4 left-1/2 z-40 flex w-[calc(100%-32px)] -translate-x-1/2 items-center justify-between overflow-x-auto rounded-full border border-white/40 bg-white/10 p-5 shadow-[0px_4px_10px_rgba(0,0,0,0.15)] backdrop-blur-sm backdrop-saturate-150 transition-all duration-300 ease-out lg:hidden",
+        "fixed bottom-4 left-1/2 z-40 flex w-[calc(100%-32px)] -translate-x-1/2 items-center gap-2 transition-all duration-300 ease-out lg:hidden",
         visible ? "translate-y-0 opacity-100" : "translate-y-24 opacity-0",
       )}
     >
-      {NAV_ITEMS.map((item) => {
-        const isActive = item.key === activeKey;
-        const hasChildren = !!item.children?.length;
-        const isOpen = hasChildren && openKey === item.key;
+      <nav
+        aria-label="Primary navigation"
+        aria-hidden={!visible}
+        className="no-scrollbar flex min-w-0 flex-1 items-center justify-between gap-1 overflow-x-auto rounded-full bg-[#171717]/90 px-3 py-3 shadow-[0px_4px_10px_rgba(0,0,0,0.25)] backdrop-blur-md backdrop-saturate-150"
+      >
+        {NAV_ITEMS.map((item) => {
+          const isActive = item.key === activeKey;
+          const hasChildren = !!item.children?.length;
+          const isOpen = hasChildren && openKey === item.key;
 
-        return (
-          <Link
-            key={item.key}
-            href={item.href}
-            ref={(node) => {
-              if (node) itemRefs.current.set(item.key, node);
-              else itemRefs.current.delete(item.key);
-            }}
-            onClick={(event) => {
-              if (item.href === "#") {
-                event.preventDefault();
-                if (hasChildren) setOpenKey((current) => (current === item.key ? null : item.key));
-              }
-            }}
-            aria-label={item.label}
-            aria-expanded={hasChildren ? isOpen : undefined}
-            className="flex shrink-0 flex-col items-center gap-0.5"
-          >
-            <NavIcon
-              icon={item.icon}
-              color="night"
-              size={12}
-              className={isActive ? "bg-brand-900" : "bg-[#001f3f] opacity-70"}
-            />
-            <span
-              className={cn(
-                "whitespace-nowrap text-[10px]",
-                isActive ? "font-semibold text-brand-900" : "font-normal text-[#001f3f] opacity-70",
-              )}
+          return (
+            <Link
+              key={item.key}
+              href={item.href}
+              ref={(node) => {
+                if (node) itemRefs.current.set(item.key, node);
+                else itemRefs.current.delete(item.key);
+              }}
+              onClick={(event) => {
+                if (item.href === "#") {
+                  event.preventDefault();
+                  if (hasChildren) setOpenKey((current) => (current === item.key ? null : item.key));
+                }
+              }}
+              aria-label={item.label}
+              aria-expanded={hasChildren ? isOpen : undefined}
+              className="flex size-11 shrink-0 items-center justify-center rounded-full"
             >
-              {SHORT_LABEL[item.key] ?? item.label}
-            </span>
-          </Link>
-        );
-      })}
+              <span
+                className={cn(
+                  "flex size-11 shrink-0 items-center justify-center rounded-full",
+                  isActive && "bg-white/15",
+                )}
+              >
+                <NavIcon icon={item.icon} color="white" size={19} className={cn(!isActive && "opacity-60")} />
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      <button
+        type="button"
+        aria-label={gridOpen ? "Close create menu" : "Create"}
+        aria-expanded={gridOpen}
+        onClick={() => setGridOpen((v) => !v)}
+        className="flex size-14 shrink-0 items-center justify-center rounded-full bg-[#171717] shadow-[0px_4px_10px_rgba(0,0,0,0.25)]"
+      >
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          {gridOpen ? (
+            <path d="M4 4L16 16M16 4L4 16" stroke="white" strokeWidth="2" strokeLinecap="round" />
+          ) : (
+            <path d="M10 3V17M3 10H17" stroke="white" strokeWidth="2" strokeLinecap="round" />
+          )}
+        </svg>
+      </button>
 
       {showFlyout &&
         flyoutPos &&
@@ -147,7 +162,14 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
           </div>,
           document.body,
         )}
-    </nav>
+
+      <MobileCreateGrid open={gridOpen} onClose={() => setGridOpen(false)} onOpenPostModal={openMobileQuickPost} />
+      <MobileQuickPostModal
+        open={mobileQuickOpen}
+        onClose={() => setMobileQuickOpen(false)}
+        initialMode={mobileQuickMode}
+      />
+    </div>
   );
 }
 
