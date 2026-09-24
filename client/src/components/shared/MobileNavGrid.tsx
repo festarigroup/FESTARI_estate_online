@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { NAV_ITEMS } from "@/components/shared/nav-items";
-import { cn } from "@/lib/utils";
 
 const ALL_CHILDREN = NAV_ITEMS.flatMap((item) =>
   (item.children ?? []).map((child) => ({ ...child, parentKey: item.key })),
@@ -22,7 +21,7 @@ export function MobileNavGrid({ open, onClose, activeKey, activeChildKey }: Mobi
   if (!open) return null;
 
   return (
-    <div className="fixed bottom-24 left-4 z-40 grid w-[320px] grid-cols-4 gap-4 rounded-[32px] border border-[#86b3fb] bg-white p-5 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.15)] lg:hidden">
+    <div className="fixed bottom-4 left-16 z-40 grid aspect-square w-64 grid-cols-4 content-center gap-x-2 gap-y-3 rounded-[32px] border-2 border-white bg-[#e6e6e6] p-4 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.25)] lg:hidden">
       {ALL_CHILDREN.map((child) => {
         const isActive = child.parentKey === activeKey && child.key === activeChildKey;
         return (
@@ -30,17 +29,12 @@ export function MobileNavGrid({ open, onClose, activeKey, activeChildKey }: Mobi
             key={`${child.parentKey}-${child.key}`}
             href={child.href}
             onClick={onClose}
-            className="flex flex-col items-center gap-2"
+            className="flex flex-col items-center gap-1"
           >
-            <span
-              className={cn(
-                "flex size-14 items-center justify-center rounded-2xl border",
-                isActive ? "border-brand-900 bg-[#f1f6ff]" : "border-gray-200 bg-white",
-              )}
-            >
-              <NavIcon icon={child.icon} color={isActive ? "brand" : "night"} size={22} />
+            <span className="flex size-10 items-center justify-center rounded-2xl bg-white">
+              <NavIcon icon={child.icon} color={isActive ? "brand" : "night"} size={16} />
             </span>
-            <span className="truncate text-[11px] font-medium text-night-900">{child.label}</span>
+            <span className="w-full truncate text-center text-[9px] font-medium text-night-900">{child.label}</span>
           </Link>
         );
       })}
