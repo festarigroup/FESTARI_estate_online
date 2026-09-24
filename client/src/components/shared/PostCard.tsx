@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { FollowButton } from "@/components/shared/FollowButton";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { comingSoonHref } from "@/lib/coming-soon";
+import { renderWithHashtags } from "@/lib/hashtags";
 import { cn } from "@/lib/utils";
 
 export type PostActionVariant = "primary" | "outline" | "outline-brand";
@@ -121,7 +122,7 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
               {post.text && (
                 <div className="flex w-full items-end gap-0.5 text-sm leading-5">
                   <p className={cn("min-w-0 flex-1 text-[#1e293b]", !textExpanded && "truncate")}>
-                    {post.text}
+                    {renderWithHashtags(post.text)}
                   </p>
                   {post.truncated !== false && (
                     <button
@@ -476,7 +477,7 @@ function PollBody({ post }: { post: PostCardData }) {
       {post.question && (
         <p className="text-[13px] leading-5 text-[#1e293b]">
           {post.question}{" "}
-          {post.hashtags && <span className="text-[#ea5e9c]">{post.hashtags}</span>}
+          {post.hashtags && <span className="font-semibold text-brand-900">{post.hashtags}</span>}
         </p>
       )}
 
@@ -770,7 +771,9 @@ function CommentRow({ comment }: { comment: CommentItem }) {
           <p className="text-[13px] font-bold text-brand-900">{comment.authorName}</p>
           <p className="shrink-0 text-[9.5px] text-gray-500">{comment.postedAt}</p>
         </div>
-        <p className="whitespace-pre-line text-[13px] leading-[1.5] text-gray-600">{comment.text}</p>
+        <p className="whitespace-pre-line text-[13px] leading-[1.5] text-gray-600">
+          {renderWithHashtags(comment.text)}
+        </p>
         <CommentLikeButton initialLikes={comment.likes ?? 0} />
       </div>
     </div>
