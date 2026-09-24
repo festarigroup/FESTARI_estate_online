@@ -134,85 +134,87 @@ export function CreatePostModal({ open, onClose, onSwitchType }: CreatePostModal
         <div className="flex max-h-[90vh] w-full flex-col gap-6 overflow-y-auto rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
         <p className="text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Create a Post</p>
 
-        <div className="flex w-full items-start gap-3">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">
-            SL
-          </span>
-          <textarea
-            value={text}
-            onChange={(event) => setText(event.target.value)}
-            rows={2}
-            placeholder="What’s happening twin? Write something down..."
-            className="min-h-[80px] w-full flex-1 resize-none rounded-lg px-3 py-3.5 text-base leading-6 text-night-900 placeholder:text-[#475568] focus:outline-none"
-          />
-        </div>
-
-        <input
-          ref={inputRef}
-          type="file"
-          multiple
-          accept={MEDIA_ACCEPT.join(",")}
-          className="hidden"
-          onChange={(event) => addFiles(event.target.files)}
-        />
-
-        {previews.length === 0 ? (
-          <div className="flex w-full flex-col gap-1">
-            <div
-              onDragOver={(event) => {
-                event.preventDefault();
-                setDragActive(true);
-              }}
-              onDragLeave={() => setDragActive(false)}
-              onDrop={handleDrop}
-              onClick={() => inputRef.current?.click()}
-              role="button"
-              tabIndex={0}
-              className={cn(
-                "flex min-h-[120px] w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed px-6 py-6 text-center",
-                dragActive ? "border-brand-900 bg-brand-900/5" : "border-[#cbd5e0] bg-[#cbd5e0]/30",
-              )}
-            >
-              <p className="text-xs text-[#19161d]">Drag and drop files here</p>
-              <p className="text-xs text-[#86888a]">or</p>
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  inputRef.current?.click();
-                }}
-                className="flex h-6 items-center justify-center gap-1.5 rounded-[40px] bg-[#19161d] px-2 text-xs text-white"
-              >
-                Choose files
-                <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={14} />
-              </button>
-            </div>
-            <p className="w-full text-xs text-[#53575a]">{MEDIA_HELPER}</p>
+        <div className="flex w-full flex-col gap-2">
+          <div className="flex w-full items-start gap-3">
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">
+              SL
+            </span>
+            <textarea
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              rows={1}
+              placeholder="What’s happening twin? Write something down..."
+              className="w-full flex-1 resize-none self-center rounded-lg px-3 py-3.5 text-base leading-6 text-night-900 placeholder:text-[#475568] focus:outline-none"
+            />
           </div>
-        ) : (
-          <div className="flex w-full flex-wrap gap-2.5 px-2">
-            {previews.map((preview, index) => (
+
+          <input
+            ref={inputRef}
+            type="file"
+            multiple
+            accept={MEDIA_ACCEPT.join(",")}
+            className="hidden"
+            onChange={(event) => addFiles(event.target.files)}
+          />
+
+          {previews.length === 0 ? (
+            <div className="flex w-full flex-col gap-1">
               <div
-                key={preview.url}
-                className="relative h-[61px] w-[97px] shrink-0 overflow-hidden rounded-md bg-gray-100"
-              >
-                {preview.isVideo ? (
-                  <video src={preview.url} className="size-full object-cover" muted />
-                ) : (
-                  <Image src={preview.url} alt="" fill className="object-cover" sizes="97px" />
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  setDragActive(true);
+                }}
+                onDragLeave={() => setDragActive(false)}
+                onDrop={handleDrop}
+                onClick={() => inputRef.current?.click()}
+                role="button"
+                tabIndex={0}
+                className={cn(
+                  "flex min-h-[120px] w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed px-6 py-6 text-center",
+                  dragActive ? "border-brand-900 bg-brand-900/5" : "border-[#cbd5e0] bg-[#cbd5e0]/30",
                 )}
+              >
+                <p className="text-xs text-[#19161d]">Drag and drop files here</p>
+                <p className="text-xs text-[#86888a]">or</p>
                 <button
                   type="button"
-                  aria-label="Remove file"
-                  onClick={() => removeFile(index)}
-                  className="absolute left-1 top-1 flex size-4 items-center justify-center rounded-full bg-white text-[10px] leading-none text-night-900"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    inputRef.current?.click();
+                  }}
+                  className="flex h-6 items-center justify-center gap-1.5 rounded-[40px] bg-[#19161d] px-2 text-xs text-white"
                 >
-                  &times;
+                  Choose files
+                  <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={14} />
                 </button>
               </div>
-            ))}
-          </div>
-        )}
+              <p className="w-full text-xs text-[#53575a]">{MEDIA_HELPER}</p>
+            </div>
+          ) : (
+            <div className="flex w-full flex-wrap gap-2.5 px-2">
+              {previews.map((preview, index) => (
+                <div
+                  key={preview.url}
+                  className="relative h-[61px] w-[97px] shrink-0 overflow-hidden rounded-md bg-gray-100"
+                >
+                  {preview.isVideo ? (
+                    <video src={preview.url} className="size-full object-cover" muted />
+                  ) : (
+                    <Image src={preview.url} alt="" fill className="object-cover" sizes="97px" />
+                  )}
+                  <button
+                    type="button"
+                    aria-label="Remove file"
+                    onClick={() => removeFile(index)}
+                    className="absolute left-1 top-1 flex size-4 items-center justify-center rounded-full bg-white text-[10px] leading-none text-night-900"
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         <div className="flex w-full flex-col gap-4">
           <button

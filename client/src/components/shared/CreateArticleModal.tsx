@@ -142,6 +142,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
         <div className="flex max-h-[90vh] w-full flex-col gap-6 overflow-y-auto rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
           <p className="text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Create an Article</p>
 
+          <div className="flex w-full flex-col gap-2">
           <div className="flex w-full items-start gap-3">
             <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">
               SL
@@ -149,9 +150,9 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
             <textarea
               value={headline}
               onChange={(event) => setHeadline(event.target.value)}
-              rows={2}
+              rows={1}
               placeholder="Start writing your insight — market trends, buyer guides, how-to advice…"
-              className="min-h-[60px] w-full flex-1 resize-none rounded-lg px-3 py-3.5 text-base leading-6 text-night-900 placeholder:text-[#475568] focus:outline-none"
+              className="w-full flex-1 resize-none self-center rounded-lg px-3 py-3.5 text-base leading-6 text-night-900 placeholder:text-[#475568] focus:outline-none"
             />
           </div>
 
@@ -198,6 +199,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
                 className="min-h-[110px] w-full px-3 py-2 text-sm text-night-900 focus:outline-none [&_blockquote]:border-l-2 [&_blockquote]:border-gray-300 [&_blockquote]:pl-3 [&_blockquote]:text-gray-600 [&_h1]:text-xl [&_h1]:font-bold [&_h2]:text-lg [&_h2]:font-bold [&_ul]:list-disc [&_ul]:pl-5 [&_a]:text-brand-900 [&_a]:underline"
               />
             </div>
+          </div>
           </div>
 
           <div className="flex w-full flex-col gap-4">
