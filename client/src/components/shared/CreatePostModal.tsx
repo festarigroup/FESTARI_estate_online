@@ -19,9 +19,9 @@ const MEDIA_ACCEPT = ["image/png", "image/jpeg", "image/gif", "video/mp4", "vide
 const MEDIA_HELPER = "PNG, JPEG, GIF, MP4, MOV, WEBM";
 
 const POST_TYPE_ROW: { key: "media" | "poll" | "article"; label: string; icon: string }[] = [
-  { key: "media", label: "Media", icon: "/icons/article-toolbar-link.svg" },
-  { key: "poll", label: "Poll", icon: "/icons/chart-02.svg" },
-  { key: "article", label: "Article", icon: "/icons/book-bookmark-01.svg" },
+  { key: "media", label: "Media", icon: "/icons/article-toolbar-link-bold.svg" },
+  { key: "poll", label: "Poll", icon: "/icons/chart-02-bold.svg" },
+  { key: "article", label: "Article", icon: "/icons/book-bookmark-01-bold.svg" },
 ];
 
 interface CreatePostModalProps {
