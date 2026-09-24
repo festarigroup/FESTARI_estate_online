@@ -105,9 +105,9 @@ export function MobileBottomNav({ activeKey = "feed", activeChildKey = "home" }:
               else itemRefs.current.delete(item.key);
             }}
             onClick={(event) => {
-              if (item.href === "#") event.preventDefault();
-              if (hasChildren) {
-                setOpenKey((current) => (current === item.key ? null : item.key));
+              if (item.href === "#") {
+                event.preventDefault();
+                if (hasChildren) setOpenKey((current) => (current === item.key ? null : item.key));
               }
             }}
             aria-label={item.label}

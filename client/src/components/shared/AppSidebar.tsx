@@ -87,9 +87,9 @@ export function AppSidebar({
                 aria-expanded={hasChildren ? isOpen : undefined}
                 aria-label={collapsed ? item.label : undefined}
                 onClick={(event) => {
-                  if (item.href === "#") event.preventDefault();
-                  if (hasChildren) {
-                    setOpenKey((current) => (current === item.key ? null : item.key));
+                  if (item.href === "#") {
+                    event.preventDefault();
+                    if (hasChildren) setOpenKey((current) => (current === item.key ? null : item.key));
                   }
                 }}
                 className={cn(
