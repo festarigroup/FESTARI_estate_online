@@ -139,7 +139,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
           </svg>
         </button>
 
-        <div className="flex max-h-[90vh] w-full flex-col gap-6 overflow-y-auto rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] max-sm:animate-sheet-slide-up sm:rounded-2xl">
+        <div className="flex max-h-[90vh] w-full flex-col gap-6 rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] max-sm:animate-sheet-slide-up sm:rounded-2xl">
           <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154] sm:hidden" />
           <p className="text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Create an Article</p>
 
@@ -184,7 +184,10 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
                 ),
               )}
             </div>
-            <div className="relative w-full flex-1 border-t border-[#e2e8f0] bg-white">
+            <div
+              className="relative w-full max-h-[320px] flex-1 overflow-y-auto border-t border-[#e2e8f0] bg-white [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-transparent"
+              style={{ scrollbarWidth: "thin", scrollbarColor: "#cbd5e0 transparent" }}
+            >
               {bodyEmpty && (
                 <p className="pointer-events-none absolute left-3 top-2 text-sm text-[#cbd5e0]">
                   Start writing your insight, market trends, buyer guides, how-to advice…
