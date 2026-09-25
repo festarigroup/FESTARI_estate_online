@@ -277,10 +277,10 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                       event.stopPropagation();
                       inputRef.current?.click();
                     }}
-                    className="flex h-11 w-full items-center justify-center gap-2 rounded-[40px] bg-[#19161d] px-4 text-sm font-medium text-white"
+                    className="flex h-10 items-center justify-center gap-1.5 rounded-[40px] bg-[#e2e5f0] px-3 text-sm font-medium text-[#19161d]"
                   >
                     Choose files
-                    <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={16} />
+                    <NavIcon icon="/icons/cloud-upload-outline.svg" color="night" size={16} className="bg-[#19161d]" />
                   </button>
                   <p className="text-xs text-[#53575a]">PNG, JPEG, GIF, MP4, MKV, AVI</p>
                 </div>
