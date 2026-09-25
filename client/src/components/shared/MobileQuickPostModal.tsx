@@ -39,7 +39,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
   const [bodyEmpty, setBodyEmpty] = useState(true);
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const [pollQuestion, setPollQuestion] = useState("");
-  const [pollOptions, setPollOptions] = useState<string[]>([]);
+  const [pollOptions, setPollOptions] = useState<string[]>(["Option 1", "Option 2"]);
   const [duration, setDuration] = useState(DURATION_OPTIONS[0]);
   const [addingOption, setAddingOption] = useState(false);
   const [newOption, setNewOption] = useState("");
@@ -94,7 +94,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
     if (bodyRef.current) bodyRef.current.innerHTML = "";
     setBodyEmpty(true);
     setPollQuestion("");
-    setPollOptions([]);
+    setPollOptions(["Option 1", "Option 2"]);
     setDuration(DURATION_OPTIONS[0]);
     setAddingOption(false);
     setNewOption("");
