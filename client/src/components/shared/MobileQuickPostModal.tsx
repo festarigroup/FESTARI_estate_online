@@ -41,11 +41,6 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
   const [pollQuestion, setPollQuestion] = useState("");
   const [pollOptions, setPollOptions] = useState<string[]>(["Option 1", "Option 2"]);
   const [duration, setDuration] = useState(DURATION_OPTIONS[0]);
-  const [addingOption, setAddingOption] = useState(false);
-  const [newOption, setNewOption] = useState("");
-  const [editingOptionIndex, setEditingOptionIndex] = useState<number | null>(null);
-  const cardRef = useRef<HTMLDivElement | null>(null);
-  const [optionOverlayCenter, setOptionOverlayCenter] = useState<{ top: number; left: number } | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const previews = useMemo(
     () => files.map((file) => ({ url: URL.createObjectURL(file), isVideo: file.type.startsWith("video/") })),
@@ -65,12 +60,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      if (addingOption) {
-        setAddingOption(false);
-        return;
-      }
-      handleClose();
+      if (event.key === "Escape") handleClose();
     };
     document.addEventListener("keydown", handleKeyDown);
     document.body.style.overflow = "hidden";
@@ -79,7 +69,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
       document.body.style.overflow = "";
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, addingOption]);
+  }, [open]);
 
   useEffect(() => {
     return () => previews.forEach((preview) => URL.revokeObjectURL(preview.url));
@@ -96,8 +86,6 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
     setPollQuestion("");
     setPollOptions(["Option 1", "Option 2"]);
     setDuration(DURATION_OPTIONS[0]);
-    setAddingOption(false);
-    setNewOption("");
     setFiles([]);
     setVisibility(DEFAULT_VISIBILITY);
     setVisibilityOpen(false);
@@ -107,26 +95,8 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
     setPollOptions((current) => [...current, `Option ${current.length + 1}`]);
   }
 
-  function openEditOption(index: number) {
-    const rect = cardRef.current?.getBoundingClientRect();
-    if (rect) setOptionOverlayCenter({ top: rect.top + rect.height / 2, left: rect.left + rect.width / 2 });
-    setNewOption(pollOptions[index]);
-    setEditingOptionIndex(index);
-    setAddingOption(true);
-  }
-
-  function confirmAddOption() {
-    const value = newOption.trim();
-    if (value) {
-      if (editingOptionIndex !== null) {
-        setPollOptions((current) => current.map((option, i) => (i === editingOptionIndex ? value : option)));
-      } else {
-        setPollOptions((current) => [...current, value]);
-      }
-    }
-    setNewOption("");
-    setEditingOptionIndex(null);
-    setAddingOption(false);
+  function updatePollOption(index: number, value: string) {
+    setPollOptions((current) => current.map((option, i) => (i === index ? value : option)));
   }
 
   function removePollOption(index: number) {
@@ -223,7 +193,6 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
       aria-label={mode === "article" ? "Create an article" : mode === "poll" ? "Create a poll" : "Create a post"}
     >
       <div
-        ref={cardRef}
         onClick={(event) => event.stopPropagation()}
         className={cn(
           "flex w-full max-h-[85vh] flex-col gap-3 rounded-t-[36px] bg-white p-6 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)] animate-sheet-slide-up",
@@ -281,15 +250,13 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                 key={index}
                 className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5"
               >
-                <button
-                  type="button"
-                  aria-label={`Edit option: ${option}`}
-                  onClick={() => openEditOption(index)}
-                  className="shrink-0"
-                >
-                  <NavIcon icon="/icons/poll-option-edit.svg" color="night" size={14} className="bg-gray-400 hover:bg-night-900" />
-                </button>
-                <p className="w-full flex-1 truncate text-sm text-night-900">{option}</p>
+                <NavIcon icon="/icons/poll-option-edit.svg" color="night" size={14} className="shrink-0 bg-gray-400" />
+                <input
+                  value={option}
+                  onChange={(event) => updatePollOption(index, event.target.value)}
+                  placeholder={`Option ${index + 1}`}
+                  className="w-full flex-1 text-sm text-night-900 placeholder:text-night-900/70 focus:outline-none"
+                />
                 {index >= 2 && (
                   <button
                     type="button"
@@ -483,48 +450,6 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
         </button>
         </div>
       </div>
-
-      {addingOption &&
-        optionOverlayCenter &&
-        createPortal(
-          <div
-            className="fixed inset-0 z-[130] bg-black/50"
-            onClick={() => {
-              setAddingOption(false);
-              setEditingOptionIndex(null);
-            }}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Edit poll option"
-          >
-            <div
-              onClick={(event) => event.stopPropagation()}
-              style={{ top: optionOverlayCenter.top, left: optionOverlayCenter.left }}
-              className="fixed flex h-12 w-[calc(100%-2rem)] max-w-[276px] -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-2xl border border-gray-200 bg-white px-3 py-1.5 shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
-            >
-              <input
-                autoFocus
-                value={newOption}
-                onChange={(event) => setNewOption(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") confirmAddOption();
-                }}
-                placeholder="Edit option"
-                className="w-full flex-1 text-sm text-night-900 placeholder:text-night-900/70 focus:outline-none"
-              />
-              <button
-                type="button"
-                aria-label="Save option"
-                onClick={confirmAddOption}
-                disabled={!newOption.trim()}
-                className={cn("relative block size-[23px] shrink-0", !newOption.trim() && "opacity-30")}
-              >
-                <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="23px" />
-              </button>
-            </div>
-          </div>,
-          document.body,
-        )}
     </div>,
     document.body,
   );
