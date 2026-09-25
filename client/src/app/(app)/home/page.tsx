@@ -422,7 +422,7 @@ function MobileComposerCard() {
 
 function FeedTabs({ activeTab, onSelect }: { activeTab: string; onSelect: (label: string) => void }) {
   return (
-    <div className="no-scrollbar flex h-[42px] w-full items-center overflow-x-auto rounded-[15px] border border-[#e6e7ec] bg-white pl-[15px] pr-2.5">
+    <div className="no-scrollbar flex h-[42px] w-full touch-pan-x items-center overflow-x-auto rounded-[15px] border border-[#e6e7ec] bg-white pl-[15px] pr-2.5">
       {FEED_TABS.map((tab) => (
         <button
           key={tab.label}

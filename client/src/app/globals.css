@@ -50,6 +50,7 @@
 
 html {
   overflow-x: hidden;
+  overscroll-behavior-x: none;
 }
 
 body {
@@ -57,6 +58,12 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   overflow-x: hidden;
+  overscroll-behavior-x: none;
+  /* Stops an ambiguous horizontal swipe from being captured as a page-level
+     drag (a brief sideways "give" that then snaps back) — vertical panning
+     still works everywhere, and elements with their own horizontal
+     scroller (e.g. the feed tabs) set their own touch-action. */
+  touch-action: pan-y;
 }
 
 .dark body {
