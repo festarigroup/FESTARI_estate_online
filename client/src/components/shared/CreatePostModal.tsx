@@ -20,9 +20,9 @@ const MEDIA_ACCEPT = ["image/png", "image/jpeg", "image/gif", "video/mp4", "vide
 const MEDIA_HELPER = "PNG, JPEG, GIF, MP4, MOV, WEBM";
 
 const POST_TYPE_ROW: { key: "media" | "poll" | "article"; label: string; icon: string }[] = [
-  { key: "media", label: "Media", icon: "/icons/article-toolbar-link-bold.svg" },
-  { key: "poll", label: "Poll", icon: "/icons/chart-02-bold.svg" },
-  { key: "article", label: "Article", icon: "/icons/book-bookmark-01-bold.svg" },
+  { key: "media", label: "Media", icon: "/icons/media-gallery.svg" },
+  { key: "poll", label: "Poll", icon: "/icons/poll-bar-chart.svg" },
+  { key: "article", label: "Article", icon: "/icons/article-document.svg" },
 ];
 
 interface CreatePostModalProps {
@@ -190,10 +190,10 @@ export function CreatePostModal({ open, onClose, onSwitchType }: CreatePostModal
                     event.stopPropagation();
                     inputRef.current?.click();
                   }}
-                  className="flex h-6 items-center justify-center gap-1.5 rounded-[40px] bg-[#19161d] px-2 text-xs text-white"
+                  className="flex h-11 items-center justify-center gap-2 rounded-[40px] bg-[#19161d] px-4 text-sm font-medium text-white"
                 >
                   Choose files
-                  <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={14} />
+                  <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={16} />
                 </button>
               </div>
               <p className="w-full text-xs text-[#53575a]">{MEDIA_HELPER}</p>

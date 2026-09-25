@@ -277,10 +277,10 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                       event.stopPropagation();
                       inputRef.current?.click();
                     }}
-                    className="flex h-6 w-full items-center justify-center gap-1.5 rounded-[40px] bg-[#19161d] px-2 text-xs text-white"
+                    className="flex h-11 w-full items-center justify-center gap-2 rounded-[40px] bg-[#19161d] px-4 text-sm font-medium text-white"
                   >
                     Choose files
-                    <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={14} />
+                    <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={16} />
                   </button>
                   <p className="text-xs text-[#53575a]">PNG, JPEG, GIF, MP4, MKV, AVI</p>
                 </div>
@@ -428,13 +428,13 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
           />
           <div className="flex items-center gap-2 border-r border-[#86b3fb] pr-3">
             <button type="button" aria-label="Media" onClick={() => setMode("post")}>
-              <NavIcon icon="/icons/image-01.svg" color="brand" size={18} className="bg-[#337df2]" />
+              <NavIcon icon="/icons/media-gallery.svg" color="brand" size={18} className="bg-[#337df2]" />
             </button>
             <button type="button" aria-label="Poll" onClick={() => setMode("poll")}>
-              <NavIcon icon="/icons/chart-02-bold.svg" color="brand" size={18} className="bg-[#337df2]" />
+              <NavIcon icon="/icons/poll-bar-chart.svg" color="brand" size={18} className="bg-[#337df2]" />
             </button>
             <button type="button" aria-label="Article" onClick={() => setMode("article")}>
-              <NavIcon icon="/icons/book-bookmark-01-bold.svg" color="brand" size={18} className="bg-[#337df2]" />
+              <NavIcon icon="/icons/article-document.svg" color="brand" size={18} className="bg-[#337df2]" />
             </button>
           </div>
           <button

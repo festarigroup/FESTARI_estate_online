@@ -278,13 +278,13 @@ export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModal
                 onChange={(event) => addFiles(event.target.files)}
               />
               <button type="button" aria-label="Media" onClick={() => onSwitchType?.("media")}>
-                <NavIcon icon="/icons/article-toolbar-link-bold.svg" color="brand" size={18} className="bg-[#337df2]" />
+                <NavIcon icon="/icons/media-gallery.svg" color="brand" size={18} className="bg-[#337df2]" />
               </button>
               <button type="button" aria-label="Poll" onClick={() => {}}>
-                <NavIcon icon="/icons/chart-02-bold.svg" color="brand" size={18} className="bg-[#337df2]" />
+                <NavIcon icon="/icons/poll-bar-chart.svg" color="brand" size={18} className="bg-[#337df2]" />
               </button>
               <button type="button" aria-label="Article" onClick={() => onSwitchType?.("article")}>
-                <NavIcon icon="/icons/book-bookmark-01-bold.svg" color="brand" size={18} className="bg-[#337df2]" />
+                <NavIcon icon="/icons/article-document.svg" color="brand" size={18} className="bg-[#337df2]" />
               </button>
             </div>
             <div className="flex items-center gap-2">
