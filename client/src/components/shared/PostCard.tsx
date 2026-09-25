@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
 import { EmojiPicker } from "@/components/shared/EmojiPicker";
 import { FollowButton } from "@/components/shared/FollowButton";
+import { LikesBottomSheet } from "@/components/shared/LikesBottomSheet";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { Tooltip } from "@/components/shared/Tooltip";
 import { comingSoonHref } from "@/lib/coming-soon";
@@ -656,8 +657,10 @@ function PostStatsBar({
 }) {
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [likesSheetOpen, setLikesSheetOpen] = useState(false);
 
   const likeCount = post.likes + (liked ? 1 : 0);
+  const likerNames = buildLikerNames(likeCount);
 
   const handleShare = async () => {
     const shareUrl =
@@ -748,9 +751,13 @@ function PostStatsBar({
       </div>
 
       {likeCount > 0 && (
-        <div className="flex items-center justify-between gap-2 sm:hidden">
-          <p className="min-w-0 flex-1 truncate text-[11px] text-gray-600">
-            Liked by <span className="font-bold text-brand-900">Kwame</span>
+        <button
+          type="button"
+          onClick={() => setLikesSheetOpen(true)}
+          className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-start"
+        >
+          <p className="min-w-0 flex-1 truncate text-left text-[11px] text-gray-600 sm:flex-none">
+            Liked by <span className="font-bold text-brand-900">{likerNames[0]}</span>
             {likeCount > 1 && (
               <>
                 {" "}
@@ -758,7 +765,7 @@ function PostStatsBar({
               </>
             )}
           </p>
-          <span className="flex shrink-0 items-center -space-x-2">
+          <span className="flex shrink-0 items-center -space-x-2 sm:order-first sm:mr-1">
             {[0, 1, 2].map((avatar) => (
               <span
                 key={avatar}
@@ -773,10 +780,21 @@ function PostStatsBar({
               </span>
             )}
           </span>
-        </div>
+        </button>
       )}
+
+      <LikesBottomSheet open={likesSheetOpen} onClose={() => setLikesSheetOpen(false)} names={likerNames} />
     </div>
   );
+}
+
+const LIKER_NAME_POOL = [
+  "Kwame", "Ama Boateng", "Kojo Mensah", "Efua Owusu", "Kwabena Asante",
+  "Akosua Darko", "Yaw Agyeman", "Abena Sarpong", "Kofi Appiah", "Adjoa Nkrumah",
+];
+
+function buildLikerNames(count: number): string[] {
+  return Array.from({ length: count }, (_, index) => LIKER_NAME_POOL[index % LIKER_NAME_POOL.length]);
 }
 
 function CommentsSection({ comments }: { comments: CommentItem[] }) {
