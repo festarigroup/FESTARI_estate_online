@@ -103,12 +103,8 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
     setVisibilityOpen(false);
   }
 
-  function openAddOption() {
-    const rect = cardRef.current?.getBoundingClientRect();
-    if (rect) setOptionOverlayCenter({ top: rect.top + rect.height / 2, left: rect.left + rect.width / 2 });
-    setNewOption("");
-    setEditingOptionIndex(null);
-    setAddingOption(true);
+  function addPollOption() {
+    setPollOptions((current) => [...current, `Option ${current.length + 1}`]);
   }
 
   function openEditOption(index: number) {
@@ -293,14 +289,16 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                   <NavIcon icon="/icons/poll-option-edit.svg" color="night" size={14} className="bg-gray-400 hover:bg-night-900" />
                 </button>
                 <p className="w-full flex-1 truncate text-sm text-night-900">{option}</p>
-                <button
-                  type="button"
-                  aria-label={`Remove option: ${option}`}
-                  onClick={() => removePollOption(index)}
-                  className="shrink-0"
-                >
-                  <NavIcon icon="/icons/poll-option-delete.svg" color="night" size={14} className="bg-red-500" />
-                </button>
+                {index >= 2 && (
+                  <button
+                    type="button"
+                    aria-label={`Remove option: ${option}`}
+                    onClick={() => removePollOption(index)}
+                    className="shrink-0"
+                  >
+                    <NavIcon icon="/icons/poll-option-delete.svg" color="night" size={14} className="bg-red-500" />
+                  </button>
+                )}
               </div>
             ))}
             <div className="flex w-full items-center justify-between">
@@ -308,7 +306,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
               <button
                 type="button"
                 aria-label="Add option"
-                onClick={openAddOption}
+                onClick={addPollOption}
                 disabled={pollOptions.length >= MAX_POLL_OPTIONS}
               >
                 <svg
@@ -491,7 +489,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
             }}
             role="dialog"
             aria-modal="true"
-            aria-label={editingOptionIndex !== null ? "Edit poll option" : "Add poll option"}
+            aria-label="Edit poll option"
           >
             <div
               onClick={(event) => event.stopPropagation()}
@@ -505,12 +503,12 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                 onKeyDown={(event) => {
                   if (event.key === "Enter") confirmAddOption();
                 }}
-                placeholder={editingOptionIndex !== null ? "Edit option" : `Option ${pollOptions.length + 1}`}
+                placeholder="Edit option"
                 className="w-full flex-1 text-sm text-night-900 placeholder:text-night-900/70 focus:outline-none"
               />
               <button
                 type="button"
-                aria-label={editingOptionIndex !== null ? "Save option" : "Add option"}
+                aria-label="Save option"
                 onClick={confirmAddOption}
                 disabled={!newOption.trim()}
                 className={cn("relative block size-[23px] shrink-0", !newOption.trim() && "opacity-30")}
