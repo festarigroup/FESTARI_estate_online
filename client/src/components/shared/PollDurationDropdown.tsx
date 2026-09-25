@@ -20,14 +20,23 @@ export function PollDurationDropdown({ value, onChange, options = DURATION_OPTIO
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
-  const [position, setPosition] = useState<{ top: number; left: number; width: number } | null>(null);
+  const [position, setPosition] = useState<{ top?: number; bottom?: number; left: number; width: number } | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!open) return;
     function updatePosition() {
       const rect = triggerRef.current?.getBoundingClientRect();
       if (!rect) return;
-      setPosition({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+      const estimatedPanelHeight = 8 + options.length * 40;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const left = Math.min(rect.left, window.innerWidth - rect.width - 8);
+      if (spaceBelow < estimatedPanelHeight && rect.top > estimatedPanelHeight) {
+        setPosition({ bottom: window.innerHeight - rect.top + 4, left, width: rect.width });
+      } else {
+        setPosition({ top: rect.bottom + 4, left, width: rect.width });
+      }
     }
     updatePosition();
     window.addEventListener("resize", updatePosition);
@@ -36,7 +45,7 @@ export function PollDurationDropdown({ value, onChange, options = DURATION_OPTIO
       window.removeEventListener("resize", updatePosition);
       window.removeEventListener("scroll", updatePosition, true);
     };
-  }, [open]);
+  }, [open, options.length]);
 
   useEffect(() => {
     if (!open) return;
@@ -79,7 +88,7 @@ export function PollDurationDropdown({ value, onChange, options = DURATION_OPTIO
         createPortal(
           <div
             ref={panelRef}
-            style={{ top: position.top, left: position.left, width: position.width }}
+            style={{ top: position.top, bottom: position.bottom, left: position.left, width: position.width }}
             className="fixed z-[120] flex flex-col gap-1 rounded-lg border border-[#cbd5e0] bg-white p-1 shadow-[0px_0px_24px_0px_rgba(0,0,0,0.08)]"
           >
             {options.map((option) => {
