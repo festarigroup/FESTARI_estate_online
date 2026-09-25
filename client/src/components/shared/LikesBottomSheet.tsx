@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { FollowButton } from "@/components/shared/FollowButton";
+import { NavIcon } from "@/components/shared/NavIcon";
+import { Tooltip } from "@/components/shared/Tooltip";
 import { cn } from "@/lib/utils";
 import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 
@@ -64,7 +66,7 @@ export function LikesBottomSheet({ open, onClose, names }: LikesBottomSheetProps
             </button>
           </div>
 
-          <LikesTabbedList names={names} className="px-6" />
+          <LikesTabbedList names={names} className="px-6" variant="sheet" />
         </div>
       </div>
 
@@ -88,7 +90,7 @@ export function LikesBottomSheet({ open, onClose, names }: LikesBottomSheetProps
           </button>
 
           <div className="flex max-h-[85vh] w-full flex-col rounded-2xl bg-white px-4 py-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)]">
-            <LikesTabbedList names={names} />
+            <LikesTabbedList names={names} variant="modal" />
           </div>
         </div>
       </div>
@@ -97,7 +99,15 @@ export function LikesBottomSheet({ open, onClose, names }: LikesBottomSheetProps
   );
 }
 
-function LikesTabbedList({ names, className }: { names: string[]; className?: string }) {
+function LikesTabbedList({
+  names,
+  className,
+  variant,
+}: {
+  names: string[];
+  className?: string;
+  variant: "sheet" | "modal";
+}) {
   const [tab, setTab] = useState<"all" | "followers">("all");
   const [following, setFollowing] = useState<Record<number, boolean>>(() =>
     Object.fromEntries(names.map((_, index) => [index, index % 3 === 0])),
@@ -110,7 +120,7 @@ function LikesTabbedList({ names, className }: { names: string[]; className?: st
     .filter((row) => tab === "all" || row.isFollower);
 
   return (
-    <div className={cn("flex w-full flex-1 flex-col overflow-y-auto overflow-x-hidden", className)}>
+    <div className={cn("no-scrollbar flex w-full flex-1 flex-col overflow-y-auto overflow-x-hidden", className)}>
       <div className="sticky top-0 z-10 flex w-full shrink-0 gap-4 border-b border-[#ebebeb] bg-white">
         {(["all", "followers"] as const).map((key) => (
           <button
@@ -128,22 +138,50 @@ function LikesTabbedList({ names, className }: { names: string[]; className?: st
         ))}
       </div>
 
-      <div className="flex w-full flex-col">
-        {rows.map(({ name, index }) => (
-          <div key={`${name}-${index}`} className="flex h-10 w-full items-center justify-between border-b border-[#f1f5f9] last:border-b-0">
-            <span className="flex items-center gap-1.5">
-              <span className="relative block size-8 shrink-0 overflow-hidden rounded-full bg-[#eef2ff]">
-                <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="32px" className="p-1" />
+      <div className="flex w-full flex-col gap-2 pt-2">
+        {rows.map(({ name, index }) => {
+          const isFollowing = following[index] ?? false;
+          const toggle = () => setFollowing((current) => ({ ...current, [index]: !current[index] }));
+
+          return (
+            <div
+              key={`${name}-${index}`}
+              className="flex h-14 w-full items-center justify-between gap-2 rounded-xl border border-[#e2e8f0] px-3"
+            >
+              <span className="flex min-w-0 items-center gap-2">
+                {variant === "modal" && (
+                  <span className="relative block size-8 shrink-0 overflow-hidden rounded-full bg-[#eef2ff]">
+                    <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="32px" className="p-1" />
+                  </span>
+                )}
+                <span className="truncate text-sm font-medium text-[#111826]">{name}</span>
               </span>
-              <span className="truncate text-sm font-medium text-[#111826]">{name}</span>
-            </span>
-            <FollowButton
-              following={following[index] ?? false}
-              onToggle={() => setFollowing((current) => ({ ...current, [index]: !current[index] }))}
-              name={name}
-            />
-          </div>
-        ))}
+
+              {variant === "sheet" ? (
+                <Tooltip label={isFollowing ? "Following" : "Follow"}>
+                  <button
+                    type="button"
+                    aria-pressed={isFollowing}
+                    aria-label={isFollowing ? `Following ${name}` : `Follow ${name}`}
+                    onClick={toggle}
+                    className={cn(
+                      "flex size-8 shrink-0 items-center justify-center rounded-full border",
+                      isFollowing ? "border-brand-900 bg-brand-900" : "border-brand-900 bg-white",
+                    )}
+                  >
+                    <NavIcon
+                      icon={isFollowing ? "/icons/check-circle.svg" : "/icons/user-add-01.svg"}
+                      color={isFollowing ? "white" : "brand"}
+                      size={16}
+                    />
+                  </button>
+                </Tooltip>
+              ) : (
+                <FollowButton following={isFollowing} onToggle={toggle} name={name} />
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
