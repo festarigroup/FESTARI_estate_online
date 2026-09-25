@@ -122,7 +122,7 @@ export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModal
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 sm:items-center sm:p-4"
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
@@ -130,21 +130,22 @@ export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModal
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="relative w-full max-w-[720px]"
+        className="relative w-full sm:max-w-[720px]"
       >
         <button
           type="button"
           aria-label="Close"
           onClick={handleClose}
-          className="absolute -right-3 -top-3 z-10 flex size-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-md hover:bg-gray-50"
+          className="absolute -right-3 -top-3 z-10 hidden size-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-md hover:bg-gray-50 sm:flex"
         >
           <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true">
             <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </button>
 
-        <div className="flex max-h-[90vh] w-full flex-col gap-6 overflow-y-auto rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
+        <div className="flex max-h-[90vh] w-full flex-col gap-6 overflow-y-auto rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] max-sm:animate-sheet-slide-up sm:rounded-2xl">
 
+        <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154] sm:hidden" />
         <p className="text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Create a Post</p>
 
         <div className="flex w-full flex-col gap-2.5 rounded-2xl border border-gray-200 p-4">

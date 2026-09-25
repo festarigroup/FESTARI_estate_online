@@ -220,7 +220,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50"
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
@@ -230,12 +230,11 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
         ref={cardRef}
         onClick={(event) => event.stopPropagation()}
         className={cn(
-          "flex w-full flex-col gap-3 rounded-[36px] bg-white p-6 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]",
-          mode === "article" ? "max-w-[400px] max-h-[85vh] overflow-hidden" : "max-w-[340px] overflow-y-auto",
-          mode === "poll" && (pollOptions.length === 0 ? "aspect-[1/0.7]" : "aspect-square"),
-          mode === "post" && (files.length === 0 ? "aspect-[1/0.7]" : "aspect-square"),
+          "flex w-full max-h-[85vh] flex-col gap-3 rounded-t-[36px] bg-white p-6 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)] animate-sheet-slide-up",
+          mode === "article" ? "overflow-hidden" : "overflow-y-auto",
         )}
       >
+        <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154]" />
         <div className="flex w-full shrink-0 items-start justify-between gap-2">
           <div className="flex items-center gap-2.5">
             <span className="relative block size-12 shrink-0">
