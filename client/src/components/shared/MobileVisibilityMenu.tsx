@@ -21,14 +21,14 @@ const SEARCH_PROFILES: SearchProfile[] = [
   { name: "Madeline Price", role: "Researcher", avatar: "/icons/avatar-sample.jpg" },
 ];
 
-const ORGANIZATION_ITEMS: SelectSheetItem[] = [
+export const ORGANIZATION_ITEMS: SelectSheetItem[] = [
   { name: "Organization 1", role: "Lead Product Designer", avatar: "/icons/org.svg", avatarIsIcon: true },
   { name: "Organization 2", role: "Product Designer", avatar: "/icons/org.svg", avatarIsIcon: true, disabled: true },
   { name: "Organization 3", role: "Head of Design", avatar: "/icons/org.svg", avatarIsIcon: true },
   { name: "Organization 4", role: "Product Designer", avatar: "/icons/org.svg", avatarIsIcon: true },
   { name: "Organization 5", role: "Chief Strategy Officer", avatar: "/icons/org.svg", avatarIsIcon: true },
 ];
-const COMMUNITY_ITEMS: SelectSheetItem[] = [
+export const COMMUNITY_ITEMS: SelectSheetItem[] = [
   { name: "Community 1", role: "Lead Product Designer", avatar: "/icons/avatar-sample.jpg" },
   { name: "Community 2", role: "Product Designer", avatar: "/icons/avatar-andy.png", disabled: true },
   { name: "Community 3", role: "Head of Design", avatar: "/icons/avatar-sample.jpg" },
@@ -85,12 +85,26 @@ interface MobileVisibilityMenuProps {
   value: PostVisibility;
   onChange: (value: PostVisibility) => void;
   anchorRef: RefObject<HTMLElement | null>;
+  /** "sheet" (default): community/organization open as a nested bottom sheet.
+   * "swap": delegate to onOpenSwapPicker instead, so the caller can swap its
+   * own content in place rather than stacking another sheet. Comparison aid
+   * for deciding between the two nested-picker UX approaches. */
+  pickerStyle?: "sheet" | "swap";
+  onOpenSwapPicker?: (kind: "community" | "organization") => void;
 }
 
 /** The compact floating "Everyone/Following/Community/Organization" menu
  * used by the mobile quick-post composer (Figma node 400:14042) — distinct
  * from the desktop VisibilityMenu's larger "Who can view?" panel. */
-export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef }: MobileVisibilityMenuProps) {
+export function MobileVisibilityMenu({
+  open,
+  onClose,
+  value,
+  onChange,
+  anchorRef,
+  pickerStyle = "sheet",
+  onOpenSwapPicker,
+}: MobileVisibilityMenuProps) {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = useState<{ bottom: number; left: number } | null>(null);
   const [communitySheetOpen, setCommunitySheetOpen] = useState(false);
@@ -175,7 +189,7 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
         active={value.kind === "custom" && value.communities.length > 0}
         hasChevron
         ariaExpanded={communitySheetOpen}
-        onClick={() => setCommunitySheetOpen(true)}
+        onClick={() => (pickerStyle === "swap" ? onOpenSwapPicker?.("community") : setCommunitySheetOpen(true))}
       />
       <Row
         label="Organization"
@@ -183,29 +197,33 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
         active={value.kind === "custom" && value.organizations.length > 0}
         hasChevron
         ariaExpanded={organizationSheetOpen}
-        onClick={() => setOrganizationSheetOpen(true)}
+        onClick={() => (pickerStyle === "swap" ? onOpenSwapPicker?.("organization") : setOrganizationSheetOpen(true))}
       />
 
-      <MobileSelectSheet
-        open={communitySheetOpen}
-        onClose={() => setCommunitySheetOpen(false)}
-        title="Select Community"
-        items={COMMUNITY_ITEMS}
-        selected={value.kind === "custom" ? value.communities : []}
-        onChangeSelected={(names) => {
-          onChange(buildCustomVisibility(names, value.kind === "custom" ? value.organizations : []));
-        }}
-      />
-      <MobileSelectSheet
-        open={organizationSheetOpen}
-        onClose={() => setOrganizationSheetOpen(false)}
-        title="Select Organization"
-        items={ORGANIZATION_ITEMS}
-        selected={value.kind === "custom" ? value.organizations : []}
-        onChangeSelected={(names) => {
-          onChange(buildCustomVisibility(value.kind === "custom" ? value.communities : [], names));
-        }}
-      />
+      {pickerStyle === "sheet" && (
+        <>
+          <MobileSelectSheet
+            open={communitySheetOpen}
+            onClose={() => setCommunitySheetOpen(false)}
+            title="Select Community"
+            items={COMMUNITY_ITEMS}
+            selected={value.kind === "custom" ? value.communities : []}
+            onChangeSelected={(names) => {
+              onChange(buildCustomVisibility(names, value.kind === "custom" ? value.organizations : []));
+            }}
+          />
+          <MobileSelectSheet
+            open={organizationSheetOpen}
+            onClose={() => setOrganizationSheetOpen(false)}
+            title="Select Organization"
+            items={ORGANIZATION_ITEMS}
+            selected={value.kind === "custom" ? value.organizations : []}
+            onChangeSelected={(names) => {
+              onChange(buildCustomVisibility(value.kind === "custom" ? value.communities : [], names));
+            }}
+          />
+        </>
+      )}
 
       <div className="mt-0.5 flex h-[29px] w-full items-center gap-1 rounded-2xl border-[0.6px] border-gray-300 bg-[#f6f6f9] px-2 py-1.5">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="shrink-0 text-gray-400">
