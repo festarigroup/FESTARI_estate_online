@@ -39,7 +39,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
   const [bodyEmpty, setBodyEmpty] = useState(true);
   const bodyRef = useRef<HTMLDivElement | null>(null);
   const [pollQuestion, setPollQuestion] = useState("");
-  const [pollOptions, setPollOptions] = useState<string[]>(["Option 1", "Option 2"]);
+  const [pollOptions, setPollOptions] = useState<string[]>(["", ""]);
   const [duration, setDuration] = useState(DURATION_OPTIONS[0]);
   const [files, setFiles] = useState<File[]>([]);
   const previews = useMemo(
@@ -84,7 +84,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
     if (bodyRef.current) bodyRef.current.innerHTML = "";
     setBodyEmpty(true);
     setPollQuestion("");
-    setPollOptions(["Option 1", "Option 2"]);
+    setPollOptions(["", ""]);
     setDuration(DURATION_OPTIONS[0]);
     setFiles([]);
     setVisibility(DEFAULT_VISIBILITY);
@@ -92,7 +92,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
   }
 
   function addPollOption() {
-    setPollOptions((current) => [...current, `Option ${current.length + 1}`]);
+    setPollOptions((current) => [...current, ""]);
   }
 
   function updatePollOption(index: number, value: string) {
