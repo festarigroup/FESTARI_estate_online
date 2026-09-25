@@ -198,7 +198,7 @@ export function MobileSelectSheet({ open, onClose, title, items, selected, onCha
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="flex max-h-[85vh] w-full animate-sheet-slide-up flex-col gap-4 rounded-t-[32px] bg-white pb-6 pt-4 shadow-[0px_-4px_8px_0px_rgba(69,71,69,0.15)]"
+        className="flex h-[85vh] w-full animate-sheet-slide-up flex-col gap-4 rounded-t-[32px] bg-white pb-6 pt-4 shadow-[0px_-4px_8px_0px_rgba(69,71,69,0.15)]"
       >
         <SelectSheetBody
           title={title}
