@@ -5,15 +5,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
-import { COMMUNITY_ITEMS, MobileVisibilityMenu, ORGANIZATION_ITEMS } from "@/components/shared/MobileVisibilityMenu";
-import { SelectSheetBody } from "@/components/shared/MobileSelectSheet";
+import { MobileVisibilityMenu } from "@/components/shared/MobileVisibilityMenu";
 import { DURATION_OPTIONS, PollDurationDropdown } from "@/components/shared/PollDurationDropdown";
-import {
-  DEFAULT_VISIBILITY,
-  buildCustomVisibility,
-  getVisibilityIcon,
-  type PostVisibility,
-} from "@/components/shared/VisibilityMenu";
+import { DEFAULT_VISIBILITY, getVisibilityIcon, type PostVisibility } from "@/components/shared/VisibilityMenu";
 import { usePostsFeed } from "@/context/PostsContext";
 import { cn } from "@/lib/utils";
 
@@ -61,11 +55,6 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
   const [visibilityOpen, setVisibilityOpen] = useState(false);
   const [visibility, setVisibility] = useState<PostVisibility>(DEFAULT_VISIBILITY);
   const visibilityTriggerRef = useRef<HTMLButtonElement | null>(null);
-  // Temporary comparison toggle between the two nested-picker UX approaches
-  // (see MobileVisibilityMenu's pickerStyle prop) — pick one and remove this
-  // once decided.
-  const [pickerStyle, setPickerStyle] = useState<"sheet" | "swap">("sheet");
-  const [swapPicker, setSwapPicker] = useState<"community" | "organization" | null>(null);
 
   const [wasOpen, setWasOpen] = useState(open);
   if (open !== wasOpen) {
@@ -112,7 +101,6 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
     setFiles([]);
     setVisibility(DEFAULT_VISIBILITY);
     setVisibilityOpen(false);
-    setSwapPicker(null);
   }
 
   function addPollOption() {
@@ -244,41 +232,6 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
       >
         <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154]" />
 
-        {!swapPicker && (
-          <button
-            type="button"
-            onClick={() => setPickerStyle((v) => (v === "sheet" ? "swap" : "sheet"))}
-            className="self-center rounded-full bg-gray-100 px-2.5 py-1 text-[10px] font-medium text-gray-500"
-          >
-            Comparing: {pickerStyle === "sheet" ? "nested sheet" : "in-place swap"} (tap to switch)
-          </button>
-        )}
-
-        {swapPicker ? (
-          <SelectSheetBody
-            title={swapPicker === "community" ? "Select Community" : "Select Organization"}
-            items={swapPicker === "community" ? COMMUNITY_ITEMS : ORGANIZATION_ITEMS}
-            selected={
-              visibility.kind === "custom"
-                ? swapPicker === "community"
-                  ? visibility.communities
-                  : visibility.organizations
-                : []
-            }
-            onChangeSelected={(names) => {
-              setVisibility((current) => {
-                const communities = current.kind === "custom" ? current.communities : [];
-                const organizations = current.kind === "custom" ? current.organizations : [];
-                return swapPicker === "community"
-                  ? buildCustomVisibility(names, organizations)
-                  : buildCustomVisibility(communities, names);
-              });
-            }}
-            onClose={() => setSwapPicker(null)}
-            variant="inline"
-          />
-        ) : (
-          <>
         <div className="flex w-full shrink-0 items-center gap-2.5">
           <button type="button" aria-label="Close" onClick={handleClose} className="flex size-6 shrink-0 items-center justify-center text-night-900">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -516,11 +469,6 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
               if (next.kind === "everyone" || next.kind === "followings") setVisibilityOpen(false);
             }}
             anchorRef={visibilityTriggerRef}
-            pickerStyle={pickerStyle}
-            onOpenSwapPicker={(kind) => {
-              setVisibilityOpen(false);
-              setSwapPicker(kind);
-            }}
           />
         </div>
         <button
@@ -534,8 +482,6 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
           Post
         </button>
         </div>
-        </>
-        )}
       </div>
 
       {addingOption &&
