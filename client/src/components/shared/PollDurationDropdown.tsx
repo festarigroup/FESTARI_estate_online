@@ -72,7 +72,7 @@ export function PollDurationDropdown({ value, onChange, options = DURATION_OPTIO
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="relative flex h-12 w-full items-center justify-between rounded-lg border border-[#cbd5e0] bg-white px-3 text-left text-sm text-[#0f1621]"
+        className="relative flex h-12 w-full items-center justify-between rounded-2xl border border-[#cbd5e0] bg-white px-3 text-left text-sm text-[#0f1621]"
       >
         <span>{value}</span>
         <NavIcon
