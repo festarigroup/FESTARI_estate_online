@@ -8,6 +8,7 @@ import { showSuccessToast } from "@/components/shared/AppToast";
 import { CreateMenu } from "@/components/shared/CreateMenu";
 import { MobileQuickPostModal, type QuickComposerMode } from "@/components/shared/MobileQuickPostModal";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { Tooltip } from "@/components/shared/Tooltip";
 import { usePostModals } from "@/hooks/usePostModals";
 import { comingSoonHref } from "@/lib/coming-soon";
 
@@ -85,16 +86,18 @@ export function TopNav() {
         </div>
 
         <div className="flex shrink-0 items-center gap-1 py-1 sm:gap-2 sm:px-2">
-          <button
-            type="button"
-            aria-label="Search"
-            onClick={() => goComingSoon("Search")}
-            className="relative flex size-[38px] items-center justify-center rounded-full hover:bg-gray-50 sm:hidden"
-          >
-            <span className="relative block size-[19px] shrink-0">
-              <Image src="/icons/search.svg" alt="" fill sizes="19px" />
-            </span>
-          </button>
+          <Tooltip label="Search" side="bottom" className="sm:hidden">
+            <button
+              type="button"
+              aria-label="Search"
+              onClick={() => goComingSoon("Search")}
+              className="relative flex size-[38px] items-center justify-center rounded-full hover:bg-gray-50"
+            >
+              <span className="relative block size-[19px] shrink-0">
+                <Image src="/icons/search.svg" alt="" fill sizes="19px" />
+              </span>
+            </button>
+          </Tooltip>
 
           <div ref={createMenuRef} className="relative">
             <button
@@ -119,29 +122,33 @@ export function TopNav() {
             )}
           </div>
 
-          <button
-            type="button"
-            aria-label="Messages"
-            onClick={() => goComingSoon("Messages")}
-            className="relative hidden size-[38px] shrink-0 items-center justify-center rounded-full hover:bg-gray-50 sm:flex"
-          >
-            <span className="relative block size-[19px] shrink-0">
-              <Image src="/icons/message-programming.svg" alt="" fill sizes="19px" />
-            </span>
-            <span className="absolute right-[7px] top-[8px] size-1.5 rounded-full border border-[#f5f0f9] bg-red-500" />
-          </button>
+          <Tooltip label="Messages" side="bottom" className="hidden sm:inline-flex">
+            <button
+              type="button"
+              aria-label="Messages"
+              onClick={() => goComingSoon("Messages")}
+              className="relative flex size-[38px] shrink-0 items-center justify-center rounded-full hover:bg-gray-50"
+            >
+              <span className="relative block size-[19px] shrink-0">
+                <Image src="/icons/message-programming.svg" alt="" fill sizes="19px" />
+              </span>
+              <span className="absolute right-[7px] top-[8px] size-1.5 rounded-full border border-[#f5f0f9] bg-red-500" />
+            </button>
+          </Tooltip>
 
-          <button
-            type="button"
-            aria-label="Notifications"
-            onClick={() => goComingSoon("Notifications")}
-            className="relative hidden size-[38px] shrink-0 items-center justify-center rounded-full hover:bg-gray-50 sm:flex"
-          >
-            <span className="relative block size-[19px] shrink-0">
-              <Image src="/icons/notification.svg" alt="" fill sizes="19px" />
-            </span>
-            <span className="absolute right-[7px] top-[8px] size-1.5 rounded-full border border-[#f5f0f9] bg-red-500" />
-          </button>
+          <Tooltip label="Notifications" side="bottom" className="hidden sm:inline-flex">
+            <button
+              type="button"
+              aria-label="Notifications"
+              onClick={() => goComingSoon("Notifications")}
+              className="relative flex size-[38px] shrink-0 items-center justify-center rounded-full hover:bg-gray-50"
+            >
+              <span className="relative block size-[19px] shrink-0">
+                <Image src="/icons/notification.svg" alt="" fill sizes="19px" />
+              </span>
+              <span className="absolute right-[7px] top-[8px] size-1.5 rounded-full border border-[#f5f0f9] bg-red-500" />
+            </button>
+          </Tooltip>
 
           <div ref={menuRef} className="relative">
             <button

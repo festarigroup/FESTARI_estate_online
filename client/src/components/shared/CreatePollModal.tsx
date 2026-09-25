@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { DURATION_OPTIONS, PollDurationDropdown } from "@/components/shared/PollDurationDropdown";
+import { Tooltip } from "@/components/shared/Tooltip";
 import {
   DEFAULT_VISIBILITY,
   VisibilityMenu,
@@ -277,15 +278,21 @@ export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModal
                 className="hidden"
                 onChange={(event) => addFiles(event.target.files)}
               />
-              <button type="button" aria-label="Media" onClick={() => onSwitchType?.("media")}>
-                <NavIcon icon="/icons/media-gallery.svg" color="brand" size={18} className="bg-[#337df2]" />
-              </button>
-              <button type="button" aria-label="Poll" onClick={() => {}}>
-                <NavIcon icon="/icons/poll-bar-chart.svg" color="brand" size={18} className="bg-[#337df2]" />
-              </button>
-              <button type="button" aria-label="Article" onClick={() => onSwitchType?.("article")}>
-                <NavIcon icon="/icons/article-document.svg" color="brand" size={18} className="bg-[#337df2]" />
-              </button>
+              <Tooltip label="Media">
+                <button type="button" aria-label="Media" onClick={() => onSwitchType?.("media")}>
+                  <NavIcon icon="/icons/media-gallery.svg" color="brand" size={18} className="bg-[#337df2]" />
+                </button>
+              </Tooltip>
+              <Tooltip label="Poll">
+                <button type="button" aria-label="Poll" onClick={() => {}}>
+                  <NavIcon icon="/icons/poll-bar-chart.svg" color="brand" size={18} className="bg-[#337df2]" />
+                </button>
+              </Tooltip>
+              <Tooltip label="Article">
+                <button type="button" aria-label="Article" onClick={() => onSwitchType?.("article")}>
+                  <NavIcon icon="/icons/article-document.svg" color="brand" size={18} className="bg-[#337df2]" />
+                </button>
+              </Tooltip>
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-0.5">
@@ -293,9 +300,11 @@ export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModal
                 <span className="whitespace-nowrap text-sm text-[#1465e6]">{wordCount} words</span>
               </div>
               <div className="h-[22px] w-px shrink-0 bg-gray-200" />
-              <button type="button" aria-label="Attach image or video" onClick={() => inputRef.current?.click()}>
-                <NavIcon icon="/icons/poll-add-alt.svg" color="brand" size={16} className="bg-[#1465e6]" />
-              </button>
+              <Tooltip label="Attach image or video">
+                <button type="button" aria-label="Attach image or video" onClick={() => inputRef.current?.click()}>
+                  <NavIcon icon="/icons/poll-add-alt.svg" color="brand" size={16} className="bg-[#1465e6]" />
+                </button>
+              </Tooltip>
               <button
                 type="button"
                 onClick={handlePost}

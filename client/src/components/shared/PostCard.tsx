@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
 import { FollowButton } from "@/components/shared/FollowButton";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { Tooltip } from "@/components/shared/Tooltip";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { renderWithHashtags } from "@/lib/hashtags";
 import { cn } from "@/lib/utils";
@@ -245,20 +246,22 @@ function PostHeader({ post }: { post: PostCardData }) {
       <div className="flex items-center gap-4">
         {post.variant !== "poll" && (
           <>
-            <button
-              type="button"
-              onClick={() => setFollowing((v) => !v)}
-              aria-label={following ? "Following" : "Follow"}
-              aria-pressed={following}
-              className="flex size-[38px] shrink-0 items-center justify-center rounded-lg sm:hidden"
-            >
-              <NavIcon
-                icon={following ? "/icons/check-circle.svg" : "/icons/user-add-01.svg"}
-                color="brand"
-                size={20}
-                className="shrink-0"
-              />
-            </button>
+            <Tooltip label={following ? "Following" : "Follow"} className="sm:hidden">
+              <button
+                type="button"
+                onClick={() => setFollowing((v) => !v)}
+                aria-label={following ? "Following" : "Follow"}
+                aria-pressed={following}
+                className="flex size-[38px] shrink-0 items-center justify-center rounded-lg"
+              >
+                <NavIcon
+                  icon={following ? "/icons/check-circle.svg" : "/icons/user-add-01.svg"}
+                  color="brand"
+                  size={20}
+                  className="shrink-0"
+                />
+              </button>
+            </Tooltip>
             <FollowButton
               following={following}
               onToggle={() => setFollowing((v) => !v)}
@@ -267,22 +270,26 @@ function PostHeader({ post }: { post: PostCardData }) {
             />
           </>
         )}
-        <button
-          type="button"
-          aria-label="Post options"
-          onClick={() => router.push(comingSoonHref("Post options"))}
-          className="relative block size-[23px] shrink-0 sm:hidden"
-        >
-          <Image src="/icons/more-horizontal.svg" alt="" fill sizes="23px" />
-        </button>
-        <button
-          type="button"
-          aria-label="Post options"
-          onClick={() => router.push(comingSoonHref("Post options"))}
-          className="relative hidden size-[23px] shrink-0 sm:block"
-        >
-          <Image src="/icons/menu-03.svg" alt="" fill sizes="23px" />
-        </button>
+        <Tooltip label="Post options" className="sm:hidden">
+          <button
+            type="button"
+            aria-label="Post options"
+            onClick={() => router.push(comingSoonHref("Post options"))}
+            className="relative block size-[23px] shrink-0"
+          >
+            <Image src="/icons/more-horizontal.svg" alt="" fill sizes="23px" />
+          </button>
+        </Tooltip>
+        <Tooltip label="Post options" className="hidden sm:inline-flex">
+          <button
+            type="button"
+            aria-label="Post options"
+            onClick={() => router.push(comingSoonHref("Post options"))}
+            className="relative block size-[23px] shrink-0"
+          >
+            <Image src="/icons/menu-03.svg" alt="" fill sizes="23px" />
+          </button>
+        </Tooltip>
       </div>
     </div>
   );

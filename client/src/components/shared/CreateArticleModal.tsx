@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { Tooltip } from "@/components/shared/Tooltip";
 import {
   DEFAULT_VISIBILITY,
   VisibilityMenu,
@@ -166,30 +167,30 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
 
           <div className="flex w-full flex-col overflow-hidden rounded-lg border border-[#e2e8f0] bg-[#f1f5f9]">
             <div className="flex w-full items-center gap-3.5 px-4 py-2.5">
-              {TOOLBAR_ACTIONS.map((action) =>
-                action.key === "link" ? (
-                  <button
-                    key={action.key}
-                    type="button"
-                    aria-label={action.label}
-                    onMouseDown={(event) => event.preventDefault()}
-                    onClick={() => handleToolbarAction(action.key)}
-                  >
-                    <NavIcon icon="/icons/article-toolbar-link.svg" color="night" size={12} />
-                  </button>
-                ) : (
-                  <button
-                    key={action.key}
-                    type="button"
-                    aria-label={action.label}
-                    onMouseDown={(event) => event.preventDefault()}
-                    onClick={() => handleToolbarAction(action.key)}
-                    className={cn("text-sm text-[#001f3f]", action.className)}
-                  >
-                    {action.glyph}
-                  </button>
-                ),
-              )}
+              {TOOLBAR_ACTIONS.map((action) => (
+                <Tooltip key={action.key} label={action.label}>
+                  {action.key === "link" ? (
+                    <button
+                      type="button"
+                      aria-label={action.label}
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => handleToolbarAction(action.key)}
+                    >
+                      <NavIcon icon="/icons/article-toolbar-link.svg" color="night" size={12} />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      aria-label={action.label}
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => handleToolbarAction(action.key)}
+                      className={cn("text-sm text-[#001f3f]", action.className)}
+                    >
+                      {action.glyph}
+                    </button>
+                  )}
+                </Tooltip>
+              ))}
             </div>
             <div
               className="relative w-full max-h-[320px] flex-1 overflow-y-auto border-t border-[#e2e8f0] bg-white [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-transparent"
@@ -241,16 +242,17 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
             <div className="flex w-full items-center justify-between">
               <div className="flex items-center gap-3">
                 {POST_TYPE_ROW.map((item) => (
-                  <button
-                    key={item.key}
-                    type="button"
-                    aria-label={item.label}
-                    onClick={() => {
-                      if (item.key === "media" || item.key === "poll") onSwitchType?.(item.key);
-                    }}
-                  >
-                    <NavIcon icon={item.icon} color="brand" size={18} className="bg-[#337df2]" />
-                  </button>
+                  <Tooltip key={item.key} label={item.label}>
+                    <button
+                      type="button"
+                      aria-label={item.label}
+                      onClick={() => {
+                        if (item.key === "media" || item.key === "poll") onSwitchType?.(item.key);
+                      }}
+                    >
+                      <NavIcon icon={item.icon} color="brand" size={18} className="bg-[#337df2]" />
+                    </button>
+                  </Tooltip>
                 ))}
               </div>
               <button

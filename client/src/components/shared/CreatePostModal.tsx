@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { Tooltip } from "@/components/shared/Tooltip";
 import {
   DEFAULT_VISIBILITY,
   VisibilityMenu,
@@ -260,14 +261,15 @@ export function CreatePostModal({ open, onClose, onSwitchType }: CreatePostModal
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-3">
               {POST_TYPE_ROW.map((item) => (
-                <button
-                  key={item.key}
-                  type="button"
-                  aria-label={item.key === "media" ? "Attach media" : item.label}
-                  onClick={() => (item.key === "media" ? inputRef.current?.click() : onSwitchType?.(item.key))}
-                >
-                  <NavIcon icon={item.icon} color="brand" size={18} className="bg-[#337df2]" />
-                </button>
+                <Tooltip key={item.key} label={item.key === "media" ? "Attach media" : item.label}>
+                  <button
+                    type="button"
+                    aria-label={item.key === "media" ? "Attach media" : item.label}
+                    onClick={() => (item.key === "media" ? inputRef.current?.click() : onSwitchType?.(item.key))}
+                  >
+                    <NavIcon icon={item.icon} color="brand" size={18} className="bg-[#337df2]" />
+                  </button>
+                </Tooltip>
               ))}
             </div>
             <div className="flex items-center gap-2">
