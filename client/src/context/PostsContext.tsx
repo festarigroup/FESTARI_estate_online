@@ -2,11 +2,13 @@
 
 import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
 import type { PostCardData } from "@/components/shared/PostCard";
+import type { PropertyListing } from "@/lib/dummy-listings";
 
 export type NewPostInput =
   | { kind: "media"; text: string; files: File[] }
   | { kind: "poll"; question: string; options: string[] }
-  | { kind: "article"; headline: string; body: string; files?: File[] };
+  | { kind: "article"; headline: string; body: string; files?: File[] }
+  | { kind: "property"; note: string; listing: PropertyListing };
 
 const CURRENT_USER = {
   authorName: "Madeline Price",
@@ -39,6 +41,26 @@ function buildPost(input: NewPostInput): PostCardData {
         .filter(Boolean)
         .map((label) => ({ label, percent: 0, votes: "0" })),
       pollFooter: `${TODAY} — 0 votes total`,
+    };
+  }
+
+  if (input.kind === "property") {
+    const { listing } = input;
+    return {
+      ...base,
+      variant: "property",
+      text: input.note.trim() || undefined,
+      images: listing.images,
+      priceLine: listing.priceLine,
+      priceSuffix: listing.priceSuffix,
+      subLine: listing.subLine,
+      beds: listing.beds,
+      baths: listing.baths,
+      actions: [
+        { label: "Request viewing", variant: "primary" },
+        { label: "View Property", variant: "outline" },
+      ],
+      messageHostLabel: "Message Host",
     };
   }
 

@@ -4,8 +4,9 @@ import { useState } from "react";
 import { CreateArticleModal } from "@/components/shared/CreateArticleModal";
 import { CreatePollModal } from "@/components/shared/CreatePollModal";
 import { CreatePostModal } from "@/components/shared/CreatePostModal";
+import { PostPropertyModal } from "@/components/shared/PostPropertyModal";
 
-export type PostModalType = "media" | "poll" | "article";
+export type PostModalType = "media" | "poll" | "article" | "property";
 
 /** Shared state + JSX for the Media/Poll/Article create-post modals, so any
  * trigger (TopNav's Create button, the feed composer's icons, etc.) can open them. */
@@ -27,6 +28,7 @@ export function usePostModals() {
       <CreatePostModal open={open && type === "media"} onClose={close} onSwitchType={openPostModal} />
       <CreatePollModal open={open && type === "poll"} onClose={close} onSwitchType={openPostModal} />
       <CreateArticleModal open={open && type === "article"} onClose={close} onSwitchType={openPostModal} />
+      <PostPropertyModal open={open && type === "property"} onClose={close} />
     </>
   );
 

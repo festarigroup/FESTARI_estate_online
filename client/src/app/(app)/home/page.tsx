@@ -232,7 +232,7 @@ export default function HomeFeedPage() {
   );
 }
 
-const LINKED_COMPOSER_KEYS = ["media", "poll", "article"] as const;
+const LINKED_COMPOSER_KEYS = ["media", "poll", "article", "property"] as const;
 
 function ComposerCard() {
   const { openPostModal, modals } = usePostModals();
@@ -297,7 +297,7 @@ function ComposerCard() {
 }
 
 function MobileComposerCard() {
-  const { modals } = usePostModals();
+  const { openPostModal, modals } = usePostModals();
   const { addPost } = usePostsFeed();
   const [commentDraft, setCommentDraft] = useState("");
   const [moreOpen, setMoreOpen] = useState(false);
@@ -383,13 +383,29 @@ function MobileComposerCard() {
         </button>
 
         {moreOpen &&
-          MORE_COMPOSER_ACTIONS.map((action) => (
-            <Link key={action.key} href={comingSoonHref(action.label)} aria-label={action.label}>
-              <span className="relative block size-3.5">
-                <Image src={action.icon} alt="" fill sizes="14px" />
-              </span>
-            </Link>
-          ))}
+          MORE_COMPOSER_ACTIONS.map((action) =>
+            action.key === "property" ? (
+              <button
+                key={action.key}
+                type="button"
+                aria-label={action.label}
+                onClick={() => {
+                  openPostModal("property");
+                  setMoreOpen(false);
+                }}
+              >
+                <span className="relative block size-3.5">
+                  <Image src={action.icon} alt="" fill sizes="14px" />
+                </span>
+              </button>
+            ) : (
+              <Link key={action.key} href={comingSoonHref(action.label)} aria-label={action.label}>
+                <span className="relative block size-3.5">
+                  <Image src={action.icon} alt="" fill sizes="14px" />
+                </span>
+              </Link>
+            ),
+          )}
 
         <button type="button" aria-label="More options" aria-expanded={moreOpen} onClick={() => setMoreOpen((v) => !v)}>
           <span className="relative block size-4">

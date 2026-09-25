@@ -36,7 +36,7 @@ const DESKTOP_LIST_SECTIONS: DesktopMenuSection[] = [
   {
     divider: true,
     items: [
-      { key: "property", icon: "/icons/building-03.svg", label: "List Property", locked: true },
+      { key: "property", icon: "/icons/building-03.svg", label: "List Property" },
       { key: "stay", icon: "/icons/guest-house-sm.svg", label: "Add Stay", locked: true },
       { key: "service", icon: "/icons/map-pin-02-sm.svg", label: "Offer a Service", locked: true },
       { key: "project", icon: "/icons/briefcase-09.svg", label: "Post Project", locked: true },
@@ -54,7 +54,31 @@ const DESKTOP_LIST_SECTIONS: DesktopMenuSection[] = [
   },
 ];
 
-function DesktopMenuRow({ item, onNavigate }: { item: DesktopMenuItem; onNavigate: () => void }) {
+function DesktopMenuRow({
+  item,
+  onNavigate,
+  onOpenPropertyModal,
+}: {
+  item: DesktopMenuItem;
+  onNavigate: () => void;
+  onOpenPropertyModal: () => void;
+}) {
+  if (item.key === "property") {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          onOpenPropertyModal();
+          onNavigate();
+        }}
+        className="flex h-8 w-full items-center gap-2 rounded-xl px-2 text-left hover:bg-gray-100"
+      >
+        <NavIcon icon={item.icon} color="night" size={14} className="shrink-0" />
+        <span className="flex-1 truncate text-sm text-night-700">{item.label}</span>
+      </button>
+    );
+  }
+
   return (
     <Link
       href={comingSoonHref(item.label)}
@@ -116,12 +140,14 @@ function MobileMenuRow({
   open,
   onToggle,
   onOpenMobilePostModal,
+  onOpenPropertyModal,
 }: {
   item: MobileMenuItem;
   onNavigate: () => void;
   open: boolean;
   onToggle: () => void;
   onOpenMobilePostModal: (type: "media" | "poll" | "article") => void;
+  onOpenPropertyModal: () => void;
 }) {
   if (!item.submenu) {
     return (
@@ -167,6 +193,19 @@ function MobileMenuRow({
                 type="button"
                 onClick={() => {
                   onOpenMobilePostModal(sub.key as "media" | "poll" | "article");
+                  onNavigate();
+                }}
+                className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
+              >
+                <NavIcon icon={sub.icon} color="night" size={16} className="shrink-0" />
+                <span className="text-sm text-night-900">{sub.label}</span>
+              </button>
+            ) : sub.key === "property" ? (
+              <button
+                key={sub.key}
+                type="button"
+                onClick={() => {
+                  onOpenPropertyModal();
                   onNavigate();
                 }}
                 className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
@@ -252,10 +291,12 @@ export function CreateMenu({
   onNavigate,
   onOpenPostModal,
   onOpenMobilePostModal,
+  onOpenPropertyModal,
 }: {
   onNavigate: () => void;
   onOpenPostModal: (type: "media" | "poll" | "article") => void;
   onOpenMobilePostModal: (type: "media" | "poll" | "article") => void;
+  onOpenPropertyModal: () => void;
 }) {
   const [openMobileKey, setOpenMobileKey] = useState<string | null>(null);
   const toggleMobileKey = (key: string) => setOpenMobileKey((current) => (current === key ? null : key));
@@ -271,6 +312,7 @@ export function CreateMenu({
             open={openMobileKey === item.key}
             onToggle={() => toggleMobileKey(item.key)}
             onOpenMobilePostModal={onOpenMobilePostModal}
+            onOpenPropertyModal={onOpenPropertyModal}
           />
         ))}
         <div className="my-1 h-px w-full bg-gray-200" />
@@ -280,6 +322,7 @@ export function CreateMenu({
           open={false}
           onToggle={() => {}}
           onOpenMobilePostModal={onOpenMobilePostModal}
+          onOpenPropertyModal={onOpenPropertyModal}
         />
       </div>
 
@@ -304,7 +347,12 @@ export function CreateMenu({
               )}
             >
               {section.items.map((item) => (
-                <DesktopMenuRow key={item.key} item={item} onNavigate={onNavigate} />
+                <DesktopMenuRow
+                  key={item.key}
+                  item={item}
+                  onNavigate={onNavigate}
+                  onOpenPropertyModal={onOpenPropertyModal}
+                />
               ))}
             </div>
           ))}
