@@ -9,11 +9,19 @@ interface TooltipProps {
 }
 
 /** Wraps an icon-only control with a hover/focus label, since a bare icon's
- * meaning isn't always obvious. Purely CSS-driven (no JS state) so it's cheap
- * to sprinkle around the app. */
+ * meaning isn't always obvious. Mostly CSS-driven, but a click/tap leaves the
+ * control focused (no mouseleave follows a tap), which would otherwise pin
+ * the tooltip open via :focus-within until something else is clicked — so a
+ * click blurs it immediately once the click has been handled. */
 export function Tooltip({ label, children, className, side = "top" }: TooltipProps) {
   return (
-    <span className={cn("group/tooltip relative inline-flex", className)}>
+    <span
+      className={cn("group/tooltip relative inline-flex", className)}
+      onClickCapture={(event) => {
+        const target = event.target as HTMLElement;
+        window.setTimeout(() => target.blur(), 0);
+      }}
+    >
       {children}
       <span
         role="tooltip"
