@@ -35,6 +35,14 @@ export interface CommentItem {
   likes?: number;
 }
 
+function getMediaItems(post: PostCardData): MediaItem[] {
+  if (post.media) return post.media;
+  if (post.video) return [{ url: post.video, isVideo: true }];
+  if (post.images) return post.images.map((url) => ({ url }));
+  if (post.image) return [{ url: post.image }];
+  return [];
+}
+
 const DEFAULT_COMMENTS: CommentItem[] = [
   {
     id: "c1",
@@ -46,6 +54,11 @@ const DEFAULT_COMMENTS: CommentItem[] = [
   { id: "c2", authorName: "John Doe", postedAt: "1m ago", text: "Cool Champ.", likes: 20 },
   { id: "c3", authorName: "Jane Doe", postedAt: "20m ago", text: "Cool Champ." },
 ];
+
+export interface MediaItem {
+  url: string;
+  isVideo?: boolean;
+}
 
 export interface PostCardData {
   id: string;
@@ -61,6 +74,7 @@ export interface PostCardData {
   image?: string;
   images?: string[];
   video?: string;
+  media?: MediaItem[];
   likes: number;
   comments: number;
   shareLabel?: string;
@@ -93,6 +107,7 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
   const [comments, setComments] = useState<CommentItem[]>(post.commentsList ?? DEFAULT_COMMENTS);
   const [commentDraft, setCommentDraft] = useState("");
   const [textExpanded, setTextExpanded] = useState(false);
+  const mediaItems = getMediaItems(post);
 
   const submitComment = () => {
     const text = commentDraft.trim();
@@ -115,7 +130,7 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
         <PollBody post={post} />
       ) : (
         <>
-          {(post.text || post.image || post.images || post.video) && (
+          {(post.text || mediaItems.length > 0) && (
             // Mobile shows the image first with the caption below it;
             // desktop keeps the caption above the image.
             <div className="flex w-full flex-col-reverse gap-[15px] sm:flex-col">
@@ -136,17 +151,7 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
                 </div>
               )}
 
-              {post.video ? (
-                <video
-                  src={post.video}
-                  controls
-                  className="h-[285px] w-full rounded-[29px] object-cover sm:rounded-[15px]"
-                />
-              ) : (
-                (post.images ?? (post.image ? [post.image] : [])).length > 0 && (
-                  <ImageCarousel images={post.images ?? [post.image!]} />
-                )
-              )}
+              {mediaItems.length > 0 && <MediaCarousel items={mediaItems} />}
             </div>
           )}
 
@@ -283,38 +288,43 @@ function PostHeader({ post }: { post: PostCardData }) {
   );
 }
 
-function ImageCarousel({ images }: { images: string[] }) {
+function MediaCarousel({ items }: { items: MediaItem[] }) {
   const [index, setIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const hasMultiple = images.length > 1;
+  const hasMultiple = items.length > 1;
+  const current = items[index];
 
-  const goTo = (next: number) => setIndex((next + images.length) % images.length);
+  const goTo = (next: number) => setIndex((next + items.length) % items.length);
 
   return (
     <div className="relative h-[285px] w-full overflow-hidden rounded-[29px] sm:rounded-[15px]">
-      <button
-        type="button"
-        aria-label="View full image"
-        onClick={() => setLightboxOpen(true)}
-        className="absolute inset-0 block size-full"
-      >
-        <Image src={images[index]} alt="" fill className="object-cover" sizes="770px" />
-      </button>
+      {current.isVideo ? (
+        <video src={current.url} controls className="size-full object-cover" />
+      ) : (
+        <button
+          type="button"
+          aria-label="View full image"
+          onClick={() => setLightboxOpen(true)}
+          className="absolute inset-0 block size-full"
+        >
+          <Image src={current.url} alt="" fill className="object-cover" sizes="770px" />
+        </button>
+      )}
 
       {lightboxOpen &&
         createPortal(
-          <ImageLightbox images={images} index={index} onIndexChange={goTo} onClose={() => setLightboxOpen(false)} />,
+          <MediaLightbox items={items} index={index} onIndexChange={goTo} onClose={() => setLightboxOpen(false)} />,
           document.body,
         )}
 
       {hasMultiple && (
         <>
-          <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-between px-4">
+          <div className="pointer-events-none absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center justify-between px-4">
             <button
               type="button"
               aria-label="Previous image"
               onClick={() => goTo(index - 1)}
-              className="flex size-[21px] items-center justify-center rounded-full bg-white shadow-[0px_0px_10px_rgba(69,71,69,0.25)]"
+              className="pointer-events-auto flex size-[21px] items-center justify-center rounded-full bg-white shadow-[0px_0px_10px_rgba(69,71,69,0.25)]"
             >
               <span className="relative block h-3 w-[5.5px] rotate-180">
                 <Image src="/icons/carousel-arrow.svg" alt="" fill sizes="6px" />
@@ -324,7 +334,7 @@ function ImageCarousel({ images }: { images: string[] }) {
               type="button"
               aria-label="Next image"
               onClick={() => goTo(index + 1)}
-              className="flex size-[21px] items-center justify-center rounded-full bg-white shadow-[0px_0px_10px_rgba(69,71,69,0.25)]"
+              className="pointer-events-auto flex size-[21px] items-center justify-center rounded-full bg-white shadow-[0px_0px_10px_rgba(69,71,69,0.25)]"
             >
               <span className="relative block h-3 w-[5.5px]">
                 <Image src="/icons/carousel-arrow.svg" alt="" fill sizes="6px" />
@@ -333,9 +343,9 @@ function ImageCarousel({ images }: { images: string[] }) {
           </div>
 
           <div className="absolute inset-x-0 bottom-[11px] flex items-center justify-center gap-2.5">
-            {images.map((image, dot) => (
+            {items.map((item, dot) => (
               <button
-                key={image + dot}
+                key={item.url + dot}
                 type="button"
                 aria-label={`Go to image ${dot + 1}`}
                 onClick={() => goTo(dot)}
@@ -349,13 +359,13 @@ function ImageCarousel({ images }: { images: string[] }) {
   );
 }
 
-function ImageLightbox({
-  images,
+function MediaLightbox({
+  items,
   index,
   onIndexChange,
   onClose,
 }: {
-  images: string[];
+  items: MediaItem[];
   index: number;
   onIndexChange: (next: number) => void;
   onClose: () => void;
@@ -392,10 +402,14 @@ function ImageLightbox({
       </button>
 
       <div className="relative h-full w-full max-w-4xl" onClick={(event) => event.stopPropagation()}>
-        <Image src={images[index]} alt="" fill className="object-contain" sizes="100vw" />
+        {items[index].isVideo ? (
+          <video src={items[index].url} controls autoPlay className="size-full object-contain" />
+        ) : (
+          <Image src={items[index].url} alt="" fill className="object-contain" sizes="100vw" />
+        )}
       </div>
 
-      {images.length > 1 && (
+      {items.length > 1 && (
         <>
           <button
             type="button"
@@ -424,7 +438,7 @@ function ImageLightbox({
             </span>
           </button>
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[13px] font-medium text-white">
-            {index + 1} / {images.length}
+            {index + 1} / {items.length}
           </div>
         </>
       )}

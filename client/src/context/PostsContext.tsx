@@ -44,30 +44,29 @@ function buildPost(input: NewPostInput): PostCardData {
 
   if (input.kind === "article") {
     const articleFiles = input.files ?? [];
-    const articleUrls = articleFiles.map((file) => URL.createObjectURL(file));
-    const articleIsVideo = articleFiles.some((file) => file.type.startsWith("video/"));
     return {
       ...base,
       variant: "text",
       text: [input.headline.trim(), input.body.trim()].filter(Boolean).join("\n\n"),
       truncated: true,
-      video: articleIsVideo ? articleUrls[0] : undefined,
-      image: !articleIsVideo && articleUrls.length === 1 ? articleUrls[0] : undefined,
-      images: !articleIsVideo && articleUrls.length > 1 ? articleUrls : undefined,
+      media: buildMedia(articleFiles),
     };
   }
-
-  const isVideo = input.files.some((file) => file.type.startsWith("video/"));
-  const urls = input.files.map((file) => URL.createObjectURL(file));
 
   return {
     ...base,
     variant: "text",
     text: input.text.trim() || undefined,
-    video: isVideo ? urls[0] : undefined,
-    image: !isVideo && urls.length === 1 ? urls[0] : undefined,
-    images: !isVideo && urls.length > 1 ? urls : undefined,
+    media: buildMedia(input.files),
   };
+}
+
+function buildMedia(files: File[]) {
+  if (files.length === 0) return undefined;
+  return files.map((file) => ({
+    url: URL.createObjectURL(file),
+    isVideo: file.type.startsWith("video/"),
+  }));
 }
 
 interface PostsContextValue {
