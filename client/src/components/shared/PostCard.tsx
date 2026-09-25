@@ -917,7 +917,7 @@ function CommentsModal({
               type="button"
               aria-label={post.shareLabel ?? "Share"}
               onClick={() => sharePost(post)}
-              className="text-xs font-bold text-brand-900"
+              className="text-xs font-bold text-brand-900 underline"
             >
               {post.shares ?? 12} Shares
             </button>

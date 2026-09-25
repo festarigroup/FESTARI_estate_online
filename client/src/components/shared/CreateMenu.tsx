@@ -36,7 +36,7 @@ const DESKTOP_LIST_SECTIONS: DesktopMenuSection[] = [
   {
     divider: true,
     items: [
-      { key: "property", icon: "/icons/building-03.svg", label: "List Property" },
+      { key: "property", icon: "/icons/building-03.svg", label: "Post a Property" },
       { key: "stay", icon: "/icons/guest-house-sm.svg", label: "Add Stay", locked: true },
       { key: "service", icon: "/icons/map-pin-02-sm.svg", label: "Offer a Service", locked: true },
       { key: "project", icon: "/icons/briefcase-09.svg", label: "Post Project", locked: true },
@@ -104,7 +104,7 @@ interface MobileMenuItem {
 }
 
 const LISTINGS_SUBMENU: DesktopSubmenuItem[] = [
-  { key: "property", icon: "/icons/building-03.svg", label: "List Property" },
+  { key: "property", icon: "/icons/building-03.svg", label: "Post a Property" },
   { key: "stay", icon: "/icons/guest-house-sm.svg", label: "Add Stay" },
   { key: "service", icon: "/icons/map-pin-02-sm.svg", label: "Offer a Service" },
   { key: "project", icon: "/icons/briefcase-09.svg", label: "Post Project" },
