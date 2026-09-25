@@ -662,6 +662,28 @@ function ActionsRow({ post }: { post: PostCardData }) {
   );
 }
 
+async function sharePost(post: PostCardData) {
+  const shareUrl =
+    typeof window !== "undefined" ? `${window.location.origin}${window.location.pathname}#post-${post.id}` : "";
+  const shareData = {
+    title: post.authorName,
+    text: post.text ?? post.subLine ?? "Check out this post on Biltlinx",
+    url: shareUrl,
+  };
+
+  try {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      await navigator.share(shareData);
+      return;
+    }
+    await navigator.clipboard.writeText(shareUrl);
+    toast.success("Link copied to clipboard");
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") return;
+    toast.error("Couldn't share this post");
+  }
+}
+
 function PostStatsBar({
   post,
   showComments,
@@ -677,28 +699,6 @@ function PostStatsBar({
 
   const likeCount = post.likes + (liked ? 1 : 0);
   const likerNames = buildLikerNames(likeCount);
-
-  const handleShare = async () => {
-    const shareUrl =
-      typeof window !== "undefined" ? `${window.location.origin}${window.location.pathname}#post-${post.id}` : "";
-    const shareData = {
-      title: post.authorName,
-      text: post.text ?? post.subLine ?? "Check out this post on Biltlinx",
-      url: shareUrl,
-    };
-
-    try {
-      if (typeof navigator !== "undefined" && navigator.share) {
-        await navigator.share(shareData);
-        return;
-      }
-      await navigator.clipboard.writeText(shareUrl);
-      toast.success("Link copied to clipboard");
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") return;
-      toast.error("Couldn't share this post");
-    }
-  };
 
   return (
     <div className="flex w-full flex-col gap-2">
@@ -739,7 +739,7 @@ function PostStatsBar({
             </span>
             <span className="hidden text-[11px] font-bold text-brand-900 sm:inline">{post.comments} Comments</span>
           </button>
-          <button type="button" className="flex items-center gap-2" aria-label={post.shareLabel ?? "Share"} onClick={handleShare}>
+          <button type="button" className="flex items-center gap-2" aria-label={post.shareLabel ?? "Share"} onClick={() => sharePost(post)}>
             <span className="relative block size-[23px] shrink-0">
               <Image src="/icons/share-05.svg" alt="" fill sizes="23px" />
             </span>
@@ -830,6 +830,9 @@ function CommentsModal({
   currentUserAvatarInitials: string;
   onClose: () => void;
 }) {
+  const [liked, setLiked] = useState(false);
+  const likeCount = post.likes + (liked ? 1 : 0);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -891,12 +894,33 @@ function CommentsModal({
         )}
 
         <div className="flex w-full items-center justify-between px-2.5">
-          <span className="flex items-center gap-2">
-            <NavIcon icon="/icons/heart-like-filled.svg" color="night" size={20} className="bg-[#ef575f]" />
-            <span className="text-xs font-bold text-[#ef575f]">{post.likes} Likes</span>
-          </span>
+          <button
+            type="button"
+            aria-pressed={liked}
+            aria-label={`${likeCount} Likes`}
+            onClick={() => setLiked((v) => !v)}
+            className="flex items-center gap-2"
+          >
+            <NavIcon
+              key={liked ? "liked" : "unliked"}
+              icon={liked ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
+              color="night"
+              size={20}
+              className={liked ? "bg-[#ef575f] animate-like-pop" : undefined}
+            />
+            <span className={cn("text-xs font-bold", liked ? "text-[#ef575f]" : "text-brand-900")}>
+              {likeCount} Likes
+            </span>
+          </button>
           <span className="flex items-center gap-4">
-            <span className="text-xs font-bold text-brand-900">{post.shares ?? 12} Shares</span>
+            <button
+              type="button"
+              aria-label={post.shareLabel ?? "Share"}
+              onClick={() => sharePost(post)}
+              className="text-xs font-bold text-brand-900"
+            >
+              {post.shares ?? 12} Shares
+            </button>
             <span className="text-xs font-bold text-brand-900">{post.comments} Comments</span>
           </span>
         </div>
