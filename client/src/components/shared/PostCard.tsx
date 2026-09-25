@@ -439,6 +439,7 @@ function parseVoteCount(votes: string) {
 function PollBody({ post }: { post: PostCardData }) {
   const [counts, setCounts] = useState(() => post.pollOptions?.map((option) => parseVoteCount(option.votes)) ?? []);
   const [votedIndex, setVotedIndex] = useState<number | null>(null);
+  const [questionExpanded, setQuestionExpanded] = useState(false);
 
   const total = counts.reduce((sum, count) => sum + count, 0);
   const leadingIndex = counts.length
@@ -475,10 +476,19 @@ function PollBody({ post }: { post: PostCardData }) {
       )}
 
       {post.question && (
-        <p className="text-[13px] leading-5 text-[#1e293b]">
-          {post.question}{" "}
-          {post.hashtags && <span className="font-semibold text-[#f088b6]">{post.hashtags}</span>}
-        </p>
+        <div className="flex w-full items-end gap-0.5 text-[13px] leading-5">
+          <p className={cn("min-w-0 flex-1 whitespace-pre-line text-[#1e293b]", !questionExpanded && "line-clamp-4")}>
+            {post.question}{" "}
+            {post.hashtags && <span className="font-semibold text-[#f088b6]">{post.hashtags}</span>}
+          </p>
+          <button
+            type="button"
+            onClick={() => setQuestionExpanded((v) => !v)}
+            className="shrink-0 font-bold text-gray-400"
+          >
+            {questionExpanded ? "less" : "more"}
+          </button>
+        </div>
       )}
 
       {post.pollOptions && (
@@ -756,6 +766,8 @@ function CommentsSection({ comments }: { comments: CommentItem[] }) {
 }
 
 function CommentRow({ comment }: { comment: CommentItem }) {
+  const [expanded, setExpanded] = useState(false);
+
   return (
     <div className="flex w-full items-start gap-[14px]">
       <span className="relative block size-[47px] shrink-0 overflow-hidden rounded-full bg-[#eef2ff]">
@@ -772,9 +784,18 @@ function CommentRow({ comment }: { comment: CommentItem }) {
           <p className="text-[13px] font-bold text-brand-900">{comment.authorName}</p>
           <p className="shrink-0 text-[9.5px] text-gray-500">{comment.postedAt}</p>
         </div>
-        <p className="whitespace-pre-line text-[13px] leading-[1.5] text-gray-600">
-          {renderWithHashtags(comment.text)}
-        </p>
+        <div className="flex w-full items-end gap-1 text-[13px] leading-[1.5]">
+          <p className={cn("min-w-0 flex-1 whitespace-pre-line text-gray-600", !expanded && "line-clamp-4")}>
+            {renderWithHashtags(comment.text)}
+          </p>
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            className="shrink-0 text-[11px] font-bold text-gray-400"
+          >
+            {expanded ? "less" : "more"}
+          </button>
+        </div>
         <CommentLikeButton initialLikes={comment.likes ?? 0} />
       </div>
     </div>
