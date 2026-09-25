@@ -224,9 +224,11 @@ export function CreatePostModal({ open, onClose, onSwitchType }: CreatePostModal
                 type="button"
                 aria-label="Add more media"
                 onClick={() => inputRef.current?.click()}
-                className="flex h-[61px] w-[97px] shrink-0 items-center justify-center rounded-md border border-dashed border-[#cbd5e0] bg-[#cbd5e0]/30 text-[#53575a] hover:border-brand-900 hover:text-brand-900"
+                className="flex h-[61px] w-[97px] shrink-0 items-center justify-center rounded-md border border-dashed border-[#cbd5e0] text-[#94a3b8] hover:border-brand-900 hover:text-brand-900"
               >
-                <NavIcon icon="/icons/add-circle-01.svg" color="night" size={20} />
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M10 3V17M3 10H17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
               </button>
             </div>
           )}
