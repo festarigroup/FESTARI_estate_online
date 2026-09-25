@@ -32,13 +32,13 @@ const FEED_TABS: FeedTab[] = [
 
 const COMPOSER_ACTIONS = [
   { key: "media", label: "Media", icon: "/icons/media-gallery.svg" },
+  { key: "poll", label: "Poll", icon: "/icons/poll-bar-chart.svg" },
+  { key: "article", label: "Article", icon: "/icons/article-document.svg" },
   { key: "property", label: "Property", icon: "/icons/building-03.svg" },
   { key: "stay", label: "Stay", icon: "/icons/guest-house-sm.svg" },
   { key: "service", label: "Service", icon: "/icons/map-pin-02-sm.svg" },
   { key: "project", label: "Project", icon: "/icons/briefcase-09.svg" },
   { key: "events", label: "Events", icon: "/icons/event-calendar-01.svg" },
-  { key: "poll", label: "Poll", icon: "/icons/poll-bar-chart.svg" },
-  { key: "article", label: "Article", icon: "/icons/article-document.svg" },
 ];
 
 /** The desktop composer's icons the mobile card doesn't show up front; the "more" toggle reveals these. */

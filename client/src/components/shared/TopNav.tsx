@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { showSuccessToast } from "@/components/shared/AppToast";
@@ -64,12 +65,12 @@ export function TopNav() {
     <header className="flex h-[67px] shrink-0 items-center border-b border-gray-200 bg-white px-[15px] py-2 sm:px-[23px]">
       <div className="flex w-full items-center justify-between gap-2">
         <div className="flex min-w-0 flex-1 items-center gap-[15px] md:gap-[38px] lg:gap-[57px] 3xl:gap-[109px] 3xl:flex-initial">
-          <div className="relative size-[34px] shrink-0 sm:hidden">
+          <Link href="/home" aria-label="Home" className="relative size-[34px] shrink-0 sm:hidden">
             <Image src="/brand/mobile%20logo.png" alt="Biltlinx" fill className="object-contain" sizes="34px" priority />
-          </div>
-          <div className="relative hidden h-[36px] w-[72px] shrink-0 sm:block">
+          </Link>
+          <Link href="/home" aria-label="Home" className="relative hidden h-[36px] w-[72px] shrink-0 sm:block">
             <Image src="/icons/logo-biltlinx.png" alt="Biltlinx" fill className="object-contain" sizes="72px" priority />
-          </div>
+          </Link>
 
           <button
             type="button"

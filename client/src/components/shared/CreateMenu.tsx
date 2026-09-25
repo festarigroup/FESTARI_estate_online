@@ -37,16 +37,16 @@ const DESKTOP_LIST_SECTIONS: DesktopMenuSection[] = [
     divider: true,
     items: [
       { key: "property", icon: "/icons/building-03.svg", label: "List Property", locked: true },
-      { key: "stay", icon: "/icons/create-menu-dt-guest-house.svg", label: "Add Stay", locked: true },
-      { key: "service", icon: "/icons/create-menu-dt-map-pin.svg", label: "Offer a Service", locked: true },
-      { key: "project", icon: "/icons/create-menu-dt-briefcase.svg", label: "Post Project", locked: true },
+      { key: "stay", icon: "/icons/guest-house-sm.svg", label: "Add Stay", locked: true },
+      { key: "service", icon: "/icons/map-pin-02-sm.svg", label: "Offer a Service", locked: true },
+      { key: "project", icon: "/icons/briefcase-09.svg", label: "Post Project", locked: true },
     ],
   },
   {
     divider: true,
     items: [
-      { key: "event", icon: "/icons/create-menu-calendar-17.svg", label: "Create Events" },
-      { key: "community", icon: "/icons/create-menu-dt-user-group.svg", label: "Create Community" },
+      { key: "event", icon: "/icons/event-calendar-01.svg", label: "Create Events" },
+      { key: "community", icon: "/icons/user-group.svg", label: "Create Community" },
     ],
   },
   {
@@ -81,16 +81,16 @@ interface MobileMenuItem {
 
 const LISTINGS_SUBMENU: DesktopSubmenuItem[] = [
   { key: "property", icon: "/icons/building-03.svg", label: "List Property" },
-  { key: "stay", icon: "/icons/create-menu-dt-guest-house.svg", label: "Add Stay" },
-  { key: "service", icon: "/icons/create-menu-dt-map-pin.svg", label: "Offer a Service" },
-  { key: "project", icon: "/icons/create-menu-dt-briefcase.svg", label: "Post Project" },
+  { key: "stay", icon: "/icons/guest-house-sm.svg", label: "Add Stay" },
+  { key: "service", icon: "/icons/map-pin-02-sm.svg", label: "Offer a Service" },
+  { key: "project", icon: "/icons/briefcase-09.svg", label: "Post Project" },
 ];
 
 const MOBILE_ITEMS: MobileMenuItem[] = [
   { key: "post", icon: "/icons/create-menu-mobile-add-alt.svg", label: "Create post", submenu: CREATE_POST_SUBMENU, rawIcon: true },
   { key: "listings", icon: "/icons/clipboard-list-01.svg", label: "Listings", submenu: LISTINGS_SUBMENU },
-  { key: "event", icon: "/icons/create-menu-calendar-17.svg", label: "Create Event" },
-  { key: "community", icon: "/icons/create-menu-dt-user-group.svg", label: "Create Community" },
+  { key: "event", icon: "/icons/event-calendar-01.svg", label: "Create Event" },
+  { key: "community", icon: "/icons/user-group.svg", label: "Create Community" },
 ];
 
 const MOBILE_REQUEST_ITEM: MobileMenuItem = {
