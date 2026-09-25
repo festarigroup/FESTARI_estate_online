@@ -92,16 +92,17 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
     setVisibilityOpen(false);
   }
 
-  function addPollOption() {
-    setPollOptions((current) => [...current, ""]);
+  function withTrailingOption(list: string[]) {
+    const allFilled = list.every((option) => option.trim().length > 0);
+    return allFilled && list.length < MAX_POLL_OPTIONS ? [...list, ""] : list;
   }
 
   function updatePollOption(index: number, value: string) {
-    setPollOptions((current) => current.map((option, i) => (i === index ? value : option)));
+    setPollOptions((current) => withTrailingOption(current.map((option, i) => (i === index ? value : option))));
   }
 
   function removePollOption(index: number) {
-    setPollOptions((current) => current.filter((_, i) => i !== index));
+    setPollOptions((current) => withTrailingOption(current.filter((_, i) => i !== index)));
   }
 
   function handleClose() {
@@ -285,20 +286,34 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
         ) : null}
 
         {mode === "poll" && (
-          <div className="flex w-full flex-col gap-3">
-            <div className="flex w-full flex-col gap-4 rounded-[17px] border border-[#e2e8f0] bg-[#f8fafc] p-[3px]">
-              <div className="flex w-full flex-col gap-1">
-                {pollOptions.map((option, index) => (
+          <div className="flex w-full flex-col gap-4 rounded-[17px] border border-[#e2e8f0] bg-[#f8fafc] p-[3px]">
+            <div className="flex w-full flex-col gap-1">
+              {pollOptions.map((option, index) => {
+                const required = index < 2;
+                const filled = option.trim().length > 0;
+                const active = required || filled;
+                return (
                   <div
                     key={index}
-                    className="flex h-12 w-full items-center gap-2 rounded-2xl border border-[#e2e8f0] bg-white px-3"
+                    className={cn(
+                      "flex h-12 w-full items-center gap-2 rounded-2xl border px-3",
+                      active ? "border-[#e2e8f0] bg-white" : "border-dashed border-[#e2e8f0] bg-gray-50/60",
+                    )}
                   >
-                    <NavIcon icon="/icons/poll-option-edit.svg" color="night" size={16} className="shrink-0 bg-gray-400" />
+                    <NavIcon
+                      icon="/icons/poll-option-edit.svg"
+                      color="night"
+                      size={16}
+                      className={cn("shrink-0", active ? "bg-gray-400" : "bg-gray-300")}
+                    />
                     <input
                       value={option}
                       onChange={(event) => updatePollOption(index, event.target.value)}
                       placeholder={`Option ${index + 1}`}
-                      className="w-full flex-1 text-sm text-[#111826] placeholder:text-[#111826]/70 focus:outline-none"
+                      className={cn(
+                        "w-full flex-1 text-sm focus:outline-none",
+                        active ? "text-[#111826] placeholder:text-[#111826]/70" : "text-gray-400 placeholder:text-gray-400",
+                      )}
                     />
                     {index >= 2 && (
                       <button
@@ -311,34 +326,14 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                       </button>
                     )}
                   </div>
-                ))}
-              </div>
-              <div className="flex w-full flex-col gap-1 px-1 pb-1">
-                <p className="text-[13px] text-[#111826]">
-                  Poll Duration<span className="text-[#ef4444]">*</span>
-                </p>
-                <PollDurationDropdown value={duration} onChange={setDuration} />
-              </div>
+                );
+              })}
             </div>
-            <div className="flex w-full items-center justify-between">
-              <p className="text-sm font-bold text-night-900">Options</p>
-              <button
-                type="button"
-                aria-label="Add option"
-                onClick={addPollOption}
-                disabled={pollOptions.length >= MAX_POLL_OPTIONS}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  aria-hidden="true"
-                  className={cn("text-night-900", pollOptions.length >= MAX_POLL_OPTIONS && "opacity-30")}
-                >
-                  <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </button>
+            <div className="flex w-full flex-col gap-1 px-1 pb-1">
+              <p className="text-[13px] text-[#111826]">
+                Poll Duration<span className="text-[#ef4444]">*</span>
+              </p>
+              <PollDurationDropdown value={duration} onChange={setDuration} />
             </div>
           </div>
         )}
