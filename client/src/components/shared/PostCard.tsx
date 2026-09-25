@@ -121,7 +121,7 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
             <div className="flex w-full flex-col-reverse gap-[15px] sm:flex-col">
               {post.text && (
                 <div className="flex w-full items-end gap-0.5 text-sm leading-5">
-                  <p className={cn("min-w-0 flex-1 text-[#1e293b]", !textExpanded && "truncate")}>
+                  <p className={cn("min-w-0 flex-1 whitespace-pre-line text-[#1e293b]", !textExpanded && "line-clamp-4")}>
                     {renderWithHashtags(post.text)}
                   </p>
                   {post.truncated !== false && (
