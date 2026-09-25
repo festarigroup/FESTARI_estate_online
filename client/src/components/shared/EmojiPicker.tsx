@@ -36,12 +36,13 @@ interface EmojiPickerProps {
   onSelect: (emoji: string) => void;
   className?: string;
   align?: "start" | "center" | "end";
+  side?: "top" | "bottom";
 }
 
 /** A trigger button that opens a small emoji grid, appending the picked
  * emoji into whatever text field it's paired with (callers own the actual
  * insertion via onSelect). Self-contained, no external emoji dependency. */
-export function EmojiPicker({ onSelect, className, align = "end" }: EmojiPickerProps) {
+export function EmojiPicker({ onSelect, className, align = "end", side = "top" }: EmojiPickerProps) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
 
@@ -72,7 +73,8 @@ export function EmojiPicker({ onSelect, className, align = "end" }: EmojiPickerP
       {open && (
         <div
           className={cn(
-            "no-scrollbar absolute bottom-[calc(100%+8px)] z-50 flex max-h-[220px] w-[240px] flex-col gap-2 overflow-y-auto rounded-xl border border-gray-200 bg-white p-3 shadow-lg",
+            "no-scrollbar absolute z-50 flex max-h-[220px] w-[240px] max-w-[calc(100vw-2.5rem)] flex-col gap-2 overflow-y-auto rounded-xl border border-gray-200 bg-white p-3 shadow-lg",
+            side === "top" ? "bottom-[calc(100%+8px)]" : "top-[calc(100%+8px)]",
             align === "start" ? "left-0" : align === "end" ? "right-0" : "left-1/2 -translate-x-1/2",
           )}
         >
