@@ -265,7 +265,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                 role="button"
                 tabIndex={0}
                 className={cn(
-                  "flex w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-[27px] border px-4 py-[50px] text-center",
+                  "flex w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-[27px] border px-4 py-8 text-center",
                   dragActive ? "border-brand-900 bg-brand-900/5" : "border-[#e2e8f0] bg-[#f8fafc]",
                 )}
               >
@@ -333,7 +333,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                 );
               })}
             </div>
-            <div className="flex w-full flex-col gap-1 px-1 pb-1">
+            <div className="flex w-full flex-col gap-1">
               <p className="text-[13px] text-[#111826]">
                 Poll Duration<span className="text-[#ef4444]">*</span>
               </p>
