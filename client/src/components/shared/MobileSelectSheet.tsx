@@ -71,7 +71,7 @@ export function MobileSelectSheet({ open, onClose, title, items, selected, onCha
   return createPortal(
     <div
       data-mobile-select-sheet
-      className="fixed inset-0 z-[130] flex items-end bg-black/50"
+      className="fixed inset-0 z-[130] flex items-end bg-transparent"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
