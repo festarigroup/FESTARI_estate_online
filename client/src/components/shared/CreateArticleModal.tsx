@@ -12,6 +12,7 @@ import {
   type PostVisibility,
 } from "@/components/shared/VisibilityMenu";
 import { usePostsFeed } from "@/context/PostsContext";
+import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 import { cn } from "@/lib/utils";
 
 type SwitchablePostType = "media" | "poll" | "article";
@@ -60,7 +61,8 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  if (!open) return null;
+  const { mounted, closing } = useAnimatedSheet(open);
+  if (!mounted) return null;
 
   function resetState() {
     setHeadline("");
@@ -139,7 +141,12 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
           </svg>
         </button>
 
-        <div className="flex max-h-[90vh] w-full flex-col gap-6 overflow-hidden rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] max-sm:animate-sheet-slide-up sm:rounded-2xl">
+        <div
+          className={cn(
+            "flex max-h-[90vh] w-full flex-col gap-6 overflow-hidden rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] sm:rounded-2xl",
+            closing ? "max-sm:animate-sheet-slide-down" : "max-sm:animate-sheet-slide-up",
+          )}
+        >
           <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154] sm:hidden" />
           <p className="shrink-0 text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Create an Article</p>
 

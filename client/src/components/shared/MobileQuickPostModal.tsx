@@ -9,6 +9,7 @@ import { MobileVisibilityMenu } from "@/components/shared/MobileVisibilityMenu";
 import { DURATION_OPTIONS, PollDurationDropdown } from "@/components/shared/PollDurationDropdown";
 import { DEFAULT_VISIBILITY, getVisibilityIcon, type PostVisibility } from "@/components/shared/VisibilityMenu";
 import { usePostsFeed } from "@/context/PostsContext";
+import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 import { cn } from "@/lib/utils";
 
 const MEDIA_ACCEPT = ["image/png", "image/jpeg", "image/gif", "video/mp4", "video/quicktime", "video/webm"];
@@ -52,6 +53,8 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
   const [visibility, setVisibility] = useState<PostVisibility>(DEFAULT_VISIBILITY);
   const visibilityTriggerRef = useRef<HTMLButtonElement | null>(null);
 
+  const { mounted, closing } = useAnimatedSheet(open);
+
   const [wasOpen, setWasOpen] = useState(open);
   if (open !== wasOpen) {
     setWasOpen(open);
@@ -76,7 +79,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
     return () => previews.forEach((preview) => URL.revokeObjectURL(preview.url));
   }, [previews]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   const pollReady = pollQuestion.trim().length > 0 && pollOptions.filter((option) => option.trim()).length >= 2;
 
@@ -197,7 +200,8 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
       <div
         onClick={(event) => event.stopPropagation()}
         className={cn(
-          "flex w-full max-h-[85vh] flex-col rounded-t-[36px] bg-white p-6 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)] animate-sheet-slide-up",
+          "flex w-full max-h-[85vh] flex-col rounded-t-[36px] bg-white p-6 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]",
+          closing ? "animate-sheet-slide-down" : "animate-sheet-slide-up",
           mode === "poll" ? "gap-4" : "gap-3",
           mode === "article" ? "overflow-hidden" : "overflow-y-auto",
         )}

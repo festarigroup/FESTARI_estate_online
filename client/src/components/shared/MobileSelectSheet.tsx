@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
+import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 
 export interface SelectSheetItem {
   name: string;
@@ -187,25 +188,7 @@ interface MobileSelectSheetProps {
 /** The bottom-sheet picker used on mobile when choosing communities/organizations
  * (Figma node 404:15742) — replaces the desktop side popover on small screens. */
 export function MobileSelectSheet({ open, onClose, title, items, selected, onChangeSelected }: MobileSelectSheetProps) {
-  const [mounted, setMounted] = useState(open);
-  const [closing, setClosing] = useState(false);
-
-  const [wasOpen, setWasOpen] = useState(open);
-  if (open !== wasOpen) {
-    setWasOpen(open);
-    if (open) {
-      setMounted(true);
-      setClosing(false);
-    } else {
-      setClosing(true);
-    }
-  }
-
-  useEffect(() => {
-    if (!closing) return;
-    const timeout = setTimeout(() => setMounted(false), 250);
-    return () => clearTimeout(timeout);
-  }, [closing]);
+  const { mounted, closing } = useAnimatedSheet(open);
 
   useEffect(() => {
     if (!mounted) return;

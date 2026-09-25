@@ -12,6 +12,7 @@ import {
   getVisibilityLabel,
   type PostVisibility,
 } from "@/components/shared/VisibilityMenu";
+import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 import { cn } from "@/lib/utils";
 import { usePostsFeed } from "@/context/PostsContext";
 
@@ -63,7 +64,8 @@ export function CreatePostModal({ open, onClose, onSwitchType }: CreatePostModal
     return () => previews.forEach((preview) => URL.revokeObjectURL(preview.url));
   }, [previews]);
 
-  if (!open) return null;
+  const { mounted, closing } = useAnimatedSheet(open);
+  if (!mounted) return null;
 
   function addFiles(list: FileList | null) {
     if (!list) return;
@@ -131,7 +133,12 @@ export function CreatePostModal({ open, onClose, onSwitchType }: CreatePostModal
           </svg>
         </button>
 
-        <div className="flex max-h-[90vh] w-full flex-col gap-6 overflow-y-auto rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] max-sm:animate-sheet-slide-up sm:rounded-2xl">
+        <div
+          className={cn(
+            "flex max-h-[90vh] w-full flex-col gap-6 overflow-y-auto rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] sm:rounded-2xl",
+            closing ? "max-sm:animate-sheet-slide-down" : "max-sm:animate-sheet-slide-up",
+          )}
+        >
         <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154] sm:hidden" />
         <p className="text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Create a Post</p>
 
