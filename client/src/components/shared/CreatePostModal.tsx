@@ -260,8 +260,12 @@ export function CreatePostModal({ open, onClose, onSwitchType }: CreatePostModal
 
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center gap-3">
-              {POST_TYPE_ROW.map((item) => (
-                <Tooltip key={item.key} label={item.key === "media" ? "Attach media" : item.label}>
+              {POST_TYPE_ROW.map((item, index) => (
+                <Tooltip
+                  key={item.key}
+                  label={item.key === "media" ? "Attach media" : item.label}
+                  align={index === 0 ? "start" : "center"}
+                >
                   <button
                     type="button"
                     aria-label={item.key === "media" ? "Attach media" : item.label}

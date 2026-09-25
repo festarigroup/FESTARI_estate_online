@@ -167,8 +167,8 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
 
           <div className="flex w-full flex-col overflow-hidden rounded-lg border border-[#e2e8f0] bg-[#f1f5f9]">
             <div className="flex w-full items-center gap-3.5 px-4 py-2.5">
-              {TOOLBAR_ACTIONS.map((action) => (
-                <Tooltip key={action.key} label={action.label}>
+              {TOOLBAR_ACTIONS.map((action, index) => (
+                <Tooltip key={action.key} label={action.label} align={index === 0 ? "start" : "center"}>
                   {action.key === "link" ? (
                     <button
                       type="button"
@@ -241,8 +241,8 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
 
             <div className="flex w-full items-center justify-between">
               <div className="flex items-center gap-3">
-                {POST_TYPE_ROW.map((item) => (
-                  <Tooltip key={item.key} label={item.label}>
+                {POST_TYPE_ROW.map((item, index) => (
+                  <Tooltip key={item.key} label={item.label} align={index === 0 ? "start" : "center"}>
                     <button
                       type="button"
                       aria-label={item.label}

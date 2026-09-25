@@ -278,7 +278,7 @@ export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModal
                 className="hidden"
                 onChange={(event) => addFiles(event.target.files)}
               />
-              <Tooltip label="Media">
+              <Tooltip label="Media" align="start">
                 <button type="button" aria-label="Media" onClick={() => onSwitchType?.("media")}>
                   <NavIcon icon="/icons/media-gallery.svg" color="brand" size={18} className="bg-[#337df2]" />
                 </button>
