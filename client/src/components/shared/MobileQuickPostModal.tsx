@@ -244,10 +244,16 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
           <div className="flex w-full flex-col">
             <textarea
               value={text}
-              onChange={(event) => setText(event.target.value)}
-              rows={previews.length > 0 ? 8 : 1}
+              onChange={(event) => {
+                setText(event.target.value);
+                const el = event.target;
+                el.style.height = "auto";
+                el.style.height = `${Math.min(el.scrollHeight, 200)}px`;
+              }}
+              rows={1}
               placeholder="What’s happening twin? Write something down..."
-              className="w-full resize-none text-sm leading-6 text-night-900 placeholder:text-gray-400 focus:outline-none"
+              className="w-full resize-none overflow-y-auto text-sm leading-6 text-night-900 placeholder:text-gray-400 focus:outline-none"
+              style={{ maxHeight: 200 }}
             />
             {previews.length === 0 && (
               <div
