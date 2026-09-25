@@ -235,26 +235,31 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
         )}
       >
         <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154]" />
-        <div className="flex w-full shrink-0 items-start justify-between gap-2">
-          <div className="flex items-center gap-2.5">
-            <span className="relative block size-12 shrink-0">
-              <span className="relative block size-full overflow-hidden rounded-full bg-[#eef2ff]">
-                <Image src="/icons/avatar-sample.jpg" alt="" fill className="object-cover" sizes="48px" />
-              </span>
-              <span className="absolute -bottom-0.5 -right-0.5 block size-[17px]">
-                <Image src="/icons/avatar-verified-badge-green.svg" alt="" fill sizes="17px" />
-              </span>
-            </span>
-            <div className="flex flex-col">
-              <p className="text-[15px] font-bold text-night-900">Madeline Price</p>
-              <p className="text-xs text-gray-500">Researcher</p>
-            </div>
-          </div>
-          <button type="button" aria-label="Close" onClick={handleClose} className="mt-1 shrink-0 text-gray-400">
-            <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-              <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <div className="flex w-full shrink-0 items-center gap-2.5">
+          <button type="button" aria-label="Close" onClick={handleClose} className="flex size-6 shrink-0 items-center justify-center text-night-900">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 4V16M10 16L4 10M10 16L16 10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
+          <p className="flex-1 text-center text-lg font-bold tracking-[-0.54px] text-black">
+            {mode === "article" ? "Write an article" : mode === "poll" ? "Create a poll" : "Make a post"}
+          </p>
+          <span className="size-6 shrink-0" aria-hidden />
+        </div>
+
+        <div className="flex w-full shrink-0 items-center gap-2.5">
+          <span className="relative block size-12 shrink-0">
+            <span className="relative block size-full overflow-hidden rounded-full bg-[#eef2ff]">
+              <Image src="/icons/avatar-sample.jpg" alt="" fill className="object-cover" sizes="48px" />
+            </span>
+            <span className="absolute -bottom-0.5 -right-0.5 block size-[17px]">
+              <Image src="/icons/avatar-verified-badge-green.svg" alt="" fill sizes="17px" />
+            </span>
+          </span>
+          <div className="flex flex-col">
+            <p className="text-[15px] font-bold text-night-900">Madeline Price</p>
+            <p className="text-xs text-gray-500">Researcher</p>
+          </div>
         </div>
 
         {mode === "poll" ? (
@@ -402,18 +407,18 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
           </div>
         )}
 
-        <div className="mt-auto flex w-full shrink-0 flex-col gap-3">
+        <div className="mt-auto flex w-full shrink-0 flex-col gap-3.5">
         <div className="h-px w-full shrink-0 bg-[#f5f5f5]" />
-        <div className="flex w-full items-center justify-between">
-          <div className="flex items-center gap-3">
-            <input
-              ref={inputRef}
-              type="file"
-              multiple
-              accept={MEDIA_ACCEPT.join(",")}
-              className="hidden"
-              onChange={(event) => addFiles(event.target.files)}
-            />
+        <div className="flex w-full items-center gap-3">
+          <input
+            ref={inputRef}
+            type="file"
+            multiple
+            accept={MEDIA_ACCEPT.join(",")}
+            className="hidden"
+            onChange={(event) => addFiles(event.target.files)}
+          />
+          <div className="flex items-center gap-2 border-r border-[#86b3fb] pr-3">
             <button
               type="button"
               aria-label="Attach files"
@@ -444,37 +449,36 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                 className={cn("bg-[#337df2]", mode === "article" && "opacity-30")}
               />
             </button>
-            <div className="h-4 w-px shrink-0 bg-gray-200" />
-            <button
-              ref={visibilityTriggerRef}
-              type="button"
-              aria-label="Post visibility"
-              onClick={() => setVisibilityOpen((v) => !v)}
-            >
-              <NavIcon icon={getVisibilityIcon(visibility)} color="brand" size={20} className="bg-[#337df2]" />
-            </button>
-            <MobileVisibilityMenu
-              open={visibilityOpen}
-              onClose={() => setVisibilityOpen(false)}
-              value={visibility}
-              onChange={(next) => {
-                setVisibility(next);
-                if (next.kind === "everyone" || next.kind === "followings") setVisibilityOpen(false);
-              }}
-              anchorRef={visibilityTriggerRef}
-            />
           </div>
           <button
+            ref={visibilityTriggerRef}
             type="button"
-            onClick={handlePost}
-            className={cn(
-              "flex h-8 items-center justify-center rounded-[13px] px-4 text-sm text-white",
-              mode === "poll" && !pollReady ? "bg-[#86b3fb]" : "bg-brand-900 hover:bg-brand-900/90",
-            )}
+            aria-label="Post visibility"
+            onClick={() => setVisibilityOpen((v) => !v)}
           >
-            Post
+            <NavIcon icon={getVisibilityIcon(visibility)} color="brand" size={20} className="bg-[#337df2]" />
           </button>
+          <MobileVisibilityMenu
+            open={visibilityOpen}
+            onClose={() => setVisibilityOpen(false)}
+            value={visibility}
+            onChange={(next) => {
+              setVisibility(next);
+              if (next.kind === "everyone" || next.kind === "followings") setVisibilityOpen(false);
+            }}
+            anchorRef={visibilityTriggerRef}
+          />
         </div>
+        <button
+          type="button"
+          onClick={handlePost}
+          className={cn(
+            "flex h-8 w-full items-center justify-center rounded-xl text-sm text-white",
+            mode === "poll" && !pollReady ? "bg-[#86b3fb]" : "bg-brand-900 hover:bg-brand-900/90",
+          )}
+        >
+          Post
+        </button>
         </div>
       </div>
 
