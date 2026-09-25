@@ -64,7 +64,6 @@ function buildPost(input: NewPostInput): PostCardData {
     ...base,
     variant: "text",
     text: input.text.trim() || undefined,
-    truncated: false,
     video: isVideo ? urls[0] : undefined,
     image: !isVideo && urls.length === 1 ? urls[0] : undefined,
     images: !isVideo && urls.length > 1 ? urls : undefined,
