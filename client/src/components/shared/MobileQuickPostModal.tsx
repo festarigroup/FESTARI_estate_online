@@ -236,41 +236,90 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
             className="w-full text-sm leading-6 text-night-900 placeholder:text-gray-400 focus:outline-none"
           />
         ) : mode === "post" ? (
-          <textarea
-            value={text}
-            onChange={(event) => setText(event.target.value)}
-            rows={3}
-            placeholder="What’s happening twin? Write something down..."
-            className="w-full resize-none text-sm leading-6 text-night-900 placeholder:text-gray-400 focus:outline-none"
-          />
+          <div className="flex w-full flex-col">
+            <textarea
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+              rows={previews.length > 0 ? 8 : 1}
+              placeholder="What’s happening twin? Write something down..."
+              className="w-full resize-none text-sm leading-6 text-night-900 placeholder:text-gray-400 focus:outline-none"
+            />
+            {previews.length === 0 && (
+              <div
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  setDragActive(true);
+                }}
+                onDragLeave={() => setDragActive(false)}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  setDragActive(false);
+                  addFiles(event.dataTransfer.files);
+                }}
+                onClick={() => inputRef.current?.click()}
+                role="button"
+                tabIndex={0}
+                className={cn(
+                  "flex w-full cursor-pointer flex-col items-center justify-center gap-2.5 rounded-[27px] border px-4 py-[50px] text-center",
+                  dragActive ? "border-brand-900 bg-brand-900/5" : "border-[#e2e8f0] bg-[#f8fafc]",
+                )}
+              >
+                <p className="text-xs text-[#1e2024]">Drag and drop files here</p>
+                <div className="flex w-full flex-col items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      inputRef.current?.click();
+                    }}
+                    className="flex h-6 w-full items-center justify-center gap-1.5 rounded-[40px] bg-[#19161d] px-2 text-xs text-white"
+                  >
+                    Choose files
+                    <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={14} />
+                  </button>
+                  <p className="text-xs text-[#53575a]">PNG, JPEG, GIF, MP4, MKV, AVI</p>
+                </div>
+              </div>
+            )}
+          </div>
         ) : null}
 
         {mode === "poll" && (
           <div className="flex w-full flex-col gap-3">
-            {pollOptions.map((option, index) => (
-              <div
-                key={index}
-                className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5"
-              >
-                <NavIcon icon="/icons/poll-option-edit.svg" color="night" size={14} className="shrink-0 bg-gray-400" />
-                <input
-                  value={option}
-                  onChange={(event) => updatePollOption(index, event.target.value)}
-                  placeholder={`Option ${index + 1}`}
-                  className="w-full flex-1 text-sm text-night-900 placeholder:text-night-900/70 focus:outline-none"
-                />
-                {index >= 2 && (
-                  <button
-                    type="button"
-                    aria-label={`Remove option: ${option}`}
-                    onClick={() => removePollOption(index)}
-                    className="shrink-0"
+            <div className="flex w-full flex-col gap-4 rounded-[17px] border border-[#e2e8f0] bg-[#f8fafc] p-[3px]">
+              <div className="flex w-full flex-col gap-1">
+                {pollOptions.map((option, index) => (
+                  <div
+                    key={index}
+                    className="flex h-12 w-full items-center gap-2 rounded-2xl border border-[#e2e8f0] bg-white px-3"
                   >
-                    <NavIcon icon="/icons/poll-option-delete.svg" color="night" size={14} className="bg-red-500" />
-                  </button>
-                )}
+                    <NavIcon icon="/icons/poll-option-edit.svg" color="night" size={16} className="shrink-0 bg-gray-400" />
+                    <input
+                      value={option}
+                      onChange={(event) => updatePollOption(index, event.target.value)}
+                      placeholder={`Option ${index + 1}`}
+                      className="w-full flex-1 text-sm text-[#111826] placeholder:text-[#111826]/70 focus:outline-none"
+                    />
+                    {index >= 2 && (
+                      <button
+                        type="button"
+                        aria-label={`Remove option: ${option}`}
+                        onClick={() => removePollOption(index)}
+                        className="shrink-0"
+                      >
+                        <NavIcon icon="/icons/poll-option-delete.svg" color="night" size={16} className="bg-red-500" />
+                      </button>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
+              <div className="flex w-full flex-col gap-1 px-1 pb-1">
+                <p className="text-[13px] text-[#111826]">
+                  Poll Duration<span className="text-[#ef4444]">*</span>
+                </p>
+                <PollDurationDropdown value={duration} onChange={setDuration} />
+              </div>
+            </div>
             <div className="flex w-full items-center justify-between">
               <p className="text-sm font-bold text-night-900">Options</p>
               <button
@@ -290,12 +339,6 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                   <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                 </svg>
               </button>
-            </div>
-            <div className="flex w-full flex-col gap-1">
-              <p className="text-sm text-[#111826]">
-                Poll Duration<span className="text-red-500">*</span>
-              </p>
-              <PollDurationDropdown value={duration} onChange={setDuration} />
             </div>
           </div>
         )}
@@ -349,45 +392,6 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
               />
             </div>
           </>
-        )}
-
-        {mode === "post" && previews.length === 0 && (
-          <div className="flex w-full flex-col gap-1">
-            <div
-              onDragOver={(event) => {
-                event.preventDefault();
-                setDragActive(true);
-              }}
-              onDragLeave={() => setDragActive(false)}
-              onDrop={(event) => {
-                event.preventDefault();
-                setDragActive(false);
-                addFiles(event.dataTransfer.files);
-              }}
-              onClick={() => inputRef.current?.click()}
-              role="button"
-              tabIndex={0}
-              className={cn(
-                "flex min-h-[100px] w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed px-6 py-6 text-center",
-                dragActive ? "border-brand-900 bg-brand-900/5" : "border-[#cbd5e0] bg-[#cbd5e0]/30",
-              )}
-            >
-              <p className="text-xs text-[#19161d]">Drag and drop files here</p>
-              <p className="text-xs text-[#86888a]">or</p>
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  inputRef.current?.click();
-                }}
-                className="flex h-6 items-center justify-center gap-1.5 rounded-[40px] bg-[#19161d] px-2 text-xs text-white"
-              >
-                Choose files
-                <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={14} />
-              </button>
-            </div>
-            <p className="w-full text-xs text-[#53575a]">PNG, JPEG, GIF, MP4, MOV, WEBM</p>
-          </div>
         )}
 
         {previews.length > 0 && (
