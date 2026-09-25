@@ -21,14 +21,14 @@ const SEARCH_PROFILES: SearchProfile[] = [
   { name: "Madeline Price", role: "Researcher", avatar: "/icons/avatar-sample.jpg" },
 ];
 
-export const ORGANIZATION_ITEMS: SelectSheetItem[] = [
+const DEFAULT_ORGANIZATION_ITEMS: SelectSheetItem[] = [
   { name: "Organization 1", role: "Lead Product Designer", avatar: "/icons/org.svg", avatarIsIcon: true },
   { name: "Organization 2", role: "Product Designer", avatar: "/icons/org.svg", avatarIsIcon: true, disabled: true },
   { name: "Organization 3", role: "Head of Design", avatar: "/icons/org.svg", avatarIsIcon: true },
   { name: "Organization 4", role: "Product Designer", avatar: "/icons/org.svg", avatarIsIcon: true },
   { name: "Organization 5", role: "Chief Strategy Officer", avatar: "/icons/org.svg", avatarIsIcon: true },
 ];
-export const COMMUNITY_ITEMS: SelectSheetItem[] = [
+const DEFAULT_COMMUNITY_ITEMS: SelectSheetItem[] = [
   { name: "Community 1", role: "Lead Product Designer", avatar: "/icons/avatar-sample.jpg" },
   { name: "Community 2", role: "Product Designer", avatar: "/icons/avatar-andy.png", disabled: true },
   { name: "Community 3", role: "Head of Design", avatar: "/icons/avatar-sample.jpg" },
@@ -97,6 +97,8 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
   const [organizationSheetOpen, setOrganizationSheetOpen] = useState(false);
   const [profileQuery, setProfileQuery] = useState("");
   const [addedProfiles, setAddedProfiles] = useState<string[]>([]);
+  const [organizationItems, setOrganizationItems] = useState(DEFAULT_ORGANIZATION_ITEMS);
+  const [communityItems, setCommunityItems] = useState(DEFAULT_COMMUNITY_ITEMS);
 
   const matchingProfiles =
     profileQuery.trim().length > 0
@@ -109,6 +111,24 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
       alreadyAdded ? current.filter((added) => added !== name) : [...current, name],
     );
     showSuccessToast(alreadyAdded ? `${name} removed from this post's audience` : `${name} added to this post's audience`);
+  }
+
+  function addOrganization() {
+    const name = `Organization ${organizationItems.length + 1}`;
+    setOrganizationItems((current) => [...current, { name, role: "Member", avatar: "/icons/org.svg", avatarIsIcon: true }]);
+    const currentCommunities = value.kind === "custom" ? value.communities : [];
+    const currentOrganizations = value.kind === "custom" ? value.organizations : [];
+    onChange(buildCustomVisibility(currentCommunities, [...currentOrganizations, name]));
+    showSuccessToast(`${name} added to this post's audience`);
+  }
+
+  function addCommunity() {
+    const name = `Community ${communityItems.length + 1}`;
+    setCommunityItems((current) => [...current, { name, role: "Member", avatar: "/icons/avatar-sample.jpg" }]);
+    const currentCommunities = value.kind === "custom" ? value.communities : [];
+    const currentOrganizations = value.kind === "custom" ? value.organizations : [];
+    onChange(buildCustomVisibility([...currentCommunities, name], currentOrganizations));
+    showSuccessToast(`${name} added to this post's audience`);
   }
 
   useEffect(() => {
@@ -190,21 +210,23 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
         open={communitySheetOpen}
         onClose={() => setCommunitySheetOpen(false)}
         title="Select Community"
-        items={COMMUNITY_ITEMS}
+        items={communityItems}
         selected={value.kind === "custom" ? value.communities : []}
         onChangeSelected={(names) => {
           onChange(buildCustomVisibility(names, value.kind === "custom" ? value.organizations : []));
         }}
+        onAdd={addCommunity}
       />
       <MobileSelectSheet
         open={organizationSheetOpen}
         onClose={() => setOrganizationSheetOpen(false)}
         title="Select Organization"
-        items={ORGANIZATION_ITEMS}
+        items={organizationItems}
         selected={value.kind === "custom" ? value.organizations : []}
         onChangeSelected={(names) => {
           onChange(buildCustomVisibility(value.kind === "custom" ? value.communities : [], names));
         }}
+        onAdd={addOrganization}
       />
 
       <div className="mt-0.5 flex h-[29px] w-full items-center gap-1 rounded-2xl border-[0.6px] border-gray-300 bg-[#f6f6f9] px-2 py-1.5">

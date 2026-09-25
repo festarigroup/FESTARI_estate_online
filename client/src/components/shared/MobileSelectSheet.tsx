@@ -1,10 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 
@@ -23,6 +21,8 @@ interface SelectSheetBodyProps {
   selected: string[];
   onChangeSelected: (next: string[]) => void;
   onClose: () => void;
+  /** Creates a new entry and selects it for this post's audience. */
+  onAdd: () => void;
   /** "sheet": drag handle + X, meant for a full bottom sheet. "inline": back
    * arrow, no drag handle, meant to swap in place inside another surface. */
   variant?: "sheet" | "inline";
@@ -31,7 +31,7 @@ interface SelectSheetBodyProps {
 /** The searchable, multi-select list shared by the nested-bottom-sheet picker
  * (MobileSelectSheet) and the in-place "swap the composer's own content"
  * alternative — same list, different chrome around it. */
-export function SelectSheetBody({ title, items, selected, onChangeSelected, onClose, variant = "sheet" }: SelectSheetBodyProps) {
+export function SelectSheetBody({ title, items, selected, onChangeSelected, onClose, onAdd, variant = "sheet" }: SelectSheetBodyProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const noun = title.replace("Select ", "");
@@ -163,15 +163,16 @@ export function SelectSheetBody({ title, items, selected, onChangeSelected, onCl
         </div>
       </div>
 
-      <Link
-        href={comingSoonHref(`Add ${noun}`)}
+      <button
+        type="button"
+        onClick={onAdd}
         className={cn(
           "flex w-full shrink-0 items-center justify-center rounded-2xl bg-brand-900 px-4 py-2.5 text-sm text-white",
           variant === "sheet" && "mx-6 w-auto",
         )}
       >
         Add {noun}
-      </Link>
+      </button>
     </div>
   );
 }
@@ -183,11 +184,12 @@ interface MobileSelectSheetProps {
   items: SelectSheetItem[];
   selected: string[];
   onChangeSelected: (next: string[]) => void;
+  onAdd: () => void;
 }
 
 /** The bottom-sheet picker used on mobile when choosing communities/organizations
  * (Figma node 404:15742) — replaces the desktop side popover on small screens. */
-export function MobileSelectSheet({ open, onClose, title, items, selected, onChangeSelected }: MobileSelectSheetProps) {
+export function MobileSelectSheet({ open, onClose, title, items, selected, onChangeSelected, onAdd }: MobileSelectSheetProps) {
   const { mounted, closing } = useAnimatedSheet(open);
 
   useEffect(() => {
@@ -222,6 +224,7 @@ export function MobileSelectSheet({ open, onClose, title, items, selected, onCha
           selected={selected}
           onChangeSelected={onChangeSelected}
           onClose={onClose}
+          onAdd={onAdd}
           variant="sheet"
         />
       </div>
