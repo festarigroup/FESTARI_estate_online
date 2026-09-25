@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
+import { EmojiPicker } from "@/components/shared/EmojiPicker";
 import { FollowButton } from "@/components/shared/FollowButton";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { Tooltip } from "@/components/shared/Tooltip";
@@ -183,6 +184,7 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
             placeholder="Add a comment"
             className="min-w-0 flex-1 bg-transparent text-[11px] text-night-900/70 placeholder:text-night-900/40 focus:outline-none"
           />
+          <EmojiPicker onSelect={(emoji) => setCommentDraft((current) => current + emoji)} />
           <button
             type="button"
             aria-label="Send comment"

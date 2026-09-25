@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
+import { EmojiPicker } from "@/components/shared/EmojiPicker";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { Tooltip } from "@/components/shared/Tooltip";
 import {
@@ -155,6 +156,7 @@ export function CreatePostModal({ open, onClose, onSwitchType }: CreatePostModal
               placeholder="What’s happening twin? Write something down..."
               className="w-full flex-1 resize-none self-center rounded-lg px-3 py-3.5 text-base leading-6 text-night-900 placeholder:text-[#475568] focus:outline-none"
             />
+            <EmojiPicker onSelect={(emoji) => setText((current) => current + emoji)} className="self-center" />
           </div>
 
           <input

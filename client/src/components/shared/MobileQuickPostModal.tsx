@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
+import { EmojiPicker } from "@/components/shared/EmojiPicker";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { MobileVisibilityMenu } from "@/components/shared/MobileVisibilityMenu";
 import { DURATION_OPTIONS, PollDurationDropdown } from "@/components/shared/PollDurationDropdown";
@@ -461,6 +462,9 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
           >
             <NavIcon icon={getVisibilityIcon(visibility)} color="brand" size={20} className="bg-[#337df2]" />
           </button>
+          {mode === "post" && (
+            <EmojiPicker onSelect={(emoji) => setText((current) => current + emoji)} align="start" />
+          )}
           {(mode === "poll" || mode === "article" || (mode === "post" && previews.length > 0)) && (
             <button type="button" aria-label="Attach images" onClick={() => inputRef.current?.click()} className="ml-auto">
               <NavIcon icon="/icons/poll-add-alt.svg" color="brand" size={18} className="bg-[#337df2]" />
