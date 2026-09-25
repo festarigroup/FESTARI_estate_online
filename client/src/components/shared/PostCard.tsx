@@ -80,6 +80,7 @@ export interface PostCardData {
   media?: MediaItem[];
   likes: number;
   comments: number;
+  shares?: number;
   shareLabel?: string;
   showComposer?: boolean;
   // poll
@@ -197,7 +198,22 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
         </div>
       )}
 
-      {showComments && <CommentsSection comments={comments} />}
+      {showComments && (
+        <>
+          <div className="sm:hidden">
+            <CommentsSection comments={comments} />
+          </div>
+          <CommentsModal
+            post={post}
+            comments={comments}
+            commentDraft={commentDraft}
+            setCommentDraft={setCommentDraft}
+            submitComment={submitComment}
+            currentUserAvatarInitials={currentUserAvatarInitials}
+            onClose={() => setShowComments(false)}
+          />
+        </>
+      )}
     </article>
   );
 }
@@ -795,6 +811,111 @@ const LIKER_NAME_POOL = [
 
 function buildLikerNames(count: number): string[] {
   return Array.from({ length: count }, (_, index) => LIKER_NAME_POOL[index % LIKER_NAME_POOL.length]);
+}
+
+function CommentsModal({
+  post,
+  comments,
+  commentDraft,
+  setCommentDraft,
+  submitComment,
+  currentUserAvatarInitials,
+  onClose,
+}: {
+  post: PostCardData;
+  comments: CommentItem[];
+  commentDraft: string;
+  setCommentDraft: (value: string) => void;
+  submitComment: () => void;
+  currentUserAvatarInitials: string;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[120] hidden items-center justify-center bg-black/50 p-4 sm:flex"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Comments"
+    >
+      <div
+        onClick={(event) => event.stopPropagation()}
+        className="relative flex max-h-[85vh] w-full max-w-[770px] flex-col gap-5 overflow-y-auto rounded-[45px] bg-white p-8 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)]"
+      >
+        <button
+          type="button"
+          aria-label="Close"
+          onClick={onClose}
+          className="absolute -right-3 -top-3 z-10 flex size-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-md hover:bg-gray-50"
+        >
+          <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </button>
+
+        {post.showComposer && (
+          <div className="flex w-full items-center gap-2 rounded-3xl bg-gray-100 p-2">
+            <span className="flex size-[38px] shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">
+              {currentUserAvatarInitials}
+            </span>
+            <input
+              type="text"
+              value={commentDraft}
+              onChange={(event) => setCommentDraft(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") submitComment();
+              }}
+              placeholder="Add a comment"
+              className="min-w-0 flex-1 bg-transparent text-[11px] text-night-900/70 placeholder:text-night-900/40 focus:outline-none"
+            />
+            <EmojiPicker onSelect={(emoji) => setCommentDraft(commentDraft + emoji)} side="bottom" />
+            <button
+              type="button"
+              aria-label="Send comment"
+              onClick={submitComment}
+              className="relative block size-[23px] shrink-0"
+            >
+              <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="23px" />
+            </button>
+          </div>
+        )}
+
+        <div className="flex w-full items-center justify-between px-2.5">
+          <span className="flex items-center gap-2">
+            <NavIcon icon="/icons/heart-like-filled.svg" color="night" size={20} className="bg-[#ef575f]" />
+            <span className="text-xs font-bold text-[#ef575f]">{post.likes} Likes</span>
+          </span>
+          <span className="flex items-center gap-4">
+            <span className="text-xs font-bold text-brand-900">{post.shares ?? 12} Shares</span>
+            <span className="text-xs font-bold text-brand-900">{post.comments} Comments</span>
+          </span>
+        </div>
+
+        <div className="flex w-full flex-col items-center gap-[14px]">
+          {comments.map((comment) => (
+            <CommentRow key={comment.id} comment={comment} />
+          ))}
+        </div>
+
+        <button type="button" className="text-left text-[11px] font-bold text-brand-900">
+          Load More Comments
+        </button>
+      </div>
+    </div>,
+    document.body,
+  );
 }
 
 function CommentsSection({ comments }: { comments: CommentItem[] }) {
