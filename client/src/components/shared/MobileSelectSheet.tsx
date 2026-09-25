@@ -56,7 +56,7 @@ export function SelectSheetBody({ title, items, selected, onChangeSelected, onCl
   }
 
   return (
-    <div className="flex h-full w-full flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       {variant === "sheet" && <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154]" />}
 
       <div className={cn("flex w-full shrink-0 items-center gap-2.5", variant === "sheet" && "px-6")}>
@@ -165,7 +165,7 @@ export function SelectSheetBody({ title, items, selected, onChangeSelected, onCl
       <Link
         href={comingSoonHref(`Add ${noun}`)}
         className={cn(
-          "mt-auto flex w-full shrink-0 items-center justify-center rounded-2xl bg-brand-900 px-4 py-2.5 text-sm text-white",
+          "flex w-full shrink-0 items-center justify-center rounded-2xl bg-brand-900 px-4 py-2.5 text-sm text-white",
           variant === "sheet" && "mx-6 w-auto",
         )}
       >
@@ -187,18 +187,35 @@ interface MobileSelectSheetProps {
 /** The bottom-sheet picker used on mobile when choosing communities/organizations
  * (Figma node 404:15742) — replaces the desktop side popover on small screens. */
 export function MobileSelectSheet({ open, onClose, title, items, selected, onChangeSelected }: MobileSelectSheetProps) {
+  const [mounted, setMounted] = useState(open);
+  const [closing, setClosing] = useState(false);
+
   const [wasOpen, setWasOpen] = useState(open);
-  if (open !== wasOpen) setWasOpen(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) {
+      setMounted(true);
+      setClosing(false);
+    } else {
+      setClosing(true);
+    }
+  }
 
   useEffect(() => {
-    if (!open) return;
+    if (!closing) return;
+    const timeout = setTimeout(() => setMounted(false), 250);
+    return () => clearTimeout(timeout);
+  }, [closing]);
+
+  useEffect(() => {
+    if (!mounted) return;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [open]);
+  }, [mounted]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   return createPortal(
     <div
@@ -211,7 +228,10 @@ export function MobileSelectSheet({ open, onClose, title, items, selected, onCha
     >
       <div
         onClick={(event) => event.stopPropagation()}
-        className="flex h-[85vh] w-full animate-sheet-slide-up flex-col gap-4 rounded-t-[32px] bg-white pb-6 pt-4 shadow-[0px_-4px_8px_0px_rgba(69,71,69,0.15)]"
+        className={cn(
+          "flex max-h-[85vh] w-full flex-col gap-4 rounded-t-[32px] bg-white pb-4 pt-4 shadow-[0px_-4px_8px_0px_rgba(69,71,69,0.15)]",
+          closing ? "animate-sheet-slide-down" : "animate-sheet-slide-up",
+        )}
       >
         <SelectSheetBody
           title={title}

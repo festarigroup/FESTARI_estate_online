@@ -109,6 +109,19 @@ body {
   animation: sheet-slide-up 0.25s ease-out;
 }
 
+@keyframes sheet-slide-down {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 100%, 0);
+  }
+}
+
+.animate-sheet-slide-down {
+  animation: sheet-slide-down 0.25s ease-in forwards;
+}
+
 @keyframes like-pop {
   0% {
     transform: scale(1) rotate(0deg);
