@@ -28,8 +28,8 @@ interface DesktopMenuSection {
 const CREATE_POST_ITEM = { key: "post", icon: "/icons/create-menu-dt-add-alt.svg", label: "Create Post" };
 const CREATE_POST_SUBMENU: DesktopSubmenuItem[] = [
   { key: "media", icon: "/icons/image-01.svg", label: "Media" },
-  { key: "poll", icon: "/icons/chart-02.svg", label: "Poll" },
-  { key: "article", icon: "/icons/book-bookmark-01.svg", label: "Article" },
+  { key: "poll", icon: "/icons/chart-02-bold.svg", label: "Poll" },
+  { key: "article", icon: "/icons/book-bookmark-01-bold.svg", label: "Article" },
 ];
 
 const DESKTOP_LIST_SECTIONS: DesktopMenuSection[] = [
