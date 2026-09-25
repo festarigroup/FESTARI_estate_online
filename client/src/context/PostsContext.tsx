@@ -6,7 +6,7 @@ import type { PostCardData } from "@/components/shared/PostCard";
 export type NewPostInput =
   | { kind: "media"; text: string; files: File[] }
   | { kind: "poll"; question: string; options: string[] }
-  | { kind: "article"; headline: string; body: string };
+  | { kind: "article"; headline: string; body: string; files?: File[] };
 
 const CURRENT_USER = {
   authorName: "Madeline Price",
@@ -43,11 +43,17 @@ function buildPost(input: NewPostInput): PostCardData {
   }
 
   if (input.kind === "article") {
+    const articleFiles = input.files ?? [];
+    const articleUrls = articleFiles.map((file) => URL.createObjectURL(file));
+    const articleIsVideo = articleFiles.some((file) => file.type.startsWith("video/"));
     return {
       ...base,
       variant: "text",
       text: [input.headline.trim(), input.body.trim()].filter(Boolean).join("\n\n"),
       truncated: true,
+      video: articleIsVideo ? articleUrls[0] : undefined,
+      image: !articleIsVideo && articleUrls.length === 1 ? articleUrls[0] : undefined,
+      images: !articleIsVideo && articleUrls.length > 1 ? articleUrls : undefined,
     };
   }
 

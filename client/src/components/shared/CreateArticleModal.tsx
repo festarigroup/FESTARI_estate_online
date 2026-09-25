@@ -234,7 +234,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
                   <button
                     key={item.key}
                     type="button"
-                    aria-label={item.key === "media" ? "Attach media" : item.label}
+                    aria-label={item.label}
                     onClick={() => {
                       if (item.key === "media" || item.key === "poll") onSwitchType?.(item.key);
                     }}

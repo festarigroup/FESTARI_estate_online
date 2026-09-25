@@ -47,6 +47,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
     [files],
   );
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const [dragActive, setDragActive] = useState(false);
   const [visibilityOpen, setVisibilityOpen] = useState(false);
   const [visibility, setVisibility] = useState<PostVisibility>(DEFAULT_VISIBILITY);
   const visibilityTriggerRef = useRef<HTMLButtonElement | null>(null);
@@ -175,7 +176,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
       return;
     }
     if (mode === "article") {
-      addPost({ kind: "article", headline: "", body: bodyRef.current?.textContent ?? "" });
+      addPost({ kind: "article", headline: "", body: bodyRef.current?.textContent ?? "", files });
     } else {
       addPost({ kind: "media", text, files });
     }
@@ -195,7 +196,8 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
       <div
         onClick={(event) => event.stopPropagation()}
         className={cn(
-          "flex w-full max-h-[85vh] flex-col gap-3 rounded-t-[36px] bg-white p-6 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)] animate-sheet-slide-up",
+          "flex w-full max-h-[85vh] flex-col rounded-t-[36px] bg-white p-6 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)] animate-sheet-slide-up",
+          mode === "poll" ? "gap-4" : "gap-3",
           mode === "article" ? "overflow-hidden" : "overflow-y-auto",
         )}
       >
@@ -244,7 +246,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
         ) : null}
 
         {mode === "poll" && (
-          <div className="flex w-full flex-col gap-2">
+          <div className="flex w-full flex-col gap-3">
             {pollOptions.map((option, index) => (
               <div
                 key={index}
@@ -349,6 +351,45 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
           </>
         )}
 
+        {mode === "post" && previews.length === 0 && (
+          <div className="flex w-full flex-col gap-1">
+            <div
+              onDragOver={(event) => {
+                event.preventDefault();
+                setDragActive(true);
+              }}
+              onDragLeave={() => setDragActive(false)}
+              onDrop={(event) => {
+                event.preventDefault();
+                setDragActive(false);
+                addFiles(event.dataTransfer.files);
+              }}
+              onClick={() => inputRef.current?.click()}
+              role="button"
+              tabIndex={0}
+              className={cn(
+                "flex min-h-[100px] w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed px-6 py-6 text-center",
+                dragActive ? "border-brand-900 bg-brand-900/5" : "border-[#cbd5e0] bg-[#cbd5e0]/30",
+              )}
+            >
+              <p className="text-xs text-[#19161d]">Drag and drop files here</p>
+              <p className="text-xs text-[#86888a]">or</p>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  inputRef.current?.click();
+                }}
+                className="flex h-6 items-center justify-center gap-1.5 rounded-[40px] bg-[#19161d] px-2 text-xs text-white"
+              >
+                Choose files
+                <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={14} />
+              </button>
+            </div>
+            <p className="w-full text-xs text-[#53575a]">PNG, JPEG, GIF, MP4, MOV, WEBM</p>
+          </div>
+        )}
+
         {previews.length > 0 && (
           <div className="flex w-full flex-wrap gap-2">
             {previews.map((preview, index) => (
@@ -383,35 +424,14 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
             onChange={(event) => addFiles(event.target.files)}
           />
           <div className="flex items-center gap-2 border-r border-[#86b3fb] pr-3">
-            <button
-              type="button"
-              aria-label="Attach files"
-              onClick={() => {
-                if (mode === "article") setMode("post");
-                inputRef.current?.click();
-              }}
-            >
-              <NavIcon icon="/icons/article-toolbar-link-bold.svg" color="brand" size={16} className="bg-[#337df2]" />
+            <button type="button" aria-label="Media" onClick={() => setMode("post")}>
+              <NavIcon icon="/icons/image-01.svg" color="brand" size={18} className="bg-[#337df2]" />
             </button>
             <button type="button" aria-label="Poll" onClick={() => setMode("poll")}>
-              <NavIcon
-                icon="/icons/chart-02-bold.svg"
-                color="brand"
-                size={18}
-                className={cn("bg-[#337df2]", mode === "poll" && "opacity-30")}
-              />
+              <NavIcon icon="/icons/chart-02-bold.svg" color="brand" size={18} className="bg-[#337df2]" />
             </button>
-            <button
-              type="button"
-              aria-label="Article"
-              onClick={() => setMode("article")}
-            >
-              <NavIcon
-                icon="/icons/book-bookmark-01-bold.svg"
-                color="brand"
-                size={18}
-                className={cn("bg-[#337df2]", mode === "article" && "opacity-30")}
-              />
+            <button type="button" aria-label="Article" onClick={() => setMode("article")}>
+              <NavIcon icon="/icons/book-bookmark-01-bold.svg" color="brand" size={18} className="bg-[#337df2]" />
             </button>
           </div>
           <button
@@ -422,7 +442,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
           >
             <NavIcon icon={getVisibilityIcon(visibility)} color="brand" size={20} className="bg-[#337df2]" />
           </button>
-          {mode === "poll" && (
+          {(mode === "poll" || mode === "article" || (mode === "post" && previews.length > 0)) && (
             <button type="button" aria-label="Attach images" onClick={() => inputRef.current?.click()} className="ml-auto">
               <NavIcon icon="/icons/poll-add-alt.svg" color="brand" size={18} className="bg-[#337df2]" />
             </button>
