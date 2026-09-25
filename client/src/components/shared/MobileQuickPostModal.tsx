@@ -419,7 +419,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
               type="button"
               aria-label="Attach files"
               onClick={() => {
-                setMode("post");
+                if (mode === "article") setMode("post");
                 inputRef.current?.click();
               }}
             >
@@ -454,6 +454,11 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
           >
             <NavIcon icon={getVisibilityIcon(visibility)} color="brand" size={20} className="bg-[#337df2]" />
           </button>
+          {mode === "poll" && (
+            <button type="button" aria-label="Attach images" onClick={() => inputRef.current?.click()} className="ml-auto">
+              <NavIcon icon="/icons/poll-add-alt.svg" color="brand" size={18} className="bg-[#337df2]" />
+            </button>
+          )}
           <MobileVisibilityMenu
             open={visibilityOpen}
             onClose={() => setVisibilityOpen(false)}
