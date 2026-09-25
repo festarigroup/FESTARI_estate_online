@@ -418,6 +418,14 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                 </button>
               </div>
             ))}
+            <button
+              type="button"
+              aria-label="Add more media"
+              onClick={() => inputRef.current?.click()}
+              className="flex size-16 shrink-0 items-center justify-center rounded-lg border border-dashed border-[#cbd5e0] bg-[#cbd5e0]/30 text-[#53575a]"
+            >
+              <NavIcon icon="/icons/add-circle-01.svg" color="night" size={18} />
+            </button>
           </div>
         )}
 
