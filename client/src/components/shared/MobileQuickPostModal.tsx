@@ -241,9 +241,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
               <path d="M10 4V16M10 16L4 10M10 16L16 10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
-          <p className="flex-1 text-center text-lg font-bold tracking-[-0.54px] text-black">
-            {mode === "article" ? "Write an article" : mode === "poll" ? "Create a poll" : "Make a post"}
-          </p>
+          <p className="flex-1 text-center text-lg font-bold tracking-[-0.54px] text-black">Make a post</p>
           <span className="size-6 shrink-0" aria-hidden />
         </div>
 
@@ -286,7 +284,6 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                 key={index}
                 className="flex w-full items-center gap-2 rounded-lg border border-gray-200 px-3 py-1.5"
               >
-                <p className="w-full flex-1 truncate text-sm text-night-900">{option}</p>
                 <button
                   type="button"
                   aria-label={`Edit option: ${option}`}
@@ -295,6 +292,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
                 >
                   <NavIcon icon="/icons/poll-option-edit.svg" color="night" size={14} className="bg-gray-400 hover:bg-night-900" />
                 </button>
+                <p className="w-full flex-1 truncate text-sm text-night-900">{option}</p>
                 <button
                   type="button"
                   aria-label={`Remove option: ${option}`}
