@@ -1,9 +1,9 @@
 <svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="12.0667" height="12.0666" viewBox="0 0 12.0667 12.0666" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g id="elements" transform="translate(0, 12.0666) scale(1, -1)">
-<path id="Rectangle 2362" d="M8.36667 7.2L9.62048 6.82386C10.4215 6.58355 10.822 6.4634 11.0527 6.15338C11.2833 5.84337 11.2833 5.42522 11.2833 4.58893V0.200001" stroke="#141B34" stroke-width="0.4" stroke-linejoin="round"/>
+<path id="Rectangle 2362" d="M8.36667 7.2L9.62048 6.82386C10.4215 6.58355 10.822 6.4634 11.0527 6.15338C11.2833 5.84337 11.2833 5.42522 11.2833 4.58893V0.200001" stroke="#141B34" stroke-width="1.4" stroke-linejoin="round"/>
 <path id="Vector" d="M3.7 7.78333L5.45 7.78333M3.7 5.45L5.45 5.45" stroke="#53575A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path id="Rectangle 2360" d="M6.03333 0.2V1.95C6.03333 2.49997 6.03333 2.77496 5.86248 2.94581C5.69162 3.11667 5.41664 3.11667 4.86667 3.11667H4.28333C3.73336 3.11667 3.45838 3.11667 3.28752 2.94581C3.11667 2.77496 3.11667 2.49997 3.11667 1.95L3.11667 0.2" stroke="#141B34" stroke-width="0.4" stroke-linejoin="round"/>
-<path id="Vector 6003" d="M0.2 0.2L11.8667 0.2" stroke="#141B34" stroke-width="0.4" stroke-linecap="round"/>
-<path id="Vector 6728" d="M0.783333 0.200001L0.783333 9.11494C0.783333 10.5795 0.783333 11.3119 1.24486 11.6752C1.70638 12.0385 2.38599 11.8413 3.74522 11.4467L6.66189 10.6001C7.48212 10.362 7.89224 10.243 8.12945 9.91854C8.36667 9.59408 8.36667 9.15216 8.36667 8.26834L8.36667 0.200001" stroke="#141B34" stroke-width="0.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Rectangle 2360" d="M6.03333 0.2V1.95C6.03333 2.49997 6.03333 2.77496 5.86248 2.94581C5.69162 3.11667 5.41664 3.11667 4.86667 3.11667H4.28333C3.73336 3.11667 3.45838 3.11667 3.28752 2.94581C3.11667 2.77496 3.11667 2.49997 3.11667 1.95L3.11667 0.2" stroke="#141B34" stroke-width="1.4" stroke-linejoin="round"/>
+<path id="Vector 6003" d="M0.2 0.2L11.8667 0.2" stroke="#141B34" stroke-width="1.4" stroke-linecap="round"/>
+<path id="Vector 6728" d="M0.783333 0.200001L0.783333 9.11494C0.783333 10.5795 0.783333 11.3119 1.24486 11.6752C1.70638 12.0385 2.38599 11.8413 3.74522 11.4467L6.66189 10.6001C7.48212 10.362 7.89224 10.243 8.12945 9.91854C8.36667 9.59408 8.36667 9.15216 8.36667 8.26834L8.36667 0.200001" stroke="#141B34" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
 </g>
 </svg>

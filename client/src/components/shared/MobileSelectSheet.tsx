@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 
 export interface SelectSheetItem {
@@ -31,6 +33,7 @@ interface SelectSheetBodyProps {
 export function SelectSheetBody({ title, items, selected, onChangeSelected, onClose, variant = "sheet" }: SelectSheetBodyProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const noun = title.replace("Select ", "");
 
   const filteredItems = query.trim()
     ? items.filter((item) => item.name.toLowerCase().includes(query.trim().toLowerCase()))
@@ -53,10 +56,10 @@ export function SelectSheetBody({ title, items, selected, onChangeSelected, onCl
   }
 
   return (
-    <div className="flex w-full flex-col gap-4">
+    <div className="flex h-full w-full flex-col gap-4">
       {variant === "sheet" && <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154]" />}
 
-      <div className={cn("flex w-full items-center gap-2.5", variant === "sheet" && "px-6")}>
+      <div className={cn("flex w-full shrink-0 items-center gap-2.5", variant === "sheet" && "px-6")}>
         <button
           type="button"
           aria-label={variant === "inline" ? "Back" : "Close"}
@@ -158,6 +161,16 @@ export function SelectSheetBody({ title, items, selected, onChangeSelected, onCl
           )}
         </div>
       </div>
+
+      <Link
+        href={comingSoonHref(`Add ${noun}`)}
+        className={cn(
+          "mt-auto flex w-full shrink-0 items-center justify-center rounded-2xl bg-brand-900 px-4 py-2.5 text-sm text-white",
+          variant === "sheet" && "mx-6 w-auto",
+        )}
+      >
+        Add {noun}
+      </Link>
     </div>
   );
 }

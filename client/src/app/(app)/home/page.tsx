@@ -366,7 +366,7 @@ function MobileComposerCard() {
           }}
         >
           <span className="relative block size-3.5">
-            <Image src="/icons/chart-02.svg" alt="" fill sizes="14px" />
+            <Image src="/icons/chart-02-bold.svg" alt="" fill sizes="14px" />
           </span>
         </button>
         <button
@@ -378,7 +378,7 @@ function MobileComposerCard() {
           }}
         >
           <span className="relative block size-3.5">
-            <Image src="/icons/book-bookmark-01.svg" alt="" fill sizes="14px" />
+            <Image src="/icons/book-bookmark-01-bold.svg" alt="" fill sizes="14px" />
           </span>
         </button>
 
