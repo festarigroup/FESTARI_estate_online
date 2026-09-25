@@ -139,11 +139,11 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
           </svg>
         </button>
 
-        <div className="flex max-h-[90vh] w-full flex-col gap-6 rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] max-sm:animate-sheet-slide-up sm:rounded-2xl">
+        <div className="flex max-h-[90vh] w-full flex-col gap-6 overflow-hidden rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] max-sm:animate-sheet-slide-up sm:rounded-2xl">
           <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154] sm:hidden" />
-          <p className="text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Create an Article</p>
+          <p className="shrink-0 text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Create an Article</p>
 
-          <div className="flex w-full flex-col gap-2">
+          <div className="flex w-full min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
           <div className="flex w-full items-start gap-3">
             <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">
               SL
@@ -206,7 +206,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
           </div>
           </div>
 
-          <div className="flex w-full flex-col gap-4">
+          <div className="flex w-full shrink-0 flex-col gap-4">
             <button
               ref={visibilityTriggerRef}
               type="button"
