@@ -1,36 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import ReactEmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
 import { Tooltip } from "@/components/shared/Tooltip";
 import { cn } from "@/lib/utils";
-
-const EMOJI_GROUPS: { label: string; emojis: string[] }[] = [
-  {
-    label: "Smileys",
-    emojis: [
-      "😀", "😁", "😂", "🤣", "😊", "😇", "🙂", "😉", "😍", "🥰",
-      "😘", "😎", "🤩", "🥳", "🤔", "🙄", "😴", "😢", "😭", "😡",
-    ],
-  },
-  {
-    label: "Gestures",
-    emojis: [
-      "👍", "👎", "👏", "🙌", "🙏", "🤝", "👋", "💪", "✌️", "🤞",
-    ],
-  },
-  {
-    label: "Hearts",
-    emojis: [
-      "❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "💯", "🔥",
-    ],
-  },
-  {
-    label: "Objects",
-    emojis: [
-      "🏠", "🏢", "🔑", "📸", "📍", "✅", "⭐", "🎉", "💰", "📈",
-    ],
-  },
-];
 
 interface EmojiPickerProps {
   onSelect: (emoji: string) => void;
@@ -39,9 +12,11 @@ interface EmojiPickerProps {
   side?: "top" | "bottom";
 }
 
-/** A trigger button that opens a small emoji grid, appending the picked
- * emoji into whatever text field it's paired with (callers own the actual
- * insertion via onSelect). Self-contained, no external emoji dependency. */
+/** A trigger button that opens emoji-picker-react's picker panel, appending
+ * the picked emoji into whatever text field it's paired with (callers own
+ * the actual insertion via onSelect). Uses Apple-style emoji images so they
+ * look modern and consistent everywhere, instead of relying on the OS's own
+ * (often dated-looking) emoji font. */
 export function EmojiPicker({ onSelect, className, align = "end", side = "top" }: EmojiPickerProps) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -73,32 +48,24 @@ export function EmojiPicker({ onSelect, className, align = "end", side = "top" }
       {open && (
         <div
           className={cn(
-            "no-scrollbar absolute z-50 flex max-h-[220px] w-[240px] max-w-[calc(100vw-2.5rem)] flex-col gap-2 overflow-y-auto rounded-xl border border-gray-200 bg-white p-3 shadow-lg",
+            "absolute z-50 w-[min(320px,calc(100vw-2.5rem))]",
             side === "top" ? "bottom-[calc(100%+8px)]" : "top-[calc(100%+8px)]",
             align === "start" ? "left-0" : align === "end" ? "right-0" : "left-1/2 -translate-x-1/2",
           )}
         >
-          {EMOJI_GROUPS.map((group) => (
-            <div key={group.label} className="flex flex-col gap-1">
-              <p className="text-[10px] font-semibold uppercase text-gray-400">{group.label}</p>
-              <div className="flex flex-wrap gap-1">
-                {group.emojis.map((emoji) => (
-                  <button
-                    key={emoji}
-                    type="button"
-                    aria-label={emoji}
-                    onClick={() => {
-                      onSelect(emoji);
-                      setOpen(false);
-                    }}
-                    className="flex size-7 items-center justify-center rounded-md text-lg hover:bg-gray-100"
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
+          <ReactEmojiPicker
+            onEmojiClick={(data) => {
+              onSelect(data.emoji);
+              setOpen(false);
+            }}
+            emojiStyle={EmojiStyle.APPLE}
+            theme={Theme.LIGHT}
+            autoFocusSearch={false}
+            skinTonesDisabled
+            previewConfig={{ showPreview: false }}
+            width="100%"
+            height={350}
+          />
         </div>
       )}
     </div>
