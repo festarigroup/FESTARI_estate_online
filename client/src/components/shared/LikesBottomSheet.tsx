@@ -15,7 +15,8 @@ interface LikesBottomSheetProps {
 
 /** Opened from a post's "Liked by X and N others" row: a bottom sheet on
  * mobile, and a centered All/Followers modal with Follow/Following actions
- * on desktop (Figma node 539:81165). */
+ * on desktop (Figma node 539:81165). Both variants share the same
+ * All/Followers list, with its tabs pinned to the top of the scroll area. */
 export function LikesBottomSheet({ open, onClose, names }: LikesBottomSheetProps) {
   const { mounted, closing } = useAnimatedSheet(open);
 
@@ -41,7 +42,7 @@ export function LikesBottomSheet({ open, onClose, names }: LikesBottomSheetProps
         <div
           onClick={(event) => event.stopPropagation()}
           className={cn(
-            "flex max-h-[75vh] w-full flex-col gap-4 rounded-t-[32px] bg-white pb-4 pt-4 shadow-[0px_-4px_8px_0px_rgba(69,71,69,0.15)]",
+            "flex max-h-[75vh] w-full flex-col gap-2 rounded-t-[32px] bg-white pb-4 pt-4 shadow-[0px_-4px_8px_0px_rgba(69,71,69,0.15)]",
             closing ? "animate-sheet-slide-down" : "animate-sheet-slide-up",
           )}
         >
@@ -57,22 +58,13 @@ export function LikesBottomSheet({ open, onClose, names }: LikesBottomSheetProps
               onClick={onClose}
               className="absolute right-6 flex size-6 shrink-0 items-center justify-center"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M19 12H5M5 12L12 5M5 12L12 19" stroke="#141b34" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+              <svg width="18" height="18" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M1 1L11 11M11 1L1 11" stroke="#141b34" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
             </button>
           </div>
 
-          <div className="flex w-full flex-col overflow-y-auto px-6">
-            {names.map((name, index) => (
-              <div key={`${name}-${index}`} className="flex w-full items-center gap-3 border-b border-[#f1f5f9] py-2.5 last:border-b-0">
-                <span className="relative block size-9 shrink-0 overflow-hidden rounded-full bg-[#eef2ff]">
-                  <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="36px" className="p-1.5" />
-                </span>
-                <p className="truncate text-sm font-semibold text-[#111826]">{name}</p>
-              </div>
-            ))}
-          </div>
+          <LikesTabbedList names={names} className="px-6" />
         </div>
       </div>
 
@@ -95,7 +87,9 @@ export function LikesBottomSheet({ open, onClose, names }: LikesBottomSheetProps
             </svg>
           </button>
 
-          <LikesTabbedList names={names} />
+          <div className="flex max-h-[85vh] w-full flex-col rounded-2xl bg-white px-4 py-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)]">
+            <LikesTabbedList names={names} />
+          </div>
         </div>
       </div>
     </>,
@@ -103,7 +97,7 @@ export function LikesBottomSheet({ open, onClose, names }: LikesBottomSheetProps
   );
 }
 
-function LikesTabbedList({ names }: { names: string[] }) {
+function LikesTabbedList({ names, className }: { names: string[]; className?: string }) {
   const [tab, setTab] = useState<"all" | "followers">("all");
   const [following, setFollowing] = useState<Record<number, boolean>>(() =>
     Object.fromEntries(names.map((_, index) => [index, index % 3 === 0])),
@@ -116,8 +110,8 @@ function LikesTabbedList({ names }: { names: string[] }) {
     .filter((row) => tab === "all" || row.isFollower);
 
   return (
-    <div className="flex max-h-[85vh] w-full flex-col gap-4 overflow-y-auto overflow-x-hidden rounded-2xl bg-white px-4 py-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)]">
-      <div className="flex w-full gap-4 border-b border-[#ebebeb]">
+    <div className={cn("flex w-full flex-1 flex-col overflow-y-auto overflow-x-hidden", className)}>
+      <div className="sticky top-0 z-10 flex w-full shrink-0 gap-4 border-b border-[#ebebeb] bg-white">
         {(["all", "followers"] as const).map((key) => (
           <button
             key={key}
