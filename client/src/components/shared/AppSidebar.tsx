@@ -25,9 +25,27 @@ export function AppSidebar({
   const itemRefs = useRef(new Map<string, HTMLDivElement>());
   const flyoutRef = useRef<HTMLDivElement | null>(null);
   const [flyoutPos, setFlyoutPos] = useState<{ top: number; left: number } | null>(null);
+  const [hoverKey, setHoverKey] = useState<string | null>(null);
+  const [hoverPos, setHoverPos] = useState<{ top: number; left: number } | null>(null);
+  const collapseBtnRef = useRef<HTMLButtonElement | null>(null);
+  const [collapseHovered, setCollapseHovered] = useState(false);
+  const [collapsePos, setCollapsePos] = useState<{ top: number; left: number } | null>(null);
 
   const openItem = openKey ? NAV_ITEMS.find((item) => item.key === openKey) : undefined;
   const showFlyout = collapsed && !!openItem?.children?.length;
+  const hoverItem = collapsed && hoverKey ? NAV_ITEMS.find((item) => item.key === hoverKey) : undefined;
+
+  // Same clipping issue as the flyout below: the collapsed rail's icon-only
+  // buttons need a label on hover, but a plain CSS tooltip positioned to the
+  // right gets clipped by the nav's overflow-y-auto ancestor. So this is
+  // portalled to <body> and positioned from the trigger's rect too.
+  function showTooltip(key: string) {
+    if (!collapsed) return;
+    const rect = itemRefs.current.get(key)?.getBoundingClientRect();
+    if (!rect) return;
+    setHoverKey(key);
+    setHoverPos({ top: rect.top + rect.height / 2, left: rect.right + 8 });
+  }
 
   // The collapsed rail sits inside overflow-hidden/overflow-auto ancestors, so
   // the flyout is portalled to <body> and positioned from the trigger's rect
@@ -86,6 +104,10 @@ export function AppSidebar({
                 href={item.href}
                 aria-expanded={hasChildren ? isOpen : undefined}
                 aria-label={collapsed ? item.label : undefined}
+                onMouseEnter={() => showTooltip(item.key)}
+                onMouseLeave={() => setHoverKey(null)}
+                onFocus={() => showTooltip(item.key)}
+                onBlur={() => setHoverKey(null)}
                 onClick={(event) => {
                   if (item.href === "#") {
                     event.preventDefault();
@@ -133,11 +155,6 @@ export function AppSidebar({
                     />
                   </span>
                 )}
-                {collapsed && (
-                  <span className="pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded-lg bg-night-900 px-3 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100">
-                    {item.label}
-                  </span>
-                )}
               </Link>
 
               {isOpen && item.children && !collapsed && (
@@ -153,9 +170,22 @@ export function AppSidebar({
       </nav>
 
       <button
+        ref={collapseBtnRef}
         type="button"
         onClick={onToggleCollapse}
-        title={collapsed ? "Expand sidebar" : "Collapse bar"}
+        onMouseEnter={() => {
+          const rect = collapseBtnRef.current?.getBoundingClientRect();
+          if (rect) setCollapsePos({ top: rect.top + rect.height / 2, left: rect.right + 8 });
+          setCollapseHovered(true);
+        }}
+        onMouseLeave={() => setCollapseHovered(false)}
+        onFocus={() => {
+          const rect = collapseBtnRef.current?.getBoundingClientRect();
+          if (rect) setCollapsePos({ top: rect.top + rect.height / 2, left: rect.right + 8 });
+          setCollapseHovered(true);
+        }}
+        onBlur={() => setCollapseHovered(false)}
+        aria-label={collapsed ? "Expand sidebar" : "Collapse bar"}
         className={cn(
           "flex w-full items-center gap-[10px] rounded-[11px] py-[11px] text-[13px] text-text-secondary-dark hover:bg-gray-50",
           collapsed ? "justify-center px-1" : "px-[15px]",
@@ -166,6 +196,31 @@ export function AppSidebar({
         </span>
         {!collapsed && <span className="whitespace-nowrap">Collapse bar</span>}
       </button>
+
+      {collapsed &&
+        collapseHovered &&
+        collapsePos &&
+        createPortal(
+          <div
+            style={{ top: collapsePos.top, left: collapsePos.left }}
+            className="pointer-events-none fixed z-50 -translate-y-1/2 whitespace-nowrap rounded-lg bg-night-900 px-3 py-2 text-xs font-medium text-white shadow-lg"
+          >
+            Expand sidebar
+          </div>,
+          document.body,
+        )}
+
+      {hoverItem &&
+        hoverPos &&
+        createPortal(
+          <div
+            style={{ top: hoverPos.top, left: hoverPos.left }}
+            className="pointer-events-none fixed z-50 -translate-y-1/2 whitespace-nowrap rounded-lg bg-night-900 px-3 py-2 text-xs font-medium text-white shadow-lg"
+          >
+            {hoverItem.label}
+          </div>,
+          document.body,
+        )}
 
       {showFlyout &&
         flyoutPos &&
