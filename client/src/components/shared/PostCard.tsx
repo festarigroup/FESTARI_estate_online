@@ -865,7 +865,7 @@ function CommentsModal({
           </svg>
         </button>
 
-        <div className="flex max-h-[85vh] w-full flex-col gap-5 overflow-y-auto overflow-x-hidden rounded-2xl bg-white p-8 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)]">
+        <div className="flex max-h-[85vh] w-full flex-col gap-5 overflow-y-auto overflow-x-hidden rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
         {post.showComposer && (
           <div className="flex w-full items-center gap-2 rounded-3xl bg-gray-100 p-2">
             <span className="flex size-[38px] shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">

@@ -83,7 +83,7 @@ export function PostPropertyModal({ open, onClose }: PostPropertyModalProps) {
 
         <div
           className={cn(
-            "flex max-h-[90vh] w-full flex-col gap-6 overflow-y-auto overflow-x-hidden rounded-t-3xl bg-white p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] sm:rounded-2xl",
+            "flex max-h-[90vh] w-full flex-col gap-6 overflow-y-auto overflow-x-hidden rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] sm:rounded-2xl",
             closing ? "max-sm:animate-sheet-slide-down" : "max-sm:animate-sheet-slide-up",
           )}
         >
