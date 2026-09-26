@@ -89,13 +89,21 @@ export function PostPropertyModal({ open, onClose }: PostPropertyModalProps) {
         >
           <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154] sm:hidden" />
 
-          <div className="flex w-full items-center justify-between">
-            <p className="text-xl font-semibold tracking-[-0.02em] text-[#111826]">Post a Property</p>
-            <button type="button" aria-label="Close" onClick={handleClose} className="flex size-6 items-center justify-center sm:hidden">
-              <svg width="16" height="16" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                <path d="M1 1L11 11M11 1L1 11" stroke="#141b34" strokeWidth="1.5" strokeLinecap="round" />
+          <div className="flex w-full items-center gap-2.5">
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={handleClose}
+              className="flex size-6 shrink-0 items-center justify-center text-night-900 sm:hidden"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M10 4V16M10 16L4 10M10 16L16 10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
+            <p className="flex-1 text-center text-xl font-semibold tracking-[-0.02em] text-[#111826] sm:text-left">
+              Post a Property
+            </p>
+            <span className="size-6 shrink-0 sm:hidden" aria-hidden />
           </div>
 
           <div className="flex w-full items-start gap-3">

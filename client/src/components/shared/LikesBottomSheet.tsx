@@ -51,19 +51,20 @@ export function LikesBottomSheet({ open, onClose, names }: LikesBottomSheetProps
           <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154]" />
 
           <div className="flex w-full shrink-0 items-center gap-2.5 px-6">
-            <p className="flex-1 text-center text-lg font-bold tracking-[-0.54px] text-black">
-              {names.length} {names.length === 1 ? "Like" : "Likes"}
-            </p>
             <button
               type="button"
               aria-label="Close"
               onClick={onClose}
-              className="absolute right-6 flex size-6 shrink-0 items-center justify-center"
+              className="flex size-6 shrink-0 items-center justify-center text-night-900"
             >
-              <svg width="18" height="18" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                <path d="M1 1L11 11M11 1L1 11" stroke="#141b34" strokeWidth="1.5" strokeLinecap="round" />
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M10 4V16M10 16L4 10M10 16L16 10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
+            <p className="flex-1 text-center text-lg font-bold tracking-[-0.54px] text-black">
+              {names.length} {names.length === 1 ? "Like" : "Likes"}
+            </p>
+            <span className="size-6 shrink-0" aria-hidden />
           </div>
 
           <LikesTabbedList names={names} className="px-6" variant="sheet" />
