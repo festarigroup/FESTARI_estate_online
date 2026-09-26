@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
@@ -239,12 +240,26 @@ function CreatePostRow({
   onOpenPostModal: (type: "media" | "poll" | "article") => void;
 }) {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
+
+  function toggleOpen() {
+    setOpen((v) => {
+      const next = !v;
+      if (next) {
+        const rect = triggerRef.current?.getBoundingClientRect();
+        if (rect) setPosition({ top: rect.bottom + 8, left: rect.left + rect.width / 2 });
+      }
+      return next;
+    });
+  }
 
   return (
     <div className="relative w-full">
       <button
+        ref={triggerRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggleOpen}
         aria-expanded={open}
         className="flex h-8 w-full items-center gap-2 rounded-xl border border-brand-900 px-2 text-left outline-none hover:bg-gray-100"
       >
@@ -253,36 +268,45 @@ function CreatePostRow({
         <NavIcon icon="/icons/more-horizontal.svg" color="night" size={16} className="shrink-0" />
       </button>
 
-      {open && (
-        <div className="absolute left-1/2 top-full z-10 mt-2 flex w-56 flex-col gap-1 rounded-2xl border border-gray-200 bg-white/95 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
-          {CREATE_POST_SUBMENU.map((sub) =>
-            sub.key === "media" || sub.key === "poll" || sub.key === "article" ? (
-              <button
-                key={sub.key}
-                type="button"
-                onClick={() => {
-                  onOpenPostModal(sub.key as "media" | "poll" | "article");
-                  onNavigate();
-                }}
-                className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
-              >
-                <NavIcon icon={sub.icon} color="night" size={14} className="shrink-0" />
-                <span className="text-[13px] text-night-900">{sub.label}</span>
-              </button>
-            ) : (
-              <Link
-                key={sub.key}
-                href={comingSoonHref(sub.label)}
-                onClick={onNavigate}
-                className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
-              >
-                <NavIcon icon={sub.icon} color="night" size={14} className="shrink-0" />
-                <span className="text-[13px] text-night-900">{sub.label}</span>
-              </Link>
-            ),
-          )}
-        </div>
-      )}
+      {open &&
+        position &&
+        createPortal(
+          <div data-create-post-submenu className="fixed inset-0 z-[110] bg-black/50" onClick={() => setOpen(false)}>
+            <div
+              onClick={(event) => event.stopPropagation()}
+              style={{ top: position.top, left: position.left }}
+              className="absolute flex w-56 -translate-x-1/2 flex-col gap-1 rounded-2xl border border-gray-200 bg-white/95 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
+            >
+              {CREATE_POST_SUBMENU.map((sub) =>
+                sub.key === "media" || sub.key === "poll" || sub.key === "article" ? (
+                  <button
+                    key={sub.key}
+                    type="button"
+                    onClick={() => {
+                      onOpenPostModal(sub.key as "media" | "poll" | "article");
+                      onNavigate();
+                    }}
+                    className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
+                  >
+                    <NavIcon icon={sub.icon} color="night" size={14} className="shrink-0" />
+                    <span className="text-[13px] text-night-900">{sub.label}</span>
+                  </button>
+                ) : (
+                  <Link
+                    key={sub.key}
+                    href={comingSoonHref(sub.label)}
+                    onClick={onNavigate}
+                    className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
+                  >
+                    <NavIcon icon={sub.icon} color="night" size={14} className="shrink-0" />
+                    <span className="text-[13px] text-night-900">{sub.label}</span>
+                  </Link>
+                ),
+              )}
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

@@ -226,14 +226,17 @@ export function AppSidebar({
         flyoutPos &&
         openItem?.children &&
         createPortal(
-          <div
-            ref={flyoutRef}
-            style={{ top: flyoutPos.top, left: flyoutPos.left }}
-            className="fixed z-50 flex w-44 flex-col gap-1 rounded-[11px] border border-gray-200 bg-white/95 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
-          >
-            {openItem.children.map((child) => (
-              <ChildLink key={child.key} child={child} isActive={child.key === activeChildKey} />
-            ))}
+          <div className="fixed inset-0 z-50 bg-black/50" onClick={() => setOpenKey(null)}>
+            <div
+              ref={flyoutRef}
+              onClick={(event) => event.stopPropagation()}
+              style={{ top: flyoutPos.top, left: flyoutPos.left }}
+              className="absolute flex w-44 flex-col gap-1 rounded-[11px] border border-gray-200 bg-white/95 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
+            >
+              {openItem.children.map((child) => (
+                <ChildLink key={child.key} child={child} isActive={child.key === activeChildKey} />
+              ))}
+            </div>
           </div>,
           document.body,
         )}

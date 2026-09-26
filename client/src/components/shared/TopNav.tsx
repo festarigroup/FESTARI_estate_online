@@ -56,6 +56,7 @@ export function TopNav() {
     if (!createMenuOpen) return;
     const handlePointerDown = (event: PointerEvent) => {
       if (createMenuRef.current?.contains(event.target as Node)) return;
+      if ((event.target as HTMLElement).closest?.("[data-create-post-submenu]")) return;
       setCreateMenuOpen(false);
     };
     document.addEventListener("pointerdown", handlePointerDown);
