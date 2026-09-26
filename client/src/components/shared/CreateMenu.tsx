@@ -254,7 +254,7 @@ function CreatePostRow({
       </button>
 
       {open && (
-        <div className="absolute left-1/2 top-full z-10 mt-2 flex w-56 flex-col gap-1 rounded-2xl border border-gray-200 bg-white p-2 shadow-lg">
+        <div className="absolute left-1/2 top-full z-10 mt-2 flex w-56 flex-col gap-1 rounded-2xl border border-gray-200 bg-white/95 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
           {CREATE_POST_SUBMENU.map((sub) =>
             sub.key === "media" || sub.key === "poll" || sub.key === "article" ? (
               <button
