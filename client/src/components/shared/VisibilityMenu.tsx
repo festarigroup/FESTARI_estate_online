@@ -139,7 +139,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
     <div
       ref={menuRef}
       style={{ bottom: position.bottom, left: position.left }}
-      className="fixed z-[110] flex w-[280px] flex-col gap-3 rounded-xl bg-white px-2.5 py-3 drop-shadow-[0px_4px_2px_rgba(0,0,0,0.28)]"
+      className="fixed z-[110] flex w-[280px] flex-col gap-3 rounded-xl bg-white/95 px-2.5 py-3 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
     >
       <div className="flex flex-col gap-0.5 px-1">
         <p className="text-sm font-semibold text-[#001f3f]">Who can view?</p>

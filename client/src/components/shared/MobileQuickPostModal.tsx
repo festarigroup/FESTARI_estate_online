@@ -201,7 +201,7 @@ export function MobileQuickPostModal({ open, onClose, initialMode = "post" }: Mo
       <div
         onClick={(event) => event.stopPropagation()}
         className={cn(
-          "flex w-full max-h-[85vh] flex-col rounded-t-[36px] bg-white p-6 shadow-[0px_24px_48px_-12px_rgba(0,0,0,0.08),0px_8px_24px_-8px_rgba(0,0,0,0.04)]",
+          "flex w-full max-h-[85vh] flex-col rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]",
           closing ? "animate-sheet-slide-down" : "animate-sheet-slide-up",
           mode === "poll" ? "gap-4" : "gap-3",
           mode === "article" ? "overflow-hidden" : "overflow-y-auto",
