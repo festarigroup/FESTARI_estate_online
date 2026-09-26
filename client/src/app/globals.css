@@ -117,7 +117,11 @@ body {
   }
 }
 
-.animate-sheet-slide-up {
+/* Registered via @utility (not a plain class) so variant prefixes like
+   max-sm: actually compile — a plain .class{} rule can't be targeted by
+   Tailwind's variant system, which silently drops "max-sm:animate-..."
+   candidates that don't resolve to a real utility. */
+@utility animate-sheet-slide-up {
   animation: sheet-slide-up 0.25s ease-out;
 }
 
@@ -130,7 +134,7 @@ body {
   }
 }
 
-.animate-sheet-slide-down {
+@utility animate-sheet-slide-down {
   animation: sheet-slide-down 0.25s ease-in forwards;
 }
 
