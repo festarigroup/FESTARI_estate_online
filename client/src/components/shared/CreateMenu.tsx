@@ -275,7 +275,7 @@ function CreatePostRow({
             <div
               onClick={(event) => event.stopPropagation()}
               style={{ top: position.top, left: position.left }}
-              className="absolute flex w-56 -translate-x-1/2 flex-col gap-1 rounded-2xl border border-gray-200 bg-white/95 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
+              className="absolute flex w-56 flex-col gap-1 rounded-2xl border border-gray-200 bg-white/95 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
             >
               {CREATE_POST_SUBMENU.map((sub) =>
                 sub.key === "media" || sub.key === "poll" || sub.key === "article" ? (
