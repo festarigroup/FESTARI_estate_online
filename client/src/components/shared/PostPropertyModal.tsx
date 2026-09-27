@@ -187,25 +187,28 @@ export function PostPropertyModal({ open, onClose }: PostPropertyModalProps) {
 
 function ListingDropdown({ value, onChange }: { value: string; onChange: (id: string) => void }) {
   const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement | null>(null);
+  const rootRef = useRef<HTMLButtonElement | null>(null);
+  const [position, setPosition] = useState<{ top: number; left: number; width: number } | null>(null);
   const selected = DUMMY_LISTINGS.find((item) => item.id === value);
 
-  useEffect(() => {
-    if (!open) return;
-    const handlePointerDown = (event: PointerEvent) => {
-      if (rootRef.current?.contains(event.target as Node)) return;
-      setOpen(false);
-    };
-    document.addEventListener("pointerdown", handlePointerDown);
-    return () => document.removeEventListener("pointerdown", handlePointerDown);
-  }, [open]);
+  function toggleOpen() {
+    setOpen((v) => {
+      const next = !v;
+      if (next) {
+        const rect = rootRef.current?.getBoundingClientRect();
+        if (rect) setPosition({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+      }
+      return next;
+    });
+  }
 
   return (
-    <div ref={rootRef} className="relative min-w-0 flex-1">
+    <div className="relative min-w-0 flex-1">
       <button
+        ref={rootRef}
         type="button"
         aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggleOpen}
         className="flex h-12 w-full items-center justify-between gap-2 rounded-lg border border-[#cbd5e0] bg-white px-3 text-left"
       >
         <span className="min-w-0 flex-1 truncate text-sm text-[#334154]">
@@ -219,29 +222,38 @@ function ListingDropdown({ value, onChange }: { value: string; onChange: (id: st
         />
       </button>
 
-      {open && (
-        <div className="absolute left-0 top-[calc(100%+4px)] z-20 flex max-h-[220px] w-full flex-col gap-0.5 overflow-y-auto rounded-lg border border-[#cbd5e0] bg-white p-1 shadow-[0px_0px_24px_0px_rgba(0,0,0,0.08)]">
-          {DUMMY_LISTINGS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => {
-                onChange(item.id);
-                setOpen(false);
-              }}
-              className={cn(
-                "flex w-full items-center gap-2 rounded p-2 text-left text-sm text-[#0f1621]",
-                item.id === value && "bg-[#f8fafc]",
-              )}
+      {open &&
+        position &&
+        createPortal(
+          <div className="fixed inset-0 z-[130] bg-black/50" onClick={() => setOpen(false)}>
+            <div
+              onClick={(event) => event.stopPropagation()}
+              style={{ top: position.top, left: position.left, width: position.width }}
+              className="absolute flex max-h-[220px] flex-col gap-0.5 overflow-y-auto rounded-lg border border-[#cbd5e0] bg-white/95 p-1 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
             >
-              <span className="relative size-9 shrink-0 overflow-hidden rounded-md">
-                <Image src={item.images[0]} alt="" fill className="object-cover" sizes="36px" />
-              </span>
-              <span className="min-w-0 flex-1 truncate">{item.title}</span>
-            </button>
-          ))}
-        </div>
-      )}
+              {DUMMY_LISTINGS.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => {
+                    onChange(item.id);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "flex w-full items-center gap-2 rounded p-2 text-left text-sm text-[#0f1621]",
+                    item.id === value && "bg-[#f8fafc]",
+                  )}
+                >
+                  <span className="relative size-9 shrink-0 overflow-hidden rounded-md">
+                    <Image src={item.images[0]} alt="" fill className="object-cover" sizes="36px" />
+                  </span>
+                  <span className="min-w-0 flex-1 truncate">{item.title}</span>
+                </button>
+              ))}
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
