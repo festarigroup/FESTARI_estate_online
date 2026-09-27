@@ -197,10 +197,10 @@ export function CreatePostModal({ open, onClose, onSwitchType }: CreatePostModal
                     event.stopPropagation();
                     inputRef.current?.click();
                   }}
-                  className="flex h-11 items-center justify-center gap-2 rounded-[40px] bg-[#19161d] px-4 text-sm font-medium text-white"
+                  className="flex h-11 items-center justify-center gap-2 rounded-[40px] bg-[#e2e5f0] px-4 text-sm font-medium text-[#19161d]"
                 >
                   Choose files
-                  <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="white" size={16} />
+                  <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="night" className="bg-[#19161d]" size={16} />
                 </button>
               </div>
               <p className="w-full text-xs text-[#53575a]">{MEDIA_HELPER}</p>
