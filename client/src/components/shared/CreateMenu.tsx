@@ -150,6 +150,17 @@ function MobileMenuRow({
   onOpenMobilePostModal: (type: "media" | "poll" | "article") => void;
   onOpenPropertyModal: () => void;
 }) {
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
+
+  function handleToggle() {
+    if (!open) {
+      const rect = triggerRef.current?.getBoundingClientRect();
+      if (rect) setPosition({ top: rect.bottom + 4, left: rect.left + 36 });
+    }
+    onToggle();
+  }
+
   if (!item.submenu) {
     return (
       <Link
@@ -166,8 +177,9 @@ function MobileMenuRow({
   return (
     <div className="relative w-full">
       <button
+        ref={triggerRef}
         type="button"
-        onClick={onToggle}
+        onClick={handleToggle}
         aria-expanded={open}
         className="flex h-11 w-full items-center gap-3 rounded-xl px-1 text-left outline-none hover:bg-gray-50"
       >
@@ -185,49 +197,58 @@ function MobileMenuRow({
         </svg>
       </button>
 
-      {open && (
-        <div className="absolute left-9 top-full z-10 mt-1 flex w-60 flex-col gap-0.5 rounded-2xl border border-gray-200 bg-white p-1.5 shadow-lg">
-          {item.submenu.map((sub) =>
-            sub.key === "media" || sub.key === "poll" || sub.key === "article" ? (
-              <button
-                key={sub.key}
-                type="button"
-                onClick={() => {
-                  onOpenMobilePostModal(sub.key as "media" | "poll" | "article");
-                  onNavigate();
-                }}
-                className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
-              >
-                <NavIcon icon={sub.icon} color="night" size={16} className="shrink-0" />
-                <span className="text-sm text-night-900">{sub.label}</span>
-              </button>
-            ) : sub.key === "property" ? (
-              <button
-                key={sub.key}
-                type="button"
-                onClick={() => {
-                  onOpenPropertyModal();
-                  onNavigate();
-                }}
-                className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
-              >
-                <NavIcon icon={sub.icon} color="night" size={16} className="shrink-0" />
-                <span className="text-sm text-night-900">{sub.label}</span>
-              </button>
-            ) : (
-              <Link
-                key={sub.key}
-                href={comingSoonHref(sub.label)}
-                onClick={onNavigate}
-                className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
-              >
-                <NavIcon icon={sub.icon} color="night" size={16} className="shrink-0" />
-                <span className="text-sm text-night-900">{sub.label}</span>
-              </Link>
-            ),
-          )}
-        </div>
-      )}
+      {open &&
+        position &&
+        createPortal(
+          <div data-create-post-submenu className="fixed inset-0 z-[110] bg-black/50" onClick={onToggle}>
+            <div
+              onClick={(event) => event.stopPropagation()}
+              style={{ top: position.top, left: position.left }}
+              className="absolute flex w-60 flex-col gap-0.5 rounded-2xl border border-[rgba(226,232,240,0.8)] bg-white/70 p-1.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-150"
+            >
+              {item.submenu.map((sub) =>
+                sub.key === "media" || sub.key === "poll" || sub.key === "article" ? (
+                  <button
+                    key={sub.key}
+                    type="button"
+                    onClick={() => {
+                      onOpenMobilePostModal(sub.key as "media" | "poll" | "article");
+                      onNavigate();
+                    }}
+                    className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
+                  >
+                    <NavIcon icon={sub.icon} color="night" size={16} className="shrink-0" />
+                    <span className="text-sm text-night-900">{sub.label}</span>
+                  </button>
+                ) : sub.key === "property" ? (
+                  <button
+                    key={sub.key}
+                    type="button"
+                    onClick={() => {
+                      onOpenPropertyModal();
+                      onNavigate();
+                    }}
+                    className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
+                  >
+                    <NavIcon icon={sub.icon} color="night" size={16} className="shrink-0" />
+                    <span className="text-sm text-night-900">{sub.label}</span>
+                  </button>
+                ) : (
+                  <Link
+                    key={sub.key}
+                    href={comingSoonHref(sub.label)}
+                    onClick={onNavigate}
+                    className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
+                  >
+                    <NavIcon icon={sub.icon} color="night" size={16} className="shrink-0" />
+                    <span className="text-sm text-night-900">{sub.label}</span>
+                  </Link>
+                ),
+              )}
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
