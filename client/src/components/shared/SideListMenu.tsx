@@ -91,10 +91,9 @@ export function SideListMenu({
     : items;
 
   return createPortal(
-    <div className="fixed inset-0 z-[120] bg-black/50" onClick={onClose}>
+    <div data-side-list-menu className="fixed inset-0 z-[120] bg-black/50" onClick={onClose}>
     <div
       ref={menuRef}
-      data-side-list-menu
       onClick={(event) => event.stopPropagation()}
       style={{ top: position.top, left: position.left }}
       className="absolute flex w-[200px] flex-col gap-3 rounded-xl bg-white/95 p-3 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"

@@ -22,18 +22,17 @@ export function buildCustomVisibility(communities: string[], organizations: stri
     : DEFAULT_VISIBILITY;
 }
 
-function formatNames(names: string[]): string {
-  return names.length > 1 ? `${names[0]} +${names.length - 1}` : names[0];
-}
-
 export function getVisibilityLabel(value: PostVisibility): string {
   switch (value.kind) {
     case "everyone":
       return "Everyone can view";
     case "followings":
       return "Followings";
-    case "custom":
-      return formatNames([...value.communities, ...value.organizations]);
+    case "custom": {
+      const names = [...value.communities, ...value.organizations];
+      if (names.length === 1) return names[0];
+      return value.communities.length > 0 ? "Community" : "Organization";
+    }
   }
 }
 
@@ -194,7 +193,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
             <NavIcon icon="/icons/user-group.svg" color="white" size={16} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">
-            {value.kind === "custom" && value.communities.length > 0 ? formatNames(value.communities) : "Community"}
+            {value.kind === "custom" && value.communities.length === 1 ? value.communities[0] : "Community"}
           </span>
           {value.kind === "custom" && value.communities.length > 0 ? (
             <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
@@ -217,7 +216,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
             <NavIcon icon="/icons/org.svg" color="white" size={14} />
           </span>
           <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">
-            {value.kind === "custom" && value.organizations.length > 0 ? formatNames(value.organizations) : "Organization"}
+            {value.kind === "custom" && value.organizations.length === 1 ? value.organizations[0] : "Organization"}
           </span>
           {value.kind === "custom" && value.organizations.length > 0 ? (
             <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
