@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { AppSidebar } from "@/components/shared/AppSidebar";
 import { MobileBottomNav } from "@/components/shared/MobileBottomNav";
+import { OfflineBanner } from "@/components/shared/OfflineBanner";
 import { TopNav } from "@/components/shared/TopNav";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
@@ -53,6 +54,7 @@ export function AppShell({ activeKey, activeChildKey, header, children, rightRai
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-gray-50">
+      <OfflineBanner />
       <TopNav />
       <div className="flex w-full flex-1 overflow-hidden">
         <AppSidebar
