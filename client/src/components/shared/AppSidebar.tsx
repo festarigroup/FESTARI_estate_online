@@ -21,7 +21,12 @@ export function AppSidebar({
   activeKey = "feed",
   activeChildKey = "home",
 }: AppSidebarProps) {
-  const [openKey, setOpenKey] = useState<string | null>(null);
+  // AppSidebar remounts on every navigation (each page renders its own AppShell,
+  // there's no persistent layout), so default to whichever section is active
+  // rather than always starting closed — otherwise clicking a child link
+  // "collapses" the section you just expanded.
+  const [openKey, setOpenKey] = useState<string | null>(activeKey ?? null);
+  const asideRef = useRef<HTMLElement | null>(null);
   const itemRefs = useRef(new Map<string, HTMLDivElement>());
   const flyoutRef = useRef<HTMLDivElement | null>(null);
   const [flyoutPos, setFlyoutPos] = useState<{ top: number; left: number } | null>(null);
@@ -59,9 +64,16 @@ export function AppSidebar({
     updatePosition();
     window.addEventListener("resize", updatePosition);
     window.addEventListener("scroll", updatePosition, true);
+    // Collapsing the rail itself triggers this flyout to appear while the
+    // rail's width is still animating (`transition-[width,padding]`), so the
+    // first measurement can land mid-transition, well past the collapsed
+    // rail's edge. Re-measure once that transition settles.
+    const asideEl = asideRef.current;
+    asideEl?.addEventListener("transitionend", updatePosition);
     return () => {
       window.removeEventListener("resize", updatePosition);
       window.removeEventListener("scroll", updatePosition, true);
+      asideEl?.removeEventListener("transitionend", updatePosition);
       setFlyoutPos(null);
     };
   }, [showFlyout, openKey]);
@@ -79,6 +91,7 @@ export function AppSidebar({
 
   return (
     <aside
+      ref={asideRef}
       className={cn(
         "hidden h-full shrink-0 flex-col gap-[11px] border border-gray-200 bg-white py-4 transition-[width,padding] duration-200 ease-in-out lg:flex",
         collapsed ? "w-20 px-3" : "w-[228px] px-[17px]",
@@ -231,7 +244,7 @@ export function AppSidebar({
               ref={flyoutRef}
               onClick={(event) => event.stopPropagation()}
               style={{ top: flyoutPos.top, left: flyoutPos.left }}
-              className="absolute flex w-44 flex-col gap-1 rounded-[11px] border border-gray-200 bg-white/95 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
+              className="absolute flex w-44 flex-col gap-1 rounded-[11px] border border-gray-200 bg-white/95 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] transition-[top,left] duration-200 ease-out"
             >
               {openItem.children.map((child) => (
                 <ChildLink key={child.key} child={child} isActive={child.key === activeChildKey} />

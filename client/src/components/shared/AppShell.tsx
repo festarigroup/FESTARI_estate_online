@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { AppSidebar } from "@/components/shared/AppSidebar";
 import { MobileBottomNav } from "@/components/shared/MobileBottomNav";
 import { TopNav } from "@/components/shared/TopNav";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+
+const SIDEBAR_COLLAPSE_KEY = "biltlinx:sidebar-collapsed";
 
 interface AppShellProps {
   activeKey?: string;
@@ -24,13 +26,38 @@ export function AppShell({ activeKey, activeChildKey, header, children, rightRai
   const [collapsedOverride, setCollapsedOverride] = useState<boolean | null>(null);
   const collapsed = collapsedOverride ?? !isXlUp;
 
+  // Every page mounts its own AppShell (there's no persistent layout), so a
+  // plain useState here would forget the user's manual toggle on every
+  // navigation. Read the saved choice after mount (avoids an SSR/hydration
+  // mismatch) so it survives moving between pages.
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(SIDEBAR_COLLAPSE_KEY);
+      if (stored !== null) setCollapsedOverride(stored === "true");
+    } catch {
+      // Ignore (private browsing, storage disabled, etc.) — falls back to the responsive default.
+    }
+  }, []);
+
+  const toggleCollapse = () => {
+    setCollapsedOverride((current) => {
+      const next = !(current ?? !isXlUp);
+      try {
+        window.localStorage.setItem(SIDEBAR_COLLAPSE_KEY, String(next));
+      } catch {
+        // Ignore — the toggle still works for this session, it just won't persist.
+      }
+      return next;
+    });
+  };
+
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-gray-50">
       <TopNav />
       <div className="flex w-full flex-1 overflow-hidden">
         <AppSidebar
           collapsed={collapsed}
-          onToggleCollapse={() => setCollapsedOverride(!collapsed)}
+          onToggleCollapse={toggleCollapse}
           activeKey={activeKey}
           activeChildKey={activeChildKey}
         />
