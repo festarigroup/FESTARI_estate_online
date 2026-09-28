@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/shared/AppShell";
 import { showSuccessToast } from "@/components/shared/AppToast";
+import { ConciergeCard } from "@/components/shared/ConciergeCard";
 import { MobileQuickPostModal, type QuickComposerMode } from "@/components/shared/MobileQuickPostModal";
 import { NewPostsPill } from "@/components/shared/NewPostsPill";
 import { PostCard, type PostCardData } from "@/components/shared/PostCard";
@@ -446,21 +447,7 @@ function FeedTabs({ activeTab, onSelect }: { activeTab: string; onSelect: (label
 function RightRail() {
   return (
     <div className="flex w-full flex-col gap-[15px]">
-      <div className="flex flex-col gap-[15px] rounded-[15px] border border-gray-200 bg-white p-[15px]">
-        <div>
-          <p className="text-[17px] font-bold text-night-900">List Your Property</p>
-          <p className="text-[13px] text-gray-500">Grow your visibility and connect with serious buyers.</p>
-        </div>
-        <div className="relative h-[114px] w-full overflow-hidden rounded-xl">
-          <Image src="/images/post-building-01.jpg" alt="" fill className="object-cover" sizes="318px" />
-        </div>
-        <Link
-          href={comingSoonHref("List Property")}
-          className="flex h-[38px] w-full items-center justify-center rounded-lg bg-brand-900 text-[13px] font-medium text-white hover:bg-brand-900/90"
-        >
-          List Property
-        </Link>
-      </div>
+      <ConciergeCard />
 
       <WhoToFollowCard />
       <TrendingPropertiesCard />
