@@ -11,6 +11,7 @@ import { FollowButton } from "@/components/shared/FollowButton";
 import { LikesBottomSheet } from "@/components/shared/LikesBottomSheet";
 import { MediaLoadError } from "@/components/shared/MediaLoadError";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { Tooltip } from "@/components/shared/Tooltip";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { renderWithHashtags } from "@/lib/hashtags";
@@ -319,10 +320,12 @@ function MediaCarousel({ items }: { items: MediaItem[] }) {
   const [index, setIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [failedUrls, setFailedUrls] = useState<Set<string>>(new Set());
+  const [loadedUrls, setLoadedUrls] = useState<Set<string>>(new Set());
   const [retryTick, setRetryTick] = useState(0);
   const hasMultiple = items.length > 1;
   const current = items[index];
   const currentFailed = failedUrls.has(current.url);
+  const currentLoaded = loadedUrls.has(current.url);
 
   const goTo = (next: number) => setIndex((next + items.length) % items.length);
 
@@ -348,13 +351,17 @@ function MediaCarousel({ items }: { items: MediaItem[] }) {
           onClick={() => setLightboxOpen(true)}
           className="absolute inset-0 block size-full"
         >
+          {/* Shown until the image reports loaded — the more meaningful state on a slow
+              connection, where the request can sit pending for seconds rather than failing outright. */}
+          {!currentLoaded && <Skeleton className="absolute inset-0 rounded-none" />}
           <Image
             key={retryTick}
             src={current.url}
             alt=""
             fill
-            className="object-cover"
+            className={cn("object-cover transition-opacity duration-300", currentLoaded ? "opacity-100" : "opacity-0")}
             sizes="770px"
+            onLoad={() => setLoadedUrls((prev) => new Set(prev).add(current.url))}
             onError={() => setFailedUrls((prev) => new Set(prev).add(current.url))}
           />
         </button>
@@ -420,9 +427,11 @@ function MediaLightbox({
   onClose: () => void;
 }) {
   const [failedUrls, setFailedUrls] = useState<Set<string>>(new Set());
+  const [loadedUrls, setLoadedUrls] = useState<Set<string>>(new Set());
   const [retryTick, setRetryTick] = useState(0);
   const current = items[index];
   const currentFailed = failedUrls.has(current.url);
+  const currentLoaded = loadedUrls.has(current.url);
 
   const retryImage = (url: string) => {
     setFailedUrls((prev) => {
@@ -470,15 +479,19 @@ function MediaLightbox({
         ) : currentFailed ? (
           <MediaLoadError onRetry={() => retryImage(current.url)} className="absolute inset-0 rounded-xl" />
         ) : (
-          <Image
-            key={retryTick}
-            src={current.url}
-            alt=""
-            fill
-            className="object-contain"
-            sizes="100vw"
-            onError={() => setFailedUrls((prev) => new Set(prev).add(current.url))}
-          />
+          <>
+            {!currentLoaded && <Skeleton className="absolute inset-0 rounded-xl" />}
+            <Image
+              key={retryTick}
+              src={current.url}
+              alt=""
+              fill
+              className={cn("object-contain transition-opacity duration-300", currentLoaded ? "opacity-100" : "opacity-0")}
+              sizes="100vw"
+              onLoad={() => setLoadedUrls((prev) => new Set(prev).add(current.url))}
+              onError={() => setFailedUrls((prev) => new Set(prev).add(current.url))}
+            />
+          </>
         )}
       </div>
 
