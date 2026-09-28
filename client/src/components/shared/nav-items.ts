@@ -22,11 +22,12 @@ function childComingSoon(label: string, navKey: string, navChildKey: string) {
 export const NAV_ITEMS: NavItem[] = [
   {
     key: "feed",
-    label: "Feed",
+    label: "Explore Hub",
     icon: "/icons/grid-view.svg",
     href: "#",
     children: [
       { key: "home", label: "Home", icon: "/icons/home-03.svg", href: "/home" },
+      { key: "feed-page", label: "Feed", icon: "/icons/article-document.svg", href: childComingSoon("Feed", "feed", "feed-page") },
       { key: "discover", label: "Discover", icon: "/icons/compass-01.svg", href: childComingSoon("Discover", "feed", "discover") },
     ],
   },
@@ -43,7 +44,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     key: "services",
     label: "Services",
-    icon: "/icons/timer-clock-watch.svg",
+    icon: "/icons/map-pin-02.svg",
     href: "#",
     children: [
       { key: "services", label: "Services", icon: "/icons/settings-02.svg", href: childComingSoon("Services", "services", "services") },
