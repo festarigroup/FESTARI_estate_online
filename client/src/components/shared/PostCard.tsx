@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { EmojiPicker } from "@/components/shared/EmojiPicker";
 import { FollowButton } from "@/components/shared/FollowButton";
 import { LikesBottomSheet } from "@/components/shared/LikesBottomSheet";
+import { MediaLoadError } from "@/components/shared/MediaLoadError";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { Tooltip } from "@/components/shared/Tooltip";
 import { comingSoonHref } from "@/lib/coming-soon";
@@ -317,15 +318,29 @@ function PostHeader({ post }: { post: PostCardData }) {
 function MediaCarousel({ items }: { items: MediaItem[] }) {
   const [index, setIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [failedUrls, setFailedUrls] = useState<Set<string>>(new Set());
+  const [retryTick, setRetryTick] = useState(0);
   const hasMultiple = items.length > 1;
   const current = items[index];
+  const currentFailed = failedUrls.has(current.url);
 
   const goTo = (next: number) => setIndex((next + items.length) % items.length);
+
+  const retryImage = (url: string) => {
+    setFailedUrls((prev) => {
+      const next = new Set(prev);
+      next.delete(url);
+      return next;
+    });
+    setRetryTick((tick) => tick + 1);
+  };
 
   return (
     <div className="relative h-[285px] w-full overflow-hidden rounded-[29px] sm:rounded-[15px]">
       {current.isVideo ? (
         <video src={current.url} controls className="size-full object-cover" />
+      ) : currentFailed ? (
+        <MediaLoadError onRetry={() => retryImage(current.url)} className="absolute inset-0" />
       ) : (
         <button
           type="button"
@@ -333,7 +348,15 @@ function MediaCarousel({ items }: { items: MediaItem[] }) {
           onClick={() => setLightboxOpen(true)}
           className="absolute inset-0 block size-full"
         >
-          <Image src={current.url} alt="" fill className="object-cover" sizes="770px" />
+          <Image
+            key={retryTick}
+            src={current.url}
+            alt=""
+            fill
+            className="object-cover"
+            sizes="770px"
+            onError={() => setFailedUrls((prev) => new Set(prev).add(current.url))}
+          />
         </button>
       )}
 
@@ -396,6 +419,20 @@ function MediaLightbox({
   onIndexChange: (next: number) => void;
   onClose: () => void;
 }) {
+  const [failedUrls, setFailedUrls] = useState<Set<string>>(new Set());
+  const [retryTick, setRetryTick] = useState(0);
+  const current = items[index];
+  const currentFailed = failedUrls.has(current.url);
+
+  const retryImage = (url: string) => {
+    setFailedUrls((prev) => {
+      const next = new Set(prev);
+      next.delete(url);
+      return next;
+    });
+    setRetryTick((tick) => tick + 1);
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
@@ -428,10 +465,20 @@ function MediaLightbox({
       </button>
 
       <div className="relative h-full w-full max-w-4xl" onClick={(event) => event.stopPropagation()}>
-        {items[index].isVideo ? (
-          <video src={items[index].url} controls autoPlay className="size-full object-contain" />
+        {current.isVideo ? (
+          <video src={current.url} controls autoPlay className="size-full object-contain" />
+        ) : currentFailed ? (
+          <MediaLoadError onRetry={() => retryImage(current.url)} className="absolute inset-0 rounded-xl" />
         ) : (
-          <Image src={items[index].url} alt="" fill className="object-contain" sizes="100vw" />
+          <Image
+            key={retryTick}
+            src={current.url}
+            alt=""
+            fill
+            className="object-contain"
+            sizes="100vw"
+            onError={() => setFailedUrls((prev) => new Set(prev).add(current.url))}
+          />
         )}
       </div>
 
