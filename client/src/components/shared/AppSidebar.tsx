@@ -7,6 +7,7 @@ import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { NAV_ITEMS, type NavChildItem } from "@/components/shared/nav-items";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface AppSidebarProps {
   collapsed: boolean;
@@ -36,16 +37,22 @@ export function AppSidebar({
   const [collapseHovered, setCollapseHovered] = useState(false);
   const [collapsePos, setCollapsePos] = useState<{ top: number; left: number } | null>(null);
 
+  // This sidebar stays mounted (just CSS-hidden via `lg:flex`) below the `lg`
+  // breakpoint, where MobileBottomNav takes over. `collapsed` is true there
+  // too (AppShell's responsive default below xl), so without this check the
+  // flyout/tooltip portals below — which aren't scoped by that hidden `<aside>`,
+  // since they're portalled straight to <body> — would render floating on mobile.
+  const isLgUp = useMediaQuery("(min-width: 1024px)");
   const openItem = openKey ? NAV_ITEMS.find((item) => item.key === openKey) : undefined;
-  const showFlyout = collapsed && !!openItem?.children?.length;
-  const hoverItem = collapsed && hoverKey ? NAV_ITEMS.find((item) => item.key === hoverKey) : undefined;
+  const showFlyout = isLgUp && collapsed && !!openItem?.children?.length;
+  const hoverItem = isLgUp && collapsed && hoverKey ? NAV_ITEMS.find((item) => item.key === hoverKey) : undefined;
 
   // Same clipping issue as the flyout below: the collapsed rail's icon-only
   // buttons need a label on hover, but a plain CSS tooltip positioned to the
   // right gets clipped by the nav's overflow-y-auto ancestor. So this is
   // portalled to <body> and positioned from the trigger's rect too.
   function showTooltip(key: string) {
-    if (!collapsed) return;
+    if (!isLgUp || !collapsed) return;
     const rect = itemRefs.current.get(key)?.getBoundingClientRect();
     if (!rect) return;
     setHoverKey(key);
