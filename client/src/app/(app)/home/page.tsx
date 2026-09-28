@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { AppShell } from "@/components/shared/AppShell";
 import { showSuccessToast } from "@/components/shared/AppToast";
 import { MobileQuickPostModal, type QuickComposerMode } from "@/components/shared/MobileQuickPostModal";
+import { NewPostsPill } from "@/components/shared/NewPostsPill";
 import { PostCard, type PostCardData } from "@/components/shared/PostCard";
 import { WhoToFollowCard } from "@/components/shared/WhoToFollowCard";
 import { TrendingPropertiesCard } from "@/components/shared/TrendingPropertiesCard";
@@ -199,7 +200,7 @@ const POSTS: PostCardData[] = [
 
 export default function HomeFeedPage() {
   const [activeTab, setActiveTab] = useState(FEED_TABS[0].label);
-  const { posts: userPosts } = usePostsFeed();
+  const { posts: userPosts, newPostsCount, showNewPosts } = usePostsFeed();
 
   const allPosts = useMemo(() => [...userPosts, ...POSTS], [userPosts]);
   const activeVariant = FEED_TABS.find((tab) => tab.label === activeTab)?.variant;
@@ -219,6 +220,7 @@ export default function HomeFeedPage() {
       }
     >
       <div className="flex w-full flex-col gap-[15px]">
+        <NewPostsPill count={newPostsCount} onReveal={showNewPosts} />
         <ComposerCard />
         {filteredPosts.length > 0 ? (
           filteredPosts.map((post) => <PostCard key={post.id} post={post} />)

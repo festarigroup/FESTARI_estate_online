@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import type { PostCardData } from "@/components/shared/PostCard";
 import type { PropertyListing } from "@/lib/dummy-listings";
 
@@ -91,21 +91,83 @@ function buildMedia(files: File[]) {
   }));
 }
 
+/** Other people's posts arriving in the background — not yet merged into the visible feed. */
+function buildIncomingPosts(): PostCardData[] {
+  const stamp = Date.now();
+  return [
+    {
+      id: `incoming-${stamp}-1`,
+      variant: "text",
+      authorName: "Nana Kwabena",
+      roleLine: "Property Investor |",
+      postedAt: "Just now",
+      avatar: "/images/avatar-generic.png",
+      verified: "individual",
+      text: "Cap rates on serviced apartments in Airport Residential are finally starting to look attractive again.",
+      likes: 0,
+      comments: 0,
+      showComposer: true,
+    },
+    {
+      id: `incoming-${stamp}-2`,
+      variant: "property",
+      authorName: "Villagio Estates",
+      roleLine: "Listed by agent |",
+      postedAt: "Just now",
+      avatar: "/images/avatar-kasapa.png",
+      verified: "organization",
+      text: "New release: 3-bedroom townhomes in East Airport, ready for viewing this weekend.",
+      images: ["/images/post-property-exterior.jpg"],
+      priceLine: "GHS 2,200,000.00",
+      subLine: "3 bedroom Townhouse",
+      beds: 3,
+      baths: 3,
+      actions: [
+        { label: "Request viewing", variant: "primary" },
+        { label: "View Property", variant: "outline" },
+      ],
+      messageHostLabel: "Message Host",
+      likes: 0,
+      comments: 0,
+    },
+  ];
+}
+
 interface PostsContextValue {
   posts: PostCardData[];
   addPost: (input: NewPostInput) => void;
+  /** Posts that have arrived but are held back until the user asks to see them. */
+  newPostsCount: number;
+  showNewPosts: () => void;
 }
 
 const PostsContext = createContext<PostsContextValue | null>(null);
 
 export function PostsProvider({ children }: { children: ReactNode }) {
   const [posts, setPosts] = useState<PostCardData[]>([]);
+  const [incoming, setIncoming] = useState<PostCardData[]>([]);
 
   const addPost = useCallback((input: NewPostInput) => {
     setPosts((current) => [buildPost(input), ...current]);
   }, []);
 
-  return <PostsContext.Provider value={{ posts, addPost }}>{children}</PostsContext.Provider>;
+  // Demo stand-in for a real-time feed push (websocket/poll) until the backend feed API lands.
+  useEffect(() => {
+    const timer = setTimeout(() => setIncoming(buildIncomingPosts()), 6000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const showNewPosts = useCallback(() => {
+    if (incoming.length === 0) return;
+    setPosts((current) => [...incoming, ...current]);
+    setIncoming([]);
+  }, [incoming]);
+
+  return (
+    <PostsContext.Provider value={{ posts, addPost, newPostsCount: incoming.length, showNewPosts }}>
+      {children}
+    </PostsContext.Provider>
+  );
 }
 
 export function usePostsFeed() {
