@@ -69,7 +69,7 @@ export function PostPropertyModal({ open, onClose }: PostPropertyModalProps) {
       aria-modal="true"
       aria-label="Post a property"
     >
-      <div onClick={(event) => event.stopPropagation()} className="relative w-full sm:max-w-[680px]">
+      <div onClick={(event) => event.stopPropagation()} className="relative w-full sm:max-w-[720px]">
         <button
           type="button"
           aria-label="Close"
@@ -83,7 +83,7 @@ export function PostPropertyModal({ open, onClose }: PostPropertyModalProps) {
 
         <div
           className={cn(
-            "flex max-h-[90vh] w-full flex-col gap-6 overflow-y-auto overflow-x-hidden rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] sm:rounded-2xl",
+            "flex max-h-[85vh] sm:max-h-[90vh] w-full flex-col gap-6 overflow-y-auto overflow-x-hidden rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] sm:rounded-2xl",
             closing ? "max-sm:animate-sheet-slide-down" : "max-sm:animate-sheet-slide-up",
           )}
         >
@@ -100,7 +100,7 @@ export function PostPropertyModal({ open, onClose }: PostPropertyModalProps) {
                 <path d="M10 4V16M10 16L4 10M10 16L16 10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
-            <p className="flex-1 text-center text-xl font-semibold tracking-[-0.02em] text-[#111826] sm:text-left">
+            <p className="flex-1 text-center text-lg font-bold tracking-[-0.54px] text-black sm:text-left sm:font-semibold sm:tracking-[-0.36px] sm:text-[#111826]">
               Post a Property
             </p>
             <span className="size-6 shrink-0 sm:hidden" aria-hidden />
