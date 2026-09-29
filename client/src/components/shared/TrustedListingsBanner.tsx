@@ -125,10 +125,10 @@ export function TrustedListingsBanner() {
             <InfoIcon />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-night-900">Watch out for fake listings</p>
+            <p className="text-sm font-bold text-night-900">Stay Safe</p>
             <p className="mt-1 text-xs leading-5 text-gray-500">
-              Only Property, Stay, Service and Project posts are verified. Other posts may not be
-              real.
+              Social posts are not verified by our admin team. Be careful when buying, selling,
+              renting, or making payments through information shared in social posts.
             </p>
           </div>
           <button
