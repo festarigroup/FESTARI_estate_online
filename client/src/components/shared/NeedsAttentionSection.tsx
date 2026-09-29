@@ -132,7 +132,7 @@ function AttentionCard({ item }: { item: AttentionItem }) {
       <Link
         href={comingSoonHref(item.action)}
         className={cn(
-          "flex h-10 w-full items-center justify-center rounded-xl text-[13px] font-medium sm:rounded-lg",
+          "flex h-10 w-full items-center justify-center rounded-full text-[13px] font-medium",
           item.primary
             ? "bg-brand-900 text-white hover:bg-brand-900/90"
             : "border border-gray-200 text-night-900 hover:bg-gray-50",
