@@ -15,6 +15,13 @@
       "when": 1786325641317,
       "tag": "0001_bumpy_the_fallen",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790639916353,
+      "tag": "0002_brief_vin_gonzales",
+      "breakpoints": true
     }
   ]
 }

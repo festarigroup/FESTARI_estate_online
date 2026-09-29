@@ -25,6 +25,8 @@ export const propertyTypeEnum = pgEnum("property_type", [
   "office",
 ]);
 
+export const priceUnitEnum = pgEnum("price_unit", ["plot", "unit", "month", "night"]);
+
 export const paymentTypeEnum = pgEnum("payment_type", [
   "subscription",
   "property",

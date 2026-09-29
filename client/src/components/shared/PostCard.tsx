@@ -4,17 +4,19 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import toast from "react-hot-toast";
 import { Button } from "@/components/ui/Button";
 import { EmojiPicker } from "@/components/shared/EmojiPicker";
 import { FollowButton } from "@/components/shared/FollowButton";
 import { LikesBottomSheet } from "@/components/shared/LikesBottomSheet";
 import { MediaLoadError } from "@/components/shared/MediaLoadError";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { CommentsModal, CommentsSection, DEFAULT_COMMENTS, type CommentItem } from "@/components/shared/PostComments";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Tooltip } from "@/components/shared/Tooltip";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { renderWithHashtags } from "@/lib/hashtags";
+import { buildLikerNames } from "@/lib/likes";
+import { shareContent } from "@/lib/share";
 import { cn } from "@/lib/utils";
 
 export type PostActionVariant = "primary" | "outline" | "outline-brand";
@@ -31,15 +33,6 @@ export interface PollOption {
   leading?: boolean;
 }
 
-export interface CommentItem {
-  id: string;
-  authorName: string;
-  avatar?: string;
-  postedAt: string;
-  text: string;
-  likes?: number;
-}
-
 function getMediaItems(post: PostCardData): MediaItem[] {
   if (post.media) return post.media;
   if (post.video) return [{ url: post.video, isVideo: true }];
@@ -47,18 +40,6 @@ function getMediaItems(post: PostCardData): MediaItem[] {
   if (post.image) return [{ url: post.image }];
   return [];
 }
-
-const DEFAULT_COMMENTS: CommentItem[] = [
-  {
-    id: "c1",
-    authorName: "Jane Doe",
-    postedAt: "17s ago",
-    text: "We are very good. Your story is very inspiring!\nDon't stop keep going.",
-    likes: 20,
-  },
-  { id: "c2", authorName: "John Doe", postedAt: "1m ago", text: "Cool Champ.", likes: 20 },
-  { id: "c3", authorName: "Jane Doe", postedAt: "20m ago", text: "Cool Champ." },
-];
 
 export interface MediaItem {
   url: string;
@@ -206,12 +187,17 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
             <CommentsSection comments={comments} />
           </div>
           <CommentsModal
-            post={post}
             comments={comments}
             commentDraft={commentDraft}
             setCommentDraft={setCommentDraft}
             submitComment={submitComment}
             currentUserAvatarInitials={currentUserAvatarInitials}
+            showComposer={post.showComposer ?? false}
+            likeCount={post.likes}
+            commentsCount={post.comments}
+            shareLabel={post.shareLabel}
+            sharesCount={post.shares}
+            onShare={() => sharePost(post)}
             onClose={() => setShowComments(false)}
           />
         </>
@@ -723,25 +709,11 @@ function ActionsRow({ post }: { post: PostCardData }) {
 }
 
 async function sharePost(post: PostCardData) {
-  const shareUrl =
-    typeof window !== "undefined" ? `${window.location.origin}${window.location.pathname}#post-${post.id}` : "";
-  const shareData = {
+  await shareContent({
     title: post.authorName,
-    text: post.text ?? post.subLine ?? "Check out this post on Biltlinx",
-    url: shareUrl,
-  };
-
-  try {
-    if (typeof navigator !== "undefined" && navigator.share) {
-      await navigator.share(shareData);
-      return;
-    }
-    await navigator.clipboard.writeText(shareUrl);
-    toast.success("Link copied to clipboard");
-  } catch (error) {
-    if (error instanceof DOMException && error.name === "AbortError") return;
-    toast.error("Couldn't share this post");
-  }
+    text: post.text ?? post.subLine ?? undefined,
+    path: `#post-${post.id}`,
+  });
 }
 
 function PostStatsBar({
@@ -861,225 +833,5 @@ function PostStatsBar({
 
       <LikesBottomSheet open={likesSheetOpen} onClose={() => setLikesSheetOpen(false)} names={likerNames} />
     </div>
-  );
-}
-
-const LIKER_NAME_POOL = [
-  "Kwame", "Ama Boateng", "Kojo Mensah", "Efua Owusu", "Kwabena Asante",
-  "Akosua Darko", "Yaw Agyeman", "Abena Sarpong", "Kofi Appiah", "Adjoa Nkrumah",
-];
-
-function buildLikerNames(count: number): string[] {
-  return Array.from({ length: count }, (_, index) => LIKER_NAME_POOL[index % LIKER_NAME_POOL.length]);
-}
-
-function CommentsModal({
-  post,
-  comments,
-  commentDraft,
-  setCommentDraft,
-  submitComment,
-  currentUserAvatarInitials,
-  onClose,
-}: {
-  post: PostCardData;
-  comments: CommentItem[];
-  commentDraft: string;
-  setCommentDraft: (value: string) => void;
-  submitComment: () => void;
-  currentUserAvatarInitials: string;
-  onClose: () => void;
-}) {
-  const [liked, setLiked] = useState(false);
-  const likeCount = post.likes + (liked ? 1 : 0);
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
-    };
-  }, [onClose]);
-
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[120] hidden items-center justify-center bg-black/50 p-4 sm:flex"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Comments"
-    >
-      <div onClick={(event) => event.stopPropagation()} className="relative w-full max-w-[770px]">
-        <button
-          type="button"
-          aria-label="Close"
-          onClick={onClose}
-          className="absolute -right-3 -top-3 z-10 flex size-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-md hover:bg-gray-50"
-        >
-          <svg width="9" height="9" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-            <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
-        </button>
-
-        <div className="flex max-h-[85vh] w-full flex-col gap-5 overflow-y-auto overflow-x-hidden rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
-        {post.showComposer && (
-          <div className="flex w-full items-center gap-2 rounded-3xl bg-gray-100 p-2">
-            <span className="flex size-[38px] shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">
-              {currentUserAvatarInitials}
-            </span>
-            <input
-              type="text"
-              value={commentDraft}
-              onChange={(event) => setCommentDraft(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") submitComment();
-              }}
-              placeholder="Add a comment"
-              className="min-w-0 flex-1 bg-transparent text-[11px] text-night-900/70 placeholder:text-night-900/40 focus:outline-none"
-            />
-            <EmojiPicker onSelect={(emoji) => setCommentDraft(commentDraft + emoji)} side="bottom" />
-            <button
-              type="button"
-              aria-label="Send comment"
-              onClick={submitComment}
-              className="relative block size-[23px] shrink-0"
-            >
-              <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="23px" />
-            </button>
-          </div>
-        )}
-
-        <div className="flex w-full items-center justify-between px-2.5">
-          <button
-            type="button"
-            aria-pressed={liked}
-            aria-label={`${likeCount} Likes`}
-            onClick={() => setLiked((v) => !v)}
-            className="flex items-center gap-2"
-          >
-            <NavIcon
-              key={liked ? "liked" : "unliked"}
-              icon={liked ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
-              color="night"
-              size={20}
-              className={liked ? "bg-[#ef575f] animate-like-pop" : undefined}
-            />
-            <span className={cn("text-xs font-bold", liked ? "text-[#ef575f]" : "text-brand-900")}>
-              {likeCount} Likes
-            </span>
-          </button>
-          <span className="flex items-center gap-4">
-            <button
-              type="button"
-              aria-label={post.shareLabel ?? "Share"}
-              onClick={() => sharePost(post)}
-              className="text-xs font-bold text-brand-900 underline"
-            >
-              {post.shares ?? 12} Shares
-            </button>
-            <span className="text-xs font-bold text-brand-900">{post.comments} Comments</span>
-          </span>
-        </div>
-
-        <div className="flex w-full flex-col items-center gap-[14px]">
-          {comments.map((comment) => (
-            <CommentRow key={comment.id} comment={comment} />
-          ))}
-        </div>
-
-        <button type="button" className="text-left text-[11px] font-bold text-brand-900">
-          Load More Comments
-        </button>
-        </div>
-      </div>
-    </div>,
-    document.body,
-  );
-}
-
-function CommentsSection({ comments }: { comments: CommentItem[] }) {
-  return (
-    <div className="flex w-full flex-col gap-2.5">
-      <p className="text-[11px] font-bold text-brand-900">Comments</p>
-      <div className="flex w-full flex-col items-center gap-[14px]">
-        {comments.map((comment) => (
-          <CommentRow key={comment.id} comment={comment} />
-        ))}
-      </div>
-      <button type="button" className="text-left text-[11px] font-bold text-brand-900">
-        Load More Comments
-      </button>
-    </div>
-  );
-}
-
-function CommentRow({ comment }: { comment: CommentItem }) {
-  const [expanded, setExpanded] = useState(false);
-
-  return (
-    <div className="flex w-full items-start gap-[14px]">
-      <span className="relative block size-[47px] shrink-0 overflow-hidden rounded-full bg-[#eef2ff]">
-        {comment.avatar ? (
-          <Image src={comment.avatar} alt={comment.authorName} fill className="object-cover" sizes="47px" />
-        ) : (
-          <span className="absolute left-1/2 top-1/2 block size-6 -translate-x-1/2 -translate-y-1/2">
-            <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="24px" />
-          </span>
-        )}
-      </span>
-      <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5">
-        <div className="flex w-full items-start justify-between gap-2">
-          <p className="text-[13px] font-bold text-brand-900">{comment.authorName}</p>
-          <p className="shrink-0 text-[9.5px] text-gray-500">{comment.postedAt}</p>
-        </div>
-        <div className="flex w-full items-end gap-1 text-[13px] leading-[1.5]">
-          <p className={cn("min-w-0 flex-1 whitespace-pre-line text-gray-600", !expanded && "line-clamp-4")}>
-            {renderWithHashtags(comment.text)}
-          </p>
-          <button
-            type="button"
-            onClick={() => setExpanded((v) => !v)}
-            className="shrink-0 text-[11px] font-bold text-gray-400"
-          >
-            {expanded ? "less" : "more"}
-          </button>
-        </div>
-        <CommentLikeButton initialLikes={comment.likes ?? 0} />
-      </div>
-    </div>
-  );
-}
-
-function CommentLikeButton({ initialLikes }: { initialLikes: number }) {
-  const [liked, setLiked] = useState(false);
-  const likeCount = initialLikes + (liked ? 1 : 0);
-
-  return (
-    <button
-      type="button"
-      onClick={() => setLiked((v) => !v)}
-      aria-pressed={liked}
-      aria-label={liked ? "Unlike comment" : "Like comment"}
-      className="flex items-center gap-1"
-    >
-      <NavIcon
-        key={liked ? "liked" : "unliked"}
-        icon={liked ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
-        color="brand"
-        size={11}
-        className={liked ? "bg-[#ef575f] animate-like-pop" : "bg-gray-400"}
-      />
-      {likeCount > 0 ? (
-        <span className={cn("text-[9.5px] font-bold", liked ? "text-[#ef575f]" : "text-brand-900")}>
-          {likeCount}
-        </span>
-      ) : (
-        <span className="text-[9.5px] font-bold text-gray-400">Like</span>
-      )}
-    </button>
   );
 }

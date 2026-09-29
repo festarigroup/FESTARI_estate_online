@@ -83,6 +83,10 @@
  *                 type: string
  *               price:
  *                 type: number
+ *               price_unit:
+ *                 type: string
+ *                 enum: [plot, unit, month, night]
+ *                 default: plot
  *               location:
  *                 type: string
  *               listing_type:
@@ -444,6 +448,9 @@
  *         price:
  *           type: string
  *           description: decimal
+ *         price_unit:
+ *           type: string
+ *           enum: [plot, unit, month, night]
  *         location:
  *           type: string
  *         listing_type:

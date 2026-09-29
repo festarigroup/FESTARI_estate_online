@@ -28,6 +28,7 @@ Content-Type: application/json
   "title": "4 Bedroom Detached House",
   "description": "Newly built, gated community, East Legon.",
   "price": 3450000,
+  "price_unit": "plot",
   "location": "East Legon, Accra",
   "listing_type": "for_sale",
   "property_type": "home",

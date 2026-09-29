@@ -122,7 +122,12 @@ function LikesTabbedList({
 
   return (
     <div className={cn("no-scrollbar flex w-full flex-1 flex-col overflow-y-auto overflow-x-hidden", className)}>
-      <div className="sticky top-0 z-10 flex w-full shrink-0 gap-4 border-b border-[#ebebeb] bg-white">
+      <div
+        className={cn(
+          "sticky top-0 z-10 flex w-full shrink-0 gap-4 border-b border-[#ebebeb]",
+          variant === "modal" ? "bg-white/95 backdrop-blur-[8px]" : "bg-white",
+        )}
+      >
         {(["all", "followers"] as const).map((key) => (
           <button
             key={key}

@@ -10,7 +10,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
-import { listingTypeEnum, moderationStatusEnum, propertyTypeEnum } from "./enums.js";
+import { listingTypeEnum, moderationStatusEnum, priceUnitEnum, propertyTypeEnum } from "./enums.js";
 import { users } from "./users.js";
 
 export const properties = pgTable(
@@ -23,6 +23,7 @@ export const properties = pgTable(
     title: text("title").notNull(),
     description: text("description"),
     price: decimal("price", { precision: 14, scale: 2 }).notNull(),
+    price_unit: priceUnitEnum("price_unit").notNull().default("plot"),
     location: text("location").notNull(),
     listing_type: listingTypeEnum("listing_type").notNull(),
     property_type: propertyTypeEnum("property_type").notNull(),
