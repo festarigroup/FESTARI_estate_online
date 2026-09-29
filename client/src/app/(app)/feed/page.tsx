@@ -82,7 +82,7 @@ export default function FeedPage() {
   );
 }
 
-const LINKED_COMPOSER_KEYS = ["media", "poll", "article", "property"] as const;
+const LINKED_COMPOSER_KEYS = ["media", "poll", "article", "property", "stay", "service"] as const;
 
 function ComposerCard() {
   const { openPostModal, modals } = usePostModals();
@@ -234,13 +234,13 @@ function MobileComposerCard() {
 
         {moreOpen &&
           MORE_COMPOSER_ACTIONS.map((action) =>
-            action.key === "property" ? (
+            action.key === "property" || action.key === "stay" || action.key === "service" ? (
               <button
                 key={action.key}
                 type="button"
                 aria-label={action.label}
                 onClick={() => {
-                  openPostModal("property");
+                  openPostModal(action.key as PostModalType);
                   setMoreOpen(false);
                 }}
               >

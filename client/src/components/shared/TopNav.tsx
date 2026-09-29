@@ -118,7 +118,7 @@ export function TopNav() {
                   onNavigate={() => setCreateMenuOpen(false)}
                   onOpenPostModal={openPostModal}
                   onOpenMobilePostModal={openMobileQuickPost}
-                  onOpenPropertyModal={() => openPostModal("property")}
+                  onOpenListingModal={openPostModal}
                 />
               </div>
             )}

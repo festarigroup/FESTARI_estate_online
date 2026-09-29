@@ -59,18 +59,19 @@ const DESKTOP_LIST_SECTIONS: DesktopMenuSection[] = [
 function DesktopMenuRow({
   item,
   onNavigate,
-  onOpenPropertyModal,
+  onOpenListingModal,
 }: {
   item: DesktopMenuItem;
   onNavigate: () => void;
-  onOpenPropertyModal: () => void;
+  onOpenListingModal: (type: "property" | "stay" | "service") => void;
 }) {
-  if (item.key === "property") {
+  if (item.key === "property" || item.key === "stay" || item.key === "service") {
+    const listingKey = item.key;
     return (
       <button
         type="button"
         onClick={() => {
-          onOpenPropertyModal();
+          onOpenListingModal(listingKey);
           onNavigate();
         }}
         className="flex h-8 w-full items-center gap-2 rounded-xl px-2 text-left hover:bg-gray-100"
@@ -145,14 +146,14 @@ function MobileMenuRow({
   open,
   onToggle,
   onOpenMobilePostModal,
-  onOpenPropertyModal,
+  onOpenListingModal,
 }: {
   item: MobileMenuItem;
   onNavigate: () => void;
   open: boolean;
   onToggle: () => void;
   onOpenMobilePostModal: (type: "media" | "poll" | "article") => void;
-  onOpenPropertyModal: () => void;
+  onOpenListingModal: (type: "property" | "stay" | "service") => void;
 }) {
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
@@ -224,12 +225,12 @@ function MobileMenuRow({
                     <NavIcon icon={sub.icon} color="night" size={16} className="shrink-0" />
                     <span className="text-sm text-night-900">{sub.label}</span>
                   </button>
-                ) : sub.key === "property" ? (
+                ) : sub.key === "property" || sub.key === "stay" || sub.key === "service" ? (
                   <button
                     key={sub.key}
                     type="button"
                     onClick={() => {
-                      onOpenPropertyModal();
+                      onOpenListingModal(sub.key as "property" | "stay" | "service");
                       onNavigate();
                     }}
                     className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
@@ -346,12 +347,12 @@ export function CreateMenu({
   onNavigate,
   onOpenPostModal,
   onOpenMobilePostModal,
-  onOpenPropertyModal,
+  onOpenListingModal,
 }: {
   onNavigate: () => void;
   onOpenPostModal: (type: "media" | "poll" | "article") => void;
   onOpenMobilePostModal: (type: "media" | "poll" | "article") => void;
-  onOpenPropertyModal: () => void;
+  onOpenListingModal: (type: "property" | "stay" | "service") => void;
 }) {
   const [openMobileKey, setOpenMobileKey] = useState<string | null>(null);
   const toggleMobileKey = (key: string) => setOpenMobileKey((current) => (current === key ? null : key));
@@ -367,7 +368,7 @@ export function CreateMenu({
             open={openMobileKey === item.key}
             onToggle={() => toggleMobileKey(item.key)}
             onOpenMobilePostModal={onOpenMobilePostModal}
-            onOpenPropertyModal={onOpenPropertyModal}
+            onOpenListingModal={onOpenListingModal}
           />
         ))}
         <div className="my-1 h-px w-full bg-gray-200" />
@@ -377,7 +378,7 @@ export function CreateMenu({
           open={false}
           onToggle={() => {}}
           onOpenMobilePostModal={onOpenMobilePostModal}
-          onOpenPropertyModal={onOpenPropertyModal}
+          onOpenListingModal={onOpenListingModal}
         />
       </div>
 
@@ -406,7 +407,7 @@ export function CreateMenu({
                   key={item.key}
                   item={item}
                   onNavigate={onNavigate}
-                  onOpenPropertyModal={onOpenPropertyModal}
+                  onOpenListingModal={onOpenListingModal}
                 />
               ))}
             </div>

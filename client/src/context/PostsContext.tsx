@@ -2,13 +2,15 @@
 
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import type { PostCardData } from "@/components/shared/PostCard";
-import type { PropertyListing } from "@/lib/dummy-listings";
+import type { PropertyListing, ServiceListing, StayListing } from "@/lib/dummy-listings";
 
 export type NewPostInput =
   | { kind: "media"; text: string; files: File[] }
   | { kind: "poll"; question: string; options: string[] }
   | { kind: "article"; headline: string; body: string; files?: File[] }
-  | { kind: "property"; note: string; listing: PropertyListing };
+  | { kind: "property"; note: string; listing: PropertyListing }
+  | { kind: "stay"; note: string; listing: StayListing }
+  | { kind: "service"; note: string; files: File[]; listing?: ServiceListing };
 
 const CURRENT_USER = {
   authorName: "Madeline Price",
@@ -61,6 +63,49 @@ function buildPost(input: NewPostInput): PostCardData {
         { label: "View Property", variant: "outline" },
       ],
       messageHostLabel: "Message Host",
+    };
+  }
+
+  if (input.kind === "stay") {
+    const { listing } = input;
+    return {
+      ...base,
+      variant: "stay",
+      text: input.note.trim() || undefined,
+      image: listing.image,
+      priceLine: listing.priceLine,
+      priceSuffix: listing.priceSuffix,
+      subLine: listing.subLine,
+      rating: listing.rating,
+      actions: [
+        { label: "Book Now", variant: "primary" },
+        { label: "Check Availability", variant: "outline" },
+      ],
+    };
+  }
+
+  if (input.kind === "service") {
+    const { listing } = input;
+    if (listing) {
+      return {
+        ...base,
+        variant: "artisan",
+        text: input.note.trim() || undefined,
+        media: buildMedia(input.files),
+        priceLine: listing.rate,
+        subLine: listing.title,
+        actions: [
+          { label: "Request Quote", variant: "primary" },
+          { label: "View Listing", variant: "outline" },
+        ],
+        messageHostLabel: "Message Provider",
+      };
+    }
+    return {
+      ...base,
+      variant: "text",
+      text: input.note.trim() || undefined,
+      media: buildMedia(input.files),
     };
   }
 
