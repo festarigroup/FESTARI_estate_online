@@ -261,7 +261,7 @@ export function PostServiceModal({ open, onClose, initialTab = "listing" }: Post
             <button
               type="button"
               onClick={handleClose}
-              className="flex h-8 items-center justify-center rounded-lg border border-[#e2e8f0] bg-[#f8fafc] px-4 text-sm text-red-500"
+              className="flex h-8 items-center justify-center rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 text-sm text-red-500 sm:rounded-lg"
             >
               Cancel
             </button>
@@ -269,7 +269,7 @@ export function PostServiceModal({ open, onClose, initialTab = "listing" }: Post
               type="button"
               onClick={handlePost}
               disabled={tab === "listing" && !listing}
-              className="flex h-8 flex-1 items-center justify-center rounded-lg bg-brand-900 px-3 text-sm text-white hover:bg-brand-900/90 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-8 flex-1 items-center justify-center rounded-xl bg-brand-900 px-3 text-sm text-white hover:bg-brand-900/90 disabled:cursor-not-allowed disabled:opacity-50 sm:rounded-lg"
             >
               Post All
             </button>

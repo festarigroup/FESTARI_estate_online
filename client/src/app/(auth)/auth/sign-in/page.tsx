@@ -25,6 +25,14 @@ function SignInContent() {
   const [errors, setErrors] = useState<{ identifier?: string; password?: string }>({});
   const { pending, run } = useHangTight();
 
+  const otherMethod = method === "email" ? "phone" : "email";
+
+  function switchMethod() {
+    setIdentifier("");
+    setErrors({});
+    router.replace(`/auth/sign-in?method=${otherMethod}`);
+  }
+
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
@@ -117,6 +125,16 @@ function SignInContent() {
             Sign up
           </Link>
         </p>
+
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={switchMethod}
+            className="text-xs font-medium text-brand-900 hover:underline"
+          >
+            Use {otherMethod === "email" ? "email address" : "phone number"} instead
+          </button>
+        </div>
       </form>
     </>
   );

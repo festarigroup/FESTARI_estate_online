@@ -9,6 +9,7 @@ import { FeedRightRail } from "@/components/shared/FeedRightRail";
 import { MobileQuickPostModal, type QuickComposerMode } from "@/components/shared/MobileQuickPostModal";
 import { NewPostsPill } from "@/components/shared/NewPostsPill";
 import { PostCard, type PostCardData } from "@/components/shared/PostCard";
+import { TrustedListingsBanner } from "@/components/shared/TrustedListingsBanner";
 import { usePostsFeed } from "@/context/PostsContext";
 import { usePostModals, type PostModalType } from "@/hooks/usePostModals";
 import { comingSoonHref } from "@/lib/coming-soon";
@@ -67,6 +68,7 @@ export default function FeedPage() {
         </div>
       }
     >
+      <TrustedListingsBanner />
       <div className="flex w-full flex-col gap-[15px]">
         <NewPostsPill count={newPostsCount} onReveal={showNewPosts} />
         <ComposerCard />

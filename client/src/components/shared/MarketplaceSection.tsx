@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { NavIcon } from "@/components/shared/NavIcon";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { MARKETPLACE_LISTINGS, type MarketplaceListing } from "@/lib/dummy-marketplace";
 
@@ -8,9 +9,13 @@ export function MarketplaceSection() {
   return (
     <section className="flex w-full flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-[15px] font-bold text-night-900">Picked for you in Marketplace</h2>
-        <Link href={comingSoonHref("Marketplace")} className="text-[12.5px] font-medium text-brand-600">
-          Browse Marketplace
+        <h2 className="text-[15px] font-bold text-night-900">From your marketplace</h2>
+        <Link
+          href={comingSoonHref("Marketplace")}
+          className="flex items-center gap-1 text-[12.5px] font-medium text-brand-600"
+        >
+          Browse marketplace
+          <NavIcon icon="/icons/chevron-right.svg" color="brand" size={10} />
         </Link>
       </div>
 

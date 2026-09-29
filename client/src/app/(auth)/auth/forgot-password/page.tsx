@@ -18,6 +18,14 @@ function ForgotPasswordContent() {
   const [error, setError] = useState<string>();
   const { pending, run } = useHangTight();
 
+  const otherMethod = method === "phone" ? "email" : "phone";
+
+  function switchMethod() {
+    setIdentifier("");
+    setError(undefined);
+    router.replace(`/auth/forgot-password?method=${otherMethod}`);
+  }
+
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
@@ -86,6 +94,16 @@ function ForgotPasswordContent() {
           <Button type="button" variant="link" onClick={() => router.push("/auth")}>
             Back to login page
           </Button>
+        </div>
+
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={switchMethod}
+            className="text-xs font-medium text-brand-900 hover:underline"
+          >
+            Use {otherMethod === "phone" ? "phone number" : "email address"} instead
+          </button>
         </div>
       </form>
     </>

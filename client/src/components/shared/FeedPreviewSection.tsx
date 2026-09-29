@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { NavIcon } from "@/components/shared/NavIcon";
 import { PostCard } from "@/components/shared/PostCard";
 import { usePostsFeed } from "@/context/PostsContext";
 import { FEED_POSTS } from "@/lib/dummy-posts";
@@ -18,8 +19,9 @@ export function FeedPreviewSection() {
     <section className="flex w-full flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-[15px] font-bold text-night-900">From your Feed</h2>
-        <Link href="/feed" className="text-[12.5px] font-medium text-brand-600">
+        <Link href="/feed" className="flex items-center gap-1 text-[12.5px] font-medium text-brand-600">
           Open Feed
+          <NavIcon icon="/icons/chevron-right.svg" color="brand" size={10} />
         </Link>
       </div>
 
