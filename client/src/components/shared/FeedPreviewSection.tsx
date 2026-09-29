@@ -1,12 +1,18 @@
+"use client";
+
 import Link from "next/link";
 import { PostCard } from "@/components/shared/PostCard";
-import { ProjectUpdateCard } from "@/components/shared/ProjectUpdateCard";
-import { FEED_POSTS, HOME_FEED_PREVIEW_IDS } from "@/lib/dummy-posts";
+import { usePostsFeed } from "@/context/PostsContext";
+import { FEED_POSTS } from "@/lib/dummy-posts";
 
-/** "/home" dashboard's condensed look at the full "/feed" stream — same post
- * data, just the two most relevant picks rather than the whole feed. */
+const PREVIEW_COUNT = 2;
+
+/** "/home" dashboard's condensed look at the full "/feed" stream — the same
+ * top-of-feed posts a viewer would see first on "/feed" (their own posts,
+ * newest first, then the dummy stream), just capped to the top two. */
 export function FeedPreviewSection() {
-  const previewPosts = FEED_POSTS.filter((post) => (HOME_FEED_PREVIEW_IDS as readonly string[]).includes(post.id));
+  const { posts: userPosts } = usePostsFeed();
+  const previewPosts = [...userPosts, ...FEED_POSTS].slice(0, PREVIEW_COUNT);
 
   return (
     <section className="flex w-full flex-col gap-3">
@@ -21,7 +27,6 @@ export function FeedPreviewSection() {
         {previewPosts.map((post) => (
           <PostCard key={post.id} post={post} />
         ))}
-        <ProjectUpdateCard />
       </div>
     </section>
   );

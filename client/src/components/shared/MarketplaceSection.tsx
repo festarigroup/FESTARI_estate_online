@@ -14,9 +14,11 @@ export function MarketplaceSection() {
         </Link>
       </div>
 
-      <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="no-scrollbar flex w-full items-start gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0">
         {MARKETPLACE_LISTINGS.map((listing) => (
-          <MarketplaceCard key={listing.id} listing={listing} />
+          <div key={listing.id} className="w-[260px] shrink-0 sm:w-full sm:shrink">
+            <MarketplaceCard listing={listing} />
+          </div>
         ))}
       </div>
     </section>

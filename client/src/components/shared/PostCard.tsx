@@ -10,7 +10,7 @@ import { FollowButton } from "@/components/shared/FollowButton";
 import { LikesBottomSheet } from "@/components/shared/LikesBottomSheet";
 import { MediaLoadError } from "@/components/shared/MediaLoadError";
 import { NavIcon } from "@/components/shared/NavIcon";
-import { CommentsModal, CommentsSection, DEFAULT_COMMENTS, type CommentItem } from "@/components/shared/PostComments";
+import { CommentsModal, DEFAULT_COMMENTS, type CommentItem } from "@/components/shared/PostComments";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Tooltip } from "@/components/shared/Tooltip";
 import { comingSoonHref } from "@/lib/coming-soon";
@@ -181,27 +181,21 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
         </div>
       )}
 
-      {showComments && (
-        <>
-          <div className="sm:hidden">
-            <CommentsSection comments={comments} />
-          </div>
-          <CommentsModal
-            comments={comments}
-            commentDraft={commentDraft}
-            setCommentDraft={setCommentDraft}
-            submitComment={submitComment}
-            currentUserAvatarInitials={currentUserAvatarInitials}
-            showComposer={post.showComposer ?? false}
-            likeCount={post.likes}
-            commentsCount={post.comments}
-            shareLabel={post.shareLabel}
-            sharesCount={post.shares}
-            onShare={() => sharePost(post)}
-            onClose={() => setShowComments(false)}
-          />
-        </>
-      )}
+      <CommentsModal
+        open={showComments}
+        comments={comments}
+        commentDraft={commentDraft}
+        setCommentDraft={setCommentDraft}
+        submitComment={submitComment}
+        currentUserAvatarInitials={currentUserAvatarInitials}
+        showComposer={post.showComposer ?? false}
+        likeCount={post.likes}
+        commentsCount={post.comments}
+        shareLabel={post.shareLabel}
+        sharesCount={post.shares}
+        onShare={() => sharePost(post)}
+        onClose={() => setShowComments(false)}
+      />
     </article>
   );
 }

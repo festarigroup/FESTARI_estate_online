@@ -4,12 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
+import { NavIcon } from "@/components/shared/NavIcon";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 
 interface AttentionItem {
-  avatar: string;
+  icon: string;
   title: string;
   heading: string;
   detail: string;
@@ -17,14 +18,10 @@ interface AttentionItem {
   primary?: boolean;
 }
 
-// Reuses this app's existing avatar photography — there's no property-manager
-// backend yet (see dummy-listings.ts).
-const AVATAR = "/images/avatar-generic.png";
-
 const ROWS: AttentionItem[][] = [
   [
     {
-      avatar: AVATAR,
+      icon: "/icons/clipboard-list-01.svg",
       title: "Rent Due",
       heading: "Unit 2B, Dzorwulu",
       detail: "GHS 3,500 due Thu 1 Oct. Reminder sent to tenant.",
@@ -32,7 +29,7 @@ const ROWS: AttentionItem[][] = [
       primary: true,
     },
     {
-      avatar: AVATAR,
+      icon: "/icons/hammer-01.svg",
       title: "Maintenance",
       heading: "Leaking kitchen tap, Unit 1A",
       detail: "2 quotes received: GHS 280 and GHS 350.",
@@ -41,14 +38,14 @@ const ROWS: AttentionItem[][] = [
   ],
   [
     {
-      avatar: AVATAR,
+      icon: "/icons/timer-01.svg",
       title: "Expiring",
       heading: "Fire safety certificate",
       detail: "Expires 14 Oct for Dzorwulu block. 17 days left.",
       action: "Start Renewal",
     },
     {
-      avatar: AVATAR,
+      icon: "/icons/hammer-01.svg",
       title: "Maintenance",
       heading: "Leaking kitchen tap, Unit 1A",
       detail: "2 quotes received: GHS 280 and GHS 350.",
@@ -62,11 +59,14 @@ const ROWS: AttentionItem[][] = [
 const BORDER_GRADIENT =
   "linear-gradient(90deg, rgba(84,51,255,0.15) 0%, rgba(84,51,255,0.3) 20%, #5433ff 40%, #1465e6 50%, rgba(20,101,230,0.3) 60%, rgba(20,101,230,0.15) 80%, rgba(84,51,255,0.15) 100%)";
 
+const ALL_ITEMS = ROWS.flat();
+
 /** "/home" dashboard section for time-sensitive property-management items —
- * only the owner/manager viewing their own dashboard sees this. Each row
- * pairs two independently-bordered cards inside one shared, slow-moving
- * gradient frame (a subtle "look here" cue), which respects
- * prefers-reduced-motion by holding still instead. */
+ * only the owner/manager viewing their own dashboard sees this. On mobile
+ * every card sits in a single horizontally scrolling line; on desktop they
+ * pair up two-per-row, each pair sharing one slow-moving gradient frame (a
+ * subtle "look here" cue) that respects prefers-reduced-motion by holding
+ * still instead. */
 export function NeedsAttentionSection() {
   return (
     <section className="flex w-full flex-col gap-3">
@@ -80,7 +80,15 @@ export function NeedsAttentionSection() {
         </span>
       </div>
 
-      <div className="flex w-full flex-col gap-3">
+      <div className="sm:hidden">
+        <GradientRow>
+          {ALL_ITEMS.map((item, index) => (
+            <AttentionCard key={index} item={item} />
+          ))}
+        </GradientRow>
+      </div>
+
+      <div className="hidden w-full flex-col gap-3 sm:flex">
         {ROWS.map((row, index) => (
           <GradientRow key={index}>
             <AttentionCard item={row[0]} />
@@ -102,7 +110,7 @@ function GradientRow({ children }: { children: ReactNode }) {
       animate={prefersReducedMotion ? undefined : { backgroundPositionX: ["0%", "100%", "0%"] }}
       transition={prefersReducedMotion ? undefined : { duration: 8, repeat: Infinity, ease: "linear" }}
     >
-      <div className="flex w-full flex-col gap-2 rounded-[21px] bg-gray-50 p-1.5 sm:flex-row sm:items-stretch">
+      <div className="no-scrollbar flex w-full items-stretch gap-2 overflow-x-auto rounded-[21px] bg-gray-50 p-1.5">
         {children}
       </div>
     </motion.div>
@@ -111,10 +119,10 @@ function GradientRow({ children }: { children: ReactNode }) {
 
 function AttentionCard({ item }: { item: AttentionItem }) {
   return (
-    <div className="flex flex-1 flex-col gap-4 rounded-2xl border border-gray-200 bg-gray-50 p-5 sm:p-6">
+    <div className="flex w-[270px] shrink-0 flex-col gap-4 rounded-2xl border border-gray-200 bg-gray-50 p-5 sm:w-auto sm:flex-1 sm:p-6">
       <div className="flex items-center gap-3">
-        <span className="relative block size-8 shrink-0 overflow-hidden rounded-full">
-          <Image src={item.avatar} alt="" fill className="object-cover" sizes="32px" />
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-900/10">
+          <NavIcon icon={item.icon} color="brand" size={16} />
         </span>
         <p className="text-[16px] font-bold tracking-tight text-night-900">{item.title}</p>
       </div>

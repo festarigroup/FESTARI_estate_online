@@ -8,7 +8,16 @@ import { NavIcon } from "@/components/shared/NavIcon";
 import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 import { cn } from "@/lib/utils";
 
-const MEDIA_ACCEPT = ["image/png", "image/jpeg", "image/gif", "video/mp4", "video/quicktime", "video/webm"];
+const MEDIA_ACCEPT = [
+  "image/png",
+  "image/jpeg",
+  "image/gif",
+  "video/mp4",
+  "video/x-matroska",
+  "video/x-msvideo",
+  "video/quicktime",
+  "video/webm",
+];
 
 export interface PostedStory {
   url: string;
@@ -68,7 +77,7 @@ export function PostStoryModal({ open, onClose, onPost }: PostStoryModalProps) {
     const picked = list?.[0];
     if (!picked) return;
     if (!MEDIA_ACCEPT.includes(picked.type)) {
-      showErrorToast("Only PNG, JPEG, GIF, MP4, MOV or WEBM files are supported");
+      showErrorToast("Only PNG, JPEG, GIF, MP4, MKV or AVI files are supported");
       return;
     }
     setFile(picked);
@@ -129,7 +138,25 @@ export function PostStoryModal({ open, onClose, onPost }: PostStoryModalProps) {
           )}
         >
           <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154] sm:hidden" />
-          <p className="text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826]">Add to your story</p>
+
+          <div className="flex w-full shrink-0 items-center gap-2.5 sm:hidden">
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={handleClose}
+              className="flex size-6 shrink-0 items-center justify-center text-night-900"
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M10 4V16M10 16L4 10M10 16L16 10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+            <p className="flex-1 text-center text-lg font-bold tracking-[-0.54px] text-black">Add to your Story</p>
+            <span className="size-6 shrink-0" aria-hidden />
+          </div>
+
+          <p className="hidden text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826] sm:block">
+            Add to your Story
+          </p>
 
           <input
             ref={inputRef}
@@ -137,6 +164,14 @@ export function PostStoryModal({ open, onClose, onPost }: PostStoryModalProps) {
             accept={MEDIA_ACCEPT.join(",")}
             className="hidden"
             onChange={(event) => pickFile(event.target.files)}
+          />
+
+          <input
+            type="text"
+            value={caption}
+            onChange={(event) => setCaption(event.target.value)}
+            placeholder="Add a caption (optional)...."
+            className="w-full border-none bg-transparent p-0 text-sm text-night-900 placeholder:text-gray-400 focus:outline-none"
           />
 
           {preview ? (
@@ -167,12 +202,11 @@ export function PostStoryModal({ open, onClose, onPost }: PostStoryModalProps) {
               role="button"
               tabIndex={0}
               className={cn(
-                "flex min-h-[220px] w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed px-6 py-6 text-center",
+                "flex min-h-[220px] w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border border-dashed px-6 py-6 text-center",
                 dragActive ? "border-brand-900 bg-brand-900/5" : "border-[#cbd5e0] bg-[#cbd5e0]/30",
               )}
             >
-              <p className="text-xs text-[#19161d]">Drag and drop a photo or video here</p>
-              <p className="text-xs text-[#86888a]">or</p>
+              <p className="text-xs text-[#19161d]">Drag and drop files here</p>
               <button
                 type="button"
                 onClick={(event) => {
@@ -181,24 +215,17 @@ export function PostStoryModal({ open, onClose, onPost }: PostStoryModalProps) {
                 }}
                 className="flex h-11 items-center justify-center gap-2 rounded-[40px] bg-[#e2e5f0] px-4 text-sm font-medium text-[#19161d]"
               >
-                Choose a file
+                Choose files
                 <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="night" className="bg-[#19161d]" size={16} />
               </button>
+              <p className="text-[11px] text-[#86888a]">PNG, JPEG, GIF, MP4, MKV, AVI</p>
             </div>
           )}
-
-          <input
-            type="text"
-            value={caption}
-            onChange={(event) => setCaption(event.target.value)}
-            placeholder="Add a caption (optional)"
-            className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm text-night-900 placeholder:text-gray-400 focus:border-brand-900 focus:outline-none"
-          />
 
           <button
             type="button"
             onClick={handlePost}
-            className="flex h-11 w-full items-center justify-center rounded-lg bg-brand-900 text-sm font-medium text-white hover:bg-brand-900/90"
+            className="flex h-12 w-full shrink-0 items-center justify-center rounded-full bg-brand-900 text-sm font-medium text-white hover:bg-brand-900/90"
           >
             Share to Story
           </button>

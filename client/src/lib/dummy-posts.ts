@@ -155,8 +155,3 @@ export const FEED_POSTS: PostCardData[] = [
     showComposer: true,
   },
 ];
-
-/** The generic PostCard-rendered post the "/home" dashboard's "From your
- * Feed" strip previews (the second slot is a bespoke ProjectUpdateCard, not
- * one of these). */
-export const HOME_FEED_PREVIEW_IDS = ["4"] as const;
