@@ -12,6 +12,7 @@ interface DesktopSubmenuItem {
   key: string;
   icon: string;
   label: string;
+  locked?: boolean;
 }
 
 interface DesktopMenuItem {
@@ -37,7 +38,7 @@ const DESKTOP_LIST_SECTIONS: DesktopMenuSection[] = [
   {
     divider: true,
     items: [
-      { key: "property", icon: "/icons/building-03.svg", label: "Post a Property" },
+      { key: "property", icon: "/icons/building-03.svg", label: "Post a Property", locked: true },
       { key: "stay", icon: "/icons/guest-house-sm.svg", label: "Add Stay", locked: true },
       { key: "service", icon: "/icons/map-pin-02-sm.svg", label: "Offer a Service", locked: true },
       { key: "project", icon: "/icons/briefcase-09.svg", label: "Post Project", locked: true },
@@ -76,6 +77,9 @@ function DesktopMenuRow({
       >
         <NavIcon icon={item.icon} color="night" size={14} className="shrink-0" />
         <span className="flex-1 truncate text-sm text-night-700">{item.label}</span>
+        {item.locked && (
+          <NavIcon icon="/icons/create-menu2-lock-key.svg" color="night" size={10} className="shrink-0" />
+        )}
       </button>
     );
   }
@@ -105,7 +109,7 @@ interface MobileMenuItem {
 }
 
 const LISTINGS_SUBMENU: DesktopSubmenuItem[] = [
-  { key: "property", icon: "/icons/building-03.svg", label: "Post a Property" },
+  { key: "property", icon: "/icons/building-03.svg", label: "Post a Property", locked: true },
   { key: "stay", icon: "/icons/guest-house-sm.svg", label: "Add Stay" },
   { key: "service", icon: "/icons/map-pin-02-sm.svg", label: "Offer a Service" },
   { key: "project", icon: "/icons/briefcase-09.svg", label: "Post Project" },
@@ -231,7 +235,10 @@ function MobileMenuRow({
                     className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
                   >
                     <NavIcon icon={sub.icon} color="night" size={16} className="shrink-0" />
-                    <span className="text-sm text-night-900">{sub.label}</span>
+                    <span className="flex-1 text-sm text-night-900">{sub.label}</span>
+                    {sub.locked && (
+                      <NavIcon icon="/icons/create-menu2-lock-key.svg" color="night" size={10} className="shrink-0" />
+                    )}
                   </button>
                 ) : (
                   <Link

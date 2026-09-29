@@ -60,7 +60,7 @@ export function StoriesRow() {
   }
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-4">
+    <div className="flex w-full flex-col gap-3 rounded-[28px] border border-gray-200 bg-white p-4">
       <div className="flex h-[18px] w-full items-center justify-between">
         <p className="text-[16px] font-bold text-gray-700">Stories</p>
         <Link href={comingSoonHref("Stories")} className="text-[13px] font-medium text-brand-600">

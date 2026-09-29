@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
@@ -29,7 +28,7 @@ const ROWS: AttentionItem[][] = [
       primary: true,
     },
     {
-      icon: "/icons/hammer-01.svg",
+      icon: "/icons/settings-02.svg",
       title: "Maintenance",
       heading: "Leaking kitchen tap, Unit 1A",
       detail: "2 quotes received: GHS 280 and GHS 350.",
@@ -45,7 +44,7 @@ const ROWS: AttentionItem[][] = [
       action: "Start Renewal",
     },
     {
-      icon: "/icons/hammer-01.svg",
+      icon: "/icons/settings-02.svg",
       title: "Maintenance",
       heading: "Leaking kitchen tap, Unit 1A",
       detail: "2 quotes received: GHS 280 and GHS 350.",
@@ -73,10 +72,8 @@ export function NeedsAttentionSection() {
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-[15px] font-bold text-night-900">Needs your attention</h2>
         <span className="flex items-center gap-1 text-[11px] text-gray-400">
-          <span className="relative block size-3 shrink-0">
-            <Image src="/icons/visibility-user-check.svg" alt="" fill sizes="12px" />
-          </span>
           Only you can see this
+          <NavIcon icon="/icons/create-menu2-lock-key.svg" color="night" size={10} className="shrink-0" />
         </span>
       </div>
 
@@ -105,12 +102,12 @@ function GradientRow({ children }: { children: ReactNode }) {
 
   return (
     <motion.div
-      className="w-full rounded-[22px] p-[1.5px]"
+      className="w-full rounded-[29.5px] p-[1.5px] sm:rounded-[22px]"
       style={{ backgroundImage: BORDER_GRADIENT, backgroundSize: "300% 100%" }}
       animate={prefersReducedMotion ? undefined : { backgroundPositionX: ["0%", "100%", "0%"] }}
       transition={prefersReducedMotion ? undefined : { duration: 8, repeat: Infinity, ease: "linear" }}
     >
-      <div className="no-scrollbar flex w-full items-stretch gap-2 overflow-x-auto rounded-[21px] bg-gray-50 p-1.5">
+      <div className="no-scrollbar flex w-full items-stretch gap-2 overflow-x-auto rounded-[28px] bg-gray-50 p-3 sm:rounded-[21px]">
         {children}
       </div>
     </motion.div>
@@ -119,7 +116,7 @@ function GradientRow({ children }: { children: ReactNode }) {
 
 function AttentionCard({ item }: { item: AttentionItem }) {
   return (
-    <div className="flex w-[270px] shrink-0 flex-col gap-4 rounded-2xl border border-gray-200 bg-gray-50 p-5 sm:w-auto sm:flex-1 sm:p-6">
+    <div className="flex w-[270px] shrink-0 flex-col gap-4 rounded-[14px] border border-gray-200 bg-gray-50 p-5 sm:w-auto sm:flex-1 sm:p-6">
       <div className="flex items-center gap-3">
         <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-900/10">
           <NavIcon icon={item.icon} color="brand" size={16} />
@@ -135,7 +132,7 @@ function AttentionCard({ item }: { item: AttentionItem }) {
       <Link
         href={comingSoonHref(item.action)}
         className={cn(
-          "flex h-10 w-full items-center justify-center rounded-lg text-[13px] font-medium",
+          "flex h-10 w-full items-center justify-center rounded-xl text-[13px] font-medium sm:rounded-lg",
           item.primary
             ? "bg-brand-900 text-white hover:bg-brand-900/90"
             : "border border-gray-200 text-night-900 hover:bg-gray-50",
