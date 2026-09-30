@@ -25,12 +25,8 @@ function SignInContent() {
   const [errors, setErrors] = useState<{ identifier?: string; password?: string }>({});
   const { pending, run } = useHangTight();
 
-  const otherMethod = method === "email" ? "phone" : "email";
-
-  function switchMethod() {
-    setIdentifier("");
-    setErrors({});
-    router.replace(`/auth/sign-in?method=${otherMethod}`);
+  function useOtherMethod() {
+    router.push("/auth");
   }
 
   function handleSubmit(event: React.FormEvent) {
@@ -129,10 +125,10 @@ function SignInContent() {
         <div className="flex justify-center">
           <button
             type="button"
-            onClick={switchMethod}
+            onClick={useOtherMethod}
             className="text-xs font-medium text-brand-900 hover:underline"
           >
-            Use {otherMethod === "email" ? "email address" : "phone number"} instead
+            Use a different method
           </button>
         </div>
       </form>
