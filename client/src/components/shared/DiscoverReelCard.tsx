@@ -836,14 +836,15 @@ export function DiscoverReelCard({
           {muteButton}
         </div>
 
-        {/* `h-full` + `justify-between` (not a fixed `gap` + bottom padding)
-            is what makes this responsive to the video's own height, which
-            already shrinks to fit `calc(100vh-91px)` — the icons space
-            themselves out across whatever room is actually available
-            instead of needing a fixed ~340px regardless of viewport height,
-            which is what pushed the lower icons below the fold on shorter
-            screens (effectively into the next reel's snap section). */}
-        <div className="ml-[32px] flex h-full flex-col items-center justify-between py-1 justify-self-start">
+        {/* `self-end` (not `h-full`/`justify-end`, which depend on this grid
+            item actually being stretched to the row's full height) pins this
+            column's own box flush to the bottom of the row — i.e. flush with
+            the video's bottom edge — directly, regardless of how tall its
+            content is. `clamp()` on the gap/padding keeps the original
+            bottom-grouped look at normal/tall heights (clamps up to the same
+            16px/38px the design used) while still shrinking on short
+            viewports instead of pushing the lower icons below the video. */}
+        <div className="ml-[32px] flex flex-col items-center gap-[clamp(4px,2vh,16px)] self-end pb-[clamp(8px,4vh,38px)] justify-self-start">
           <button type="button" onClick={toggleLike} aria-pressed={liked} aria-label={`${formatCount(likeCount)} likes`} className="flex flex-col items-center gap-1">
             <NavIcon
               icon={liked ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
