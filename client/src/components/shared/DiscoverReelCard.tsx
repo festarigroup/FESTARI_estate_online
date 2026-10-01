@@ -56,18 +56,47 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
     setShareCount((count) => count + 1);
   }
 
-  // Drives the actual <video> element from the `playing` state the
-  // play/pause button toggles — a plain state flag doesn't control media
-  // playback on its own, it has to be applied imperatively.
+  // `playing` mirrors the video's actual native state via its own play/pause
+  // events, rather than driving the video one-way from React state — if that
+  // were reversed, a silently-rejected autoplay (common on mobile even when
+  // muted) or the browser auto-pausing an off-screen video would leave
+  // `playing` saying "true" while the video is really paused, and the
+  // button's first click would toggle the (already-wrong) state without
+  // ever actually calling `.play()`. Making the video's own events the
+  // single source of truth means the button can never go out of sync with
+  // what's actually happening.
+  //
+  // Depends on `isMobile`: `useMediaQuery`'s SSR snapshot always starts as
+  // "desktop", then corrects right after mount if the viewport is actually
+  // narrow — swapping which of the two return branches below is rendered,
+  // which mounts a brand-new <video> DOM node. With an empty deps array this
+  // effect would only ever attach to that first (desktop) node and never
+  // reattach once the real mobile video mounts, leaving the icon/progress
+  // permanently stuck reflecting a video that's no longer even on screen.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (playing) video.play().catch(() => undefined);
+    const syncPlaying = () => setPlaying(!video.paused);
+    video.addEventListener("play", syncPlaying);
+    video.addEventListener("pause", syncPlaying);
+    syncPlaying();
+    return () => {
+      video.removeEventListener("play", syncPlaying);
+      video.removeEventListener("pause", syncPlaying);
+    };
+  }, [isMobile]);
+
+  function togglePlayback() {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) video.play().catch(() => undefined);
     else video.pause();
-  }, [playing]);
+  }
 
   // Drives the gradient bar at the bottom of the card as a real playback
-  // tracker instead of a static decoration.
+  // tracker instead of a static decoration. Same `[isMobile]` reasoning as
+  // the play/pause effect above — needs to reattach to whichever <video>
+  // node is actually mounted after the branch swap.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -81,9 +110,13 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
       video.removeEventListener("timeupdate", updateProgress);
       video.removeEventListener("loadedmetadata", updateProgress);
     };
-  }, []);
+  }, [isMobile]);
 
   function seek(event: MouseEvent<HTMLDivElement>) {
+    // The whole reel (mobile) / video column (desktop) toggles playback on
+    // tap — stop this click from bubbling up to that, or seeking would also
+    // pause/resume the video.
+    event.stopPropagation();
     const video = videoRef.current;
     if (!video?.duration) return;
     const rect = event.currentTarget.getBoundingClientRect();
@@ -106,6 +139,12 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
       loop
       muted
       playsInline
+      // No onClick here — the tap-to-toggle handler lives on the
+      // surrounding container (mobile: the whole screen; desktop: the video
+      // column) instead, so tapping *anywhere* on the reel works, not just
+      // the exact pixels the video itself occupies. Every other control
+      // (progress bar, post/play buttons, action rail) stops its own click
+      // from bubbling there, so this is purely about the empty space.
       className="absolute inset-0 size-full object-cover"
     />
   );
@@ -132,21 +171,32 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
   );
 
   const playButton = (
+    // Figma nodes 792:38372 (pause) and 792:38398 (play) — plain white
+    // icons, no circular/backdrop container around them.
     <Tooltip label={playing ? "Pause" : "Play"} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
       <button
         type="button"
-        onClick={() => setPlaying((v) => !v)}
+        onClick={(event) => {
+          event.stopPropagation();
+          togglePlayback();
+        }}
         aria-pressed={playing}
-        className="flex size-14 items-center justify-center rounded-full bg-white/70 backdrop-blur-sm transition-opacity hover:bg-white/90"
+        aria-label={playing ? "Pause" : "Play"}
+        className="flex items-center justify-center"
       >
         {playing ? (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <rect x="6" y="4" width="4" height="16" rx="1" fill="#06090e" />
-            <rect x="14" y="4" width="4" height="16" rx="1" fill="#06090e" />
+          <svg width="37" height="37" viewBox="0 0 45.7332 45.7336" fill="none" aria-hidden="true">
+            <path d="M10.1278 0.000220028H9.93889C8.38086 0.000178235 7.07198 0.000143124 6.01058 0.108117C4.89658 0.221441 3.84997 0.468954 2.90361 1.10129C2.19024 1.57795 1.57773 2.19046 1.10107 2.90383C0.468736 3.85019 0.221223 4.8968 0.107899 6.0108C-7.5267e-05 7.0722 -4.01562e-05 8.38101 1.6365e-06 9.93904V35.7947C-4.01562e-05 37.3527 -7.5267e-05 38.6616 0.107899 39.723C0.221223 40.837 0.468736 41.8836 1.10107 42.8299C1.57773 43.5433 2.19024 44.1558 2.90361 44.6325C3.84997 45.2648 4.89658 45.5123 6.01058 45.6257C7.072 45.7336 8.38083 45.7336 9.9389 45.7336H10.1278C11.6858 45.7336 12.9947 45.7336 14.0561 45.6257C15.1701 45.5123 16.2167 45.2648 17.1631 44.6325C17.8764 44.1558 18.4889 43.5433 18.9656 42.8299C19.5979 41.8836 19.8455 40.837 19.9588 39.723C20.0668 38.6616 20.0667 37.3527 20.0667 35.7947V9.93912C20.0667 8.38105 20.0668 7.07222 19.9588 6.0108C19.8455 4.8968 19.5979 3.85019 18.9656 2.90383C18.4889 2.19046 17.8764 1.57795 17.1631 1.10129C16.2167 0.468954 15.1701 0.221441 14.0561 0.108117C12.9947 0.000143124 11.6858 0.000178235 10.1278 0.000220028Z" fill="white" />
+            <path d="M35.7943 1.54153e-06H35.6055C34.0474 -3.86155e-05 32.7385 -7.23464e-05 31.6771 0.1079C30.5631 0.221224 29.5165 0.468737 28.5702 1.10107C27.8568 1.57773 27.2443 2.19024 26.7676 2.90361C26.1353 3.84997 25.8878 4.89658 25.7745 6.01058C25.6665 7.07199 25.6665 8.3808 25.6666 9.93884V35.7944C25.6665 37.3525 25.6665 38.6614 25.7745 39.7228C25.8878 40.8368 26.1353 41.8834 26.7676 42.8297C27.2443 43.5431 27.8568 44.1556 28.5702 44.6323C29.5165 45.2646 30.5631 45.5121 31.6771 45.6254C32.7386 45.7334 34.0474 45.7334 35.6055 45.7333H35.7943C37.3524 45.7334 38.6612 45.7334 39.7227 45.6254C40.8367 45.5121 41.8833 45.2646 42.8296 44.6323C43.543 44.1556 44.1555 43.5431 44.6322 42.8297C45.2645 41.8834 45.512 40.8368 45.6253 39.7228C45.7333 38.6614 45.7333 37.3526 45.7332 35.7945V9.9389C45.7333 8.38088 45.7333 7.07198 45.6253 6.01058C45.512 4.89658 45.2645 3.84997 44.6322 2.90361C44.1555 2.19024 43.543 1.57773 42.8296 1.10107C41.8833 0.468737 40.8367 0.221224 39.7227 0.1079C38.6613 -7.23464e-05 37.3524 -3.86155e-05 35.7943 1.54153e-06Z" fill="white" />
           </svg>
         ) : (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M7 4.5v15l13-7.5-13-7.5Z" fill="#06090e" />
+          <svg width="34" height="37" viewBox="0 0 39.5 42.2501" fill="none" aria-hidden="true">
+            <path
+              d="M38.6991 23.4515C37.7271 27.1448 33.1333 29.7546 23.9458 34.9742C15.0641 40.0201 10.6233 42.543 7.04454 41.5289C5.56495 41.1096 4.21687 40.3133 3.12967 39.2164C0.5 36.5633 0.5 31.4172 0.5 21.125C0.5 10.8329 0.5 5.68681 3.12967 3.03367C4.21687 1.93677 5.56495 1.14047 7.04454 0.721198C10.6233 -0.292924 15.0641 2.23 23.9458 7.27584C33.1333 12.4955 37.7271 15.1053 38.6991 18.7986C39.1003 20.3231 39.1003 21.927 38.6991 23.4515Z"
+              fill="white"
+              stroke="white"
+              strokeLinejoin="round"
+            />
           </svg>
         )}
       </button>
@@ -156,7 +206,10 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
   const postButton = (
     <button
       type="button"
-      onClick={onOpenPostComposer}
+      onClick={(event) => {
+        event.stopPropagation();
+        onOpenPostComposer?.();
+      }}
       aria-label="Post a reel"
       className="absolute left-3 top-3 flex size-7 items-center justify-center rounded-full bg-brand-900 text-white shadow-md transition-transform hover:scale-105"
     >
@@ -168,15 +221,31 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
     // Full-screen, TikTok-style takeover — video fills the remaining
     // viewport below the pinned navbar/story bar, with the caption and
     // action rail overlaid directly on it instead of in separate columns.
+    // `100vh`, not `100dvh` — AppShell's own outer shell is `h-screen`
+    // (100vh), so matching that unit exactly is what makes this reel's
+    // height equal the real remaining flex space with no gap at the
+    // bottom; mixing viewport units here would under/overshoot it
+    // depending on whether the mobile browser's address bar is showing.
     return (
-      <div className={cn("relative h-[calc(100dvh-140px)] w-full overflow-hidden bg-black", className)}>
+      // `onClick` here, not just on the <video> — this is what makes tapping
+      // *anywhere* on the screen toggle playback (the gradient scrim and the
+      // caption's own empty space aren't the video element, so without this
+      // on the container, tapping them would do nothing). Every actual
+      // control below stops its click from bubbling here.
+      <div
+        onClick={togglePlayback}
+        className={cn("relative h-[calc(100vh-140px)] w-full overflow-hidden bg-black", className)}
+      >
         {videoEl}
         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent" />
         {progressBar}
         {postButton}
         {playButton}
 
-        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 pb-6">
+        <div
+          onClick={(event) => event.stopPropagation()}
+          className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 pb-6"
+        >
           <div className="flex min-w-0 flex-col items-start gap-2">
             <div className="flex items-center gap-[6px]">
               <div className="relative size-9 shrink-0 overflow-hidden rounded-full border border-white/40">
@@ -297,7 +366,10 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
             so one reel always fits on screen without vertical scrolling;
             width (and the grid row height other columns stretch to) follows
             from the 402:716 aspect ratio. */}
-        <div className="relative aspect-[402/716] h-[min(716px,calc(100vh-130px))] w-auto max-w-[402px] shrink-0 overflow-hidden rounded-[30px] bg-gray-100">
+        <div
+          onClick={togglePlayback}
+          className="relative aspect-[402/716] h-[min(716px,calc(100vh-130px))] w-auto max-w-[402px] shrink-0 overflow-hidden rounded-[30px] bg-gray-100"
+        >
           {videoEl}
           <div className="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-[#5433ff] to-[#20bdff]" />
           {progressBar}
