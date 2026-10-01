@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/Button";
-import { EmojiPicker } from "@/components/shared/EmojiPicker";
 import { FollowButton } from "@/components/shared/FollowButton";
 import { LikesBottomSheet } from "@/components/shared/LikesBottomSheet";
 import { MediaLoadError } from "@/components/shared/MediaLoadError";
 import { NavIcon } from "@/components/shared/NavIcon";
+import type { CommentAttachments } from "@/components/shared/CommentComposer";
 import { CommentsModal, DEFAULT_COMMENTS, type CommentItem } from "@/components/shared/PostComments";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Tooltip } from "@/components/shared/Tooltip";
@@ -89,18 +89,18 @@ interface PostCardProps {
   currentUserAvatarInitials?: string;
 }
 
-export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardProps) {
+export function PostCard({ post }: PostCardProps) {
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<CommentItem[]>(post.commentsList ?? DEFAULT_COMMENTS);
   const [commentDraft, setCommentDraft] = useState("");
   const [textExpanded, setTextExpanded] = useState(false);
   const mediaItems = getMediaItems(post);
 
-  const submitComment = () => {
+  const submitComment = ({ image, audio }: CommentAttachments) => {
     const text = commentDraft.trim();
-    if (!text) return;
+    if (!text && !image && !audio) return;
     setComments((current) => [
-      { id: `local-${Date.now()}`, authorName: "You", postedAt: "Just now", text },
+      { id: `local-${Date.now()}`, authorName: "You", postedAt: "Just now", text, image, audio },
       ...current,
     ]);
     setCommentDraft("");
@@ -122,7 +122,7 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
             // desktop keeps the caption above the image.
             <div className="flex w-full flex-col-reverse gap-[15px] sm:flex-col">
               {post.text && (
-                <div className="flex w-full items-end gap-0.5 text-sm leading-5">
+                <div className="flex w-full items-end gap-0.5 text-[12px] leading-5 sm:text-sm">
                   <p className={cn("min-w-0 flex-1 whitespace-pre-line text-[#1e293b]", !textExpanded && "line-clamp-4")}>
                     {renderWithHashtags(post.text)}
                   </p>
@@ -154,40 +154,12 @@ export function PostCard({ post, currentUserAvatarInitials = "SL" }: PostCardPro
 
       <PostStatsBar post={post} showComments={showComments} onToggleComments={() => setShowComments((v) => !v)} />
 
-      {post.showComposer && (
-        <div className="flex w-full items-center gap-2 rounded-3xl bg-gray-100 p-2">
-          <span className="flex size-[38px] shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">
-            {currentUserAvatarInitials}
-          </span>
-          <input
-            type="text"
-            value={commentDraft}
-            onChange={(event) => setCommentDraft(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") submitComment();
-            }}
-            placeholder="Add a comment"
-            className="min-w-0 flex-1 bg-transparent text-[11px] text-night-900/70 placeholder:text-night-900/40 focus:outline-none"
-          />
-          <EmojiPicker onSelect={(emoji) => setCommentDraft((current) => current + emoji)} />
-          <button
-            type="button"
-            aria-label="Send comment"
-            onClick={submitComment}
-            className="relative block size-[23px] shrink-0"
-          >
-            <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="23px" />
-          </button>
-        </div>
-      )}
-
       <CommentsModal
         open={showComments}
         comments={comments}
         commentDraft={commentDraft}
         setCommentDraft={setCommentDraft}
         submitComment={submitComment}
-        currentUserAvatarInitials={currentUserAvatarInitials}
         showComposer={post.showComposer ?? false}
         likeCount={post.likes}
         commentsCount={post.comments}
@@ -238,7 +210,7 @@ function PostHeader({ post }: { post: PostCardData }) {
           )}
         </span>
         <div className="flex flex-col items-start whitespace-nowrap">
-          <p className="text-[13px] font-bold text-brand-900">{post.authorName}</p>
+          <p className="text-[12px] font-bold text-brand-900 sm:text-[13px]">{post.authorName}</p>
           <p className="text-[9.5px] text-gray-500">
             {post.roleLine} <span className="font-medium">{post.postedAt}</span>
           </p>
@@ -556,7 +528,7 @@ function PollBody({ post }: { post: PostCardData }) {
       )}
 
       {post.question && (
-        <div className="flex w-full items-end gap-0.5 text-[13px] leading-5">
+        <div className="flex w-full items-end gap-0.5 text-[12px] leading-5 sm:text-[13px]">
           <p className={cn("min-w-0 flex-1 whitespace-pre-line text-[#1e293b]", !questionExpanded && "line-clamp-4")}>
             {post.question}{" "}
             {post.hashtags && <span className="font-semibold text-[#f088b6]">{post.hashtags}</span>}
@@ -585,7 +557,7 @@ function PollBody({ post }: { post: PostCardData }) {
                   onClick={() => handleVote(index)}
                   aria-pressed={voted}
                   aria-label={`Vote for ${option.label}`}
-                  className="flex w-full items-center justify-between text-[13px]"
+                  className="flex w-full items-center justify-between text-[12px] sm:text-[13px]"
                 >
                   <div
                     className={cn(
@@ -624,11 +596,11 @@ function PriceRow({ post }: { post: PostCardData }) {
   return (
     <div className="flex w-full items-center justify-between">
       <div className="flex flex-col gap-1 whitespace-nowrap text-gray-700">
-        <p className="text-[19px] font-semibold">
+        <p className="text-[16px] font-semibold sm:text-[19px]">
           {post.priceLine}
-          {post.priceSuffix && <span className="text-[10.5px] font-normal">{post.priceSuffix}</span>}
+          {post.priceSuffix && <span className="text-[9px] font-normal sm:text-[10.5px]">{post.priceSuffix}</span>}
         </p>
-        <p className="text-[13px] font-light">{post.subLine}</p>
+        <p className="text-[11px] font-light sm:text-[13px]">{post.subLine}</p>
       </div>
 
       {post.beds !== undefined && post.baths !== undefined ? (

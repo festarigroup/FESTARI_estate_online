@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { EmojiPicker } from "@/components/shared/EmojiPicker";
+import { CommentComposer, type CommentAttachments } from "@/components/shared/CommentComposer";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 import { renderWithHashtags } from "@/lib/hashtags";
@@ -16,6 +16,10 @@ export interface CommentItem {
   postedAt: string;
   text: string;
   likes?: number;
+  /** Object URL of an attached photo. */
+  image?: string;
+  /** Object URL of an attached voice note. */
+  audio?: string;
 }
 
 export const DEFAULT_COMMENTS: CommentItem[] = [
@@ -35,8 +39,7 @@ interface CommentsModalProps {
   comments: CommentItem[];
   commentDraft: string;
   setCommentDraft: (value: string) => void;
-  submitComment: () => void;
-  currentUserAvatarInitials: string;
+  submitComment: (attachments: CommentAttachments) => void;
   showComposer: boolean;
   likeCount: number;
   commentsCount: number;
@@ -56,7 +59,6 @@ export function CommentsModal({
   commentDraft,
   setCommentDraft,
   submitComment,
-  currentUserAvatarInitials,
   showComposer,
   likeCount: initialLikeCount,
   commentsCount,
@@ -87,30 +89,7 @@ export function CommentsModal({
   const body = (
     <>
       {showComposer && (
-        <div className="flex w-full items-center gap-2 rounded-3xl bg-gray-100 p-2">
-          <span className="flex size-[38px] shrink-0 items-center justify-center rounded-full bg-[#eef2ff] text-[13px] font-extrabold text-[#4f46e5]">
-            {currentUserAvatarInitials}
-          </span>
-          <input
-            type="text"
-            value={commentDraft}
-            onChange={(event) => setCommentDraft(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") submitComment();
-            }}
-            placeholder="Add a comment"
-            className="min-w-0 flex-1 bg-transparent text-[11px] text-night-900/70 placeholder:text-night-900/40 focus:outline-none"
-          />
-          <EmojiPicker onSelect={(emoji) => setCommentDraft(commentDraft + emoji)} side="bottom" />
-          <button
-            type="button"
-            aria-label="Send comment"
-            onClick={submitComment}
-            className="relative block size-[23px] shrink-0"
-          >
-            <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="23px" />
-          </button>
-        </div>
+        <CommentComposer draft={commentDraft} onDraftChange={setCommentDraft} onSubmit={submitComment} />
       )}
 
       <div className="flex w-full items-center justify-between px-2.5">
@@ -140,7 +119,7 @@ export function CommentsModal({
         </span>
       </div>
 
-      <div className="flex w-full flex-col items-center gap-[14px]">
+      <div className="flex w-full flex-col items-center">
         {comments.map((comment) => (
           <CommentRow key={comment.id} comment={comment} />
         ))}
@@ -218,35 +197,107 @@ export function CommentsModal({
   );
 }
 
-function CommentRow({ comment }: { comment: CommentItem }) {
+function CommentRow({ comment, isReply = false }: { comment: CommentItem; isReply?: boolean }) {
   const [expanded, setExpanded] = useState(false);
+  const [replying, setReplying] = useState(false);
+  const [replyDraft, setReplyDraft] = useState("");
+  const [replies, setReplies] = useState<CommentItem[]>([]);
+
+  const submitReply = () => {
+    const text = replyDraft.trim();
+    if (!text) return;
+    setReplies((prev) => [
+      ...prev,
+      { id: `${comment.id}-r${prev.length + 1}`, authorName: "You", postedAt: "Just now", text },
+    ]);
+    setReplyDraft("");
+    setReplying(false);
+  };
+
+  const avatarSize = isReply ? 36 : 50;
 
   return (
-    <div className="flex w-full items-start gap-[14px]">
-      <span className="relative block size-[47px] shrink-0 overflow-hidden rounded-full bg-[#eef2ff]">
-        {comment.avatar ? (
-          <Image src={comment.avatar} alt={comment.authorName} fill className="object-cover" sizes="47px" />
-        ) : (
-          <span className="absolute left-1/2 top-1/2 block size-6 -translate-x-1/2 -translate-y-1/2">
-            <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="24px" />
-          </span>
-        )}
-      </span>
-      <div className="flex min-w-0 flex-1 flex-col items-start gap-1.5">
-        <div className="flex w-full items-start justify-between gap-2">
-          <p className="text-[13px] font-bold text-brand-900">{comment.authorName}</p>
-          <p className="shrink-0 text-[9.5px] text-gray-500">{comment.postedAt}</p>
+    <div className="flex w-full flex-col">
+      <div className="flex w-full items-start gap-[15px] py-2.5">
+        <span
+          className="relative block shrink-0 overflow-hidden rounded-full bg-[#eef2ff]"
+          style={{ width: avatarSize, height: avatarSize }}
+        >
+          {comment.avatar ? (
+            <Image src={comment.avatar} alt={comment.authorName} fill className="object-cover" sizes={`${avatarSize}px`} />
+          ) : (
+            <span className="absolute left-1/2 top-1/2 block size-6 -translate-x-1/2 -translate-y-1/2">
+              <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="24px" />
+            </span>
+          )}
+        </span>
+        <div className="flex min-w-0 flex-1 flex-col items-start">
+          <div className="flex w-full items-start justify-between gap-2">
+            <p className="text-[14px] font-bold text-brand-900">{comment.authorName}</p>
+            <p className="mt-0.5 shrink-0 font-rubik text-[10px] font-medium leading-5 text-[#646464]">
+              {comment.postedAt}
+            </p>
+          </div>
+          <div className="flex w-full items-end gap-1 font-rubik text-[14px] leading-[1.5] text-[#646464]">
+            <p className={cn("min-w-0 flex-1 whitespace-pre-line", !expanded && "line-clamp-4")}>
+              {renderWithHashtags(comment.text)}
+            </p>
+            <button type="button" onClick={() => setExpanded((v) => !v)} className="shrink-0 text-[11px] font-bold text-gray-400">
+              {expanded ? "less" : "more"}
+            </button>
+          </div>
+          {comment.image && (
+            <span className="relative my-1 block h-40 w-full max-w-[240px] overflow-hidden rounded-xl bg-gray-100">
+              <Image src={comment.image} alt="Photo attached to comment" fill unoptimized className="object-cover" sizes="240px" />
+            </span>
+          )}
+          {comment.audio && <audio controls src={comment.audio} className="my-1 h-8 w-full max-w-[240px]" />}
+          <div className="flex items-center gap-[15px]">
+            <CommentLikeButton initialLikes={comment.likes ?? 0} />
+            {!isReply && (
+              <button
+                type="button"
+                aria-expanded={replying}
+                onClick={() => setReplying((v) => !v)}
+                className="text-[10px] font-bold leading-[18px] text-brand-900"
+              >
+                Reply
+              </button>
+            )}
+          </div>
         </div>
-        <div className="flex w-full items-end gap-1 text-[13px] leading-[1.5]">
-          <p className={cn("min-w-0 flex-1 whitespace-pre-line text-gray-600", !expanded && "line-clamp-4")}>
-            {renderWithHashtags(comment.text)}
-          </p>
-          <button type="button" onClick={() => setExpanded((v) => !v)} className="shrink-0 text-[11px] font-bold text-gray-400">
-            {expanded ? "less" : "more"}
-          </button>
-        </div>
-        <CommentLikeButton initialLikes={comment.likes ?? 0} />
       </div>
+
+      {(replies.length > 0 || replying) && (
+        <div className="ml-[65px] flex flex-col">
+          {replies.map((reply) => (
+            <CommentRow key={reply.id} comment={reply} isReply />
+          ))}
+          {replying && (
+            <div className="flex w-full items-center gap-2 rounded-3xl bg-gray-100 p-2">
+              <input
+                type="text"
+                autoFocus
+                value={replyDraft}
+                onChange={(event) => setReplyDraft(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") submitReply();
+                }}
+                placeholder={`Reply to ${comment.authorName}`}
+                className="min-w-0 flex-1 bg-transparent px-2 text-[11px] text-night-900/70 placeholder:text-night-900/40 focus:outline-none"
+              />
+              <button
+                type="button"
+                aria-label="Send reply"
+                onClick={submitReply}
+                className="relative block size-[23px] shrink-0"
+              >
+                <Image src="/icons/send-alt-filled.svg" alt="" fill sizes="23px" />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -254,6 +305,7 @@ function CommentRow({ comment }: { comment: CommentItem }) {
 function CommentLikeButton({ initialLikes }: { initialLikes: number }) {
   const [liked, setLiked] = useState(false);
   const likeCount = initialLikes + (liked ? 1 : 0);
+  const filled = liked || likeCount > 0;
 
   return (
     <button
@@ -265,15 +317,15 @@ function CommentLikeButton({ initialLikes }: { initialLikes: number }) {
     >
       <NavIcon
         key={liked ? "liked" : "unliked"}
-        icon={liked ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
+        icon={filled ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
         color="brand"
-        size={11}
-        className={liked ? "bg-[#ef575f] animate-like-pop" : "bg-gray-400"}
+        size={14}
+        className={cn(filled ? "bg-[#ea5e9c]" : "bg-gray-400", liked && "animate-like-pop")}
       />
       {likeCount > 0 ? (
-        <span className={cn("text-[9.5px] font-bold", liked ? "text-[#ef575f]" : "text-brand-900")}>{likeCount}</span>
+        <span className="font-rubik text-[10px] font-bold uppercase text-brand-900">{likeCount}</span>
       ) : (
-        <span className="text-[9.5px] font-bold text-gray-400">Like</span>
+        <span className="text-[10px] font-bold text-gray-400">Like</span>
       )}
     </button>
   );

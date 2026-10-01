@@ -116,7 +116,7 @@ export function TrustedListingsBanner() {
     <div className="fixed inset-x-0 top-[76px] z-[90] flex justify-center px-4 sm:top-[88px]">
       <div
         className={cn(
-          "w-full max-w-[420px] overflow-hidden rounded-2xl bg-amber-100 p-[3px] shadow-[0px_12px_32px_-8px_rgba(0,0,0,0.2)]",
+          "w-full max-w-[420px] overflow-hidden sm:max-w-3xl rounded-2xl bg-amber-100 p-[3px] shadow-[0px_12px_32px_-8px_rgba(0,0,0,0.2)]",
           closing ? "animate-leave" : "animate-enter",
         )}
       >

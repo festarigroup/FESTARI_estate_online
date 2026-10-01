@@ -14,6 +14,10 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-plus-jakarta-sans);
   --font-display: var(--font-plus-jakarta-sans);
+  --font-inter: var(--font-inter-face);
+  --font-lexend: var(--font-lexend-face);
+  --font-onest: var(--font-onest-face);
+  --font-rubik: var(--font-rubik-face);
 
   /* Matches the Figma desktop frame width (1440px) where the full
      3-column feed layout (sidebar + content + right rail) fits. */
