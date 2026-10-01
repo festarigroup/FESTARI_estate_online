@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { showErrorToast } from "@/components/shared/AppToast";
 import { EmojiPicker } from "@/components/shared/EmojiPicker";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { cn } from "@/lib/utils";
@@ -12,6 +13,8 @@ export interface CommentAttachments {
   /** Object URL of a recorded voice note. */
   audio?: string;
 }
+
+const IMAGE_ACCEPT = ["image/png", "image/jpeg", "image/gif", "image/webp"];
 
 interface CommentComposerProps {
   draft: string;
@@ -25,47 +28,77 @@ function formatClock(totalSeconds: number) {
 }
 
 /** The "Add a comment" bar shown in the comments sheet/modal: text, emoji,
- * a photo attachment and a recorded voice note. */
+ * a photo attachment and a recorded voice note.
+ *
+ * Object-URL lifecycle: the image preview is derived from the selected
+ * `File` via `useMemo`, and a paired cleanup effect revokes it whenever it
+ * changes or the composer unmounts — unless it's been handed off to
+ * `onSubmit`, in which case `handedOffRef` marks it as now owned by the
+ * posted comment (mirrors the pattern in PostStoryModal). This closes the
+ * leak the previous version had: it created object URLs ad hoc and only
+ * ever revoked them on explicit removal, never on unmount or after a
+ * successful submit. */
 export function CommentComposer({ draft, onDraftChange, onSubmit }: CommentComposerProps) {
-  const [attachments, setAttachments] = useState<CommentAttachments>({});
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | undefined>(undefined);
+  const handedOffRef = useRef<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const recorder = useVoiceRecorder({
-    onRecorded: (audio) => setAttachments((current) => ({ ...current, audio })),
-  });
+  const imagePreview = useMemo(() => (imageFile ? URL.createObjectURL(imageFile) : undefined), [imageFile]);
 
-  const canSend =
-    !recorder.isRecording && (draft.trim().length > 0 || !!attachments.image || !!attachments.audio);
+  useEffect(() => {
+    if (!imagePreview) return;
+    return () => {
+      if (!handedOffRef.current.has(imagePreview)) URL.revokeObjectURL(imagePreview);
+    };
+  }, [imagePreview]);
+
+  useEffect(() => {
+    if (!audioUrl) return;
+    return () => {
+      if (!handedOffRef.current.has(audioUrl)) URL.revokeObjectURL(audioUrl);
+    };
+  }, [audioUrl]);
+
+  const recorder = useVoiceRecorder({ onRecorded: setAudioUrl });
+
+  const canSend = !recorder.isRecording && (draft.trim().length > 0 || !!imagePreview || !!audioUrl);
 
   const removeAttachment = (kind: keyof CommentAttachments) => {
-    const url = attachments[kind];
-    if (url) URL.revokeObjectURL(url);
-    setAttachments((current) => ({ ...current, [kind]: undefined }));
+    if (kind === "image") setImageFile(null);
+    else setAudioUrl(undefined);
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
-    if (!file || !file.type.startsWith("image/")) return;
-    if (attachments.image) URL.revokeObjectURL(attachments.image);
-    setAttachments((current) => ({ ...current, image: URL.createObjectURL(file) }));
+    if (!file) return;
+    if (!IMAGE_ACCEPT.includes(file.type)) {
+      showErrorToast("Only PNG, JPEG, GIF or WEBP images are supported");
+      return;
+    }
+    setImageFile(file);
   };
 
   const submit = () => {
     if (!canSend) return;
-    onSubmit(attachments);
-    // The submitted comment now owns these URLs, so don't revoke them.
-    setAttachments({});
+    // Mark these as owned by the comment being posted before clearing local
+    // state, so the cleanup effects above skip revoking them.
+    if (imagePreview) handedOffRef.current.add(imagePreview);
+    if (audioUrl) handedOffRef.current.add(audioUrl);
+    onSubmit({ image: imagePreview, audio: audioUrl });
+    setImageFile(null);
+    setAudioUrl(undefined);
   };
 
   return (
     <div className="flex w-full flex-col gap-2 rounded-3xl bg-gray-100 p-2">
-      {(attachments.image || attachments.audio) && (
+      {(imagePreview || audioUrl) && (
         <div className="flex flex-wrap items-center gap-2 px-1 pt-1">
-          {attachments.image && (
+          {imagePreview && (
             <div className="relative size-16 shrink-0">
               <Image
-                src={attachments.image}
+                src={imagePreview}
                 alt="Attached photo"
                 fill
                 unoptimized
@@ -75,9 +108,9 @@ export function CommentComposer({ draft, onDraftChange, onSubmit }: CommentCompo
               <RemoveButton label="Remove photo" onClick={() => removeAttachment("image")} />
             </div>
           )}
-          {attachments.audio && (
+          {audioUrl && (
             <div className="relative flex min-w-0 items-center rounded-full bg-white py-1 pl-1 pr-3">
-              <audio controls src={attachments.audio} className="h-8 w-[200px] max-w-full" />
+              <audio controls src={audioUrl} className="h-8 w-[200px] max-w-full" />
               <RemoveButton label="Remove voice note" onClick={() => removeAttachment("audio")} />
             </div>
           )}
@@ -151,7 +184,8 @@ export function CommentComposer({ draft, onDraftChange, onSubmit }: CommentCompo
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept={IMAGE_ACCEPT.join(",")}
+          aria-label="Attach a photo"
           className="hidden"
           onChange={handleFileChange}
         />

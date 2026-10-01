@@ -197,7 +197,10 @@ export function CommentsModal({
   );
 }
 
-function CommentRow({ comment, isReply = false }: { comment: CommentItem; isReply?: boolean }) {
+/** Exported so other comment UIs that want the same full-size row (avatar,
+ * name, timestamp, text, attachments, like/reply) can reuse it — e.g.
+ * Discover's mobile comment sheet — instead of rebuilding it. */
+export function CommentRow({ comment, isReply = false }: { comment: CommentItem; isReply?: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const [replying, setReplying] = useState(false);
   const [replyDraft, setReplyDraft] = useState("");
@@ -302,7 +305,9 @@ function CommentRow({ comment, isReply = false }: { comment: CommentItem; isRepl
   );
 }
 
-function CommentLikeButton({ initialLikes }: { initialLikes: number }) {
+/** Exported so other compact comment UIs (e.g. Discover's comment panel)
+ * can reuse the exact same like-toggle visuals instead of rebuilding them. */
+export function CommentLikeButton({ initialLikes }: { initialLikes: number }) {
   const [liked, setLiked] = useState(false);
   const likeCount = initialLikes + (liked ? 1 : 0);
   const filled = liked || likeCount > 0;

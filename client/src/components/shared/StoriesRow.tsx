@@ -10,17 +10,17 @@ import { cn } from "@/lib/utils";
 import { STORIES } from "@/lib/dummy-stories";
 import { PostStoryModal, type PostedStory } from "@/components/shared/PostStoryModal";
 
-const RING_GRADIENT =
+export const RING_GRADIENT =
   "linear-gradient(45deg, #f09433 0%, #e6643c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)";
 
-const STORY_LIFETIME_MS = 24 * 60 * 60 * 1000;
+export const STORY_LIFETIME_MS = 24 * 60 * 60 * 1000;
 
-interface MyStory extends PostedStory {
+export interface MyStory extends PostedStory {
   id: string;
   postedAt: number;
 }
 
-function makeStoryId() {
+export function makeStoryId() {
   return typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `story-${Date.now()}`;
 }
 
@@ -147,7 +147,11 @@ function StoryItem({
   );
 }
 
-function MyStoryViewer({
+/** Full-screen viewer for the signed-in user's own posted stories — shared
+ * by any "your story" entry point (the home dashboard's `StoriesRow` and
+ * Discover's vertical `DiscoverStoryRail`) so the posting/viewing mechanics
+ * stay identical wherever a story avatar appears. */
+export function MyStoryViewer({
   stories,
   initialIndex,
   onClose,

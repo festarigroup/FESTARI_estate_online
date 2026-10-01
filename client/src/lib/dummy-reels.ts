@@ -1,0 +1,81 @@
+export interface DiscoverReel {
+  id: string;
+  authorName: string;
+  authorAvatar: string;
+  verified: boolean;
+  following: boolean;
+  caption: string;
+  /** Looping background clip (CC0 sample footage) — shown instead of a
+   * static poster so the reel actually plays like a reel. */
+  video: string;
+  /** Shown while the video's first frame loads. */
+  poster: string;
+  likes: number;
+  comments: number;
+  shares: number;
+  reposts: number;
+  saves: number;
+}
+
+export const DISCOVER_REELS: DiscoverReel[] = [
+  {
+    id: "reel-1",
+    authorName: "Andy Ansong",
+    authorAvatar: "/images/avatar-kasapa.png",
+    verified: true,
+    following: true,
+    caption: "Walkthrough of a newly listed 4-bedroom in East Legon — every room gets natural light all day. (More)",
+    video: "/videos/reel-flower.mp4",
+    poster: "/images/post-property-living-room.jpg",
+    likes: 42000,
+    comments: 21000,
+    shares: 42000,
+    reposts: 2000,
+    saves: 1000,
+  },
+  {
+    id: "reel-2",
+    authorName: "Golden Palm Estates",
+    authorAvatar: "/images/avatar-golden-palm.png",
+    verified: true,
+    following: false,
+    caption: "Rooftop pool views at our newest hotel listing — book a tour this week. (More)",
+    video: "/videos/reel-friday.mp4",
+    poster: "/images/post-hotel-pool.jpg",
+    likes: 18400,
+    comments: 3200,
+    shares: 5600,
+    reposts: 640,
+    saves: 2100,
+  },
+  {
+    id: "reel-3",
+    authorName: "Kasapa Builders",
+    authorAvatar: "/images/avatar-generic.png",
+    verified: false,
+    following: false,
+    caption: "Foundation to finish in 90 days — timelapse of our latest build in Spintex. (More)",
+    video: "/videos/reel-flower.mp4",
+    poster: "/images/post-building-01.jpg",
+    likes: 9800,
+    comments: 1100,
+    shares: 760,
+    reposts: 210,
+    saves: 540,
+  },
+  {
+    id: "reel-4",
+    authorName: "Andy Ansong",
+    authorAvatar: "/images/avatar-kasapa.png",
+    verified: true,
+    following: true,
+    caption: "Kitchen renovation reveal — swipe for the before shots. (More)",
+    video: "/videos/reel-friday.mp4",
+    poster: "/images/post-property-kitchen.jpg",
+    likes: 27600,
+    comments: 4300,
+    shares: 1900,
+    reposts: 380,
+    saves: 980,
+  },
+];

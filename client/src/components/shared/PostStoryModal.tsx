@@ -8,7 +8,7 @@ import { NavIcon } from "@/components/shared/NavIcon";
 import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 import { cn } from "@/lib/utils";
 
-const MEDIA_ACCEPT = [
+const STORY_MEDIA_ACCEPT = [
   "image/png",
   "image/jpeg",
   "image/gif",
@@ -18,6 +18,8 @@ const MEDIA_ACCEPT = [
   "video/quicktime",
   "video/webm",
 ];
+
+export const VIDEO_ONLY_ACCEPT = ["video/mp4", "video/x-matroska", "video/x-msvideo", "video/quicktime", "video/webm"];
 
 export interface PostedStory {
   url: string;
@@ -29,12 +31,32 @@ interface PostStoryModalProps {
   open: boolean;
   onClose: () => void;
   onPost: (story: PostedStory) => void;
+  /** Lets callers reuse this composer for a differently-labeled single-media
+   * post (e.g. Discover's "Post a Reel") instead of duplicating the whole
+   * modal just to change copy/accepted file types. Defaults keep the
+   * original "add to your story" behavior for existing callers. */
+  title?: string;
+  ctaLabel?: string;
+  accept?: string[];
+  dropHint?: string;
+  missingMediaError?: string;
+  postedMessage?: string;
 }
 
 /** Single-image/video "add to your story" composer — a lighter-weight
  * sibling of CreatePostModal, since a story is just one piece of media plus
  * an optional caption rather than a full post. */
-export function PostStoryModal({ open, onClose, onPost }: PostStoryModalProps) {
+export function PostStoryModal({
+  open,
+  onClose,
+  onPost,
+  title = "Add to your Story",
+  ctaLabel = "Share to Story",
+  accept = STORY_MEDIA_ACCEPT,
+  dropHint = "PNG, JPEG, GIF, MP4, MKV, AVI",
+  missingMediaError = "Add a photo or video for your story",
+  postedMessage = "Your story has been posted",
+}: PostStoryModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [caption, setCaption] = useState("");
   const [dragActive, setDragActive] = useState(false);
@@ -76,8 +98,8 @@ export function PostStoryModal({ open, onClose, onPost }: PostStoryModalProps) {
   function pickFile(list: FileList | null) {
     const picked = list?.[0];
     if (!picked) return;
-    if (!MEDIA_ACCEPT.includes(picked.type)) {
-      showErrorToast("Only PNG, JPEG, GIF, MP4, MKV or AVI files are supported");
+    if (!accept.includes(picked.type)) {
+      showErrorToast(`Only ${dropHint} files are supported`);
       return;
     }
     setFile(picked);
@@ -101,12 +123,12 @@ export function PostStoryModal({ open, onClose, onPost }: PostStoryModalProps) {
 
   function handlePost() {
     if (!preview) {
-      showErrorToast("Add a photo or video for your story");
+      showErrorToast(missingMediaError);
       return;
     }
     handedOffUrlRef.current = preview.url;
     onPost({ url: preview.url, isVideo: preview.isVideo, caption: caption.trim() || undefined });
-    showSuccessToast("Your story has been posted");
+    showSuccessToast(postedMessage);
     resetState();
     onClose();
   }
@@ -117,7 +139,7 @@ export function PostStoryModal({ open, onClose, onPost }: PostStoryModalProps) {
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
-      aria-label="Add to your story"
+      aria-label={title}
     >
       <div onClick={(event) => event.stopPropagation()} className="relative w-full sm:max-w-[420px]">
         <button
@@ -150,18 +172,18 @@ export function PostStoryModal({ open, onClose, onPost }: PostStoryModalProps) {
                 <path d="M10 4V16M10 16L4 10M10 16L16 10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
-            <p className="flex-1 text-center text-lg font-bold tracking-[-0.54px] text-black">Add to your Story</p>
+            <p className="flex-1 text-center text-lg font-bold tracking-[-0.54px] text-black">{title}</p>
             <span className="size-6 shrink-0" aria-hidden />
           </div>
 
           <p className="hidden text-lg font-semibold leading-6 tracking-[-0.36px] text-[#111826] sm:block">
-            Add to your Story
+            {title}
           </p>
 
           <input
             ref={inputRef}
             type="file"
-            accept={MEDIA_ACCEPT.join(",")}
+            accept={accept.join(",")}
             className="hidden"
             onChange={(event) => pickFile(event.target.files)}
           />
@@ -218,7 +240,7 @@ export function PostStoryModal({ open, onClose, onPost }: PostStoryModalProps) {
                 Choose files
                 <NavIcon icon="/icons/create-menu-upload-arrow.svg" color="night" className="bg-[#19161d]" size={16} />
               </button>
-              <p className="text-[11px] text-[#86888a]">PNG, JPEG, GIF, MP4, MKV, AVI</p>
+              <p className="text-[11px] text-[#86888a]">{dropHint}</p>
             </div>
           )}
 
@@ -227,7 +249,7 @@ export function PostStoryModal({ open, onClose, onPost }: PostStoryModalProps) {
             onClick={handlePost}
             className="flex h-12 w-full shrink-0 items-center justify-center rounded-full bg-brand-900 text-sm font-medium text-white hover:bg-brand-900/90"
           >
-            Share to Story
+            {ctaLabel}
           </button>
         </div>
       </div>
