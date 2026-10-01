@@ -1,11 +1,13 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { FollowButton } from "@/components/shared/FollowButton";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { Tooltip } from "@/components/shared/Tooltip";
+import { DISCOVER_TABS, type DiscoverTab } from "@/components/shared/DiscoverTopBar";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { comingSoonHref } from "@/lib/coming-soon";
@@ -22,6 +24,19 @@ interface DiscoverReelCardProps {
   /** Opens the "Post a Reel" composer (see discover/page.tsx) instead of
    * routing to a coming-soon screen. */
   onOpenPostComposer?: () => void;
+  /** Drives the mobile in-video "Reels ⌄" filter dropdown (Figma reference:
+   * tabs live behind a dropdown on mobile instead of DiscoverTopBar's
+   * horizontal row, which is hidden below `xl:` entirely). */
+  activeTab?: DiscoverTab;
+  onTabChange?: (tab: DiscoverTab) => void;
+}
+
+interface LikeParticle {
+  id: number;
+  x: number;
+  rotate: number;
+  scale: number;
+  delay: number;
 }
 
 function formatCount(value: number): string {
@@ -29,7 +44,14 @@ function formatCount(value: number): string {
   return String(value);
 }
 
-export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostComposer }: DiscoverReelCardProps) {
+export function DiscoverReelCard({
+  reel,
+  className,
+  onOpenComments,
+  onOpenPostComposer,
+  activeTab,
+  onTabChange,
+}: DiscoverReelCardProps) {
   // JS-driven, not CSS `xl:hidden`/`hidden xl:grid` — the two layouts below
   // each embed their own <video>, and CSS-only dual-mounting would create
   // two real <video> elements sharing one ref/one autoplay cycle at once
@@ -45,7 +67,41 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
   const [expanded, setExpanded] = useState(false);
   const [progress, setProgress] = useState(0);
   const [shareCount, setShareCount] = useState(reel.shares);
+  const [likeParticles, setLikeParticles] = useState<LikeParticle[]>([]);
+  const [tabMenuOpen, setTabMenuOpen] = useState(false);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const likeParticleIdRef = useRef(0);
+
+  // TikTok/Instagram-style reaction: liking the reel (not unliking it) sends
+  // up a small shower of hearts drifting from the center of the video,
+  // staggered and slow, rather than a single instant pop — closer to how
+  // every other reels feed actually "feels" when you like one. Each particle
+  // removes itself from state via its own `onAnimationComplete`, so there's
+  // no shared timer to leak or race against fast repeat taps.
+  function toggleLike() {
+    setLiked((current) => {
+      const next = !current;
+      if (next && !prefersReducedMotion) {
+        const batch: LikeParticle[] = Array.from({ length: 7 }, () => {
+          likeParticleIdRef.current += 1;
+          return {
+            id: likeParticleIdRef.current,
+            x: Math.random() * 120 - 60,
+            rotate: Math.random() * 50 - 25,
+            scale: 0.75 + Math.random() * 0.55,
+            delay: Math.random() * 0.5,
+          };
+        });
+        setLikeParticles((current2) => [...current2, ...batch]);
+      }
+      return next;
+    });
+  }
+
+  function removeLikeParticle(id: number) {
+    setLikeParticles((current) => current.filter((particle) => particle.id !== id));
+  }
 
   function handleShare() {
     shareContent({
@@ -149,6 +205,27 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
     />
   );
 
+  const likeBurst = (
+    <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
+      <AnimatePresence>
+        {likeParticles.map((particle) => (
+          <motion.div
+            key={particle.id}
+            initial={{ opacity: 0, x: particle.x, y: 0, scale: particle.scale * 0.4, rotate: particle.rotate }}
+            animate={{ opacity: [0, 1, 1, 0], y: -260, scale: particle.scale }}
+            transition={{ duration: 2, delay: particle.delay, ease: "easeOut", times: [0, 0.12, 0.7, 1] }}
+            onAnimationComplete={() => removeLikeParticle(particle.id)}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          >
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="#ef575f" aria-hidden="true" className="drop-shadow-[0_3px_8px_rgba(0,0,0,0.35)]">
+              <path d="M12 21s-6.72-4.35-9.33-8.3C1.02 10.1 1.42 6.6 4.2 4.9c2.26-1.4 5.1-0.9 6.73 1.1L12 7.5l1.07-1.5c1.63-2 4.47-2.5 6.73-1.1 2.78 1.7 3.18 5.2 1.33 7.8C18.72 16.65 12 21 12 21z" />
+            </svg>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+
   const progressBar = (
     <div
       role="slider"
@@ -211,36 +288,170 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
         onOpenPostComposer?.();
       }}
       aria-label="Post a reel"
-      className="absolute left-3 top-3 flex size-7 items-center justify-center rounded-full bg-brand-900 text-white shadow-md transition-transform hover:scale-105"
+      // Desktop only — mobile's equivalent button lives inline in the
+      // in-video overlay header instead of floating absolutely (see the
+      // mobile branch below), since that header already reserves this exact
+      // top-left corner.
+      className="absolute left-3 top-3 flex size-7 items-center justify-center rounded-[16px] bg-gradient-to-r from-[#5433ff] to-[#20bdff] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)] transition-transform hover:scale-105"
     >
-      <span className="text-[16px] leading-none">+</span>
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M6 0.5V11.5M0.5 6H11.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
     </button>
   );
 
   if (isMobile) {
-    // Full-screen, TikTok-style takeover — video fills the remaining
-    // viewport below the pinned navbar/story bar, with the caption and
-    // action rail overlaid directly on it instead of in separate columns.
+    // Full-screen, TikTok/Reels-style takeover — no app chrome at all above
+    // it (DiscoverTopBar and the story rail are hidden entirely below `xl:`,
+    // see DiscoverTopBar.tsx), so the video is the only thing on screen; the
+    // back/filter/more controls that would normally live in a navbar are
+    // instead a transparent overlay floating on top of the video itself.
     // `100vh`, not `100dvh` — AppShell's own outer shell is `h-screen`
     // (100vh), so matching that unit exactly is what makes this reel's
-    // height equal the real remaining flex space with no gap at the
-    // bottom; mixing viewport units here would under/overshoot it
-    // depending on whether the mobile browser's address bar is showing.
+    // height equal the full viewport with no gap at the bottom; mixing
+    // viewport units here would under/overshoot it depending on whether the
+    // mobile browser's address bar is showing.
     return (
       // `onClick` here, not just on the <video> — this is what makes tapping
       // *anywhere* on the screen toggle playback (the gradient scrim and the
       // caption's own empty space aren't the video element, so without this
       // on the container, tapping them would do nothing). Every actual
       // control below stops its click from bubbling here.
-      <div
-        onClick={togglePlayback}
-        className={cn("relative h-[calc(100vh-140px)] w-full overflow-hidden bg-black", className)}
-      >
+      <div onClick={togglePlayback} className={cn("relative h-screen w-full overflow-hidden bg-black", className)}>
         {videoEl}
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/60 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent" />
+        {likeBurst}
         {progressBar}
-        {postButton}
         {playButton}
+
+        {/* `sticky`, not `fixed` — this reel's own wrapper is exactly one
+            viewport tall and is what the scroll-snap stack aligns to, so a
+            sticky child pins to the top of the screen for exactly as long as
+            *this* reel is the one in view, then hands off to the next reel's
+            own header as the user swipes past — no global/lifted state or
+            scroll-position tracking needed, and each header still reads the
+            right reel's own save/repost state. */}
+        <div
+          onClick={(event) => event.stopPropagation()}
+          className="sticky top-0 z-30 flex items-center justify-between px-4 pb-2 pt-[max(14px,env(safe-area-inset-top))]"
+        >
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onOpenPostComposer?.();
+            }}
+            aria-label="Post a reel"
+            className="flex size-9 items-center justify-center rounded-[16px] bg-gradient-to-r from-[#5433ff] to-[#20bdff] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
+          >
+            <svg width="14" height="14" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M6 0.5V11.5M0.5 6H11.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
+
+          <div className="relative">
+            <button
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={tabMenuOpen}
+              onClick={() => setTabMenuOpen((v) => !v)}
+              className="flex items-center gap-1 text-[16px] font-bold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)]"
+            >
+              Reels
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" className={cn("transition-transform", tabMenuOpen && "rotate-180")}>
+                <path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+
+            {tabMenuOpen && (
+              <>
+                <div className="fixed inset-0 z-20" onClick={() => setTabMenuOpen(false)} />
+                <div className="absolute left-1/2 top-full z-30 mt-2 w-[180px] -translate-x-1/2 rounded-[16px] border border-white/15 bg-black/35 p-1.5 shadow-[0px_12px_30px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+                  {DISCOVER_TABS.map((tab) => (
+                    <button
+                      key={tab}
+                      type="button"
+                      onClick={() => {
+                        onTabChange?.(tab);
+                        setTabMenuOpen(false);
+                      }}
+                      className={cn(
+                        "block w-full rounded-[10px] px-3 py-2 text-left text-[13px] font-medium",
+                        tab === activeTab ? "bg-white/25 text-white" : "text-white/85 hover:bg-white/10",
+                      )}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="relative">
+            <button
+              type="button"
+              aria-label="More options"
+              aria-haspopup="menu"
+              aria-expanded={moreMenuOpen}
+              onClick={() => setMoreMenuOpen((v) => !v)}
+              className="flex size-9 items-center justify-center"
+            >
+              <NavIcon icon="/icons/more-horizontal.svg" color="white" size={22} />
+            </button>
+
+            {moreMenuOpen && (
+              <>
+                <div className="fixed inset-0 z-20" onClick={() => setMoreMenuOpen(false)} />
+                <div className="absolute right-0 top-full z-30 mt-2 w-[170px] rounded-[16px] border border-white/15 bg-black/35 p-1.5 text-white/85 shadow-[0px_12px_30px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+                  <Link
+                    href={comingSoonHref("Repost")}
+                    onClick={() => setMoreMenuOpen(false)}
+                    className="flex items-center gap-2.5 rounded-[10px] px-3 py-2 text-[13px] font-medium hover:bg-white/10"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M7 7h8a3 3 0 0 1 3 3v2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                      <path d="M10 4 7 7l3 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M17 17H9a3 3 0 0 1-3-3v-2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                      <path d="M14 20l3-3-3-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    Repost
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSaved((v) => !v);
+                      setMoreMenuOpen(false);
+                    }}
+                    className="flex w-full items-center gap-2.5 rounded-[10px] px-3 py-2 text-left text-[13px] font-medium hover:bg-white/10"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" className={saved ? "text-brand-300" : undefined}>
+                      <path
+                        d="M5 4.6C5 3.84575 5 3.46863 5.23431 3.23431C5.46863 3 5.84575 3 6.6 3H17.4C18.1542 3 18.5314 3 18.7657 3.23431C19 3.46863 19 3.84575 19 4.6V19.4454C19 20.1263 19 20.4667 18.783 20.5784C18.5661 20.69 18.289 20.4922 17.735 20.0964L12.93 16.6643C12.4809 16.3435 12.2564 16.1831 12 16.1831C11.7436 16.1831 11.5191 16.3435 11.07 16.6643L6.26499 20.0964C5.71095 20.4922 5.43393 20.69 5.21697 20.5784C5 20.4667 5 20.1263 5 19.4454V4.6Z"
+                        fill={saved ? "currentColor" : "none"}
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                      />
+                    </svg>
+                    {saved ? "Saved" : "Save"}
+                  </button>
+                  <Link
+                    href={comingSoonHref("Reel Options")}
+                    onClick={() => setMoreMenuOpen(false)}
+                    className="flex items-center gap-2.5 rounded-[10px] px-3 py-2 text-[13px] font-medium hover:bg-white/10"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M12 9v4M12 16.5h.01" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.6" />
+                    </svg>
+                    Report
+                  </Link>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
 
         <div
           onClick={(event) => event.stopPropagation()}
@@ -262,7 +473,7 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
           </div>
 
           <div className="flex shrink-0 flex-col items-center gap-[18px] pb-1">
-            <button type="button" onClick={() => setLiked((v) => !v)} aria-pressed={liked} aria-label={`${formatCount(likeCount)} likes`} className="flex flex-col items-center gap-1">
+            <button type="button" onClick={toggleLike} aria-pressed={liked} aria-label={`${formatCount(likeCount)} likes`} className="flex flex-col items-center gap-1">
               <NavIcon
                 icon={liked ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
                 color="white"
@@ -287,36 +498,6 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
                 {formatCount(shareCount)}
               </span>
             </button>
-
-            <Link href={comingSoonHref("Repost")} aria-label={`${formatCount(reel.reposts)} reposts`} className="flex flex-col items-center gap-1 text-white">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
-                <path d="M7 7h8a3 3 0 0 1 3 3v2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                <path d="M10 4 7 7l3 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M17 17H9a3 3 0 0 1-3-3v-2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                <path d="M14 20l3-3-3-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="text-[11px] font-bold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)]">
-                {formatCount(reel.reposts)}
-              </span>
-            </Link>
-
-            <button type="button" onClick={() => setSaved((v) => !v)} aria-pressed={saved} aria-label={`${formatCount(saveCount)} saves`} className="flex flex-col items-center gap-1">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true" className={cn(saved ? "text-brand-300" : "text-white", "drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]")}>
-                <path
-                  d="M5 4.6C5 3.84575 5 3.46863 5.23431 3.23431C5.46863 3 5.84575 3 6.6 3H17.4C18.1542 3 18.5314 3 18.7657 3.23431C19 3.46863 19 3.84575 19 4.6V19.4454C19 20.1263 19 20.4667 18.783 20.5784C18.5661 20.69 18.289 20.4922 17.735 20.0964L12.93 16.6643C12.4809 16.3435 12.2564 16.1831 12 16.1831C11.7436 16.1831 11.5191 16.3435 11.07 16.6643L6.26499 20.0964C5.71095 20.4922 5.43393 20.69 5.21697 20.5784C5 20.4667 5 20.1263 5 19.4454V4.6Z"
-                  fill={saved ? "currentColor" : "none"}
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                />
-              </svg>
-              <span className="text-[11px] font-bold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)]">
-                {formatCount(saveCount)}
-              </span>
-            </button>
-
-            <Link href={comingSoonHref("Reel Options")} aria-label="More options" className="flex size-[26px] items-center justify-center">
-              <NavIcon icon="/icons/more-horizontal.svg" color="white" size={26} className="rotate-90" />
-            </Link>
           </div>
         </div>
       </div>
@@ -327,14 +508,26 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
   // columns (Figma's layout), symmetrically centered — see the grid-column
   // comment below.
   return (
-    <div className={cn("grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-[32px]", className)}>
+    <div
+      className={cn(
+        "grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-0 xl:pl-[40px]",
+        className,
+      )}
+    >
         {/* `justify-end` pins the author/caption block to the bottom of the
             row so it lines up with the video's bottom edge, matching the
             Figma design — the grid row's height is driven by the video
-            column (see below), and this column stretches to match it. */}
-        <div className="flex w-[293px] flex-col items-start justify-end gap-[8px] justify-self-end">
-          <div className="flex w-full items-center gap-[6px]">
-            <div className="flex items-center gap-2">
+            column (see below), and this column stretches to match it.
+            `mr-1` (4px) is the gap to the video itself; the extra `xl:pl-[40px]`
+            on the row above is what pushes this whole column further from the
+            sidebar without touching that tight 4px.
+            `w-full max-w-[293px]` (not a fixed `w-[293px]`) is what makes this
+            shrink along with the grid's `minmax(0,1fr)` column as the app
+            sidebar expands/collapses and eats into the available row width,
+            instead of overflowing past it. */}
+        <div className="mr-1 flex w-full max-w-[293px] flex-col items-start justify-end gap-[8px] justify-self-end">
+          <div className="flex w-full min-w-0 items-center gap-[6px]">
+            <div className="flex min-w-0 items-center gap-2">
               <div className="relative size-[40px] shrink-0 overflow-hidden rounded-full">
                 <Image src={reel.authorAvatar} alt="" fill sizes="40px" className="object-cover" />
                 {reel.verified && (
@@ -343,7 +536,7 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
                   </span>
                 )}
               </div>
-              <p className="whitespace-nowrap text-[14px] font-bold text-brand-900">{reel.authorName}</p>
+              <p className="truncate text-[14px] font-bold text-brand-900">{reel.authorName}</p>
             </div>
             <FollowButton following={following} onToggle={() => setFollowing((v) => !v)} name={reel.authorName} />
           </div>
@@ -361,58 +554,60 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
           </p>
         </div>
 
-        {/* Height-driven, not width-driven: caps at the design's native 716px
-            but shrinks on shorter viewports (via the topNav+padding offset)
-            so one reel always fits on screen without vertical scrolling;
-            width (and the grid row height other columns stretch to) follows
-            from the 402:716 aspect ratio. */}
+        {/* Height-driven, not width-driven: fills almost the whole
+            `calc(100vh-67px)` viewport slot the page gives each reel (see
+            discover/page.tsx), capped at the design's native 780px so it
+            doesn't grow absurdly tall on huge monitors; width (and the grid
+            row height the other columns stretch to) follows from the
+            402:716 aspect ratio. */}
         <div
           onClick={togglePlayback}
-          className="relative aspect-[402/716] h-[min(716px,calc(100vh-130px))] w-auto max-w-[402px] shrink-0 overflow-hidden rounded-[30px] bg-gray-100"
+          className="relative aspect-[402/716] h-[min(780px,calc(100vh-91px))] w-auto max-w-[402px] shrink-0 overflow-hidden rounded-[16px] bg-gray-100"
         >
           {videoEl}
           <div className="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-[#5433ff] to-[#20bdff]" />
+          {likeBurst}
           {progressBar}
           {postButton}
           {playButton}
         </div>
 
-        <div className="flex shrink-0 flex-col items-center justify-center gap-[16px] pb-[38px] justify-self-start">
-          <button type="button" onClick={() => setLiked((v) => !v)} aria-pressed={liked} aria-label={`${formatCount(likeCount)} likes`} className="flex flex-col items-center gap-1">
+        <div className="ml-[32px] flex shrink-0 flex-col items-center justify-end gap-[16px] justify-self-start">
+          <button type="button" onClick={toggleLike} aria-pressed={liked} aria-label={`${formatCount(likeCount)} likes`} className="flex flex-col items-center gap-1">
             <NavIcon
               icon={liked ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
-              size={24}
+              size={20}
               className={liked && !prefersReducedMotion ? "bg-[#ef575f] animate-like-pop" : liked ? "bg-[#ef575f]" : undefined}
             />
-            <span className="text-[12px] font-bold text-[#06090e]">{formatCount(likeCount)}</span>
+            <span className="text-[11px] font-bold text-[#06090e]">{formatCount(likeCount)}</span>
           </button>
 
           <button type="button" onClick={onOpenComments} aria-label={`${formatCount(reel.comments)} comments`} className="flex flex-col items-center gap-1">
-            <span className="relative block size-6">
-              <Image src="/icons/message-03.svg" alt="" fill sizes="24px" />
+            <span className="relative block size-5">
+              <Image src="/icons/message-03.svg" alt="" fill sizes="20px" />
             </span>
-            <span className="text-[12px] font-bold text-[#06090e]">{formatCount(reel.comments)}</span>
+            <span className="text-[11px] font-bold text-[#06090e]">{formatCount(reel.comments)}</span>
           </button>
 
           <button type="button" onClick={handleShare} aria-label={`Share — ${formatCount(shareCount)} shares`} className="flex flex-col items-center gap-1">
-            <span className="relative block size-6">
-              <Image src="/icons/share-05.svg" alt="" fill sizes="24px" />
+            <span className="relative block size-5">
+              <Image src="/icons/share-05.svg" alt="" fill sizes="20px" />
             </span>
-            <span className="text-[12px] font-bold text-[#06090e]">{formatCount(shareCount)}</span>
+            <span className="text-[11px] font-bold text-[#06090e]">{formatCount(shareCount)}</span>
           </button>
 
           <Link href={comingSoonHref("Repost")} aria-label={`${formatCount(reel.reposts)} reposts`} className="flex flex-col items-center gap-1 text-night-700">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M7 7h8a3 3 0 0 1 3 3v2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
               <path d="M10 4 7 7l3 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               <path d="M17 17H9a3 3 0 0 1-3-3v-2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
               <path d="M14 20l3-3-3-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span className="text-[12px] font-bold text-[#06090e]">{formatCount(reel.reposts)}</span>
+            <span className="text-[11px] font-bold text-[#06090e]">{formatCount(reel.reposts)}</span>
           </Link>
 
           <button type="button" onClick={() => setSaved((v) => !v)} aria-pressed={saved} aria-label={`${formatCount(saveCount)} saves`} className="flex flex-col items-center gap-1">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" className={saved ? "text-brand-600" : "text-night-700"}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" className={saved ? "text-brand-600" : "text-night-700"}>
               <path
                 d="M5 4.6C5 3.84575 5 3.46863 5.23431 3.23431C5.46863 3 5.84575 3 6.6 3H17.4C18.1542 3 18.5314 3 18.7657 3.23431C19 3.46863 19 3.84575 19 4.6V19.4454C19 20.1263 19 20.4667 18.783 20.5784C18.5661 20.69 18.289 20.4922 17.735 20.0964L12.93 16.6643C12.4809 16.3435 12.2564 16.1831 12 16.1831C11.7436 16.1831 11.5191 16.3435 11.07 16.6643L6.26499 20.0964C5.71095 20.4922 5.43393 20.69 5.21697 20.5784C5 20.4667 5 20.1263 5 19.4454V4.6Z"
                 fill={saved ? "currentColor" : "none"}
@@ -420,13 +615,13 @@ export function DiscoverReelCard({ reel, className, onOpenComments, onOpenPostCo
                 strokeWidth="1.6"
               />
             </svg>
-            <span className="text-[12px] font-bold text-[#06090e]">{formatCount(saveCount)}</span>
+            <span className="text-[11px] font-bold text-[#06090e]">{formatCount(saveCount)}</span>
           </button>
 
           <Tooltip label="More options" side="bottom" align="end">
-            <Link href={comingSoonHref("Reel Options")} aria-label="More options" className="flex size-6 items-center justify-center">
-              <span className="relative block size-6 rotate-90">
-                <Image src="/icons/more-horizontal.svg" alt="" fill sizes="24px" />
+            <Link href={comingSoonHref("Reel Options")} aria-label="More options" className="flex size-5 items-center justify-center">
+              <span className="relative block size-5">
+                <Image src="/icons/more-horizontal.svg" alt="" fill sizes="20px" />
               </span>
             </Link>
           </Tooltip>

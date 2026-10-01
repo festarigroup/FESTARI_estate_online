@@ -29,7 +29,11 @@ interface DiscoverTopBarProps {
  * affordances Figma specifies for this screen. */
 export function DiscoverTopBar({ query, onQueryChange, activeTab, onTabChange, below }: DiscoverTopBarProps) {
   return (
-    <div className="flex w-full shrink-0 flex-col">
+    // Hidden entirely below `xl:` — mobile Discover has no navbar/story-rail
+    // chrome at all (the video takes the full screen), with its own minimal
+    // back/filter/more controls overlaid directly on the reel instead (see
+    // DiscoverReelCard's mobile branch).
+    <div className="hidden w-full shrink-0 flex-col xl:flex">
       <header className="flex h-[67px] w-full shrink-0 items-center border-b border-gray-200 bg-white px-[15px] py-2 sm:px-[23px]">
       <div className="flex w-full items-center justify-between gap-2">
         <div className="flex min-w-0 shrink-0 items-center gap-[15px] md:gap-[24px]">

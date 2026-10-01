@@ -86,7 +86,7 @@ export default function DiscoverPage() {
       rightRail={<DiscoverStoryRail activeStories={stories.activeStories} onYourStoryClick={stories.openYourStory} />}
       rightRailBare
       contentFullWidth
-      contentPadding="px-0 pb-0 xl:px-[23px] xl:pb-[23px]"
+      contentPadding="px-0 pb-0"
       railAccessory={
         !loading && reels.length > 1 ? (
           // Fixed-footprint box — always exactly the nav buttons' size, so
@@ -116,33 +116,19 @@ export default function DiscoverPage() {
         ) : undefined
       }
       topNav={
-        <DiscoverTopBar
-          query={query}
-          onQueryChange={setQuery}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          below={
-            // Mobile-only: the "status bar" (story rail) pinned directly
-            // beneath the navbar, inside this same non-scrolling slot — it
-            // never needs `position: sticky` because it's not in the
-            // scrollable area to begin with. Hidden once the desktop
-            // vertical aside (in `rightRail` above) takes over at `xl:`.
-            <div className="xl:hidden">
-              <DiscoverStoryRail
-                layout="horizontal"
-                activeStories={stories.activeStories}
-                onYourStoryClick={stories.openYourStory}
-              />
-            </div>
-          }
-        />
+        // DiscoverTopBar hides itself entirely below `xl:` — mobile has no
+        // navbar/story-rail chrome at all, so there's nothing to pass as
+        // `below` here any more (see DiscoverReelCard's mobile overlay for
+        // the equivalent back/filter/more controls).
+        <DiscoverTopBar query={query} onQueryChange={setQuery} activeTab={activeTab} onTabChange={setActiveTab} />
       }
     >
-      {/* No gap below `xl:` — the mobile reel already fills the full
-          remaining viewport edge to edge (via AppShell's `contentPadding`
-          override above), so stacking them with spacing would break the
-          continuous full-screen feed. */}
-      <div className="flex w-full flex-col gap-0 xl:gap-[24px] xl:pt-[23px]">
+      {/* No gap, no extra padding — each reel's own wrapper below claims
+          exactly one viewport's worth of height (`calc(100vh-67px)`, the
+          Discover topbar's fixed height), so the scroll-snap stack moves
+          one full reel per swipe/scroll on every breakpoint instead of
+          leaving the next reel's edge visible. */}
+      <div className="flex w-full flex-col gap-0">
         {loading ? (
           <DiscoverReelCardSkeleton />
         ) : reels.length > 0 ? (
@@ -150,13 +136,18 @@ export default function DiscoverPage() {
             <FadeIn
               key={reel.id}
               delay={prefersReducedMotion ? 0 : index * 0.05}
-              className="snap-start [scroll-snap-stop:always] xl:snap-align-none"
+              className="snap-start [scroll-snap-stop:always]"
             >
-              <div ref={(el) => void (cardRefs.current[index] = el)}>
+              <div
+                ref={(el) => void (cardRefs.current[index] = el)}
+                className="xl:flex xl:min-h-[calc(100vh-67px)] xl:items-center xl:justify-center xl:px-[16px] xl:py-[12px]"
+              >
                 <DiscoverReelCard
                   reel={reel}
                   onOpenComments={() => setCommentsReelId(reel.id)}
                   onOpenPostComposer={() => setComposerOpen(true)}
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
                 />
               </div>
             </FadeIn>
