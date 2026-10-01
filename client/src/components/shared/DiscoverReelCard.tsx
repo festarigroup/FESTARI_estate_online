@@ -110,6 +110,17 @@ function CheckIcon() {
   );
 }
 
+function ToggleSwitch({ on }: { on: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn("flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors", on ? "bg-brand-900" : "bg-gray-300")}
+    >
+      <span className={cn("size-4 rounded-full bg-white shadow transition-transform", on && "translate-x-4")} />
+    </span>
+  );
+}
+
 interface ReelOptionRowProps {
   icon: ReactNode;
   label: string;
@@ -117,6 +128,10 @@ interface ReelOptionRowProps {
   selected?: boolean;
   danger?: boolean;
   borderTop?: boolean;
+  /** Renders a real on/off switch instead of the plain checkmark — for
+   * settings like Auto-scroll that flip a persistent state rather than
+   * recording a one-off choice. */
+  toggle?: boolean;
   href?: string;
   onClick?: () => void;
 }
@@ -125,11 +140,11 @@ interface ReelOptionRowProps {
  * shared between the plain coming-soon links and the three rows that are
  * actually wired up (Auto-scroll, Interested, Not Interested), so both kinds
  * get the same spacing/hover/selected styling instead of drifting apart. */
-function ReelOptionRow({ icon, label, locked, selected, danger, borderTop, href, onClick }: ReelOptionRowProps) {
+function ReelOptionRow({ icon, label, locked, selected, danger, borderTop, toggle, href, onClick }: ReelOptionRowProps) {
   const rowClassName = cn(
     "flex w-full items-center justify-between rounded-[10px] px-3 py-2 text-left text-[13px] font-medium",
     danger ? "text-[#ff3135] hover:bg-red-50" : "text-night-700 hover:bg-gray-50",
-    selected && !danger && "bg-brand-900/5 text-brand-900",
+    selected && !danger && !toggle && "bg-brand-900/5 text-brand-900",
     borderTop && "mt-1 border-t border-gray-200 pt-3",
   );
   const content = (
@@ -138,7 +153,7 @@ function ReelOptionRow({ icon, label, locked, selected, danger, borderTop, href,
         {icon}
         {label}
       </span>
-      {locked ? <LockIcon /> : selected ? <CheckIcon /> : null}
+      {toggle ? <ToggleSwitch on={!!selected} /> : locked ? <LockIcon /> : selected ? <CheckIcon /> : null}
     </>
   );
 
@@ -150,7 +165,13 @@ function ReelOptionRow({ icon, label, locked, selected, danger, borderTop, href,
     );
   }
   return (
-    <button type="button" onClick={onClick} className={rowClassName}>
+    <button
+      type="button"
+      onClick={onClick}
+      role={toggle ? "switch" : undefined}
+      aria-checked={toggle ? selected : undefined}
+      className={rowClassName}
+    >
       {content}
     </button>
   );
@@ -176,6 +197,12 @@ export function DiscoverReelCard({
   const isMobile = useMediaQuery("(max-width: 1279px)");
   const prefersReducedMotion = usePrefersReducedMotion();
   const [playing, setPlaying] = useState(!prefersReducedMotion);
+  // Starts muted on every reel — browsers block unmuted autoplay outright,
+  // so a reel that started unmuted would just silently fail to autoplay
+  // instead of actually having sound. The speaker button lets anyone turn it
+  // on with one tap (a real user gesture), including on reels they posted
+  // themselves with their own audio.
+  const [muted, setMuted] = useState(true);
   const [following, setFollowing] = useState(reel.following);
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -330,7 +357,7 @@ export function DiscoverReelCard({
       // next one instead of repeating.
       loop={!autoScroll}
       onEnded={autoScroll ? onAutoScrollNext : undefined}
-      muted
+      muted={muted}
       playsInline
       // No onClick here — the tap-to-toggle handler lives on the
       // surrounding container (mobile: the whole screen; desktop: the video
@@ -340,6 +367,34 @@ export function DiscoverReelCard({
       // from bubbling there, so this is purely about the empty space.
       className="absolute inset-0 size-full object-cover"
     />
+  );
+
+  const muteButton = (
+    <Tooltip label={muted ? "Unmute" : "Mute"} className="absolute right-3 top-16 z-20 xl:top-3">
+      <button
+        type="button"
+        onClick={(event) => {
+          event.stopPropagation();
+          setMuted((v) => !v);
+        }}
+        aria-pressed={!muted}
+        aria-label={muted ? "Unmute" : "Mute"}
+        className="flex size-7 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm"
+      >
+        {muted ? (
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 9v6h4l5 5V4L8 9H4Z" fill="currentColor" />
+            <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a9 9 0 0 1 0 12" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" opacity="0.35" />
+            <path d="M15.5 9.5l5 5m0-5l-5 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+          </svg>
+        ) : (
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 9v6h4l5 5V4L8 9H4Z" fill="currentColor" />
+            <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a9 9 0 0 1 0 12" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+          </svg>
+        )}
+      </button>
+    </Tooltip>
   );
 
   const likeBurst = (
@@ -461,6 +516,7 @@ export function DiscoverReelCard({
         {likeBurst}
         {progressBar}
         {playButton}
+        {muteButton}
 
         {/* `sticky`, not `fixed` — this reel's own wrapper is exactly one
             viewport tall and is what the scroll-snap stack aligns to, so a
@@ -649,11 +705,9 @@ export function DiscoverReelCard({
                   <ReelOptionRow
                     icon={AUTO_SCROLL_ICON}
                     label="Auto-scroll"
+                    toggle
                     selected={autoScroll}
-                    onClick={() => {
-                      onToggleAutoScroll?.();
-                      setOptionsSheetOpen(false);
-                    }}
+                    onClick={() => onToggleAutoScroll?.()}
                   />
                   <ReelOptionRow
                     icon={INFO_ICON}
@@ -763,9 +817,17 @@ export function DiscoverReelCard({
           {progressBar}
           {postButton}
           {playButton}
+          {muteButton}
         </div>
 
-        <div className="ml-[32px] flex shrink-0 flex-col items-center justify-end gap-[16px] justify-self-start">
+        {/* `h-full` + `justify-between` (not a fixed `gap` + bottom padding)
+            is what makes this responsive to the video's own height, which
+            already shrinks to fit `calc(100vh-91px)` — the icons space
+            themselves out across whatever room is actually available
+            instead of needing a fixed ~340px regardless of viewport height,
+            which is what pushed the lower icons below the fold on shorter
+            screens (effectively into the next reel's snap section). */}
+        <div className="ml-[32px] flex h-full flex-col items-center justify-between py-1 justify-self-start">
           <button type="button" onClick={toggleLike} aria-pressed={liked} aria-label={`${formatCount(likeCount)} likes`} className="flex flex-col items-center gap-1">
             <NavIcon
               icon={liked ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
@@ -841,11 +903,9 @@ export function DiscoverReelCard({
                     <ReelOptionRow
                       icon={AUTO_SCROLL_ICON}
                       label="Auto-scroll"
+                      toggle
                       selected={autoScroll}
-                      onClick={() => {
-                        onToggleAutoScroll?.();
-                        setDesktopOptionsOpen(false);
-                      }}
+                      onClick={() => onToggleAutoScroll?.()}
                     />
                     <ReelOptionRow
                       icon={INFO_ICON}
