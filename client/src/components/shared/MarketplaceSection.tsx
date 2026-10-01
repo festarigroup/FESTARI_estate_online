@@ -9,12 +9,12 @@ export function MarketplaceSection() {
   return (
     <section className="flex w-full flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-[16px] font-bold text-night-700">Picked for you in Marketplace</h2>
+        <h2 className="text-[16px] font-bold text-night-700">From your marketplace</h2>
         <Link
           href={comingSoonHref("Marketplace")}
           className="flex items-center gap-2 font-inter text-[13px] font-medium text-brand-600"
         >
-          Browse Marketplace
+          Marketplace
           <NavIcon icon="/icons/chevron-right.svg" color="brand" size={10} />
         </Link>
       </div>
