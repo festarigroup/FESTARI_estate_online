@@ -28,6 +28,7 @@ export default function DiscoverPage() {
   const [commentsReelId, setCommentsReelId] = useState<string | null>(null);
   const [myReels, setMyReels] = useState<DiscoverReel[]>([]);
   const [composerOpen, setComposerOpen] = useState(false);
+  const [autoScroll, setAutoScroll] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
   const stories = useDiscoverStories();
@@ -148,6 +149,9 @@ export default function DiscoverPage() {
                   onOpenPostComposer={() => setComposerOpen(true)}
                   activeTab={activeTab}
                   onTabChange={setActiveTab}
+                  autoScroll={autoScroll}
+                  onToggleAutoScroll={() => setAutoScroll((v) => !v)}
+                  onAutoScrollNext={() => scrollToIndex(index + 1)}
                 />
               </div>
             </FadeIn>

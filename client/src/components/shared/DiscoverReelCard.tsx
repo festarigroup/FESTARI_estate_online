@@ -3,11 +3,14 @@
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { showSuccessToast } from "@/components/shared/AppToast";
 import { FollowButton } from "@/components/shared/FollowButton";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { Tooltip } from "@/components/shared/Tooltip";
 import { DISCOVER_TABS, type DiscoverTab } from "@/components/shared/DiscoverTopBar";
+import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { comingSoonHref } from "@/lib/coming-soon";
@@ -29,6 +32,13 @@ interface DiscoverReelCardProps {
    * horizontal row, which is hidden below `xl:` entirely). */
   activeTab?: DiscoverTab;
   onTabChange?: (tab: DiscoverTab) => void;
+  /** Feed-wide "Auto-scroll" setting (desktop "Reel options" popover) — lives
+   * in discover/page.tsx, not per-card, so every reel plays once (instead of
+   * looping) and hands off to the next one consistently as you move through
+   * the feed. */
+  autoScroll?: boolean;
+  onToggleAutoScroll?: () => void;
+  onAutoScrollNext?: () => void;
 }
 
 interface LikeParticle {
@@ -44,6 +54,108 @@ function formatCount(value: number): string {
   return String(value);
 }
 
+const OPTION_ICON_PROPS = { width: 14, height: 14, viewBox: "0 0 24 24", fill: "none", "aria-hidden": true } as const;
+
+const AUTO_SCROLL_ICON = (
+  <svg {...OPTION_ICON_PROPS}>
+    <path d="M12 4v16M7 8l5-5 5 5M7 16l5 5 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+const INFO_ICON = (
+  <svg {...OPTION_ICON_PROPS}>
+    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+    <path d="M12 8v5M12 16h.01" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+);
+const INTERESTED_ICON = (
+  <svg {...OPTION_ICON_PROPS}>
+    <path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+    <circle cx="12" cy="12" r="2.5" stroke="currentColor" strokeWidth="1.8" />
+  </svg>
+);
+const NOT_INTERESTED_ICON = (
+  <svg {...OPTION_ICON_PROPS}>
+    <path
+      d="M3 5l18 14M2 12s3.5-6.5 10-6.5c1.9 0 3.5.4 4.8 1M22 12s-1.1 2.05-3.2 3.7M9.5 14.6a2.5 2.5 0 0 0 3.4 1"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+const MANAGE_PREFERENCES_ICON = (
+  <svg {...OPTION_ICON_PROPS}>
+    <circle cx="8" cy="8" r="3" stroke="currentColor" strokeWidth="1.8" />
+    <path d="M2 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    <circle cx="17" cy="7" r="2.2" stroke="currentColor" strokeWidth="1.8" />
+    <path d="M14.5 14.3c2.6.4 4.5 2.3 4.5 5.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+);
+
+function LockIcon() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0 text-gray-400">
+      <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0 text-brand-900">
+      <path d="M4 12l6 6L20 6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+interface ReelOptionRowProps {
+  icon: ReactNode;
+  label: string;
+  locked?: boolean;
+  selected?: boolean;
+  danger?: boolean;
+  borderTop?: boolean;
+  href?: string;
+  onClick?: () => void;
+}
+
+/** One row of the desktop "Reel options" popover (Figma node 805:39305) —
+ * shared between the plain coming-soon links and the three rows that are
+ * actually wired up (Auto-scroll, Interested, Not Interested), so both kinds
+ * get the same spacing/hover/selected styling instead of drifting apart. */
+function ReelOptionRow({ icon, label, locked, selected, danger, borderTop, href, onClick }: ReelOptionRowProps) {
+  const rowClassName = cn(
+    "flex w-full items-center justify-between rounded-[10px] px-3 py-2 text-left text-[13px] font-medium",
+    danger ? "text-[#ff3135] hover:bg-red-50" : "text-night-700 hover:bg-gray-50",
+    selected && !danger && "bg-brand-900/5 text-brand-900",
+    borderTop && "mt-1 border-t border-gray-200 pt-3",
+  );
+  const content = (
+    <>
+      <span className="flex items-center gap-3">
+        {icon}
+        {label}
+      </span>
+      {locked ? <LockIcon /> : selected ? <CheckIcon /> : null}
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} onClick={onClick} className={rowClassName}>
+        {content}
+      </Link>
+    );
+  }
+  return (
+    <button type="button" onClick={onClick} className={rowClassName}>
+      {content}
+    </button>
+  );
+}
+
 export function DiscoverReelCard({
   reel,
   className,
@@ -51,6 +163,9 @@ export function DiscoverReelCard({
   onOpenPostComposer,
   activeTab,
   onTabChange,
+  autoScroll,
+  onToggleAutoScroll,
+  onAutoScrollNext,
 }: DiscoverReelCardProps) {
   // JS-driven, not CSS `xl:hidden`/`hidden xl:grid` — the two layouts below
   // each embed their own <video>, and CSS-only dual-mounting would create
@@ -69,9 +184,27 @@ export function DiscoverReelCard({
   const [shareCount, setShareCount] = useState(reel.shares);
   const [likeParticles, setLikeParticles] = useState<LikeParticle[]>([]);
   const [tabMenuOpen, setTabMenuOpen] = useState(false);
-  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [optionsSheetOpen, setOptionsSheetOpen] = useState(false);
+  const [desktopOptionsOpen, setDesktopOptionsOpen] = useState(false);
+  const [feedback, setFeedback] = useState<"interested" | "not-interested" | null>(null);
+  const { mounted: optionsSheetMounted, closing: optionsSheetClosing } = useAnimatedSheet(optionsSheetOpen);
   const videoRef = useRef<HTMLVideoElement>(null);
   const likeParticleIdRef = useRef(0);
+
+  // "Interested"/"Not Interested" are mutually exclusive and toggle off on a
+  // second click — a toast confirms the choice since there's nothing else on
+  // screen that visibly changes right away (the feed itself doesn't re-rank).
+  // Computed from the `feedback` closure rather than inside a `setFeedback`
+  // updater — a side effect (the toast call) inside an updater can run
+  // twice under React Strict Mode, which fired the toast twice.
+  function handleFeedback(next: "interested" | "not-interested") {
+    const nextValue = feedback === next ? null : next;
+    setFeedback(nextValue);
+    if (nextValue === "interested") showSuccessToast("Thanks — we'll show you more like this");
+    else if (nextValue === "not-interested") showSuccessToast("Got it — we'll show you less like this");
+    setDesktopOptionsOpen(false);
+    setOptionsSheetOpen(false);
+  }
 
   // TikTok/Instagram-style reaction: liking the reel (not unliking it) sends
   // up a small shower of hearts drifting from the center of the video,
@@ -192,7 +325,11 @@ export function DiscoverReelCard({
       poster={reel.poster}
       aria-label={reel.caption}
       autoPlay={!prefersReducedMotion}
-      loop
+      // Looping is the default feed behavior; when the feed-wide Auto-scroll
+      // setting is on, each reel plays once and `onEnded` hands off to the
+      // next one instead of repeating.
+      loop={!autoScroll}
+      onEnded={autoScroll ? onAutoScrollNext : undefined}
       muted
       playsInline
       // No onClick here — the tap-to-toggle handler lives on the
@@ -389,68 +526,16 @@ export function DiscoverReelCard({
             )}
           </div>
 
-          <div className="relative">
-            <button
-              type="button"
-              aria-label="More options"
-              aria-haspopup="menu"
-              aria-expanded={moreMenuOpen}
-              onClick={() => setMoreMenuOpen((v) => !v)}
-              className="flex size-9 items-center justify-center"
-            >
-              <NavIcon icon="/icons/more-horizontal.svg" color="white" size={22} />
-            </button>
-
-            {moreMenuOpen && (
-              <>
-                <div className="fixed inset-0 z-20" onClick={() => setMoreMenuOpen(false)} />
-                <div className="absolute right-0 top-full z-30 mt-2 w-[170px] rounded-[16px] border border-white/15 bg-black/35 p-1.5 text-white/85 shadow-[0px_12px_30px_rgba(0,0,0,0.35)] backdrop-blur-xl">
-                  <Link
-                    href={comingSoonHref("Repost")}
-                    onClick={() => setMoreMenuOpen(false)}
-                    className="flex items-center gap-2.5 rounded-[10px] px-3 py-2 text-[13px] font-medium hover:bg-white/10"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M7 7h8a3 3 0 0 1 3 3v2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                      <path d="M10 4 7 7l3 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M17 17H9a3 3 0 0 1-3-3v-2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                      <path d="M14 20l3-3-3-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    Repost
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSaved((v) => !v);
-                      setMoreMenuOpen(false);
-                    }}
-                    className="flex w-full items-center gap-2.5 rounded-[10px] px-3 py-2 text-left text-[13px] font-medium hover:bg-white/10"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true" className={saved ? "text-brand-300" : undefined}>
-                      <path
-                        d="M5 4.6C5 3.84575 5 3.46863 5.23431 3.23431C5.46863 3 5.84575 3 6.6 3H17.4C18.1542 3 18.5314 3 18.7657 3.23431C19 3.46863 19 3.84575 19 4.6V19.4454C19 20.1263 19 20.4667 18.783 20.5784C18.5661 20.69 18.289 20.4922 17.735 20.0964L12.93 16.6643C12.4809 16.3435 12.2564 16.1831 12 16.1831C11.7436 16.1831 11.5191 16.3435 11.07 16.6643L6.26499 20.0964C5.71095 20.4922 5.43393 20.69 5.21697 20.5784C5 20.4667 5 20.1263 5 19.4454V4.6Z"
-                        fill={saved ? "currentColor" : "none"}
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                      />
-                    </svg>
-                    {saved ? "Saved" : "Save"}
-                  </button>
-                  <Link
-                    href={comingSoonHref("Reel Options")}
-                    onClick={() => setMoreMenuOpen(false)}
-                    className="flex items-center gap-2.5 rounded-[10px] px-3 py-2 text-[13px] font-medium hover:bg-white/10"
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M12 9v4M12 16.5h.01" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.6" />
-                    </svg>
-                    Report
-                  </Link>
-                </div>
-              </>
-            )}
-          </div>
+          <button
+            type="button"
+            aria-label="More options"
+            aria-haspopup="dialog"
+            aria-expanded={optionsSheetOpen}
+            onClick={() => setOptionsSheetOpen(true)}
+            className="flex size-9 items-center justify-center"
+          >
+            <NavIcon icon="/icons/more-horizontal.svg" color="white" size={22} />
+          </button>
         </div>
 
         <div
@@ -498,8 +583,116 @@ export function DiscoverReelCard({
                 {formatCount(shareCount)}
               </span>
             </button>
+
+            <Link href={comingSoonHref("Repost")} aria-label={`${formatCount(reel.reposts)} reposts`} className="flex flex-col items-center gap-1 text-white">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
+                <path d="M7 7h8a3 3 0 0 1 3 3v2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                <path d="M10 4 7 7l3 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M17 17H9a3 3 0 0 1-3-3v-2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                <path d="M14 20l3-3-3-3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="text-[11px] font-bold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)]">
+                {formatCount(reel.reposts)}
+              </span>
+            </Link>
+
+            <button type="button" onClick={() => setSaved((v) => !v)} aria-pressed={saved} aria-label={`${formatCount(saveCount)} saves`} className="flex flex-col items-center gap-1">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true" className={cn(saved ? "text-brand-300" : "text-white", "drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]")}>
+                <path
+                  d="M5 4.6C5 3.84575 5 3.46863 5.23431 3.23431C5.46863 3 5.84575 3 6.6 3H17.4C18.1542 3 18.5314 3 18.7657 3.23431C19 3.46863 19 3.84575 19 4.6V19.4454C19 20.1263 19 20.4667 18.783 20.5784C18.5661 20.69 18.289 20.4922 17.735 20.0964L12.93 16.6643C12.4809 16.3435 12.2564 16.1831 12 16.1831C11.7436 16.1831 11.5191 16.3435 11.07 16.6643L6.26499 20.0964C5.71095 20.4922 5.43393 20.69 5.21697 20.5784C5 20.4667 5 20.1263 5 19.4454V4.6Z"
+                  fill={saved ? "currentColor" : "none"}
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                />
+              </svg>
+              <span className="text-[11px] font-bold text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.5)]">
+                {formatCount(saveCount)}
+              </span>
+            </button>
           </div>
         </div>
+
+        {optionsSheetMounted &&
+          createPortal(
+            <div
+              className="fixed inset-0 z-[120] flex items-end bg-black/50"
+              onClick={() => setOptionsSheetOpen(false)}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Reel options"
+            >
+              <div
+                onClick={(event) => event.stopPropagation()}
+                className={cn(
+                  "flex w-full flex-col gap-4 rounded-t-[32px] bg-white pb-6 pt-4 shadow-[0px_-4px_8px_0px_rgba(69,71,69,0.15)]",
+                  optionsSheetClosing ? "animate-sheet-slide-down" : "animate-sheet-slide-up",
+                )}
+              >
+                <div className="h-[3px] w-[152px] shrink-0 self-center rounded-[20px] bg-[#334154]" />
+
+                <div className="flex w-full shrink-0 items-center gap-2.5 px-6">
+                  <button
+                    type="button"
+                    aria-label="Close"
+                    onClick={() => setOptionsSheetOpen(false)}
+                    className="flex size-6 shrink-0 items-center justify-center text-night-900"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                      <path d="M10 4V16M10 16L4 10M10 16L16 10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  <p className="flex-1 text-center text-lg font-bold tracking-[-0.54px] text-black">Reel options</p>
+                  <span className="size-6 shrink-0" aria-hidden />
+                </div>
+
+                <div className="flex flex-col gap-1 px-4">
+                  <ReelOptionRow
+                    icon={AUTO_SCROLL_ICON}
+                    label="Auto-scroll"
+                    selected={autoScroll}
+                    onClick={() => {
+                      onToggleAutoScroll?.();
+                      setOptionsSheetOpen(false);
+                    }}
+                  />
+                  <ReelOptionRow
+                    icon={INFO_ICON}
+                    label="Why you're seeing this post"
+                    locked
+                    href={comingSoonHref("Why you're seeing this post")}
+                    onClick={() => setOptionsSheetOpen(false)}
+                  />
+                  <ReelOptionRow
+                    icon={INTERESTED_ICON}
+                    label="Interested"
+                    selected={feedback === "interested"}
+                    onClick={() => handleFeedback("interested")}
+                  />
+                  <ReelOptionRow
+                    icon={NOT_INTERESTED_ICON}
+                    label="Not Interested"
+                    selected={feedback === "not-interested"}
+                    onClick={() => handleFeedback("not-interested")}
+                  />
+                  <ReelOptionRow
+                    icon={MANAGE_PREFERENCES_ICON}
+                    label="Manage content preferences"
+                    href={comingSoonHref("Manage content preferences")}
+                    onClick={() => setOptionsSheetOpen(false)}
+                  />
+                  <ReelOptionRow
+                    icon={INFO_ICON}
+                    label="Report"
+                    danger
+                    borderTop
+                    href={comingSoonHref("Report")}
+                    onClick={() => setOptionsSheetOpen(false)}
+                  />
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )}
       </div>
     );
   }
@@ -618,13 +811,80 @@ export function DiscoverReelCard({
             <span className="text-[11px] font-bold text-[#06090e]">{formatCount(saveCount)}</span>
           </button>
 
-          <Tooltip label="More options" side="bottom" align="end">
-            <Link href={comingSoonHref("Reel Options")} aria-label="More options" className="flex size-5 items-center justify-center">
-              <span className="relative block size-5">
-                <Image src="/icons/more-horizontal.svg" alt="" fill sizes="20px" />
-              </span>
-            </Link>
-          </Tooltip>
+          <div className="relative">
+            <Tooltip label="More options" side="bottom" align="end">
+              <button
+                type="button"
+                aria-label="More options"
+                aria-haspopup="menu"
+                aria-expanded={desktopOptionsOpen}
+                onClick={() => setDesktopOptionsOpen((v) => !v)}
+                className="flex size-5 items-center justify-center"
+              >
+                <span className="relative block size-5">
+                  <Image src="/icons/more-horizontal.svg" alt="" fill sizes="20px" />
+                </span>
+              </button>
+            </Tooltip>
+
+            {desktopOptionsOpen && (
+              <>
+                <div className="fixed inset-0 z-20" onClick={() => setDesktopOptionsOpen(false)} />
+
+                {/* Figma node 805:39305 — an outer frosted-glass card (barely-there
+                    white tint, blurred) with the actual white content card nested
+                    inside it, not a single flat panel. Anchored to the trigger
+                    (its "righteous position"), not centered as a full-screen
+                    dialog. */}
+                <div className="absolute bottom-full left-0 z-30 mb-2 w-[230px] rounded-[22px] bg-white/10 p-2 shadow-[0px_12px_30px_rgba(0,0,0,0.2)] backdrop-blur-xl">
+                  <div className="flex w-full flex-col gap-1 rounded-[16px] bg-white/90 p-2.5 backdrop-blur-sm">
+                    <ReelOptionRow
+                      icon={AUTO_SCROLL_ICON}
+                      label="Auto-scroll"
+                      selected={autoScroll}
+                      onClick={() => {
+                        onToggleAutoScroll?.();
+                        setDesktopOptionsOpen(false);
+                      }}
+                    />
+                    <ReelOptionRow
+                      icon={INFO_ICON}
+                      label="Why you're seeing this post"
+                      locked
+                      href={comingSoonHref("Why you're seeing this post")}
+                      onClick={() => setDesktopOptionsOpen(false)}
+                    />
+                    <ReelOptionRow
+                      icon={INTERESTED_ICON}
+                      label="Interested"
+                      selected={feedback === "interested"}
+                      onClick={() => handleFeedback("interested")}
+                    />
+                    <ReelOptionRow
+                      icon={NOT_INTERESTED_ICON}
+                      label="Not Interested"
+                      selected={feedback === "not-interested"}
+                      onClick={() => handleFeedback("not-interested")}
+                    />
+                    <ReelOptionRow
+                      icon={MANAGE_PREFERENCES_ICON}
+                      label="Manage content preferences"
+                      href={comingSoonHref("Manage content preferences")}
+                      onClick={() => setDesktopOptionsOpen(false)}
+                    />
+                    <ReelOptionRow
+                      icon={INFO_ICON}
+                      label="Report"
+                      danger
+                      borderTop
+                      href={comingSoonHref("Report")}
+                      onClick={() => setDesktopOptionsOpen(false)}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
     </div>
   );
