@@ -302,6 +302,19 @@ export function DiscoverReelCard({
     };
   }, [isMobile]);
 
+  // React's `muted` JSX attribute only reliably sets the *initial* state of
+  // a <video> — toggling it via a prop re-render doesn't consistently flip
+  // the element's real audio output in every browser, which is why tapping
+  // the speaker button did nothing. Setting the DOM property directly here
+  // is what actually (un)mutes playback; the JSX attribute below still does
+  // its job of starting every reel muted so autoplay isn't blocked before
+  // this effect even runs.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = muted;
+  }, [muted, isMobile]);
+
   function togglePlayback() {
     const video = videoRef.current;
     if (!video) return;
@@ -357,7 +370,10 @@ export function DiscoverReelCard({
       // next one instead of repeating.
       loop={!autoScroll}
       onEnded={autoScroll ? onAutoScrollNext : undefined}
-      muted={muted}
+      // Always starts `true` in markup (autoplay would otherwise be blocked
+      // outright) — actual mute/unmute after that is owned entirely by the
+      // effect above, which sets `video.muted` on the DOM node directly.
+      muted
       playsInline
       // No onClick here — the tap-to-toggle handler lives on the
       // surrounding container (mobile: the whole screen; desktop: the video
