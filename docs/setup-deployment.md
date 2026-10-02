@@ -101,14 +101,50 @@ You'll also need a Supabase project regardless, for file storage (`SUPABASE_URL`
 `SUPABASE_SERVICE_ROLE_KEY`) — there's no local-disk fallback for uploads.
 
 ## Production Deployment
+
+### Backend (`server/`)
 - Build the server image (`docker build -t festari-backend ./server`) or deploy the compiled
   output (`npm run build && node dist/server.js`) to any Node host.
 - Set `NODE_ENV=production` and every var listed in step 2 with production values.
 - Point `PAYSTACK_CALLBACK_URL` at your real domain's `/api/v1/payments/webhook`.
 - Run `npm run db:migrate:run` against the production database before starting the server.
-- The frontend deploys as a standard Next.js app (Vercel or `next build && next start` behind
-  any reverse proxy) — set `NEXT_PUBLIC_API_URL` to the deployed backend's URL at build time
-  (Next.js inlines `NEXT_PUBLIC_*` vars at build, not at runtime).
+
+### Frontend (`client/`) — Vercel
+
+The frontend is a standard Next.js app deployed to Vercel, already linked to an existing
+project (`client/.vercel/project.json` — gitignored, so a fresh clone or a new Claude Code
+session needs to either reuse that file if present locally, or re-link as shown below).
+
+**One-time setup (per machine/session that doesn't already have `client/.vercel/`):**
+```bash
+cd client
+npx vercel login              # or use a token (see below)
+npx vercel link                # links this directory to the existing "client" Vercel project
+```
+
+**Token-based, non-interactive deploy** (what this repo's Claude Code sessions use, since
+there's no interactive browser login available):
+1. Get a Vercel access token from https://vercel.com/account/tokens.
+2. Save it somewhere **outside the repo** — e.g. the session scratchpad
+   (`.../scratchpad/vercel_token.txt`) or a local env var. Never commit it, never print it to
+   chat/logs.
+3. Deploy:
+   ```bash
+   cd client
+   npx vercel --prod --token="$VERCEL_TOKEN" --yes
+   ```
+   `--yes` skips the confirmation prompt; `--prod` deploys to the production environment/domain
+   (omit `--prod` for a preview deployment instead).
+4. Check the JSON output: `"readyState": "READY"` and `"target": "production"` confirm success;
+   `"url"`/`"productionUrl"` gives the live link.
+
+If `client/.vercel/project.json` is missing (new clone, new machine) but you have access to the
+existing Vercel project, `npx vercel link --token="$VERCEL_TOKEN" --yes` re-creates it without
+needing a browser.
+
+- `NEXT_PUBLIC_API_URL` must be set as an environment variable on the Vercel project (Project
+  Settings → Environment Variables), not just locally — Next.js inlines `NEXT_PUBLIC_*` vars at
+  build time, so it has to be present when Vercel runs the build, not just at runtime.
 
 ## Monitoring & Maintenance
 - **API health**: any successful response from `GET /api/v1/example` (or `/` for the root HTML
