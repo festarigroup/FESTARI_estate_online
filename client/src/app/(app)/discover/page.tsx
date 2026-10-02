@@ -1,75 +1,30 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { AppShell } from "@/components/shared/AppShell";
 import { DiscoverCommentPanel } from "@/components/shared/DiscoverCommentPanel";
 import { DiscoverCommentSheet } from "@/components/shared/DiscoverCommentSheet";
 import { DiscoverReelCard } from "@/components/shared/DiscoverReelCard";
 import { DiscoverReelCardSkeleton } from "@/components/shared/DiscoverReelCardSkeleton";
 import { DiscoverStoryRail } from "@/components/shared/DiscoverStoryRail";
-import { DISCOVER_TABS, DiscoverTopBar, type DiscoverTab } from "@/components/shared/DiscoverTopBar";
+import { DiscoverTopBar } from "@/components/shared/DiscoverTopBar";
 import { FadeIn } from "@/components/motion/FadeIn";
-import { PostStoryModal, VIDEO_ONLY_ACCEPT, type PostedStory } from "@/components/shared/PostStoryModal";
+import { PostStoryModal, VIDEO_ONLY_ACCEPT } from "@/components/shared/PostStoryModal";
 import { MyStoryViewer } from "@/components/shared/StoriesRow";
 import { Tooltip } from "@/components/shared/Tooltip";
-import { useDiscoverStories } from "@/hooks/useDiscoverStories";
+import { useDiscoverReels } from "@/hooks/useDiscoverReels";
+import { useMyStories } from "@/hooks/useMyStories";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
-import { DISCOVER_REELS, type DiscoverReel } from "@/lib/dummy-reels";
-
-function makeReelId() {
-  return typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `reel-${Date.now()}`;
-}
 
 export default function DiscoverPage() {
-  const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<DiscoverTab>(DISCOVER_TABS[0]);
+  const { reels, loading, query, setQuery, activeTab, setActiveTab, addReel } = useDiscoverReels();
   const [activeIndex, setActiveIndex] = useState(0);
   const [commentsReelId, setCommentsReelId] = useState<string | null>(null);
-  const [myReels, setMyReels] = useState<DiscoverReel[]>([]);
   const [composerOpen, setComposerOpen] = useState(false);
   const [autoScroll, setAutoScroll] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
-  const stories = useDiscoverStories();
-
-  // Simulates the brief fetch a real reels feed would need, so the stack's
-  // skeleton state is actually reachable instead of being dead code.
-  useEffect(() => {
-    const timer = window.setTimeout(() => setLoading(false), 500);
-    return () => window.clearTimeout(timer);
-  }, []);
-
-  function postReel({ url, caption }: PostedStory) {
-    setMyReels((current) => [
-      {
-        id: makeReelId(),
-        authorName: "Andy Ansong",
-        authorAvatar: "/images/avatar-kasapa.png",
-        verified: true,
-        following: true,
-        caption: caption ? `${caption} (More)` : "New reel",
-        video: url,
-        poster: "/images/avatar-kasapa.png",
-        likes: 0,
-        comments: 0,
-        shares: 0,
-        reposts: 0,
-        saves: 0,
-      },
-      ...current,
-    ]);
-  }
-
-  const reels = useMemo(() => {
-    const allReels = [...myReels, ...DISCOVER_REELS];
-    const byTab = activeTab === "Following" ? allReels.filter((reel) => reel.following) : allReels;
-    const q = query.trim().toLowerCase();
-    if (!q) return byTab;
-    return byTab.filter(
-      (reel) => reel.authorName.toLowerCase().includes(q) || reel.caption.toLowerCase().includes(q),
-    );
-  }, [activeTab, query, myReels]);
+  const stories = useMyStories();
 
   function scrollToIndex(index: number) {
     const clamped = Math.max(0, Math.min(index, reels.length - 1));
@@ -166,7 +121,7 @@ export default function DiscoverPage() {
       <PostStoryModal
         open={composerOpen}
         onClose={() => setComposerOpen(false)}
-        onPost={postReel}
+        onPost={addReel}
         title="Post a Reel"
         ctaLabel="Post Reel"
         accept={VIDEO_ONLY_ACCEPT}

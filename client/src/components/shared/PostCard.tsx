@@ -9,29 +9,17 @@ import { FollowButton } from "@/components/shared/FollowButton";
 import { LikesBottomSheet } from "@/components/shared/LikesBottomSheet";
 import { MediaLoadError } from "@/components/shared/MediaLoadError";
 import { NavIcon } from "@/components/shared/NavIcon";
-import type { CommentAttachments } from "@/components/shared/CommentComposer";
-import { CommentsModal, DEFAULT_COMMENTS, type CommentItem } from "@/components/shared/PostComments";
+import { CommentsModal, DEFAULT_COMMENTS } from "@/components/shared/PostComments";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { useMediaLoadState } from "@/hooks/useMediaLoadState";
 import { Tooltip } from "@/components/shared/Tooltip";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { renderWithHashtags } from "@/lib/hashtags";
 import { buildLikerNames } from "@/lib/likes";
 import { shareContent } from "@/lib/share";
 import { cn } from "@/lib/utils";
-
-export type PostActionVariant = "primary" | "outline" | "outline-brand";
-
-export interface PostAction {
-  label: string;
-  variant: PostActionVariant;
-}
-
-export interface PollOption {
-  label: string;
-  percent: number;
-  votes: string;
-  leading?: boolean;
-}
+import type { CommentAttachments, CommentItem } from "@/types/comment";
+import type { MediaItem, PostCardData } from "@/types/post";
 
 function getMediaItems(post: PostCardData): MediaItem[] {
   if (post.media) return post.media;
@@ -39,49 +27,6 @@ function getMediaItems(post: PostCardData): MediaItem[] {
   if (post.images) return post.images.map((url) => ({ url }));
   if (post.image) return [{ url: post.image }];
   return [];
-}
-
-export interface MediaItem {
-  url: string;
-  isVideo?: boolean;
-}
-
-export interface PostCardData {
-  id: string;
-  variant?: "text" | "poll" | "property" | "stay" | "project" | "professional" | "artisan";
-  authorName: string;
-  roleLine: string;
-  postedAt: string;
-  avatar: string;
-  avatarPlaceholder?: boolean;
-  verified?: "individual" | "organization";
-  text?: string;
-  truncated?: boolean;
-  image?: string;
-  images?: string[];
-  video?: string;
-  media?: MediaItem[];
-  likes: number;
-  comments: number;
-  shares?: number;
-  shareLabel?: string;
-  showComposer?: boolean;
-  // poll
-  participantAvatars?: string[];
-  question?: string;
-  hashtags?: string;
-  pollOptions?: PollOption[];
-  pollFooter?: string;
-  // property / stay
-  priceLine?: string;
-  priceSuffix?: string;
-  subLine?: string;
-  beds?: number;
-  baths?: number;
-  rating?: string;
-  actions?: PostAction[];
-  messageHostLabel?: string;
-  commentsList?: CommentItem[];
 }
 
 interface PostCardProps {
@@ -243,24 +188,15 @@ function PostHeader({ post }: { post: PostCardData }) {
             />
           </>
         )}
-        <Tooltip label="Post options" className="sm:hidden">
+        <Tooltip label="Post options">
           <button
             type="button"
             aria-label="Post options"
             onClick={() => router.push(comingSoonHref("Post options"))}
             className="relative block size-[23px] shrink-0"
           >
-            <Image src="/icons/more-horizontal.svg" alt="" fill sizes="23px" />
-          </button>
-        </Tooltip>
-        <Tooltip label="Post options" className="hidden sm:inline-flex">
-          <button
-            type="button"
-            aria-label="Post options"
-            onClick={() => router.push(comingSoonHref("Post options"))}
-            className="relative block size-[23px] shrink-0"
-          >
-            <Image src="/icons/menu-03.svg" alt="" fill sizes="23px" />
+            <Image src="/icons/more-horizontal.svg" alt="" fill sizes="23px" className="sm:hidden" />
+            <Image src="/icons/menu-03.svg" alt="" fill sizes="23px" className="hidden sm:block" />
           </button>
         </Tooltip>
       </div>
@@ -271,31 +207,18 @@ function PostHeader({ post }: { post: PostCardData }) {
 function MediaCarousel({ items }: { items: MediaItem[] }) {
   const [index, setIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [failedUrls, setFailedUrls] = useState<Set<string>>(new Set());
-  const [loadedUrls, setLoadedUrls] = useState<Set<string>>(new Set());
-  const [retryTick, setRetryTick] = useState(0);
   const hasMultiple = items.length > 1;
   const current = items[index];
-  const currentFailed = failedUrls.has(current.url);
-  const currentLoaded = loadedUrls.has(current.url);
+  const media = useMediaLoadState(current.url);
 
   const goTo = (next: number) => setIndex((next + items.length) % items.length);
-
-  const retryImage = (url: string) => {
-    setFailedUrls((prev) => {
-      const next = new Set(prev);
-      next.delete(url);
-      return next;
-    });
-    setRetryTick((tick) => tick + 1);
-  };
 
   return (
     <div className="relative h-[285px] w-full overflow-hidden rounded-[29px] sm:rounded-[15px]">
       {current.isVideo ? (
         <video src={current.url} controls className="size-full object-cover" />
-      ) : currentFailed ? (
-        <MediaLoadError onRetry={() => retryImage(current.url)} className="absolute inset-0" />
+      ) : media.failed ? (
+        <MediaLoadError onRetry={media.retry} className="absolute inset-0" />
       ) : (
         <button
           type="button"
@@ -305,16 +228,15 @@ function MediaCarousel({ items }: { items: MediaItem[] }) {
         >
           {/* Shown until the image reports loaded — the more meaningful state on a slow
               connection, where the request can sit pending for seconds rather than failing outright. */}
-          {!currentLoaded && <Skeleton className="absolute inset-0 rounded-none" />}
+          {!media.loaded && <Skeleton className="absolute inset-0 rounded-none" />}
           <Image
-            key={retryTick}
+            key={media.retryKey}
             src={current.url}
             alt=""
             fill
-            className={cn("object-cover transition-opacity duration-300", currentLoaded ? "opacity-100" : "opacity-0")}
+            className={cn("object-cover transition-opacity duration-300", media.loaded ? "opacity-100" : "opacity-0")}
             sizes="770px"
-            onLoad={() => setLoadedUrls((prev) => new Set(prev).add(current.url))}
-            onError={() => setFailedUrls((prev) => new Set(prev).add(current.url))}
+            {...media.imageProps}
           />
         </button>
       )}
@@ -378,21 +300,8 @@ function MediaLightbox({
   onIndexChange: (next: number) => void;
   onClose: () => void;
 }) {
-  const [failedUrls, setFailedUrls] = useState<Set<string>>(new Set());
-  const [loadedUrls, setLoadedUrls] = useState<Set<string>>(new Set());
-  const [retryTick, setRetryTick] = useState(0);
   const current = items[index];
-  const currentFailed = failedUrls.has(current.url);
-  const currentLoaded = loadedUrls.has(current.url);
-
-  const retryImage = (url: string) => {
-    setFailedUrls((prev) => {
-      const next = new Set(prev);
-      next.delete(url);
-      return next;
-    });
-    setRetryTick((tick) => tick + 1);
-  };
+  const media = useMediaLoadState(current.url);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -428,20 +337,19 @@ function MediaLightbox({
       <div className="relative h-full w-full max-w-4xl" onClick={(event) => event.stopPropagation()}>
         {current.isVideo ? (
           <video src={current.url} controls autoPlay className="size-full object-contain" />
-        ) : currentFailed ? (
-          <MediaLoadError onRetry={() => retryImage(current.url)} className="absolute inset-0 rounded-xl" />
+        ) : media.failed ? (
+          <MediaLoadError onRetry={media.retry} className="absolute inset-0 rounded-xl" />
         ) : (
           <>
-            {!currentLoaded && <Skeleton className="absolute inset-0 rounded-xl" />}
+            {!media.loaded && <Skeleton className="absolute inset-0 rounded-xl" />}
             <Image
-              key={retryTick}
+              key={media.retryKey}
               src={current.url}
               alt=""
               fill
-              className={cn("object-contain transition-opacity duration-300", currentLoaded ? "opacity-100" : "opacity-0")}
+              className={cn("object-contain transition-opacity duration-300", media.loaded ? "opacity-100" : "opacity-0")}
               sizes="100vw"
-              onLoad={() => setLoadedUrls((prev) => new Set(prev).add(current.url))}
-              onError={() => setFailedUrls((prev) => new Set(prev).add(current.url))}
+              {...media.imageProps}
             />
           </>
         )}
@@ -714,12 +622,12 @@ function PostStatsBar({
               icon={liked ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
               color="night"
               size={23}
-              className={liked ? "bg-[#ef575f] animate-like-pop" : undefined}
+              className={liked ? "bg-like animate-like-pop" : undefined}
             />
             <span
               className={cn(
                 "hidden text-[11px] font-bold sm:inline",
-                liked ? "text-[#ef575f]" : "text-brand-900",
+                liked ? "text-like" : "text-brand-900",
               )}
             >
               {likeCount} Likes

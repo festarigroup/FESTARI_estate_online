@@ -5,10 +5,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Tooltip } from "@/components/shared/Tooltip";
 import { comingSoonHref } from "@/lib/coming-soon";
+import { DISCOVER_TABS, type DiscoverTab } from "@/lib/discover-tabs";
 import { cn } from "@/lib/utils";
-
-export const DISCOVER_TABS = ["For You", "Following", "Popular", "Featured", "Watch Later"] as const;
-export type DiscoverTab = (typeof DISCOVER_TABS)[number];
 
 interface DiscoverTopBarProps {
   query: string;
@@ -87,22 +85,6 @@ export function DiscoverTopBar({ query, onQueryChange, activeTab, onTabChange, b
         </div>
 
         <div className="flex shrink-0 items-center gap-1 py-1 sm:gap-2">
-          <Tooltip label="Search" side="bottom" className="lg:hidden">
-            <button
-              type="button"
-              aria-label="Search Discover"
-              onClick={() => {
-                const next = window.prompt("Search Discover", query);
-                if (next !== null) onQueryChange(next);
-              }}
-              className="relative flex size-[38px] items-center justify-center rounded-full hover:bg-gray-50"
-            >
-              <span className="relative block size-[19px] shrink-0">
-                <Image src="/icons/search.svg" alt="" fill sizes="19px" />
-              </span>
-            </button>
-          </Tooltip>
-
           <Tooltip label="Messages" side="bottom" className="hidden sm:inline-flex">
             <Link
               href={comingSoonHref("Messages")}

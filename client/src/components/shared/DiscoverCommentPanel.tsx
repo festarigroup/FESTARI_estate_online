@@ -4,8 +4,9 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { showErrorToast } from "@/components/shared/AppToast";
 import { EmojiPicker } from "@/components/shared/EmojiPicker";
-import { CommentLikeButton, DEFAULT_COMMENTS, type CommentItem } from "@/components/shared/PostComments";
+import { CommentLikeButton, DEFAULT_COMMENTS } from "@/components/shared/PostComments";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
+import type { CommentItem } from "@/types/comment";
 
 interface DiscoverCommentPanelProps {
   reelId: string;
@@ -149,7 +150,7 @@ export function DiscoverCommentPanel({ reelId, onClose }: DiscoverCommentPanelPr
             <span className="h-[18px] w-[1.5px] shrink-0 bg-brand-900" aria-hidden />
             {recorder.isRecording ? (
               <p className="flex min-w-0 flex-1 items-center gap-2 text-[13px] font-medium text-black" role="status">
-                <span className="size-2 shrink-0 animate-pulse rounded-full bg-[#ef575f]" />
+                <span className="size-2 shrink-0 animate-pulse rounded-full bg-like" />
                 Recording… {formatClock(recorder.seconds)}
               </p>
             ) : (
@@ -204,7 +205,7 @@ export function DiscoverCommentPanel({ reelId, onClose }: DiscoverCommentPanelPr
           className="flex size-3.5 items-center justify-center"
         >
           {recorder.isRecording ? (
-            <span className="size-2.5 rounded-sm bg-[#ef575f]" />
+            <span className="size-2.5 rounded-sm bg-like" />
           ) : (
             <Image src="/icons/mic-02.svg" alt="" width={10} height={13} />
           )}
@@ -212,7 +213,7 @@ export function DiscoverCommentPanel({ reelId, onClose }: DiscoverCommentPanelPr
       </div>
 
       {recorder.error && (
-        <p className="text-[11px] text-[#ef575f]" role="alert">
+        <p className="text-[11px] text-like" role="alert">
           {recorder.error}
         </p>
       )}

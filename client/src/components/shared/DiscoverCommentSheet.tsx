@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { CommentComposer, type CommentAttachments } from "@/components/shared/CommentComposer";
-import { CommentRow, DEFAULT_COMMENTS, type CommentItem } from "@/components/shared/PostComments";
+import { CommentComposer } from "@/components/shared/CommentComposer";
+import { CommentRow, DEFAULT_COMMENTS } from "@/components/shared/PostComments";
 import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 import { cn } from "@/lib/utils";
+import type { CommentAttachments, CommentItem } from "@/types/comment";
 
 interface DiscoverCommentSheetProps {
   open: boolean;

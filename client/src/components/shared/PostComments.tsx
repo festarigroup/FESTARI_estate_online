@@ -3,24 +3,12 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { CommentComposer, type CommentAttachments } from "@/components/shared/CommentComposer";
+import { CommentComposer } from "@/components/shared/CommentComposer";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 import { renderWithHashtags } from "@/lib/hashtags";
 import { cn } from "@/lib/utils";
-
-export interface CommentItem {
-  id: string;
-  authorName: string;
-  avatar?: string;
-  postedAt: string;
-  text: string;
-  likes?: number;
-  /** Object URL of an attached photo. */
-  image?: string;
-  /** Object URL of an attached voice note. */
-  audio?: string;
-}
+import type { CommentAttachments, CommentItem } from "@/types/comment";
 
 export const DEFAULT_COMMENTS: CommentItem[] = [
   {
@@ -105,9 +93,9 @@ export function CommentsModal({
             icon={liked ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
             color="night"
             size={20}
-            className={liked ? "bg-[#ef575f] animate-like-pop" : undefined}
+            className={liked ? "bg-like animate-like-pop" : undefined}
           />
-          <span className={cn("text-xs font-bold", liked ? "text-[#ef575f]" : "text-brand-900")}>
+          <span className={cn("text-xs font-bold", liked ? "text-like" : "text-brand-900")}>
             {likeCount} Likes
           </span>
         </button>
@@ -325,7 +313,7 @@ export function CommentLikeButton({ initialLikes }: { initialLikes: number }) {
         icon={filled ? "/icons/heart-like-filled.svg" : "/icons/heart-like.svg"}
         color="brand"
         size={14}
-        className={cn(filled ? "bg-[#ea5e9c]" : "bg-gray-400", liked && "animate-like-pop")}
+        className={cn(filled ? "bg-like-soft" : "bg-gray-400", liked && "animate-like-pop")}
       />
       {likeCount > 0 ? (
         <span className="font-rubik text-[10px] font-bold uppercase text-brand-900">{likeCount}</span>

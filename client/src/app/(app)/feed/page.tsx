@@ -8,12 +8,13 @@ import { showSuccessToast } from "@/components/shared/AppToast";
 import { FeedRightRail } from "@/components/shared/FeedRightRail";
 import { MobileQuickPostModal, type QuickComposerMode } from "@/components/shared/MobileQuickPostModal";
 import { NewPostsPill } from "@/components/shared/NewPostsPill";
-import { PostCard, type PostCardData } from "@/components/shared/PostCard";
+import { PostCard } from "@/components/shared/PostCard";
 import { TrustedListingsBanner } from "@/components/shared/TrustedListingsBanner";
 import { usePostsFeed } from "@/context/PostsContext";
 import { usePostModals, type PostModalType } from "@/hooks/usePostModals";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { FEED_POSTS } from "@/lib/dummy-posts";
+import type { PostCardData } from "@/types/post";
 
 interface FeedTab {
   label: string;

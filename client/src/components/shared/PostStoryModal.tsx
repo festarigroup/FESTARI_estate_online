@@ -7,6 +7,7 @@ import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 import { cn } from "@/lib/utils";
+import type { PostedStory } from "@/types/story";
 
 const STORY_MEDIA_ACCEPT = [
   "image/png",
@@ -20,12 +21,6 @@ const STORY_MEDIA_ACCEPT = [
 ];
 
 export const VIDEO_ONLY_ACCEPT = ["video/mp4", "video/x-matroska", "video/x-msvideo", "video/quicktime", "video/webm"];
-
-export interface PostedStory {
-  url: string;
-  isVideo: boolean;
-  caption?: string;
-}
 
 interface PostStoryModalProps {
   open: boolean;

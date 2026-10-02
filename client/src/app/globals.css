@@ -50,6 +50,14 @@
   --color-gray-500: #64748a;
   --color-gray-700: #334154;
   --color-text-secondary-dark: #676e85;
+
+  /* Interaction + Discover reel tokens (previously repeated as raw hex). */
+  --color-like: #ef575f;
+  --color-like-soft: #ea5e9c;
+  --color-danger: #ff3135;
+  --color-reel-from: #5433ff;
+  --color-reel-to: #20bdff;
+  --color-reel-ink: #06090e;
 }
 
 html {

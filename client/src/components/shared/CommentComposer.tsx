@@ -6,13 +6,7 @@ import { showErrorToast } from "@/components/shared/AppToast";
 import { EmojiPicker } from "@/components/shared/EmojiPicker";
 import { useVoiceRecorder } from "@/hooks/useVoiceRecorder";
 import { cn } from "@/lib/utils";
-
-export interface CommentAttachments {
-  /** Object URL of an attached photo. */
-  image?: string;
-  /** Object URL of a recorded voice note. */
-  audio?: string;
-}
+import type { CommentAttachments } from "@/types/comment";
 
 const IMAGE_ACCEPT = ["image/png", "image/jpeg", "image/gif", "image/webp"];
 
@@ -127,7 +121,7 @@ export function CommentComposer({ draft, onDraftChange, onSubmit }: CommentCompo
 
         {recorder.isRecording ? (
           <p className="flex min-w-0 flex-1 items-center gap-2 text-[12px] font-medium text-black" role="status">
-            <span className="size-2 shrink-0 animate-pulse rounded-full bg-[#ef575f]" />
+            <span className="size-2 shrink-0 animate-pulse rounded-full bg-like" />
             Recording… {formatClock(recorder.seconds)}
           </p>
         ) : (
@@ -174,7 +168,7 @@ export function CommentComposer({ draft, onDraftChange, onSubmit }: CommentCompo
             className="flex size-3.5 items-center justify-center"
           >
             {recorder.isRecording ? (
-              <span className="size-2.5 rounded-sm bg-[#ef575f]" />
+              <span className="size-2.5 rounded-sm bg-like" />
             ) : (
               <Image src="/icons/mic-02.svg" alt="" width={10} height={13} />
             )}
@@ -192,7 +186,7 @@ export function CommentComposer({ draft, onDraftChange, onSubmit }: CommentCompo
       </div>
 
       {recorder.error && (
-        <p className="px-2 pb-1 text-[11px] text-[#ef575f]" role="alert">
+        <p className="px-2 pb-1 text-[11px] text-like" role="alert">
           {recorder.error}
         </p>
       )}

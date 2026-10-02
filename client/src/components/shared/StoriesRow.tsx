@@ -8,21 +8,10 @@ import { comingSoonHref } from "@/lib/coming-soon";
 import { shareContent } from "@/lib/share";
 import { cn } from "@/lib/utils";
 import { STORIES } from "@/lib/dummy-stories";
-import { PostStoryModal, type PostedStory } from "@/components/shared/PostStoryModal";
-
-export const RING_GRADIENT =
-  "linear-gradient(45deg, #f09433 0%, #e6643c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)";
-
-export const STORY_LIFETIME_MS = 24 * 60 * 60 * 1000;
-
-export interface MyStory extends PostedStory {
-  id: string;
-  postedAt: number;
-}
-
-export function makeStoryId() {
-  return typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `story-${Date.now()}`;
-}
+import { StoryRing } from "@/components/shared/StoryRing";
+import { PostStoryModal } from "@/components/shared/PostStoryModal";
+import { useMyStories } from "@/hooks/useMyStories";
+import type { MyStory } from "@/types/story";
 
 /** "Stories" card at the top of the "/home" dashboard — a horizontally
  * scrollable rail of avatars, each ringed in the Instagram-style gradient
@@ -31,33 +20,9 @@ export function makeStoryId() {
  * and each posted story expires — is dropped from the list — 24h after
  * posting, same as real stories. */
 export function StoriesRow() {
-  const [myStories, setMyStories] = useState<MyStory[]>([]);
-  const [composerOpen, setComposerOpen] = useState(false);
-  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
-
-  // Prune expired stories on an interval, not just on the next unrelated
-  // render, so a story you leave the tab open past 24h on still disappears.
-  useEffect(() => {
-    const prune = () => {
-      setMyStories((current) => {
-        const active = current.filter((story) => Date.now() - story.postedAt < STORY_LIFETIME_MS);
-        return active.length === current.length ? current : active;
-      });
-    };
-    const interval = setInterval(prune, 60_000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const activeStories = myStories.filter((story) => Date.now() - story.postedAt < STORY_LIFETIME_MS);
+  const stories = useMyStories();
+  const { activeStories } = stories;
   const latestStory = activeStories[activeStories.length - 1];
-
-  function addStory(story: PostedStory) {
-    setMyStories((current) => [...current, { ...story, id: makeStoryId(), postedAt: Date.now() }]);
-  }
-
-  function deleteStory(id: string) {
-    setMyStories((current) => current.filter((story) => story.id !== id));
-  }
 
   return (
     <div className="flex w-full flex-col gap-3 rounded-[28px] border border-gray-200 bg-white p-4">
@@ -74,24 +39,24 @@ export function StoriesRow() {
           avatar={latestStory?.url ?? "/images/stories/your-story.jpg"}
           addBadge
           hasStory={activeStories.length > 0}
-          onClick={() => (activeStories.length > 0 ? setViewerIndex(0) : setComposerOpen(true))}
+          onClick={stories.openYourStory}
         />
         {STORIES.map((story) => (
           <StoryItem key={story.id} href={comingSoonHref(`${story.name}'s Story`)} label={story.name} avatar={story.avatar} />
         ))}
       </div>
 
-      <PostStoryModal open={composerOpen} onClose={() => setComposerOpen(false)} onPost={addStory} />
+      <PostStoryModal open={stories.composerOpen} onClose={() => stories.setComposerOpen(false)} onPost={stories.addStory} />
 
-      {viewerIndex !== null && activeStories.length > 0 && (
+      {stories.viewerIndex !== null && activeStories.length > 0 && (
         <MyStoryViewer
           stories={activeStories}
-          initialIndex={viewerIndex}
-          onClose={() => setViewerIndex(null)}
-          onDelete={deleteStory}
+          initialIndex={stories.viewerIndex}
+          onClose={() => stories.setViewerIndex(null)}
+          onDelete={stories.deleteStory}
           onAddAnother={() => {
-            setViewerIndex(null);
-            setComposerOpen(true);
+            stories.setViewerIndex(null);
+            stories.setComposerOpen(true);
           }}
         />
       )}
@@ -114,21 +79,19 @@ function StoryItem({
   hasStory?: boolean;
   onClick?: () => void;
 }) {
-  const ringStyle = addBadge && !hasStory ? { backgroundColor: "#e2e8f0" } : { backgroundImage: RING_GRADIENT };
-
   const content = (
     <>
-      <span className="relative flex size-14 shrink-0 items-center justify-center rounded-full p-0.5" style={ringStyle}>
-        <span className="relative block size-full overflow-hidden rounded-full border-2 border-white">
+      <span className="relative block size-14 shrink-0">
+        <StoryRing active={!addBadge || !!hasStory} className="size-full">
           <Image src={avatar} alt="" fill className="object-cover" sizes="56px" />
-        </span>
+        </StoryRing>
         {addBadge && (
-          <span className="absolute -bottom-0.5 -right-0.5 flex size-5 items-center justify-center rounded-full border-2 border-white bg-brand-900 text-[11px] font-bold leading-none text-white">
+          <span className="absolute -bottom-0.5 right-0 flex size-5 items-center justify-center rounded-full border-2 border-white bg-brand-900 text-[11px] font-bold leading-none text-white drop-shadow-[0px_1px_1px_rgba(0,0,0,0.05)]">
             +
           </span>
         )}
       </span>
-      <span className="w-full truncate pt-1.5 text-center text-[11px] font-medium text-night-900">{label}</span>
+      <span className="w-full truncate pt-1.5 text-center text-[11px] font-medium text-reel-ink">{label}</span>
     </>
   );
 
@@ -164,15 +127,13 @@ export function MyStoryViewer({
   onDelete: (id: string) => void;
   onAddAnother: () => void;
 }) {
-  const [index, setIndex] = useState(Math.min(initialIndex, stories.length - 1));
+  const [requestedIndex, setIndex] = useState(initialIndex);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   // The list shrinks in place when a story is deleted or expires out from
-  // under the viewer — keep the index in range instead of pointing past the end.
-  useEffect(() => {
-    if (index > stories.length - 1) setIndex(Math.max(0, stories.length - 1));
-  }, [stories.length, index]);
+  // under the viewer — derive an in-range index instead of pointing past the end.
+  const index = Math.max(0, Math.min(requestedIndex, stories.length - 1));
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -192,11 +153,11 @@ export function MyStoryViewer({
       onClose();
       return;
     }
-    setIndex((i) => i + 1);
+    setIndex(index + 1);
   }
 
   function goPrev() {
-    setIndex((i) => Math.max(0, i - 1));
+    setIndex(Math.max(0, index - 1));
   }
 
   function handleShare() {

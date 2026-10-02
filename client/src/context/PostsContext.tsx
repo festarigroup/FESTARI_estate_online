@@ -1,8 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
-import type { PostCardData } from "@/components/shared/PostCard";
 import type { PropertyListing, ServiceListing, StayListing } from "@/lib/dummy-listings";
+import type { PostCardData } from "@/types/post";
 
 export type NewPostInput =
   | { kind: "media"; text: string; files: File[] }

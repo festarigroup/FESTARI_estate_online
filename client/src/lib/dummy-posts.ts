@@ -1,4 +1,4 @@
-import type { PostCardData } from "@/components/shared/PostCard";
+import type { PostCardData } from "@/types/post";
 
 const POST_TEXT =
   "Land prices in East Legon Hills are up nearly 12% this quarter. If you're thinking of buying in the next 6 months, now's worth a serious look.";

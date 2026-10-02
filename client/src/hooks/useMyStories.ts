@@ -1,33 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { PostedStory } from "@/components/shared/PostStoryModal";
+import { isStoryActive, makeStoryId } from "@/lib/stories";
+import type { MyStory, PostedStory } from "@/types/story";
 
-const STORY_LIFETIME_MS = 24 * 60 * 60 * 1000;
-
-export interface MyStory extends PostedStory {
-  id: string;
-  postedAt: number;
-}
-
-function makeStoryId() {
-  return typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `story-${Date.now()}`;
-}
-
-/** Shared "my story" state for Discover's two story-rail layouts (the
- * desktop vertical aside and the mobile horizontal bar) — lifted to a single
- * hook call in discover/page.tsx and threaded down as props, rather than
- * each layout owning its own copy, so posting/deleting a story stays
- * consistent regardless of which layout is visible at a given viewport. */
-export function useDiscoverStories() {
+/** The signed-in user's own stories — posting, viewing, deleting, and the
+ * 24h expiry — shared by every "your story" surface (the home dashboard's
+ * `StoriesRow` and Discover's `DiscoverStoryRail`) so the mechanics are
+ * defined exactly once. */
+export function useMyStories() {
   const [myStories, setMyStories] = useState<MyStory[]>([]);
   const [composerOpen, setComposerOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
+  // Prune on an interval, not just on the next unrelated render, so a story
+  // left open in a tab past 24h still disappears.
   useEffect(() => {
     const prune = () => {
       setMyStories((current) => {
-        const active = current.filter((story) => Date.now() - story.postedAt < STORY_LIFETIME_MS);
+        const active = current.filter((story) => isStoryActive(story));
         return active.length === current.length ? current : active;
       });
     };
@@ -35,7 +26,7 @@ export function useDiscoverStories() {
     return () => clearInterval(interval);
   }, []);
 
-  const activeStories = myStories.filter((story) => Date.now() - story.postedAt < STORY_LIFETIME_MS);
+  const activeStories = myStories.filter((story) => isStoryActive(story));
 
   function addStory(story: PostedStory) {
     setMyStories((current) => [...current, { ...story, id: makeStoryId(), postedAt: Date.now() }]);
