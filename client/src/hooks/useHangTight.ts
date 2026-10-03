@@ -13,5 +13,14 @@ export function useHangTight(delayMs: number = DEFAULT_DELAY_MS) {
     }, delayMs);
   }
 
-  return { pending, run };
+  async function runAsync<T>(task: () => Promise<T>): Promise<T> {
+    setPending(true);
+    try {
+      return await task();
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return { pending, run, runAsync };
 }

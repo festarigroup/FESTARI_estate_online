@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
-import { showSuccessToast } from "@/components/shared/AppToast";
+import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { HangTightCard } from "@/components/shared/HangTightCard";
 import { Button } from "@/components/ui/Button";
@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useHangTight } from "@/hooks/useHangTight";
+import { ApiError } from "@/lib/api";
+import { login } from "@/lib/auth-api";
 import { isNonEmpty, validateIdentifier } from "@/lib/validation";
 
 const TAGLINE = { highlight: "Welcome Back to", rest: "the Built Environment" };
@@ -23,13 +25,13 @@ function SignInContent() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ identifier?: string; password?: string }>({});
-  const { pending, run } = useHangTight();
+  const { pending, runAsync } = useHangTight();
 
   function useOtherMethod() {
     router.push("/auth");
   }
 
-  function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
     const nextErrors = {
@@ -39,10 +41,15 @@ function SignInContent() {
     setErrors(nextErrors);
     if (nextErrors.identifier || nextErrors.password) return;
 
-    run(() => {
+    try {
+      await runAsync(() =>
+        login(method === "email" ? { email: identifier, password } : { phone: identifier, password }),
+      );
       showSuccessToast("Signed in! Welcome back to Biltlinx");
       router.push("/home");
-    });
+    } catch (error) {
+      showErrorToast(error instanceof ApiError ? error.message : "Unable to sign in");
+    }
   }
 
   if (pending) {

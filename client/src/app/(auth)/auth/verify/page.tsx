@@ -2,13 +2,15 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
-import { showSuccessToast } from "@/components/shared/AppToast";
+import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { HangTightCard } from "@/components/shared/HangTightCard";
 import { OtpInput } from "@/components/shared/OtpInput";
 import { Button } from "@/components/ui/Button";
 import { useHangTight } from "@/hooks/useHangTight";
 import { useResendCountdown } from "@/hooks/useResendCountdown";
+import { ApiError } from "@/lib/api";
+import { resendOtp, verifyOtp } from "@/lib/auth-api";
 import { isCompleteOtp } from "@/lib/validation";
 import { cn } from "@/lib/utils";
 
@@ -21,26 +23,34 @@ function VerifyContent() {
 
   const [otp, setOtp] = useState<string[]>(["", "", "", ""]);
   const [otpError, setOtpError] = useState(false);
-  const { pending, run } = useHangTight();
+  const { pending, runAsync } = useHangTight();
   const { secondsLeft, canResend, restart } = useResendCountdown();
 
-  function handleResend() {
+  async function handleResend() {
     if (!canResend) return;
-    showSuccessToast("OTP resent");
-    restart();
+    try {
+      await resendOtp({ email: identifier });
+      showSuccessToast("OTP resent");
+      restart();
+    } catch (error) {
+      showErrorToast(error instanceof ApiError ? error.message : "Unable to resend OTP");
+    }
   }
 
-  function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
     const incomplete = !isCompleteOtp(otp);
     setOtpError(incomplete);
     if (incomplete) return;
 
-    run(() => {
-      showSuccessToast(isSignup ? "Account created! Welcome to Biltlinx" : "Welcome back!");
-      router.push("/home");
-    });
+    try {
+      await runAsync(() => verifyOtp({ email: identifier, otp: otp.join("") }));
+      showSuccessToast(isSignup ? "Account verified! Sign in to continue" : "Account verified!");
+      router.push("/auth/sign-in?method=email");
+    } catch (error) {
+      showErrorToast(error instanceof ApiError ? error.message : "Unable to verify code");
+    }
   }
 
   if (pending) {

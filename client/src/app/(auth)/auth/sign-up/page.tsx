@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { showSuccessToast } from "@/components/shared/AppToast";
+import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { HangTightCard } from "@/components/shared/HangTightCard";
 import { SocialAuthButton } from "@/components/shared/SocialAuthButton";
@@ -13,6 +13,8 @@ import { Divider } from "@/components/ui/Divider";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useHangTight } from "@/hooks/useHangTight";
+import { ApiError } from "@/lib/api";
+import { register } from "@/lib/auth-api";
 import { validateFullName, validateIdentifier, validatePassword } from "@/lib/validation";
 
 const TERMS_ERROR = "You must confirm your age and agree to the terms to continue";
@@ -80,7 +82,7 @@ export default function SignUpPage() {
     password?: string;
     terms?: string;
   }>({});
-  const { pending, run } = useHangTight();
+  const { pending, runAsync } = useHangTight();
 
   function handleContinue(event: React.FormEvent) {
     event.preventDefault();
@@ -95,13 +97,14 @@ export default function SignUpPage() {
     setStep("security");
   }
 
-  function goToOtpVerification() {
-    const channel = email ? "email" : "phone";
-    const params = new URLSearchParams({
-      identifier: email || phone,
-      channel,
-      context: "signup",
-    });
+  async function submitRegistration() {
+    try {
+      await runAsync(() => register({ username: fullName, primaryContact: phone, email, password }));
+    } catch (error) {
+      showErrorToast(error instanceof ApiError ? error.message : "Unable to create account");
+      return;
+    }
+    const params = new URLSearchParams({ identifier: email, channel: "email", context: "signup" });
     router.push(`/auth/verify?${params.toString()}`);
   }
 
@@ -125,7 +128,7 @@ export default function SignUpPage() {
     setErrors((prev) => ({ ...prev, terms: termsError }));
     if (termsError) return;
 
-    run(goToOtpVerification);
+    void submitRegistration();
   }
 
   const mobileField: MobileField = MOBILE_FIELDS[mobileFieldIndex];
@@ -151,7 +154,7 @@ export default function SignUpPage() {
     if (fieldError || termsError) return;
 
     if (isMobileLastField) {
-      run(goToOtpVerification);
+      void submitRegistration();
       return;
     }
     setMobileFieldIndex((index) => index + 1);

@@ -10,6 +10,7 @@ import { MobileQuickPostModal, type QuickComposerMode } from "@/components/share
 import { NavIcon } from "@/components/shared/NavIcon";
 import { Tooltip } from "@/components/shared/Tooltip";
 import { usePostModals } from "@/hooks/usePostModals";
+import { logout } from "@/lib/auth-api";
 import { comingSoonHref } from "@/lib/coming-soon";
 
 export function TopNav() {
@@ -27,8 +28,13 @@ export function TopNav() {
     setMobileQuickOpen(true);
   }
 
-  function handleLogout() {
+  async function handleLogout() {
     setMenuOpen(false);
+    try {
+      await logout();
+    } catch {
+      // session may already be gone; leave the page regardless
+    }
     showSuccessToast("You've been logged out");
     router.push("/auth");
   }
