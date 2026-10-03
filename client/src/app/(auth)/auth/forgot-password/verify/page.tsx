@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
-import { showSuccessToast } from "@/components/shared/AppToast";
+import { Suspense, useEffect, useState } from "react";
+import { showErrorToast, showSuccessToast } from "@/components/shared/AppToast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { HangTightCard } from "@/components/shared/HangTightCard";
 import { OtpInput } from "@/components/shared/OtpInput";
@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/Button";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { useHangTight } from "@/hooks/useHangTight";
 import { useResendCountdown } from "@/hooks/useResendCountdown";
+import { ApiError } from "@/lib/api";
+import { forgotPassword, resetPassword } from "@/lib/auth-api";
 import { isCompleteOtp, validatePassword } from "@/lib/validation";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +26,7 @@ function BackToLoginLink({ router }: { router: ReturnType<typeof useRouter> }) {
 function ForgotPasswordVerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const identifier = searchParams.get("identifier") || "Useraccount@gmail.com";
+  const identifier = searchParams.get("identifier") ?? "";
   const method = searchParams.get("method") === "phone" ? "phone" : "email";
 
   const [step, setStep] = useState<"otp" | "newPassword">("otp");
@@ -36,9 +38,14 @@ function ForgotPasswordVerifyContent() {
     newPassword?: string;
     confirmPassword?: string;
   }>({});
-  const { pending, run } = useHangTight();
+  const { pending, runAsync } = useHangTight();
   const { secondsLeft, canResend, restart } = useResendCountdown();
 
+  useEffect(() => {
+    if (!identifier) router.replace("/auth/forgot-password");
+  }, [identifier, router]);
+
+  // The OTP is only checked by the backend together with the new password.
   function handleVerify(event: React.FormEvent) {
     event.preventDefault();
 
@@ -46,16 +53,21 @@ function ForgotPasswordVerifyContent() {
     setOtpError(incomplete);
     if (incomplete) return;
 
-    run(() => setStep("newPassword"));
+    setStep("newPassword");
   }
 
-  function handleResend() {
+  async function handleResend() {
     if (!canResend) return;
-    showSuccessToast("OTP resent");
-    restart();
+    try {
+      await forgotPassword({ [method]: identifier });
+      showSuccessToast("OTP resent");
+      restart();
+    } catch (error) {
+      showErrorToast(error instanceof ApiError ? error.message : "Unable to resend OTP");
+    }
   }
 
-  function handleResetPassword(event: React.FormEvent) {
+  async function handleResetPassword(event: React.FormEvent) {
     event.preventDefault();
 
     const nextErrors = {
@@ -66,10 +78,20 @@ function ForgotPasswordVerifyContent() {
     setPasswordErrors(nextErrors);
     if (nextErrors.newPassword || nextErrors.confirmPassword) return;
 
-    run(() => {
+    try {
+      await runAsync(() =>
+        resetPassword({ [method]: identifier, otp: otp.join(""), newPassword, confirmPassword }),
+      );
       showSuccessToast("Password reset successful");
-      router.push("/auth");
-    });
+      router.push(`/auth/sign-in?method=${method}`);
+    } catch (error) {
+      showErrorToast(error instanceof ApiError ? error.message : "Unable to reset password");
+      if (error instanceof ApiError && error.code === "invalid_reset_otp") {
+        setOtp(["", "", "", ""]);
+        setOtpError(true);
+        setStep("otp");
+      }
+    }
   }
 
   if (pending) {

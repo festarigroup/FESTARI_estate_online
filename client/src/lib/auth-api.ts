@@ -13,6 +13,20 @@ export function resendOtp(input: { email: string }) {
   return apiRequest("/auth/resend-otp", { method: "POST", body: input });
 }
 
+export function forgotPassword(input: { email?: string; phone?: string }) {
+  return apiRequest("/auth/forgot-password", { method: "POST", body: input });
+}
+
+export function resetPassword(input: {
+  email?: string;
+  phone?: string;
+  otp: string;
+  newPassword: string;
+  confirmPassword: string;
+}) {
+  return apiRequest("/auth/forgot-password-reset", { method: "POST", body: input });
+}
+
 export async function login(input: { email?: string; phone?: string; password: string }) {
   await apiRequest("/auth/login", { method: "POST", body: input });
   clearCsrfToken(); // token is bound to the signed-in user

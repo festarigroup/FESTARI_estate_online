@@ -2,11 +2,14 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
+import { showErrorToast } from "@/components/shared/AppToast";
 import { AuthScreenLayout } from "@/components/shared/AuthScreenLayout";
 import { HangTightCard } from "@/components/shared/HangTightCard";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useHangTight } from "@/hooks/useHangTight";
+import { ApiError } from "@/lib/api";
+import { forgotPassword } from "@/lib/auth-api";
 import { validateIdentifier } from "@/lib/validation";
 
 function ForgotPasswordContent() {
@@ -16,7 +19,7 @@ function ForgotPasswordContent() {
 
   const [identifier, setIdentifier] = useState("");
   const [error, setError] = useState<string>();
-  const { pending, run } = useHangTight();
+  const { pending, runAsync } = useHangTight();
 
   const otherMethod = method === "phone" ? "email" : "phone";
 
@@ -26,25 +29,28 @@ function ForgotPasswordContent() {
     router.replace(`/auth/forgot-password?method=${otherMethod}`);
   }
 
-  function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
     const identifierError = validateIdentifier(identifier, method);
     setError(identifierError);
     if (identifierError) return;
 
-    run(() => {
+    try {
+      await runAsync(() => forgotPassword({ [method]: identifier }));
       const params = new URLSearchParams({ identifier, method });
       router.push(`/auth/forgot-password/verify?${params.toString()}`);
-    });
+    } catch (error) {
+      showErrorToast(error instanceof ApiError ? error.message : "Unable to send reset code");
+    }
   }
 
   if (pending) {
     return (
       <div className="flex justify-center">
         <HangTightCard
-          heading="Sending reset link!"
-          body={`We are sending instructions to your ${method === "phone" ? "phone" : "email"}!`}
+          heading="Sending your code!"
+          body={`We are sending a reset code to your ${method === "phone" ? "phone" : "email"}!`}
           footer="This won't take long..."
         />
       </div>
@@ -58,8 +64,8 @@ function ForgotPasswordContent() {
           Reset your password
         </h1>
         <p className="text-sm leading-5 text-black dark:text-white">
-          Enter your {method === "phone" ? "phone number" : "email address"} and we will send you
-          password reset instructions
+          Enter your {method === "phone" ? "phone number" : "email address"} and we will send you a
+          code to reset your password
         </p>
       </div>
 
@@ -87,7 +93,7 @@ function ForgotPasswordContent() {
         )}
 
         <Button type="submit" variant="primary">
-          Send reset link
+          Send code
         </Button>
 
         <div className="flex justify-center">
