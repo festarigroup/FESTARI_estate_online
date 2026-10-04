@@ -37,9 +37,42 @@ function safeParse(text: string): unknown {
   }
 }
 
+// Auth endpoints whose 401 means "bad credentials / no session", never "access token expired".
+const NO_REFRESH_PATHS = ["/auth/login", "/auth/refresh", "/auth/logout"];
+
+let refreshInFlight: Promise<boolean> | null = null;
+
+// Single-flight: concurrent 401s share one refresh, since each refresh rotates the refresh token.
+function refreshSession(): Promise<boolean> {
+  refreshInFlight ??= (async () => {
+    try {
+      const res = await fetch(`${API_URL}/auth/refresh`, {
+        method: "POST",
+        headers: { "X-Requested-With": "fetch" },
+        credentials: "include",
+      });
+      if (res.ok) clearCsrfToken(); // token is bound to the (re)issued identity
+      return res.ok;
+    } catch {
+      return false;
+    } finally {
+      refreshInFlight = null;
+    }
+  })();
+  return refreshInFlight;
+}
+
+function redirectToSignIn() {
+  clearCsrfToken();
+  if (typeof window !== "undefined" && !window.location.pathname.startsWith("/auth")) {
+    window.location.assign("/auth/sign-in");
+  }
+}
+
 export async function apiRequest<T = void>(
   path: string,
   options: { method?: "GET" | "POST"; body?: unknown } = {},
+  hasRetried = false,
 ): Promise<T> {
   const method = options.method ?? "GET";
   const headers: Record<string, string> = {};
@@ -63,6 +96,11 @@ export async function apiRequest<T = void>(
 
   const text = await res.text();
   const data = text ? safeParse(text) : undefined;
+
+  if (res.status === 401 && !hasRetried && !NO_REFRESH_PATHS.includes(path)) {
+    if (await refreshSession()) return apiRequest<T>(path, options, true);
+    redirectToSignIn();
+  }
 
   if (!res.ok) {
     const first = (data as { errors?: { code?: string; message?: string }[] } | undefined)?.errors?.[0];

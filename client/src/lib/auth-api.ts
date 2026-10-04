@@ -27,7 +27,7 @@ export function resetPassword(input: {
   return apiRequest("/auth/forgot-password-reset", { method: "POST", body: input });
 }
 
-export async function login(input: { email?: string; phone?: string; password: string }) {
+export async function login(input: { email?: string; phone?: string; password: string; rememberMe?: boolean }) {
   await apiRequest("/auth/login", { method: "POST", body: input });
   clearCsrfToken(); // token is bound to the signed-in user
 }

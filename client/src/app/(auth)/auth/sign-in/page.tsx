@@ -24,6 +24,7 @@ function SignInContent() {
 
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<{ identifier?: string; password?: string }>({});
   const { pending, runAsync } = useHangTight();
 
@@ -43,7 +44,11 @@ function SignInContent() {
 
     try {
       await runAsync(() =>
-        login(method === "email" ? { email: identifier, password } : { phone: identifier, password }),
+        login(
+          method === "email"
+            ? { email: identifier, password, rememberMe }
+            : { phone: identifier, password, rememberMe },
+        ),
       );
       showSuccessToast("Signed in! Welcome back to Biltlinx");
       router.push("/home");
@@ -108,7 +113,12 @@ function SignInContent() {
           />
 
           <div className="flex items-center justify-between">
-            <Checkbox id="remember-me" label="Remember me" />
+            <Checkbox
+              id="remember-me"
+              label="Remember me"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
             <Link
               href={`/auth/forgot-password?method=${method}`}
               className="text-xs text-ink hover:underline dark:text-white"
