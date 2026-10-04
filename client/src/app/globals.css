@@ -83,6 +83,13 @@ body {
   color: #ffffff;
 }
 
+/* One caret color everywhere text gets typed, instead of the browser
+   default (which just follows each input's own text color). */
+input,
+textarea {
+  caret-color: var(--color-brand-900);
+}
+
 @keyframes toast-progress {
   from {
     width: 100%;

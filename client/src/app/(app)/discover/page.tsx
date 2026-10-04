@@ -45,12 +45,18 @@ export default function DiscoverPage() {
       contentPadding="px-0 pb-0"
       railAccessory={
         !loading && reels.length > 1 ? (
-          // Fixed-footprint box — always exactly the nav buttons' size, so
-          // opening the comment panel below never changes how much space
-          // this slot claims in the layout, and `main`/the reel never
-          // reflow. The panel is `absolute`, floating out over the content
-          // to the left, not a layout participant.
-          <div className="relative flex flex-col gap-[16px] px-[8px]">
+          // `h-full` so this column spans the same vertical space as `main`
+          // (its sibling) — the nav buttons still center within it via
+          // `justify-center`, unaffected, but it also gives the absolute
+          // panel below a `top: 0` that's the actual top of the row (same as
+          // the reel wrapper's own top), not just the nav buttons' own box.
+          // Fixed-footprint width — opening the comment panel never changes
+          // how much space this slot claims in the layout, so `main`/the
+          // reel never reflow or shift; the panel is `absolute`, floating
+          // over the content to the left, top-aligned with `pt-[12px]`
+          // (matches the reel wrapper's own `xl:py-[12px]` below) so it sits
+          // level with the video's top edge.
+          <div className="relative flex h-full flex-col items-center justify-center gap-[16px] px-[8px]">
             <ReelNavButton
               direction="prev"
               label="Previous reel"
@@ -64,7 +70,12 @@ export default function DiscoverPage() {
               onClick={() => scrollToIndex(activeIndex + 1)}
             />
             {commentsReelId && (
-              <div className="absolute right-full top-1/2 z-20 mr-[16px] -translate-y-1/2">
+              // `mr-[-62px]` (negative) pulls the panel rightward to the nav
+              // buttons' own right edge (54px button + 8px left padding),
+              // covering them, while leaving this column's 8px right padding
+              // as a gap before the story rail instead of running flush
+              // into it.
+              <div className="absolute right-full top-0 z-20 mr-[-62px] pt-[12px]">
                 <DiscoverCommentPanel reelId={commentsReelId} onClose={() => setCommentsReelId(null)} />
               </div>
             )}

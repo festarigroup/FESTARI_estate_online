@@ -97,16 +97,15 @@ export function DiscoverCommentPanel({ reelId, onClose }: DiscoverCommentPanelPr
   }
 
   return (
-    // `h-[min(...)]` matches the reel video's own height formula exactly, and
-    // `flex-col` + the card below being `flex-1 min-h-0` means the card plus
-    // the quick-action pill (and the attachment preview strip inside the
-    // card, when shown) always add up to that same total height — an
-    // attachment never grows the panel taller than one reel, it just
-    // squeezes the comment list's share of the fixed space.
-    <div className="flex h-[min(716px,calc(100vh-130px))] w-[349px] flex-col items-start gap-[12px]">
+    // Matches the reel video's own height formula exactly (see the `h-[min(...)]`
+    // on the video column in DiscoverReelCard.tsx) so the panel's bottom edge
+    // lines up with the reel's, since both start from the same top offset
+    // (this panel's wrapper in discover/page.tsx uses the same `pt-[12px]`
+    // as the reel wrapper's `xl:py-[12px]`).
+    <div className="flex h-[min(780px,calc(100vh-91px))] w-[358px] flex-col items-start gap-[12px]">
       <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-[30px] border border-brand-900 bg-white">
-        <div className="flex h-[56px] shrink-0 items-center justify-between border-b border-gray-200 px-[28px]">
-          <h2 className="text-[17px] font-bold tracking-[-0.255px] text-[#181a1f]">Add comment</h2>
+        <div className="flex h-[48px] shrink-0 items-center justify-between border-b border-gray-200 px-[20px]">
+          <h2 className="text-[14px] font-bold tracking-[-0.21px] text-[#181a1f]">Add comment</h2>
           <button
             type="button"
             aria-label="Close comments"
@@ -119,13 +118,13 @@ export function DiscoverCommentPanel({ reelId, onClose }: DiscoverCommentPanelPr
           </button>
         </div>
 
-        <div className="no-scrollbar flex flex-1 flex-col gap-[12px] overflow-y-auto px-[28px] py-[16px]">
+        <div className="no-scrollbar flex flex-1 flex-col gap-[10px] overflow-y-auto px-[20px] py-[14px]">
           {comments.map((comment) => (
             <DiscoverCommentRow key={comment.id} comment={comment} />
           ))}
         </div>
 
-        <div className="flex shrink-0 flex-col gap-[12px] border-t border-gray-200 px-[28px] pb-[24px] pt-[17px]">
+        <div className="flex shrink-0 flex-col gap-[10px] border-t border-gray-200 px-[20px] pb-[18px] pt-[14px]">
           {(imagePreview || audioUrl) && (
             <div className="flex flex-wrap items-center gap-2">
               {imagePreview && (
@@ -143,13 +142,12 @@ export function DiscoverCommentPanel({ reelId, onClose }: DiscoverCommentPanelPr
             </div>
           )}
 
-          <div className="flex w-full items-center gap-[12px]">
-            <span className="relative block size-6 shrink-0 overflow-hidden rounded-full bg-gray-100">
-              <Image src="/images/avatar-kasapa.png" alt="" fill sizes="24px" className="object-cover" />
+          <div className="flex w-full items-center gap-[10px]">
+            <span className="relative block size-5 shrink-0 overflow-hidden rounded-full bg-gray-100">
+              <Image src="/images/avatar-kasapa.png" alt="" fill sizes="20px" className="object-cover" />
             </span>
-            <span className="h-[18px] w-[1.5px] shrink-0 bg-brand-900" aria-hidden />
             {recorder.isRecording ? (
-              <p className="flex min-w-0 flex-1 items-center gap-2 text-[13px] font-medium text-black" role="status">
+              <p className="flex min-w-0 flex-1 items-center gap-2 text-[12px] font-medium text-black" role="status">
                 <span className="size-2 shrink-0 animate-pulse rounded-full bg-like" />
                 Recording… {formatClock(recorder.seconds)}
               </p>
@@ -163,7 +161,7 @@ export function DiscoverCommentPanel({ reelId, onClose }: DiscoverCommentPanelPr
                 }}
                 placeholder="Enter your comment"
                 aria-label="Enter your comment"
-                className="min-w-0 flex-1 bg-transparent text-[14px] text-night-900 placeholder:text-[#94a3b7] focus:outline-none"
+                className="min-w-0 flex-1 bg-transparent text-[12px] text-night-900 placeholder:text-[#94a3b7] focus:outline-none"
               />
             )}
             <button
@@ -185,29 +183,29 @@ export function DiscoverCommentPanel({ reelId, onClose }: DiscoverCommentPanelPr
           floating control below the comment card, not nested inside its
           border, matching Figma (same emoji/photo/voice-note mechanics as
           CommentComposer). */}
-      <div className="flex w-fit shrink-0 items-center gap-[16px] rounded-full border border-brand-900 bg-white px-[17px] py-[9px] shadow-sm">
+      <div className="flex w-fit shrink-0 items-center gap-[12px] rounded-full border border-brand-900 bg-white px-[13px] py-[7px] shadow-sm">
         <EmojiPicker onSelect={(emoji) => setDraft((current) => current + emoji)} side="top">
-          <Image src="/icons/emoji-add.svg" alt="Add emoji" width={16} height={16} />
+          <Image src="/icons/emoji-add.svg" alt="Add emoji" width={14} height={14} />
         </EmojiPicker>
         <button
           type="button"
           aria-label="Add photo or GIF"
           onClick={() => fileInputRef.current?.click()}
-          className="flex size-3.5 items-center justify-center"
+          className="flex size-3 items-center justify-center"
         >
-          <Image src="/icons/gallery-01.svg" alt="" width={14} height={14} />
+          <Image src="/icons/gallery-01.svg" alt="" width={12} height={12} />
         </button>
         <button
           type="button"
           aria-label={recorder.isRecording ? "Stop recording" : "Record voice note"}
           aria-pressed={recorder.isRecording}
           onClick={recorder.isRecording ? recorder.stop : recorder.start}
-          className="flex size-3.5 items-center justify-center"
+          className="flex size-3 items-center justify-center"
         >
           {recorder.isRecording ? (
-            <span className="size-2.5 rounded-sm bg-like" />
+            <span className="size-2 rounded-sm bg-like" />
           ) : (
-            <Image src="/icons/mic-02.svg" alt="" width={10} height={13} />
+            <Image src="/icons/mic-02.svg" alt="" width={9} height={11} />
           )}
         </button>
       </div>
@@ -249,32 +247,32 @@ function DiscoverCommentRow({ comment }: { comment: CommentItem }) {
   return (
     <div className="flex w-full flex-col items-start gap-[3px]">
       <div className="flex w-full items-center gap-[6px]">
-        <span className="relative block size-6 shrink-0 overflow-hidden rounded-full bg-gray-100">
+        <span className="relative block size-5 shrink-0 overflow-hidden rounded-full bg-gray-100">
           {comment.avatar ? (
-            <Image src={comment.avatar} alt="" fill sizes="24px" className="object-cover" />
+            <Image src={comment.avatar} alt="" fill sizes="20px" className="object-cover" />
           ) : (
-            <span className="absolute left-1/2 top-1/2 block size-4 -translate-x-1/2 -translate-y-1/2">
-              <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="16px" />
+            <span className="absolute left-1/2 top-1/2 block size-3.5 -translate-x-1/2 -translate-y-1/2">
+              <Image src="/icons/avatar-placeholder-user.svg" alt="" fill sizes="14px" />
             </span>
           )}
-          <span className="absolute -bottom-0.5 -right-0.5 block size-2.5">
-            <Image src="/icons/avatar-verified-badge-green.svg" alt="" fill sizes="10px" />
+          <span className="absolute -bottom-0.5 -right-0.5 block size-2">
+            <Image src="/icons/avatar-verified-badge-green.svg" alt="" fill sizes="8px" />
           </span>
         </span>
-        <p className="whitespace-nowrap text-[14px] font-bold text-brand-900">{comment.authorName}</p>
-        <p className="whitespace-nowrap text-[13px] text-[#9398a1]">{comment.postedAt}</p>
+        <p className="whitespace-nowrap text-[13px] font-bold text-brand-900">{comment.authorName}</p>
+        <p className="whitespace-nowrap text-[11px] text-[#9398a1]">{comment.postedAt}</p>
       </div>
-      <div className="flex w-full flex-col items-start gap-1 pl-[30px]">
+      <div className="flex w-full flex-col items-start gap-1 pl-[26px]">
         {comment.text && (
-          <p className="w-full whitespace-pre-line text-[13px] leading-[19.25px] text-[#42454b]">{comment.text}</p>
+          <p className="w-full whitespace-pre-line text-[12px] leading-[17px] text-[#42454b]">{comment.text}</p>
         )}
         {comment.image && (
-          <span className="relative my-1 block h-28 w-full max-w-[180px] overflow-hidden rounded-xl bg-gray-100">
-            <Image src={comment.image} alt="" fill unoptimized className="object-cover" sizes="180px" />
+          <span className="relative my-1 block h-24 w-full max-w-[150px] overflow-hidden rounded-xl bg-gray-100">
+            <Image src={comment.image} alt="" fill unoptimized className="object-cover" sizes="150px" />
           </span>
         )}
-        {comment.audio && <audio controls src={comment.audio} className="my-1 h-8 w-full max-w-[220px]" />}
-        <div className="flex items-center gap-[15px]">
+        {comment.audio && <audio controls src={comment.audio} className="my-1 h-7 w-full max-w-[190px]" />}
+        <div className="flex items-center gap-[12px]">
           <CommentLikeButton initialLikes={comment.likes ?? 0} />
           <button type="button" className="text-[10px] font-bold text-brand-900">
             Reply
