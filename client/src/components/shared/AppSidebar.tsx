@@ -25,8 +25,12 @@ export function AppSidebar({
   // AppSidebar remounts on every navigation (each page renders its own AppShell,
   // there's no persistent layout), so default to whichever section is active
   // rather than always starting closed — otherwise clicking a child link
-  // "collapses" the section you just expanded.
-  const [openKey, setOpenKey] = useState<string | null>(activeKey ?? null);
+  // "collapses" the section you just expanded. Only when expanded, though:
+  // collapsed mode shows children in a hover/click flyout rather than an
+  // inline list, and defaulting it open here would auto-pop the flyout back
+  // open on the very page a child link just navigated to, which looks
+  // indistinguishable from "it never closed".
+  const [openKey, setOpenKey] = useState<string | null>(collapsed ? null : activeKey ?? null);
   const asideRef = useRef<HTMLElement | null>(null);
   const itemRefs = useRef(new Map<string, HTMLDivElement>());
   const flyoutRef = useRef<HTMLDivElement | null>(null);
@@ -45,7 +49,12 @@ export function AppSidebar({
   const isLgUp = useMediaQuery("(min-width: 1024px)");
   const openItem = openKey ? NAV_ITEMS.find((item) => item.key === openKey) : undefined;
   const showFlyout = isLgUp && collapsed && !!openItem?.children?.length;
-  const hoverItem = isLgUp && collapsed && hoverKey ? NAV_ITEMS.find((item) => item.key === hoverKey) : undefined;
+  // Suppressed once that item's own flyout is open — otherwise the tooltip
+  // and the flyout render over each other for the same item at once.
+  const hoverItem =
+    isLgUp && collapsed && hoverKey && hoverKey !== openKey
+      ? NAV_ITEMS.find((item) => item.key === hoverKey)
+      : undefined;
 
   // Same clipping issue as the flyout below: the collapsed rail's icon-only
   // buttons need a label on hover, but a plain CSS tooltip positioned to the
@@ -180,7 +189,12 @@ export function AppSidebar({
               {isOpen && item.children && !collapsed && (
                 <div className="flex w-full flex-col items-start pb-1">
                   {item.children.map((child) => (
-                    <ChildLink key={child.key} child={child} isActive={child.key === activeChildKey} />
+                    <ChildLink
+                      key={child.key}
+                      child={child}
+                      isActive={child.key === activeChildKey}
+                      onNavigate={() => setOpenKey(null)}
+                    />
                   ))}
                 </div>
               )}
@@ -254,7 +268,12 @@ export function AppSidebar({
               className="absolute flex w-44 flex-col gap-1 rounded-[11px] border border-gray-200 bg-white/95 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] transition-[top,left] duration-200 ease-out"
             >
               {openItem.children.map((child) => (
-                <ChildLink key={child.key} child={child} isActive={child.key === activeChildKey} />
+                <ChildLink
+                  key={child.key}
+                  child={child}
+                  isActive={child.key === activeChildKey}
+                  onNavigate={() => setOpenKey(null)}
+                />
               ))}
             </div>
           </div>,
@@ -264,12 +283,21 @@ export function AppSidebar({
   );
 }
 
-function ChildLink({ child, isActive }: { child: NavChildItem; isActive: boolean }) {
+function ChildLink({
+  child,
+  isActive,
+  onNavigate,
+}: {
+  child: NavChildItem;
+  isActive: boolean;
+  onNavigate: () => void;
+}) {
   return (
     <Link
       href={child.href}
       onClick={(event) => {
         if (child.href === "#") event.preventDefault();
+        onNavigate();
       }}
       className="flex h-[34px] w-full items-center gap-[15px] rounded-[11px] px-[23px] py-2 text-[13px] hover:bg-gray-50"
     >

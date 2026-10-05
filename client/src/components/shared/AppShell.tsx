@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useSyncExternalStore, type ReactNode } from "react";
 import { AppSidebar } from "@/components/shared/AppSidebar";
 import { MobileBottomNav } from "@/components/shared/MobileBottomNav";
 import { OfflineBanner } from "@/components/shared/OfflineBanner";
@@ -9,6 +9,50 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
 
 const SIDEBAR_COLLAPSE_KEY = "biltlinx:sidebar-collapsed";
+
+// Module-scoped (not component state) so the user's manual collapse choice
+// can be read via `useSyncExternalStore` — same pattern as `useMediaQuery` —
+// instead of a `useState` + effect. That matters because every page mounts
+// its own `AppShell` (there's no persistent layout): an effect-based read
+// only applies a frame after the first paint, visibly flashing the sidebar
+// from expanded to the real state on every navigation; `useSyncExternalStore`
+// resolves the real value before that first paint, like `useMediaQuery`
+// already does for the responsive breakpoint below.
+let cachedSidebarOverride: boolean | null | undefined;
+const sidebarOverrideListeners = new Set<() => void>();
+
+function readSidebarOverride(): boolean | null {
+  try {
+    const stored = window.localStorage.getItem(SIDEBAR_COLLAPSE_KEY);
+    return stored === null ? null : stored === "true";
+  } catch {
+    return null;
+  }
+}
+
+function getSidebarOverrideSnapshot(): boolean | null {
+  if (cachedSidebarOverride === undefined) cachedSidebarOverride = readSidebarOverride();
+  return cachedSidebarOverride;
+}
+
+function getSidebarOverrideServerSnapshot(): boolean | null {
+  return null;
+}
+
+function subscribeToSidebarOverride(listener: () => void) {
+  sidebarOverrideListeners.add(listener);
+  return () => sidebarOverrideListeners.delete(listener);
+}
+
+function setSidebarOverride(next: boolean) {
+  cachedSidebarOverride = next;
+  try {
+    window.localStorage.setItem(SIDEBAR_COLLAPSE_KEY, String(next));
+  } catch {
+    // Ignore — the toggle still works for this session, it just won't persist.
+  }
+  sidebarOverrideListeners.forEach((listener) => listener());
+}
 
 interface AppShellProps {
   activeKey?: string;
@@ -62,42 +106,21 @@ export function AppShell({
   // keeps enough room; it expands automatically once there's space again,
   // unless the user has manually toggled it (that choice then sticks).
   const isXlUp = useMediaQuery("(min-width: 1280px)");
-  const [collapsedOverride, setCollapsedOverride] = useState<boolean | null>(null);
-  // `useMediaQuery`'s SSR/first-paint snapshot is always `false` (there's no
-  // viewport to measure yet), which would make `!isXlUp` read as "narrow" —
-  // and briefly collapse the sidebar on every load, even on desktop — until
-  // the real value syncs in just after mount. Expanded is the correct
-  // assumption for that gap (it's also the default everyone should land on),
-  // so responsive auto-collapse only kicks in once `mounted` confirms we
-  // have a real viewport reading to act on.
-  const [mounted, setMounted] = useState(false);
-  const collapsed = collapsedOverride ?? (mounted && !isXlUp);
-
   // Every page mounts its own AppShell (there's no persistent layout), so a
   // plain useState here would forget the user's manual toggle on every
-  // navigation. Read the saved choice after mount (avoids an SSR/hydration
-  // mismatch) so it survives moving between pages.
-  useEffect(() => {
-    setMounted(true);
-    try {
-      const stored = window.localStorage.getItem(SIDEBAR_COLLAPSE_KEY);
-      if (stored !== null) setCollapsedOverride(stored === "true");
-    } catch {
-      // Ignore (private browsing, storage disabled, etc.) — falls back to the responsive default.
-    }
-  }, []);
+  // navigation. Read via `useSyncExternalStore` (see its definitions above)
+  // rather than `useState` + an effect, so the real stored value resolves
+  // before the first paint instead of a frame after it — otherwise every
+  // navigation flashes the sidebar expanded, then snaps to the real
+  // collapsed state a moment later.
+  const collapsedOverride = useSyncExternalStore(
+    subscribeToSidebarOverride,
+    getSidebarOverrideSnapshot,
+    getSidebarOverrideServerSnapshot,
+  );
+  const collapsed = collapsedOverride ?? !isXlUp;
 
-  const toggleCollapse = () => {
-    setCollapsedOverride((current) => {
-      const next = !(current ?? !isXlUp);
-      try {
-        window.localStorage.setItem(SIDEBAR_COLLAPSE_KEY, String(next));
-      } catch {
-        // Ignore — the toggle still works for this session, it just won't persist.
-      }
-      return next;
-    });
-  };
+  const toggleCollapse = () => setSidebarOverride(!collapsed);
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-gray-50">
