@@ -231,27 +231,32 @@ function ListingDropdown({ value, onChange }: { value: string; onChange: (id: st
             <div
               onClick={(event) => event.stopPropagation()}
               style={{ top: position.top, left: position.left, width: position.width }}
-              className="absolute flex max-h-[220px] flex-col gap-0.5 overflow-y-auto rounded-lg border border-[#cbd5e0] bg-white/95 p-1 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
+              className="absolute rounded-[26px] border border-[rgba(15,22,33,0.12)] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
             >
-              {DUMMY_LISTINGS.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => {
-                    onChange(item.id);
-                    setOpen(false);
-                  }}
-                  className={cn(
-                    "flex w-full items-center gap-2 rounded p-2 text-left text-sm text-[#0f1621]",
-                    item.id === value && "bg-[#f8fafc]",
-                  )}
-                >
-                  <span className="relative size-9 shrink-0 overflow-hidden rounded-md">
-                    <Image src={item.images[0]} alt="" fill className="object-cover" sizes="36px" />
-                  </span>
-                  <span className="min-w-0 flex-1 truncate">{item.title}</span>
-                </button>
-              ))}
+              <div className="flex max-h-[240px] flex-col gap-1 overflow-y-auto rounded-2xl bg-white/90 p-2.5">
+                {DUMMY_LISTINGS.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      onChange(item.id);
+                      setOpen(false);
+                    }}
+                    className={cn(
+                      "flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left hover:bg-[#f8fafc]",
+                      item.id === value ? "border-[#e2e8f0]/60 bg-[#f8fafc]" : "border-transparent",
+                    )}
+                  >
+                    <span className="relative size-9 shrink-0 overflow-hidden rounded-md">
+                      <Image src={item.images[0]} alt="" fill className="object-cover" sizes="36px" />
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-[13.5px] leading-[20.25px] tracking-[-0.337px] text-[#334155]">{item.title}</span>
+                    {item.id === value && (
+                      <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="shrink-0 bg-[#1465e6]" />
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>,
           document.body,

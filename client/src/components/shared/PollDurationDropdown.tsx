@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { VisibilityRow } from "@/components/shared/VisibilityRow";
 import { cn } from "@/lib/utils";
 
 export const DURATION_OPTIONS = ["1 day", "3 days", "A week", "A month"];
@@ -29,7 +30,7 @@ export function PollDurationDropdown({ value, onChange, options = DURATION_OPTIO
     function updatePosition() {
       const rect = triggerRef.current?.getBoundingClientRect();
       if (!rect) return;
-      const estimatedPanelHeight = 8 + options.length * 40;
+      const estimatedPanelHeight = 40 + options.length * 40;
       const spaceBelow = window.innerHeight - rect.bottom;
       const left = Math.min(rect.left, window.innerWidth - rect.width - 8);
       if (spaceBelow < estimatedPanelHeight && rect.top > estimatedPanelHeight) {
@@ -89,28 +90,21 @@ export function PollDurationDropdown({ value, onChange, options = DURATION_OPTIO
           <div
             ref={panelRef}
             style={{ top: position.top, bottom: position.bottom, left: position.left, width: position.width }}
-            className="fixed z-[120] flex flex-col gap-1 rounded-lg border border-[#cbd5e0] bg-white p-1 shadow-[0px_0px_24px_0px_rgba(0,0,0,0.08)]"
+            className="fixed z-[120] rounded-[26px] border border-[rgba(15,22,33,0.12)] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
           >
-            {options.map((option) => {
-              const selected = option === value;
-              return (
-                <button
+            <div className="flex flex-col gap-1 rounded-2xl bg-white/90 p-2.5">
+              {options.map((option) => (
+                <VisibilityRow
                   key={option}
-                  type="button"
+                  label={option}
+                  selected={option === value}
                   onClick={() => {
                     onChange(option);
                     setOpen(false);
                   }}
-                  className={cn(
-                    "flex w-full items-center justify-between rounded p-1 text-sm text-[#0f1621]",
-                    selected && "bg-[#f8fafc]",
-                  )}
-                >
-                  <span>{option}</span>
-                  {selected && <NavIcon icon="/icons/poll-duration-check.svg" color="night" size={12} />}
-                </button>
-              );
-            })}
+                />
+              ))}
+            </div>
           </div>,
           document.body,
         )}

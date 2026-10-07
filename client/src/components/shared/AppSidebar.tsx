@@ -265,16 +265,18 @@ export function AppSidebar({
               ref={flyoutRef}
               onClick={(event) => event.stopPropagation()}
               style={{ top: flyoutPos.top, left: flyoutPos.left }}
-              className="absolute flex w-44 flex-col gap-1 rounded-[11px] border border-gray-200 bg-white/95 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] transition-[top,left] duration-200 ease-out"
+              className="absolute w-[220px] rounded-[26px] border border-[rgba(15,22,33,0.12)] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] transition-[top,left] duration-200 ease-out"
             >
-              {openItem.children.map((child) => (
-                <ChildLink
-                  key={child.key}
-                  child={child}
-                  isActive={child.key === activeChildKey}
-                  onNavigate={() => setOpenKey(null)}
-                />
-              ))}
+              <div className="flex flex-col gap-1 rounded-2xl bg-white/90 p-2.5">
+                {openItem.children.map((child) => (
+                  <ChildLink
+                    key={child.key}
+                    child={child}
+                    isActive={child.key === activeChildKey}
+                    onNavigate={() => setOpenKey(null)}
+                  />
+                ))}
+              </div>
             </div>
           </div>,
           document.body,
@@ -299,10 +301,13 @@ function ChildLink({
         if (child.href === "#") event.preventDefault();
         onNavigate();
       }}
-      className="flex h-[34px] w-full items-center gap-[15px] rounded-[11px] px-[23px] py-2 text-[13px] hover:bg-gray-50"
+      className={cn(
+        "flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-[13.5px] leading-[20.25px] tracking-[-0.337px] hover:bg-[#f8fafc]",
+        isActive ? "border-[#e2e8f0]/60 bg-[#f8fafc]" : "border-transparent",
+      )}
     >
-      <NavIcon icon={child.icon} color={isActive ? "brand" : "night"} size={15} />
-      <span className={cn("whitespace-nowrap", isActive ? "font-medium text-brand-600" : "text-night-700")}>
+      <NavIcon icon={child.icon} color={isActive ? "brand" : "night"} size={14} />
+      <span className={cn("whitespace-nowrap", isActive ? "font-medium text-brand-600" : "text-[#334155]")}>
         {child.label}
       </span>
     </Link>

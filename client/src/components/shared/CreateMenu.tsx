@@ -311,7 +311,7 @@ function CreatePostRow({
             <div
               onClick={(event) => event.stopPropagation()}
               style={{ top: position.top, left: position.left }}
-              className="absolute flex w-[266px] flex-col rounded-[26px] border border-[#e2e8f0] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
+              className="absolute flex w-[266px] flex-col rounded-[26px] border border-[rgba(15,22,33,0.12)] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
             >
               <div className="flex w-full flex-col gap-1 rounded-2xl bg-white/90 p-2.5">
                 {CREATE_POST_SUBMENU.map((sub) =>
@@ -386,7 +386,7 @@ export function CreateMenu({
         />
       </div>
 
-      <div className="hidden w-[358px] flex-col rounded-[26px] border border-[#e2e8f0] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] sm:flex">
+      <div className="hidden w-[358px] flex-col rounded-[26px] border border-[rgba(15,22,33,0.12)] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] sm:flex">
         <div className="flex w-full flex-col gap-2.5 rounded-2xl bg-white/90 p-2.5">
           <div className="flex items-center gap-1.5 px-2 py-1">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0 text-[#001f3f]">

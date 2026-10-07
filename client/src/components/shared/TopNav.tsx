@@ -178,7 +178,7 @@ export function TopNav() {
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-[266px] rounded-[26px] border border-[#e2e8f0] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
+              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-[266px] rounded-[26px] border border-[rgba(15,22,33,0.12)] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
                 <div className="flex flex-col gap-1 rounded-2xl bg-white/90 p-2.5">
                   <button
                     type="button"

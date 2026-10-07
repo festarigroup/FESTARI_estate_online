@@ -43,7 +43,7 @@ export default function AccountSettingsPage() {
 
   return (
     <AppShell contentFullWidth rightRail={<ProfileCompletionCard />}>
-      <div className="mx-auto flex w-full max-w-[762px] flex-col gap-4 pb-6 pt-6 sm:pt-8">
+      <div className="mx-auto flex w-full max-w-[762px] flex-col gap-4 pb-6 pt-2">
         <ProfileBanner />
         <nav
           className="flex h-[43px] w-full items-stretch overflow-x-auto rounded-2xl border border-[#e6e7ec] bg-white pl-4 pr-2.5 no-scrollbar"
@@ -154,7 +154,7 @@ function SwitchRoleMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-[calc(100%+8px)] z-30 w-[266px] rounded-[26px] border border-[#e2e8f0] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
+        <div className="absolute right-0 top-[calc(100%+8px)] z-30 w-[266px] rounded-[26px] border border-[rgba(15,22,33,0.12)] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
           <div className="flex flex-col gap-2.5 rounded-2xl bg-white/90 p-2.5">
             <p className="text-sm font-semibold leading-5 text-[#001f3f]">Switch account</p>
             <ul className="flex flex-col gap-1">
@@ -189,10 +189,6 @@ function ProfileTab() {
       <div className="flex flex-col gap-1">
         <h1 className="text-lg font-semibold text-night-900">Profile</h1>
         <p className="text-[13px] text-gray-600">Account information from your authentication profile</p>
-      </div>
-
-      <div className="rounded-2xl border border-gray-200 p-4">
-        <IdentityBlock compact />
       </div>
 
       <InfoCard title="Personal Information" fields={PERSONAL_INFO} />

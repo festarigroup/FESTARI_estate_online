@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { showSuccessToast } from "@/components/shared/AppToast";
 import { MobileSelectSheet, type SelectSheetItem } from "@/components/shared/MobileSelectSheet";
-import { NavIcon } from "@/components/shared/NavIcon";
+import { VisibilityRow } from "@/components/shared/VisibilityRow";
 import { buildCustomVisibility, type PostVisibility } from "@/components/shared/VisibilityMenu";
 import { cn } from "@/lib/utils";
 
@@ -36,7 +36,7 @@ const DEFAULT_COMMUNITY_ITEMS: SelectSheetItem[] = [
   { name: "Community 5", role: "Chief Strategy Officer", avatar: "/icons/avatar-sample.jpg" },
 ];
 
-const MENU_WIDTH = 220;
+const MENU_WIDTH = 250;
 
 function Row({
   label,
@@ -56,26 +56,15 @@ function Row({
   ariaExpanded?: boolean;
 }) {
   return (
-    <button
-      ref={buttonRef}
-      type="button"
+    <VisibilityRow
+      buttonRef={buttonRef}
+      icon={icon}
+      label={label}
+      selected={active}
+      hasSubmenu={hasChevron}
+      expanded={ariaExpanded}
       onClick={onClick}
-      aria-expanded={ariaExpanded}
-      className={cn(
-        "flex w-full items-center gap-3 rounded-lg p-2",
-        active && "bg-[rgba(239,239,239,0.85)]",
-      )}
-    >
-      <NavIcon icon={icon} color="night" size={16} className="shrink-0" />
-      <span className={cn("flex-1 text-left text-sm font-medium", active ? "text-[#171717]" : "text-night-900")}>
-        {label}
-      </span>
-      {hasChevron && (
-        <svg width="16" height="16" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="shrink-0 text-[#94a3b7]">
-          <path d="M5 3L9 7L5 11" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      )}
-    </button>
+    />
   );
 }
 
@@ -175,23 +164,24 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
     <div
       ref={menuRef}
       style={{ bottom: position.bottom, left: position.left, width: MENU_WIDTH }}
-      className="fixed z-[110] flex flex-col gap-0.5 rounded-[24px] border border-gray-200 bg-[rgba(255,255,255,0.96)] p-[9px] shadow-[0px_8px_24px_-8px_rgba(0,0,0,0.15)] backdrop-blur-[14px]"
+      className="fixed z-[110] rounded-[26px] border border-[rgba(15,22,33,0.12)] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
     >
+      <div className="flex flex-col gap-1 rounded-2xl bg-white/90 p-2.5">
       <Row
         label="Everyone"
-        icon="/icons/create-menu-globe-visibility.svg"
+        icon="/icons/visibility-user-sharing.svg"
         active={value.kind === "everyone"}
         onClick={() => onChange({ kind: "everyone" })}
       />
       <Row
         label="Following"
-        icon="/icons/user-add-01.svg"
+        icon="/icons/visibility-user-add-02.svg"
         active={value.kind === "followings"}
         onClick={() => onChange({ kind: "followings" })}
       />
       <Row
         label="Community"
-        icon="/icons/user-group.svg"
+        icon="/icons/visibility-user-group.svg"
         active={value.kind === "custom" && value.communities.length > 0}
         hasChevron
         ariaExpanded={communitySheetOpen}
@@ -199,7 +189,7 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
       />
       <Row
         label="Organization"
-        icon="/icons/org.svg"
+        icon="/icons/visibility-user.svg"
         active={value.kind === "custom" && value.organizations.length > 0}
         hasChevron
         ariaExpanded={organizationSheetOpen}
@@ -279,6 +269,7 @@ export function MobileVisibilityMenu({ open, onClose, value, onChange, anchorRef
           })}
         </ul>
       )}
+      </div>
     </div>,
     document.body,
   );
