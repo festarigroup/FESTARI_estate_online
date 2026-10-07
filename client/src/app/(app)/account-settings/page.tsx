@@ -201,28 +201,125 @@ function ProfileTab() {
 }
 
 function InfoCard({ title, fields }: { title: string; fields: { label: string; value: string }[] }) {
+  const [editing, setEditing] = useState(false);
+  const [saved, setSaved] = useState(fields);
+  const [draft, setDraft] = useState(fields);
+  const firstInputRef = useRef<HTMLInputElement | null>(null);
+  const cardRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!editing) return;
+    // preventScroll: a plain autoFocus scrolls the page abruptly while the card is still resizing.
+    firstInputRef.current?.focus({ preventScroll: true });
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") discard();
+    };
+    // The dim layer ignores pointer events so wheel/touch scrolling still reaches the page; a press outside the card discards instead.
+    const onPointerDown = (event: PointerEvent) => {
+      if (!cardRef.current?.contains(event.target as Node)) discard();
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPointerDown);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editing]);
+
+  function startEditing() {
+    setDraft(saved);
+    setEditing(true);
+  }
+
+  function discard() {
+    setDraft(saved);
+    setEditing(false);
+  }
+
+  function save() {
+    setSaved(draft);
+    setEditing(false);
+    showSuccessToast(`${title} updated`);
+  }
+
+  const shown = editing ? draft : saved;
+
   return (
-    <section className="flex flex-col gap-5 rounded-2xl border border-gray-200 p-4 sm:p-5">
-      <div className="flex items-center justify-between">
-        <h2 className="text-[15px] font-medium text-night-900">{title}</h2>
-        <button
-          type="button"
-          onClick={() => showSuccessToast("Editing is coming soon")}
-          className="flex h-8 items-center gap-2 rounded-2xl border sm:rounded-lg border border-gray-200 px-3 text-xs text-night-900 hover:bg-gray-50"
-        >
-          Edit
-          <NavIcon icon="/icons/poll-option-edit.svg" color="night" size={12} />
-        </button>
-      </div>
-      <dl className="grid grid-cols-1 gap-x-12 gap-y-4 sm:grid-cols-2">
-        {fields.map((field) => (
-          <div key={field.label} className="flex items-center justify-between gap-3 border-b border-gray-200 pb-2 text-[13px]">
-            <dt className="text-gray-400">{field.label}</dt>
-            <dd className="truncate text-night-900">{field.value}</dd>
+    <>
+      {editing && <div className="pointer-events-none fixed inset-0 z-50 bg-black/25" aria-hidden="true" />}
+      <section
+        ref={cardRef}
+        className={cn(
+          "flex flex-col gap-5 border border-gray-200 p-4 transition-[border-radius,box-shadow] duration-200 sm:p-5",
+          editing
+            ? "relative z-[60] rounded-[28px] bg-white shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.25)]"
+            : "rounded-2xl",
+        )}
+      >
+        <div className="flex items-center justify-between">
+          <h2 className={cn("text-night-900", editing ? "text-base font-semibold tracking-[-0.48px] text-[#111826]" : "text-[15px] font-medium")}>
+            {title}
+          </h2>
+          {!editing && (
+            <button
+              type="button"
+              onClick={startEditing}
+              className="flex h-8 items-center gap-2 rounded-2xl border border-gray-200 px-3 text-xs text-night-900 hover:bg-gray-50 sm:rounded-lg"
+            >
+              Edit
+              <NavIcon icon="/icons/poll-option-edit.svg" color="night" size={12} />
+            </button>
+          )}
+        </div>
+        <dl className={cn("grid grid-cols-1 gap-x-12 sm:grid-cols-2", editing ? "gap-y-4" : "gap-y-4")}>
+          {shown.map((field, index) => (
+            <div
+              key={field.label}
+              className={cn(
+                "flex items-center justify-between gap-3 border-b pb-2 text-[13px]",
+                editing && index === 0 ? "border-brand-900" : "border-gray-200",
+              )}
+            >
+              <dt className="shrink-0 text-gray-400">{field.label}</dt>
+              {editing ? (
+                <dd className="min-w-0 flex-1">
+                  <input
+                    value={field.value}
+                    onChange={(event) =>
+                      setDraft((current) => current.map((item, i) => (i === index ? { ...item, value: event.target.value } : item)))
+                    }
+                    aria-label={field.label}
+                    ref={index === 0 ? firstInputRef : undefined}
+                    className="w-full bg-transparent text-right font-medium text-[#334154] focus:outline-none"
+                  />
+                </dd>
+              ) : (
+                <dd className="truncate text-night-900">{field.value}</dd>
+              )}
+            </div>
+          ))}
+        </dl>
+        {editing && (
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={discard}
+              className="h-10 shrink-0 rounded-lg border border-[#e2e8f0] bg-white px-4 text-sm text-[#0f1621] hover:bg-gray-50"
+            >
+              Discard Changes
+            </button>
+            <button
+              type="button"
+              onClick={save}
+              className="h-10 flex-1 rounded-lg bg-brand-900 px-4 text-sm text-white hover:bg-brand-900/90"
+            >
+              Save Changes
+            </button>
           </div>
-        ))}
-      </dl>
-    </section>
+        )}
+      </section>
+    </>
   );
 }
 

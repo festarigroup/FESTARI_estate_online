@@ -204,7 +204,7 @@ export function TopNav() {
                     }}
                     className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-[13.5px] leading-[20.25px] tracking-[-0.337px] hover:bg-[#f8fafc] text-[#334155]"
                   >
-                    <NavIcon icon="/icons/settings-02.svg" color="night" size={14} />
+                    <NavIcon icon="/icons/menu-settings.svg" color="night" size={14} className="bg-[#475568]" />
                     Account Settings
                   </button>
                   <button
