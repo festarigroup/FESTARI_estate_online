@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/shared/AppShell";
 import { showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
 
 const TABS = ["Profile", "Security", "Billings", "General Settings"] as const;
@@ -204,6 +205,7 @@ function InfoCard({ title, fields }: { title: string; fields: { label: string; v
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(fields);
   const [draft, setDraft] = useState(fields);
+  const canEdit = useMediaQuery("(min-width: 640px)");
   const firstInputRef = useRef<HTMLInputElement | null>(null);
   const cardRef = useRef<HTMLElement | null>(null);
 
@@ -228,6 +230,8 @@ function InfoCard({ title, fields }: { title: string; fields: { label: string; v
   }, [editing]);
 
   function startEditing() {
+    // Editing is desktop-only for now; the button stays visible on mobile but does nothing yet.
+    if (!canEdit) return;
     setDraft(saved);
     setEditing(true);
   }
@@ -265,7 +269,7 @@ function InfoCard({ title, fields }: { title: string; fields: { label: string; v
             <button
               type="button"
               onClick={startEditing}
-              className="flex h-8 items-center gap-2 rounded-2xl border border-gray-200 px-3 text-xs text-night-900 hover:bg-gray-50 sm:rounded-lg"
+              className="hidden h-8 items-center gap-2 rounded-lg border border-gray-200 px-3 text-xs text-night-900 hover:bg-gray-50 sm:flex"
             >
               Edit
               <NavIcon icon="/icons/poll-option-edit.svg" color="night" size={12} />
