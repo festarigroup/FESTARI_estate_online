@@ -265,7 +265,7 @@ function InfoCard({ title, fields }: { title: string; fields: { label: string; v
             <button
               type="button"
               onClick={startEditing}
-              className="hidden h-8 items-center gap-2 rounded-lg border border-gray-200 px-3 text-xs text-night-900 hover:bg-gray-50 sm:flex"
+              className="flex h-8 items-center gap-2 rounded-2xl border border-gray-200 px-3 text-xs text-night-900 hover:bg-gray-50 sm:rounded-lg"
             >
               Edit
               <NavIcon icon="/icons/poll-option-edit.svg" color="night" size={12} />
