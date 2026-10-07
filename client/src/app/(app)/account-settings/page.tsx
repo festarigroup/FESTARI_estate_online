@@ -26,12 +26,22 @@ const ADDRESS = [
   { label: "Postal Code", value: "00233" },
 ];
 
-const COMPLETION_STEPS = [
-  { label: "Setup account", percent: 50, done: true },
-  { label: "Upload your photo", percent: 5, done: true },
-  { label: "Personal Info", percent: 25, done: true },
-  { label: "Address", percent: 20, done: false },
-];
+type Field = { label: string; value: string };
+
+const AVATAR = "/icons/avatar-sample.jpg";
+
+const isFilled = (fields: Field[]) => fields.every((field) => field.value.trim().length > 0);
+
+/** Profile completion is derived from the saved profile data, so editing a section updates it live. */
+function getCompletionSteps(personal: Field[], address: Field[]) {
+  const valueOf = (label: string) => personal.find((field) => field.label === label)?.value.trim() ?? "";
+  return [
+    { label: "Setup account", percent: 50, done: valueOf("Email").length > 0 && valueOf("Account ID").length > 0 },
+    { label: "Upload your photo", percent: 5, done: AVATAR.length > 0 },
+    { label: "Personal Info", percent: 25, done: isFilled(personal) },
+    { label: "Address", percent: 20, done: isFilled(address) },
+  ];
+}
 
 const ACCOUNTS = [
   { name: "Madeline Price", email: "Madelinerrince@gmail.com", avatar: "/icons/avatar-sample.jpg" },
@@ -40,9 +50,12 @@ const ACCOUNTS = [
 
 export default function AccountSettingsPage() {
   const [tab, setTab] = useState<Tab>("Profile");
+  const [personal, setPersonal] = useState<Field[]>(PERSONAL_INFO);
+  const [address, setAddress] = useState<Field[]>(ADDRESS);
+  const completionCard = <ProfileCompletionCard steps={getCompletionSteps(personal, address)} />;
 
   return (
-    <AppShell contentFullWidth rightRail={<ProfileCompletionCard />}>
+    <AppShell contentFullWidth rightRail={completionCard}>
       <div className="mx-auto flex w-full max-w-[762px] flex-col gap-4 pb-6 pt-2">
         <ProfileBanner />
         <nav
@@ -69,14 +82,14 @@ export default function AccountSettingsPage() {
 
         <div className="rounded-2xl border border-gray-200 bg-white p-3">
           {tab === "Profile" ? (
-            <ProfileTab />
+            <ProfileTab personal={personal} address={address} onSavePersonal={setPersonal} onSaveAddress={setAddress} />
           ) : (
             <p className="px-4 py-16 text-center text-sm text-gray-500">{tab} is coming soon.</p>
           )}
         </div>
 
         <div className="xl:hidden">
-          <ProfileCompletionCard />
+          {completionCard}
         </div>
       </div>
     </AppShell>
@@ -183,7 +196,17 @@ function SwitchRoleMenu() {
   );
 }
 
-function ProfileTab() {
+function ProfileTab({
+  personal,
+  address,
+  onSavePersonal,
+  onSaveAddress,
+}: {
+  personal: Field[];
+  address: Field[];
+  onSavePersonal: (fields: Field[]) => void;
+  onSaveAddress: (fields: Field[]) => void;
+}) {
   return (
     <div className="flex flex-col gap-4 px-2 pb-2 sm:px-4 sm:pb-4">
       <div className="flex flex-col gap-1">
@@ -191,15 +214,14 @@ function ProfileTab() {
         <p className="text-[13px] text-gray-600">Account information from your authentication profile</p>
       </div>
 
-      <InfoCard title="Personal Information" fields={PERSONAL_INFO} />
-      <InfoCard title="Address" fields={ADDRESS} />
+      <InfoCard title="Personal Information" fields={personal} onSave={onSavePersonal} />
+      <InfoCard title="Address" fields={address} onSave={onSaveAddress} />
     </div>
   );
 }
 
-function InfoCard({ title, fields }: { title: string; fields: { label: string; value: string }[] }) {
+function InfoCard({ title, fields, onSave }: { title: string; fields: Field[]; onSave: (fields: Field[]) => void }) {
   const [editing, setEditing] = useState(false);
-  const [saved, setSaved] = useState(fields);
   const [draft, setDraft] = useState(fields);
   const canEdit = useMediaQuery("(min-width: 640px)");
   const firstInputRef = useRef<HTMLInputElement | null>(null);
@@ -228,22 +250,22 @@ function InfoCard({ title, fields }: { title: string; fields: { label: string; v
   function startEditing() {
     // Editing is desktop-only for now; the button stays visible on mobile but does nothing yet.
     if (!canEdit) return;
-    setDraft(saved);
+    setDraft(fields);
     setEditing(true);
   }
 
   function discard() {
-    setDraft(saved);
+    setDraft(fields);
     setEditing(false);
   }
 
   function save() {
-    setSaved(draft);
+    onSave(draft);
     setEditing(false);
     showSuccessToast(`${title} updated`);
   }
 
-  const shown = editing ? draft : saved;
+  const shown = editing ? draft : fields;
 
   return (
     <>
@@ -323,8 +345,8 @@ function InfoCard({ title, fields }: { title: string; fields: { label: string; v
   );
 }
 
-function ProfileCompletionCard() {
-  const total = COMPLETION_STEPS.reduce((sum, step) => sum + (step.done ? step.percent : 0), 0);
+function ProfileCompletionCard({ steps }: { steps: ReturnType<typeof getCompletionSteps> }) {
+  const total = steps.reduce((sum, step) => sum + (step.done ? step.percent : 0), 0);
 
   return (
     <div className="flex flex-col items-center gap-3 rounded-2xl border border-gray-200 bg-white p-5">
@@ -333,7 +355,7 @@ function ProfileCompletionCard() {
         style={{ background: `conic-gradient(#1465e6 ${total}%, #e2e8f0 0)` }}
       >
         <span className="relative block size-full overflow-hidden rounded-full border-2 border-white">
-          <Image src="/icons/avatar-sample.jpg" alt="" fill className="object-cover" sizes="56px" />
+          <Image src={AVATAR} alt="" fill className="object-cover" sizes="56px" />
         </span>
       </span>
       <div className="flex flex-col items-center gap-0.5 text-center">
@@ -343,7 +365,7 @@ function ProfileCompletionCard() {
         </p>
       </div>
       <ul className="flex w-full flex-col gap-1.5">
-        {COMPLETION_STEPS.map((step) => (
+        {steps.map((step) => (
           <li
             key={step.label}
             className={cn("flex items-center justify-between text-[10px]", step.done ? "text-night-900" : "text-gray-400")}
@@ -356,13 +378,6 @@ function ProfileCompletionCard() {
           </li>
         ))}
       </ul>
-      <button
-        type="button"
-        onClick={() => showSuccessToast("Profile setup is coming soon")}
-        className="h-10 w-full rounded-2xl bg-brand-900 sm:rounded-lg text-[13px] text-white hover:bg-brand-900/90"
-      >
-        Complete profile
-      </button>
     </div>
   );
 }
