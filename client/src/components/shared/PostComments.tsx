@@ -9,6 +9,8 @@ import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 import { renderWithHashtags } from "@/lib/hashtags";
 import { cn } from "@/lib/utils";
 import type { CommentAttachments, CommentItem } from "@/types/comment";
+import { MODAL_FRAME } from "@/lib/modal-styles";
+
 
 export const DEFAULT_COMMENTS: CommentItem[] = [
   {
@@ -163,7 +165,7 @@ export function CommentsModal({
         aria-modal="true"
         aria-label="Comments"
       >
-        <div onClick={(event) => event.stopPropagation()} className="relative w-full max-w-[770px]">
+        <div onClick={(event) => event.stopPropagation()} className={cn("relative w-full max-w-[770px]", MODAL_FRAME)}>
           <button
             type="button"
             aria-label="Close"
@@ -175,7 +177,7 @@ export function CommentsModal({
             </svg>
           </button>
 
-          <div className="flex max-h-[85vh] w-full flex-col gap-5 overflow-y-auto overflow-x-hidden rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
+          <div className="flex max-h-[calc(85vh-1.25rem)] w-full flex-col gap-5 overflow-y-auto overflow-x-hidden rounded-2xl bg-white/90 p-6">
             {body}
           </div>
         </div>

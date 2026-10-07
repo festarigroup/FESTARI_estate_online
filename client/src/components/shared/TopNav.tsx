@@ -178,31 +178,44 @@ export function TopNav() {
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 top-[calc(100%+8px)] z-50 flex w-48 flex-col gap-1 rounded-[11px] border border-gray-200 bg-white p-2 shadow-lg">
-                <button
-                  type="button"
-                  onClick={() => goComingSoon("Messages")}
-                  className="flex h-10 w-full items-center gap-3 rounded-[10px] px-3 text-[13px] text-night-700 hover:bg-gray-50 sm:hidden"
-                >
-                  <NavIcon icon="/icons/message-programming.svg" color="night" size={18} />
-                  Messages
-                </button>
-                <button
-                  type="button"
-                  onClick={() => goComingSoon("Notifications")}
-                  className="flex h-10 w-full items-center gap-3 rounded-[10px] px-3 text-[13px] text-night-700 hover:bg-gray-50 sm:hidden"
-                >
-                  <NavIcon icon="/icons/notification.svg" color="night" size={18} />
-                  Notifications
-                </button>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="flex h-10 w-full items-center gap-3 rounded-[10px] px-3 text-[13px] text-red-600 hover:bg-gray-50"
-                >
-                  <NavIcon icon="/icons/logout-01.svg" color="night" size={18} className="bg-red-600" />
-                  Logout
-                </button>
+              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-[266px] rounded-[26px] border border-[#e2e8f0] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
+                <div className="flex flex-col gap-1 rounded-2xl bg-white/90 p-2.5">
+                  <button
+                    type="button"
+                    onClick={() => goComingSoon("Messages")}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-[13.5px] leading-[20.25px] tracking-[-0.337px] hover:bg-[#f8fafc] text-[#334155] sm:hidden"
+                  >
+                    <NavIcon icon="/icons/message-programming.svg" color="night" size={14} />
+                    Messages
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => goComingSoon("Notifications")}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-[13.5px] leading-[20.25px] tracking-[-0.337px] hover:bg-[#f8fafc] text-[#334155] sm:hidden"
+                  >
+                    <NavIcon icon="/icons/notification.svg" color="night" size={14} />
+                    Notifications
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      router.push("/account-settings");
+                    }}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-[13.5px] leading-[20.25px] tracking-[-0.337px] hover:bg-[#f8fafc] text-[#334155]"
+                  >
+                    <NavIcon icon="/icons/settings-02.svg" color="night" size={14} />
+                    Account Settings
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-[13.5px] leading-[20.25px] tracking-[-0.337px] hover:bg-[#f8fafc] border-t border-[#e2e8f0] text-[#ff3135]"
+                  >
+                    <NavIcon icon="/icons/menu-power.svg" color="night" size={14} className="bg-[#ff3135]" />
+                    Log out
+                  </button>
+                </div>
               </div>
             )}
           </div>

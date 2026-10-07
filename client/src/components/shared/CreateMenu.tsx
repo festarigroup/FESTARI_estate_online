@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { VisibilityRow } from "@/components/shared/VisibilityRow";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { cn } from "@/lib/utils";
 
@@ -45,7 +46,6 @@ const DESKTOP_LIST_SECTIONS: DesktopMenuSection[] = [
     ],
   },
   {
-    divider: true,
     items: [
       { key: "event", icon: "/icons/event-calendar-01.svg", label: "Create Events" },
       { key: "community", icon: "/icons/user-group.svg", label: "Create Community" },
@@ -74,10 +74,10 @@ function DesktopMenuRow({
           onOpenListingModal(listingKey);
           onNavigate();
         }}
-        className="flex h-8 w-full items-center gap-2 rounded-xl px-2 text-left hover:bg-gray-100"
+        className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left hover:bg-[#f8fafc]"
       >
         <NavIcon icon={item.icon} color="night" size={14} className="shrink-0" />
-        <span className="flex-1 truncate text-sm text-night-700">{item.label}</span>
+        <span className="flex-1 truncate text-[13.5px] leading-[20.25px] tracking-[-0.337px] text-[#334155]">{item.label}</span>
         {item.locked && (
           <NavIcon icon="/icons/create-menu2-lock-key.svg" color="night" size={10} className="shrink-0" />
         )}
@@ -89,10 +89,10 @@ function DesktopMenuRow({
     <Link
       href={comingSoonHref(item.label)}
       onClick={onNavigate}
-      className="flex h-8 w-full items-center gap-2 rounded-xl px-2 hover:bg-gray-100"
+      className="flex w-full items-center gap-3 rounded-xl px-3 py-2 hover:bg-[#f8fafc]"
     >
       <NavIcon icon={item.icon} color="night" size={14} className="shrink-0" />
-      <span className="flex-1 truncate text-sm text-night-700">{item.label}</span>
+      <span className="flex-1 truncate text-[13.5px] leading-[20.25px] tracking-[-0.337px] text-[#334155]">{item.label}</span>
       {item.locked && (
         <NavIcon icon="/icons/create-menu2-lock-key.svg" color="night" size={10} className="shrink-0" />
       )}
@@ -293,11 +293,15 @@ function CreatePostRow({
         type="button"
         onClick={toggleOpen}
         aria-expanded={open}
-        className="flex h-8 w-full items-center gap-2 rounded-xl border border-brand-900 px-2 text-left outline-none hover:bg-gray-100"
+        className="flex w-full items-center justify-between gap-3 rounded-xl border border-[#337df2] bg-[#eff6ff]/20 px-[15px] py-[11px] text-left outline-none hover:bg-[#eff6ff]/60"
       >
-        <NavIcon icon={CREATE_POST_ITEM.icon} color="night" size={14} className="shrink-0 bg-brand-900" />
-        <span className="flex-1 truncate text-sm font-medium text-night-900">{CREATE_POST_ITEM.label}</span>
-        <NavIcon icon="/icons/more-horizontal.svg" color="night" size={16} className="shrink-0" />
+        <span className="flex min-w-0 items-center gap-3">
+          <NavIcon icon={CREATE_POST_ITEM.icon} color="night" size={18} className="shrink-0 bg-[#337df2]" />
+          <span className="truncate text-sm leading-5 tracking-[-0.35px] text-[#0f172a]">{CREATE_POST_ITEM.label}</span>
+        </span>
+        <span className="flex shrink-0 items-center justify-center rounded p-1">
+          <NavIcon icon="/icons/more-horizontal.svg" color="night" size={16} />
+        </span>
       </button>
 
       {open &&
@@ -307,34 +311,34 @@ function CreatePostRow({
             <div
               onClick={(event) => event.stopPropagation()}
               style={{ top: position.top, left: position.left }}
-              className="absolute flex w-56 flex-col gap-1 rounded-2xl border border-[rgba(226,232,240,0.8)] bg-white/70 p-2 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-150"
+              className="absolute flex w-[266px] flex-col rounded-[26px] border border-[#e2e8f0] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
             >
-              {CREATE_POST_SUBMENU.map((sub) =>
-                sub.key === "media" || sub.key === "poll" || sub.key === "article" ? (
-                  <button
-                    key={sub.key}
-                    type="button"
-                    onClick={() => {
-                      onOpenPostModal(sub.key as "media" | "poll" | "article");
-                      onNavigate();
-                    }}
-                    className="flex items-center gap-3 rounded-lg p-2 text-left hover:bg-gray-50"
-                  >
-                    <NavIcon icon={sub.icon} color="night" size={14} className="shrink-0" />
-                    <span className="text-[13px] text-night-900">{sub.label}</span>
-                  </button>
-                ) : (
-                  <Link
-                    key={sub.key}
-                    href={comingSoonHref(sub.label)}
-                    onClick={onNavigate}
-                    className="flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
-                  >
-                    <NavIcon icon={sub.icon} color="night" size={14} className="shrink-0" />
-                    <span className="text-[13px] text-night-900">{sub.label}</span>
-                  </Link>
-                ),
-              )}
+              <div className="flex w-full flex-col gap-1 rounded-2xl bg-white/90 p-2.5">
+                {CREATE_POST_SUBMENU.map((sub) =>
+                  sub.key === "media" || sub.key === "poll" || sub.key === "article" ? (
+                    <VisibilityRow
+                      key={sub.key}
+                      icon={sub.icon}
+                      label={sub.label}
+                      selected={false}
+                      onClick={() => {
+                        onOpenPostModal(sub.key as "media" | "poll" | "article");
+                        onNavigate();
+                      }}
+                    />
+                  ) : (
+                    <Link
+                      key={sub.key}
+                      href={comingSoonHref(sub.label)}
+                      onClick={onNavigate}
+                      className="flex w-full items-center gap-3 rounded-xl border border-transparent px-3 py-2 hover:bg-[#f8fafc]"
+                    >
+                      <NavIcon icon={sub.icon} color="night" size={13} className="shrink-0" />
+                      <span className="truncate text-[13.5px] leading-[20.25px] tracking-[-0.337px] text-[#334155]">{sub.label}</span>
+                    </Link>
+                  ),
+                )}
+              </div>
             </div>
           </div>,
           document.body,
@@ -382,36 +386,37 @@ export function CreateMenu({
         />
       </div>
 
-      <div className="hidden w-[300px] flex-col items-center gap-1.5 rounded-[28px] border border-[rgba(226,232,240,0.8)] bg-white/70 px-3 pb-3 pt-5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-150 sm:flex">
-        <div className="flex w-[270px] flex-col gap-1">
-          <div className="flex items-center gap-1">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-gray-500">Share</p>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="text-gray-400">
+      <div className="hidden w-[358px] flex-col rounded-[26px] border border-[#e2e8f0] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] sm:flex">
+        <div className="flex w-full flex-col gap-2.5 rounded-2xl bg-white/90 p-2.5">
+          <div className="flex items-center gap-1.5 px-2 py-1">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true" className="shrink-0 text-[#001f3f]">
               <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
+            <p className="text-sm font-medium uppercase leading-4 tracking-[0.6px] text-[#001f3f]">Share</p>
           </div>
-          <CreatePostRow onNavigate={onNavigate} onOpenPostModal={onOpenPostModal} />
-        </div>
 
-        <div className="flex w-[270px] flex-col gap-1.5 rounded-2xl border border-gray-200 bg-white p-1.5">
-          {DESKTOP_LIST_SECTIONS.map((section, sectionIndex) => (
-            <div
-              key={sectionIndex}
-              className={cn(
-                "flex w-full flex-col items-start gap-0.5",
-                section.divider && "border-b border-gray-200 pb-1.5",
-              )}
-            >
-              {section.items.map((item) => (
-                <DesktopMenuRow
-                  key={item.key}
-                  item={item}
-                  onNavigate={onNavigate}
-                  onOpenListingModal={onOpenListingModal}
-                />
-              ))}
-            </div>
-          ))}
+          <CreatePostRow onNavigate={onNavigate} onOpenPostModal={onOpenPostModal} />
+
+          <div className="flex w-full flex-col rounded-2xl border border-[#e2e8f0]/85 bg-white p-1.5 shadow-[0px_20px_45px_-12px_rgba(15,23,42,0.12),0px_0px_0px_1px_rgba(15,23,42,0.05)]">
+            {DESKTOP_LIST_SECTIONS.map((section, sectionIndex) => (
+              <div
+                key={sectionIndex}
+                className={cn(
+                  "flex w-full flex-col items-start",
+                  section.divider && "mb-1.5 border-b border-[#f1f5f9] pb-1.5",
+                )}
+              >
+                {section.items.map((item) => (
+                  <DesktopMenuRow
+                    key={item.key}
+                    item={item}
+                    onNavigate={onNavigate}
+                    onOpenListingModal={onOpenListingModal}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </>

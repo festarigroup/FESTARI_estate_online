@@ -133,6 +133,8 @@ function AttentionCard({ item }: { item: AttentionItem }) {
         href={comingSoonHref(item.action)}
         className={cn(
           "flex h-10 w-full items-center justify-center rounded-full text-[13px] font-medium",
+          // Desktop (Figma node 755:34636): 8px-radius rectangle, Inter Regular 14/20, 16×10 padding.
+          "lg:gap-2 lg:rounded-lg lg:px-4 lg:py-2.5 lg:font-inter lg:text-sm lg:font-normal lg:leading-5",
           item.primary
             ? "bg-brand-900 text-white hover:bg-brand-900/90"
             : "border border-gray-200 text-night-900 hover:bg-gray-50",

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { NavIcon } from "@/components/shared/NavIcon";
 import { comingSoonHref } from "@/lib/coming-soon";
 import { shareContent } from "@/lib/share";
 import { cn } from "@/lib/utils";
@@ -11,6 +12,7 @@ import { STORIES } from "@/lib/dummy-stories";
 import { StoryRing } from "@/components/shared/StoryRing";
 import { PostStoryModal } from "@/components/shared/PostStoryModal";
 import { useMyStories } from "@/hooks/useMyStories";
+import { useScrollRail } from "@/hooks/useScrollRail";
 import type { MyStory } from "@/types/story";
 
 /** "Stories" card at the top of the "/home" dashboard — a horizontally
@@ -21,19 +23,33 @@ import type { MyStory } from "@/types/story";
  * posting, same as real stories. */
 export function StoriesRow() {
   const stories = useMyStories();
+  const { ref: railRef, canScroll, atEnd, scroll: scrollRail } = useScrollRail<HTMLDivElement>();
   const { activeStories } = stories;
   const latestStory = activeStories[activeStories.length - 1];
 
   return (
-    <div className="flex w-full flex-col gap-3 rounded-[28px] border border-gray-200 bg-white p-4">
+    <div className="flex w-full flex-col gap-3 rounded-[28px] border border-gray-200 bg-white p-4 sm:rounded-2xl">
       <div className="flex h-[18px] w-full items-center justify-between">
         <p className="text-[16px] font-bold text-gray-700">Stories</p>
-        <Link href={comingSoonHref("Stories")} className="text-[13px] font-medium text-brand-600">
-          View all
-        </Link>
+        {canScroll && (
+          <button
+            type="button"
+            onClick={scrollRail}
+            aria-label={atEnd ? "Back to the first stories" : "Show more stories"}
+            // Keeps the 18px header height from Figma while giving a bigger tap target.
+            className="-my-[7px] flex h-8 w-10 items-center justify-center rounded-lg hover:bg-gray-50"
+          >
+            <NavIcon
+              icon="/icons/chevron-right.svg"
+              color="night"
+              size={10}
+              className={cn("bg-night-900 transition-transform duration-200", atEnd && "rotate-180")}
+            />
+          </button>
+        )}
       </div>
 
-      <div className="no-scrollbar flex w-full min-w-0 touch-pan-x items-start gap-5 overflow-x-auto pb-2">
+      <div ref={railRef} className="no-scrollbar flex w-full min-w-0 touch-pan-x items-start gap-5 overflow-x-auto pb-2">
         <StoryItem
           label="Your story"
           avatar={latestStory?.url ?? "/images/stories/your-story.jpg"}

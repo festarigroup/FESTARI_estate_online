@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
 import { SideListMenu } from "@/components/shared/SideListMenu";
+import { VisibilityRow } from "@/components/shared/VisibilityRow";
 import { cn } from "@/lib/utils";
 
 export type PostVisibility =
@@ -140,90 +141,51 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
       ref={menuRef}
       onClick={(event) => event.stopPropagation()}
       style={{ bottom: position.bottom, left: position.left }}
-      className="absolute flex w-[280px] flex-col gap-3 rounded-xl bg-white/95 px-2.5 py-3 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
+      className="absolute flex w-[264px] flex-col rounded-[26px] border border-[#e2e8f0] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
     >
-      <div className="flex flex-col gap-0.5 px-1">
-        <p className="text-sm font-semibold text-[#001f3f]">Who can view?</p>
-        <p className="text-xs font-semibold text-[#64748a]">Choose who can view this post</p>
+    <div className="flex w-full flex-col gap-2.5 rounded-2xl bg-white/90 p-2.5">
+      <div className="flex flex-col">
+        <p className="text-sm font-semibold leading-5 text-[#001f3f]">Who can view?</p>
+        <p className="text-[11px] font-medium leading-4 text-[#64748a]">Choose who can view this post</p>
       </div>
 
       <div className="flex flex-col gap-1">
-        <button
-          type="button"
+        <VisibilityRow
+          icon="/icons/visibility-user-sharing.svg"
+          label="Everyone can view"
+          selected={value.kind === "everyone"}
           onClick={() => onChange({ kind: "everyone" })}
-          className="flex w-full items-center gap-2 rounded-lg px-1 py-1"
-        >
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
-            <NavIcon icon="/icons/create-menu-globe-visibility.svg" color="white" size={16} />
-          </span>
-          <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Everyone can view</span>
-          {value.kind === "everyone" && (
-            <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
-          )}
-        </button>
-
-        <button
-          type="button"
+        />
+        <VisibilityRow
+          icon="/icons/visibility-user-add-02.svg"
+          label="Followings"
+          selected={value.kind === "followings"}
           onClick={() => onChange({ kind: "followings" })}
-          className={cn(
-            "flex w-full items-center gap-2 rounded-full px-1 py-1",
-            value.kind === "followings" && "bg-[#f1f6ff]",
-          )}
-        >
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
-            <NavIcon icon="/icons/user-add-01.svg" color="white" size={14} />
-          </span>
-          <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">Followings</span>
-          {value.kind === "followings" && (
-            <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
-          )}
-        </button>
-
-        <button
-          ref={communityRef}
-          type="button"
+        />
+        <VisibilityRow
+          buttonRef={communityRef}
+          icon="/icons/visibility-user-group.svg"
+          label={value.kind === "custom" && value.communities.length === 1 ? value.communities[0] : "Community"}
+          selected={value.kind === "custom" && value.communities.length > 0}
+          hasSubmenu
+          expanded={communityOpen}
           onClick={() => {
             setCommunityOpen((v) => !v);
             setOrganizationOpen(false);
           }}
-          aria-expanded={communityOpen}
-          className="flex w-full items-center gap-2 rounded-lg px-1 py-1"
-        >
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
-            <NavIcon icon="/icons/user-group.svg" color="white" size={16} />
-          </span>
-          <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">
-            {value.kind === "custom" && value.communities.length === 1 ? value.communities[0] : "Community"}
-          </span>
-          {value.kind === "custom" && value.communities.length > 0 ? (
-            <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
-          ) : (
-            <NavIcon icon="/icons/visibility-chevron-outline-right.svg" color="night" size={10} />
-          )}
-        </button>
-
-        <button
-          ref={organizationRef}
-          type="button"
+        />
+        <VisibilityRow
+          buttonRef={organizationRef}
+          icon="/icons/visibility-user.svg"
+          label={value.kind === "custom" && value.organizations.length === 1 ? value.organizations[0] : "Organization"}
+          selected={value.kind === "custom" && value.organizations.length > 0}
+          hasSubmenu
+          expanded={organizationOpen}
           onClick={() => {
             setOrganizationOpen((v) => !v);
             setCommunityOpen(false);
           }}
-          aria-expanded={organizationOpen}
-          className="flex w-full items-center gap-2 rounded-lg px-1 py-1"
-        >
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
-            <NavIcon icon="/icons/org.svg" color="white" size={14} />
-          </span>
-          <span className="flex-1 text-left text-sm font-medium text-[#2d264b]">
-            {value.kind === "custom" && value.organizations.length === 1 ? value.organizations[0] : "Organization"}
-          </span>
-          {value.kind === "custom" && value.organizations.length > 0 ? (
-            <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="bg-[#1465e6]" />
-          ) : (
-            <NavIcon icon="/icons/visibility-chevron-outline-right.svg" color="night" size={10} />
-          )}
-        </button>
+        />
       </div>
 
       <SideListMenu
@@ -231,6 +193,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
         onClose={() => setCommunityOpen(false)}
         anchorRef={communityRef}
         items={COMMUNITY_ITEMS}
+        icon="/icons/visibility-user-group.svg"
         title={enableMultiSelect ? "Your Communities" : undefined}
         searchable={enableMultiSelect}
         multiple={enableMultiSelect}
@@ -254,7 +217,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
         onClose={() => setOrganizationOpen(false)}
         anchorRef={organizationRef}
         items={ORGANIZATION_ITEMS}
-        icon="/icons/org.svg"
+        icon="/icons/visibility-user.svg"
         title={enableMultiSelect ? "Your Organizations" : undefined}
         searchable={enableMultiSelect}
         multiple={enableMultiSelect}
@@ -274,17 +237,18 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
         }}
       />
 
-      <div className="flex w-full items-center gap-2 rounded-xl bg-[#f6f6f9] px-1.5 py-1.5">
-        <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#86b3fb]">
-          <NavIcon icon="/icons/visibility-search.svg" color="white" size={14} />
-        </span>
-        <input
-          value={profileQuery}
-          onChange={(event) => setProfileQuery(event.target.value)}
-          placeholder="Search Profile"
-          className="w-full flex-1 bg-transparent text-sm text-[#94a3b7] placeholder:text-[#94a3b7] focus:outline-none"
-        />
+      <div className="flex w-full flex-col border-t-[0.5px] border-[#cbd5e0] py-1.5">
+        <div className="flex h-7 w-full items-center gap-2 overflow-hidden rounded-lg border border-[#e2e8f0] bg-white px-3">
+          <NavIcon icon="/icons/visibility-search-sm.svg" color="night" size={12} />
+          <input
+            value={profileQuery}
+            onChange={(event) => setProfileQuery(event.target.value)}
+            placeholder="Search Profile"
+            className="min-w-0 flex-1 bg-transparent text-xs leading-5 text-[#334155] placeholder:text-[#53575a] focus:outline-none"
+          />
+        </div>
       </div>
+
 
       {matchingProfiles.length > 0 && (
         <ul className="flex max-h-[160px] w-full flex-col gap-1 overflow-y-auto">
@@ -323,6 +287,7 @@ export function VisibilityMenu({ open, onClose, value, onChange, anchorRef, enab
           })}
         </ul>
       )}
+    </div>
     </div>
     </div>,
     document.body,

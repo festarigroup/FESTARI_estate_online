@@ -8,6 +8,8 @@ import { NavIcon } from "@/components/shared/NavIcon";
 import { Tooltip } from "@/components/shared/Tooltip";
 import { cn } from "@/lib/utils";
 import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
+import { MODAL_FRAME } from "@/lib/modal-styles";
+
 
 interface LikesBottomSheetProps {
   open: boolean;
@@ -78,7 +80,7 @@ export function LikesBottomSheet({ open, onClose, names }: LikesBottomSheetProps
         aria-modal="true"
         aria-label="Likes"
       >
-        <div onClick={(event) => event.stopPropagation()} className="relative w-full max-w-[680px]">
+        <div onClick={(event) => event.stopPropagation()} className={cn("relative w-full max-w-[680px]", MODAL_FRAME)}>
           <button
             type="button"
             aria-label="Close"
@@ -90,7 +92,7 @@ export function LikesBottomSheet({ open, onClose, names }: LikesBottomSheetProps
             </svg>
           </button>
 
-          <div className="flex max-h-[85vh] w-full flex-col rounded-2xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
+          <div className="flex max-h-[calc(85vh-1.25rem)] w-full flex-col rounded-2xl bg-white/90 p-6">
             <LikesTabbedList names={names} variant="modal" />
           </div>
         </div>

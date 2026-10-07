@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { VisibilityRow } from "@/components/shared/VisibilityRow";
+import { cn } from "@/lib/utils";
 
 interface SideListMenuProps {
   open: boolean;
@@ -96,18 +98,23 @@ export function SideListMenu({
       ref={menuRef}
       onClick={(event) => event.stopPropagation()}
       style={{ top: position.top, left: position.left }}
-      className="absolute flex w-[200px] flex-col gap-3 rounded-xl bg-white/95 p-3 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
+      className="absolute flex w-[264px] flex-col rounded-[26px] border border-[#e2e8f0] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]"
     >
+    <div className="flex w-full flex-col gap-2.5 rounded-2xl bg-white/90 p-2.5">
       {title && (
-        <div className="flex flex-col gap-1.5 border-b border-[#cbd5e0] pb-1.5">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3">
-            <p className="flex-1 truncate text-sm font-bold text-black">{title}</p>
+            <p className="flex-1 truncate text-sm font-semibold leading-5 text-[#001f3f]">{title}</p>
             {searchable && (
               <button
                 type="button"
                 aria-label="Search"
+                aria-pressed={searchOpen}
                 onClick={() => setSearchOpen((v) => !v)}
-                className="flex size-5 shrink-0 items-center justify-center rounded-full bg-[#a8c9fd]"
+                className={cn(
+                  "flex size-5 shrink-0 items-center justify-center rounded-full",
+                  searchOpen ? "bg-brand-900" : "bg-[#a8c9fd]",
+                )}
               >
                 <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                   <circle cx="6.5" cy="6.5" r="5" stroke="white" strokeWidth="1.5" />
@@ -117,55 +124,36 @@ export function SideListMenu({
             )}
           </div>
           {searchOpen && (
-            <input
-              autoFocus
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search..."
-              className="w-full rounded-lg border border-gray-200 px-2 py-1 text-xs text-night-900 placeholder:text-gray-400 focus:outline-none"
-            />
+            <div className="flex h-7 w-full items-center gap-2 overflow-hidden rounded-lg border border-[#e2e8f0] bg-white px-3">
+              <NavIcon icon="/icons/visibility-search-sm.svg" color="night" size={12} />
+              <input
+                autoFocus
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search..."
+                className="min-w-0 flex-1 bg-transparent text-xs leading-5 text-[#334155] placeholder:text-[#53575a] focus:outline-none"
+              />
+            </div>
           )}
         </div>
       )}
 
-      <div className="flex max-h-[184px] w-full flex-col gap-2 overflow-y-auto">
+      <div className="no-scrollbar flex max-h-[184px] w-full flex-col gap-1 overflow-y-auto">
         {filteredItems.length === 0 ? (
-          <p className="text-xs text-gray-400">No matches</p>
+          <p className="px-3 py-2 text-xs text-[#64748a]">No matches</p>
         ) : (
-          filteredItems.map((item, index) => {
-            const isSelected = multiple && selected.includes(item);
-            return (
-              <button
-                key={`${item}-${index}`}
-                type="button"
-                onClick={() => (multiple ? onToggle?.(item) : onSelect?.(item))}
-                className="flex h-6 w-full items-center gap-2 text-left text-sm font-medium text-[#334154] hover:text-brand-900"
-              >
-                {icon && <NavIcon icon={icon} color="night" size={14} className="shrink-0" />}
-                <span className="flex-1 truncate">{item}</span>
-                {isSelected && (
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    aria-hidden="true"
-                    className="shrink-0 text-brand-900"
-                  >
-                    <path
-                      d="M3 8.5L6.5 12L13 4"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                )}
-              </button>
-            );
-          })
+          filteredItems.map((item, index) => (
+            <VisibilityRow
+              key={`${item}-${index}`}
+              icon={icon}
+              label={item}
+              selected={selected.includes(item)}
+              onClick={() => (multiple ? onToggle?.(item) : onSelect?.(item))}
+            />
+          ))
         )}
       </div>
+    </div>
     </div>
     </div>,
     document.body,

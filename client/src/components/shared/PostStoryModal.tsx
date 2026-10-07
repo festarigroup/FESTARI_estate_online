@@ -8,6 +8,8 @@ import { NavIcon } from "@/components/shared/NavIcon";
 import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 import { cn } from "@/lib/utils";
 import type { PostedStory } from "@/types/story";
+import { MODAL_FRAME } from "@/lib/modal-styles";
+
 
 const STORY_MEDIA_ACCEPT = [
   "image/png",
@@ -136,7 +138,7 @@ export function PostStoryModal({
       aria-modal="true"
       aria-label={title}
     >
-      <div onClick={(event) => event.stopPropagation()} className="relative w-full sm:max-w-[420px]">
+      <div onClick={(event) => event.stopPropagation()} className={cn("relative w-full sm:max-w-[420px]", MODAL_FRAME)}>
         <button
           type="button"
           aria-label="Close"
@@ -150,7 +152,7 @@ export function PostStoryModal({
 
         <div
           className={cn(
-            "flex max-h-[90vh] w-full flex-col gap-4 overflow-y-auto rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] sm:rounded-2xl",
+            "flex max-h-[90vh] sm:max-h-[calc(90vh-1.25rem)] w-full flex-col gap-4 overflow-y-auto rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] sm:rounded-2xl sm:bg-white/90 sm:shadow-none sm:backdrop-blur-none",
             closing ? "max-sm:animate-sheet-slide-down" : "max-sm:animate-sheet-slide-up",
           )}
         >

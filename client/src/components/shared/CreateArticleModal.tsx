@@ -15,6 +15,8 @@ import {
 import { usePostsFeed } from "@/context/PostsContext";
 import { useAnimatedSheet } from "@/hooks/useAnimatedSheet";
 import { cn } from "@/lib/utils";
+import { MODAL_FRAME } from "@/lib/modal-styles";
+
 
 type SwitchablePostType = "media" | "poll" | "article";
 
@@ -130,7 +132,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
       aria-modal="true"
       aria-label="Create an article"
     >
-      <div onClick={(event) => event.stopPropagation()} className="relative w-full sm:max-w-[720px]">
+      <div onClick={(event) => event.stopPropagation()} className={cn("relative w-full sm:max-w-[720px]", MODAL_FRAME)}>
         <button
           type="button"
           aria-label="Close"
@@ -144,7 +146,7 @@ export function CreateArticleModal({ open, onClose, onSwitchType }: CreateArticl
 
         <div
           className={cn(
-            "flex max-h-[90vh] w-full flex-col gap-6 overflow-hidden rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] sm:rounded-2xl",
+            "flex max-h-[90vh] sm:max-h-[calc(90vh-1.25rem)] w-full flex-col gap-6 overflow-hidden rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] sm:rounded-2xl sm:bg-white/90 sm:shadow-none sm:backdrop-blur-none",
             closing ? "max-sm:animate-sheet-slide-down" : "max-sm:animate-sheet-slide-up",
           )}
         >
