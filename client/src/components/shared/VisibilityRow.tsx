@@ -11,10 +11,12 @@ export interface VisibilityRowProps {
   /** Community/Organization rows open a side list rather than choosing directly. */
   hasSubmenu?: boolean;
   expanded?: boolean;
+  /** Red text and icon for destructive actions such as Log out. */
+  destructive?: boolean;
 }
 
 /** One option in the desktop "Who can view?" panel and its Community/Organization lists (Figma node 927:17826). */
-export function VisibilityRow({ icon, label, selected, onClick, buttonRef, hasSubmenu, expanded }: VisibilityRowProps) {
+export function VisibilityRow({ icon, label, selected, onClick, buttonRef, hasSubmenu, expanded, destructive }: VisibilityRowProps) {
   return (
     <button
       ref={buttonRef}
@@ -29,10 +31,10 @@ export function VisibilityRow({ icon, label, selected, onClick, buttonRef, hasSu
       <span className="flex min-w-0 items-center gap-3">
         {icon && (
         <span className="flex size-3.5 shrink-0 items-center justify-center">
-          <NavIcon icon={icon} color="night" size={13} />
+          <NavIcon icon={icon} color="night" size={13} className={destructive ? "bg-[#ff3135]" : undefined} />
         </span>
         )}
-        <span className="truncate text-[13.5px] leading-[20.25px] tracking-[-0.337px] text-[#334155]">{label}</span>
+        <span className={cn("truncate text-[13.5px] leading-[20.25px] tracking-[-0.337px]", destructive ? "text-[#ff3135]" : "text-[#334155]")}>{label}</span>
       </span>
       {selected ? (
         <NavIcon icon="/icons/visibility-tick-check.svg" color="brand" size={16} className="shrink-0 bg-[#1465e6]" />

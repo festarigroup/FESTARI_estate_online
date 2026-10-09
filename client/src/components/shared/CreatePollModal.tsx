@@ -150,7 +150,7 @@ export function CreatePollModal({ open, onClose, onSwitchType }: CreatePollModal
 
         <div
           className={cn(
-            "flex max-h-[90vh] sm:max-h-[calc(90vh-1.25rem)] w-full flex-col gap-6 overflow-y-auto rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] sm:rounded-2xl sm:bg-white/90 sm:shadow-none sm:backdrop-blur-none",
+            "flex max-h-[90vh] sm:max-h-[calc(90vh-1.25rem)] w-full flex-col gap-6 overflow-y-auto rounded-t-3xl bg-white/95 p-6 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px] sm:rounded-2xl sm:bg-white",
             closing ? "max-sm:animate-sheet-slide-down" : "max-sm:animate-sheet-slide-up",
           )}
         >

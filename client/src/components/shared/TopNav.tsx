@@ -8,6 +8,7 @@ import { showSuccessToast } from "@/components/shared/AppToast";
 import { CreateMenu } from "@/components/shared/CreateMenu";
 import { MobileQuickPostModal, type QuickComposerMode } from "@/components/shared/MobileQuickPostModal";
 import { NavIcon } from "@/components/shared/NavIcon";
+import { VisibilityRow } from "@/components/shared/VisibilityRow";
 import { Tooltip } from "@/components/shared/Tooltip";
 import { usePostModals } from "@/hooks/usePostModals";
 import { logout } from "@/lib/auth-api";
@@ -180,41 +181,22 @@ export function TopNav() {
             {menuOpen && (
               <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-[266px] rounded-[26px] border border-[rgba(15,22,33,0.12)] bg-white/10 p-2.5 shadow-[0px_24px_60px_-15px_rgba(0,0,0,0.15)] backdrop-blur-[8px]">
                 <div className="flex flex-col gap-1 rounded-2xl bg-white/90 p-2.5">
-                  <button
-                    type="button"
-                    onClick={() => goComingSoon("Messages")}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-[13.5px] leading-[20.25px] tracking-[-0.337px] hover:bg-[#f8fafc] text-[#334155] sm:hidden"
-                  >
-                    <NavIcon icon="/icons/message-programming.svg" color="night" size={14} />
-                    Messages
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => goComingSoon("Notifications")}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-[13.5px] leading-[20.25px] tracking-[-0.337px] hover:bg-[#f8fafc] text-[#334155] sm:hidden"
-                  >
-                    <NavIcon icon="/icons/notification.svg" color="night" size={14} />
-                    Notifications
-                  </button>
-                  <button
-                    type="button"
+                  <div className="sm:hidden">
+                    <VisibilityRow icon="/icons/message-programming.svg" label="Messages" selected={false} onClick={() => goComingSoon("Messages")} />
+                    <VisibilityRow icon="/icons/notification.svg" label="Notifications" selected={false} onClick={() => goComingSoon("Notifications")} />
+                  </div>
+                  <VisibilityRow
+                    icon="/icons/menu-settings.svg"
+                    label="Account Settings"
+                    selected={false}
                     onClick={() => {
                       setMenuOpen(false);
                       router.push("/account-settings");
                     }}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-[13.5px] leading-[20.25px] tracking-[-0.337px] hover:bg-[#f8fafc] text-[#334155]"
-                  >
-                    <NavIcon icon="/icons/menu-settings.svg" color="night" size={14} className="bg-[#475568]" />
-                    Account Settings
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-[13.5px] leading-[20.25px] tracking-[-0.337px] hover:bg-[#f8fafc] border-t border-[#e2e8f0] text-[#ff3135]"
-                  >
-                    <NavIcon icon="/icons/menu-power.svg" color="night" size={14} className="bg-[#ff3135]" />
-                    Log out
-                  </button>
+                  />
+                  <div className="mt-1 border-t border-[#e2e8f0] pt-1">
+                    <VisibilityRow icon="/icons/menu-power.svg" label="Log out" selected={false} destructive onClick={handleLogout} />
+                  </div>
                 </div>
               </div>
             )}

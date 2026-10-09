@@ -92,7 +92,7 @@ export function LikesBottomSheet({ open, onClose, names }: LikesBottomSheetProps
             </svg>
           </button>
 
-          <div className="flex max-h-[calc(85vh-1.25rem)] w-full flex-col rounded-2xl bg-white/90 p-6">
+          <div className="flex max-h-[calc(85vh-1.25rem)] w-full flex-col rounded-2xl bg-white p-6">
             <LikesTabbedList names={names} variant="modal" />
           </div>
         </div>

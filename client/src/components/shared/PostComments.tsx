@@ -177,7 +177,7 @@ export function CommentsModal({
             </svg>
           </button>
 
-          <div className="flex max-h-[calc(85vh-1.25rem)] w-full flex-col gap-5 overflow-y-auto overflow-x-hidden rounded-2xl bg-white/90 p-6">
+          <div className="flex max-h-[calc(85vh-1.25rem)] w-full flex-col gap-5 overflow-y-auto overflow-x-hidden rounded-2xl bg-white p-6">
             {body}
           </div>
         </div>

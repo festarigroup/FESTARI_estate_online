@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/shared/AppShell";
 import { showSuccessToast } from "@/components/shared/AppToast";
 import { NavIcon } from "@/components/shared/NavIcon";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
 
 const TABS = ["Profile", "Security", "Billings", "General Settings"] as const;
@@ -88,7 +87,7 @@ export default function AccountSettingsPage() {
           )}
         </div>
 
-        <div className="xl:hidden">
+        <div className="hidden sm:block xl:hidden">
           {completionCard}
         </div>
       </div>
@@ -223,7 +222,6 @@ function ProfileTab({
 function InfoCard({ title, fields, onSave }: { title: string; fields: Field[]; onSave: (fields: Field[]) => void }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(fields);
-  const canEdit = useMediaQuery("(min-width: 640px)");
   const firstInputRef = useRef<HTMLInputElement | null>(null);
   const cardRef = useRef<HTMLElement | null>(null);
 
@@ -248,8 +246,6 @@ function InfoCard({ title, fields, onSave }: { title: string; fields: Field[]; o
   }, [editing]);
 
   function startEditing() {
-    // Editing is desktop-only for now; the button stays visible on mobile but does nothing yet.
-    if (!canEdit) return;
     setDraft(fields);
     setEditing(true);
   }
@@ -323,18 +319,18 @@ function InfoCard({ title, fields, onSave }: { title: string; fields: Field[]; o
           ))}
         </dl>
         {editing && (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <button
               type="button"
               onClick={discard}
-              className="h-10 shrink-0 rounded-lg border border-[#e2e8f0] bg-white px-4 text-sm text-[#0f1621] hover:bg-gray-50"
+              className="h-10 shrink-0 whitespace-nowrap rounded-2xl border border-[#e2e8f0] bg-white px-3 text-xs sm:rounded-lg sm:px-4 sm:text-sm text-[#0f1621] hover:bg-gray-50"
             >
               Discard Changes
             </button>
             <button
               type="button"
               onClick={save}
-              className="h-10 flex-1 rounded-lg bg-brand-900 px-4 text-sm text-white hover:bg-brand-900/90"
+              className="h-10 min-w-0 flex-1 whitespace-nowrap rounded-2xl bg-brand-900 px-3 text-xs text-white sm:rounded-lg sm:px-4 sm:text-sm hover:bg-brand-900/90"
             >
               Save Changes
             </button>
